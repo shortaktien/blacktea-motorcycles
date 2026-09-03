@@ -18,9 +18,7 @@
 - [Quellen — Black Tea Hilfe](https://btm.shortaktien.de/quellen): Nachvollziehbare Quellen zu Insolvenzstatus, Handbüchern, lokalen PDFs, Ersatzteilspuren und Community-Wissen.
 - [Impressum — Black Tea Hilfe](https://btm.shortaktien.de/impressum): Anbieterinformationen und rechtliche Hinweise zu Black Tea Hilfe.
 - [Datenschutz — Black Tea Hilfe](https://btm.shortaktien.de/datenschutz): Datenschutzhinweise zu Kommentaren, Bildanhängen und dem Betrieb von Black Tea Hilfe.
-- [Wiki — Black Tea Hilfe](https://btm.shortaktien.de/wiki): Technische Modellseiten für Black Tea Bonfire und Wildfire — mit Daten, Quellen und klar markierten Unsicherheiten.
-- [Bonfire: Daten für Abgleich & Wartung — Black Tea Hilfe](https://btm.shortaktien.de/wiki/bonfire): Die wichtigsten Bonfire-Handbuchwerte für Ersatzteilsuche, Wartung und den Abgleich am konkreten Bike.
-- [Wildfire: Reichweite, Modi & Pflege — Black Tea Hilfe](https://btm.shortaktien.de/wiki/wildfire): Reichweite, Fahrmodi, Bremsen und Pflegehinweise aus der gesicherten Wildfire-Community-Dokumentation — mit markierten Unsicherheiten.
+- [Wiki — Black Tea Hilfe](https://btm.shortaktien.de/wiki): Das BTM-Wiki wird vorbereitet.
 
 ## Reparaturhilfen
 

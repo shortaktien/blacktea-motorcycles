@@ -1418,111 +1418,35 @@ const sourcingCards: SourcingCard[] = [
   },
 ];
 
-type WikiSpecItem = { label: string; value: string; note: string };
-type WikiSpecGroup = { title: string; items: WikiSpecItem[] };
-type BikeWikiPageData = {
-  path: string;
-  model: string;
-  title: string;
-  intro: string;
-  sourceNote: string;
-  sources: Array<{ label: string; href: string }>;
-  groups: WikiSpecGroup[];
-  notes: string[];
-};
-
-const bikeWikiPages: Record<string, BikeWikiPageData> = {
-  '/wiki/bonfire': {
-    path: '/wiki/bonfire',
-    model: 'Bonfire',
-    title: 'Bonfire: Daten für Abgleich & Wartung',
-    intro: 'Die wichtigsten Handbuchwerte für Ersatzteilsuche, Wartung und den Abgleich am konkreten Bike — kompakt zusammengeführt und sauber eingeordnet.',
-    sourceNote: 'Die technischen Werte stammen aus der lokal gesicherten Bonfire-Handbuchkopie. Das Handbuch bündelt Varianten und Baujahre; die Angaben sind deshalb keine pauschale Ersatzteil- oder Zulassungsfreigabe.',
-    sources: [
-      { label: 'Bonfire-Handbuch öffnen', href: '/pdfs/15-bonfire-handbuch-lokal.pdf' },
-    ],
-    groups: [
-      {
-        title: 'Akku & Laden',
-        items: [
-          { label: 'Akku', value: '52 V Li-Ion', note: 'herausnehmbar' },
-          { label: 'Kapazität', value: '1,8 kWh', note: 'pro Akku' },
-          { label: 'Ladegerät', value: '58,8 V · 10 A', note: '80 % in ca. 3 Stunden' },
-          { label: 'Akkugewicht', value: '11,5 kg', note: 'pro Akku' },
-        ],
-      },
-      {
-        title: 'Maße & Gewicht',
-        items: [
-          { label: 'Abmessungen', value: '1.900 × 700 × 1.250 mm', note: 'L × B × H' },
-          { label: 'Radstand', value: '1.300 mm', note: 'Handbuchangabe' },
-          { label: 'Gewicht', value: '87 / 110 kg', note: 'trocken / mit 2 Akkus' },
-          { label: 'Zul. Gesamtgewicht', value: '260 kg', note: 'Handbuchangabe' },
-        ],
-      },
-      {
-        title: 'Reifen & Bremsen',
-        items: [
-          { label: 'Reifen Straße', value: '90/90-18 · 110/80-18', note: 'vorn · hinten' },
-          { label: 'Reifen Offroad', value: '3.50-18 · 110/80-18', note: 'vorn · hinten' },
-          { label: 'Reifendruck', value: '230 kPa · 2,3 bar', note: 'Handbuchangabe' },
-          { label: 'Bremse', value: 'CBS · hydraulisch', note: '265 mm vorn · 180 mm hinten' },
-        ],
-      },
-    ],
-    notes: [
-      'Reifen, Bremsen, Akku und Zulassung am konkreten Fahrzeug gegenprüfen.',
-      'Das Handbuch nennt mehrere Varianten; vor einer Bestellung immer Maße, Fotos und Teilenummer abgleichen.',
-      'Arbeiten an Bremse, Akku und Hochvolt gehören in qualifizierte Hände.',
+const technicalGroups = [
+  {
+    title: 'Akku & Laden',
+    items: [
+      { label: 'Akku', value: '52 V Li-Ion', note: 'herausnehmbar' },
+      { label: 'Kapazität', value: '1,8 kWh', note: 'pro Akku' },
+      { label: 'Ladegerät', value: '58,8 V · 10 A', note: '80 % in ca. 3 Stunden' },
+      { label: 'Akkugewicht', value: '11,5 kg', note: 'pro Akku' },
     ],
   },
-  '/wiki/wildfire': {
-    path: '/wiki/wildfire',
-    model: 'Wildfire',
-    title: 'Wildfire: Reichweite, Modi & Pflege',
-    intro: 'Reichweite, Fahrmodi, Bremsen und Pflegehinweise aus der gesicherten Community-Dokumentation — mit Unsicherheiten und Varianten sichtbar markiert.',
-    sourceNote: 'Die Wildfire-Werte stammen aus Community-Handbuch, Wartungshinweis und Willkommensdokument. Das sind keine aktuellen Herstellerunterlagen; besonders bei Hochvolt, Controller, Reifen und Bremsen zählt der konkrete Fahrzeugstand.',
-    sources: [
-      { label: 'Wildfire-Handbuch der Community', href: '/pdfs/19-wildfire-handbuch-community.pdf' },
-      { label: 'Wildfire-Wartungshinweis', href: '/pdfs/20-wildfire-wartung-community.pdf' },
-      { label: 'Wildfire-Willkommenshinweis', href: '/pdfs/01-wildfire-willkommenshinweis.pdf' },
-    ],
-    groups: [
-      {
-        title: 'Reichweite & Fahrmodi',
-        items: [
-          { label: 'Reichweite', value: '60–120 km / Akku', note: 'je nach Tempo, Gelände, Reifen und Gewicht' },
-          { label: 'Eco', value: 'bis 90 km/h', note: '7 kW pro Akku · ruhige Beschleunigung' },
-          { label: 'Normal', value: 'bis 100 km/h', note: '10 kW pro Akku' },
-          { label: 'Sport', value: '110 / 125 km/h', note: '1 / 2 Akkus · für kurze Strecken und Überholen' },
-        ],
-      },
-      {
-        title: 'Akku & Anzeige',
-        items: [
-          { label: 'Bezugsgröße', value: '1 Akku', note: 'Reichweitenwerte im Community-Handbuch' },
-          { label: 'Ladegrenze', value: 'unter 0 °C nicht laden', note: 'Community-Handbuch' },
-          { label: 'Lebensdauer', value: '~800 Vollzyklen', note: 'bis ca. 80 % Restkapazität · Orientierungswert' },
-          { label: 'Spannungsanzeige', value: '115 → 87 V', note: '100 → 0 % laut Community-Tabelle' },
-        ],
-      },
-      {
-        title: 'Reifen, Bremse & Pflege',
-        items: [
-          { label: 'Reifendruck', value: '2,4 / 2,6 bar', note: 'Mindestwert vorn / hinten; anderer Hinweis: 2,5 bar beidseits' },
-          { label: 'Bremse', value: 'Kombi links · vorn rechts', note: 'hinten + vorn links kombiniert · keine Fußbremse' },
-          { label: 'Druckprüfung', value: 'alle 2 Wochen', note: 'Speichenräder können 0,1–0,3 bar/Woche verlieren' },
-          { label: 'Erste Inspektion', value: '12.000 km / 2 Jahre', note: 'danach alle 12.000 km · Community-Wartungshinweis' },
-        ],
-      },
-    ],
-    notes: [
-      'Die Dokumente nennen beim Reifendruck unterschiedliche Werte: 2,5 bar beidseits bzw. mindestens 2,4 bar vorn und 2,6 bar hinten. Vor der Fahrt die konkrete Vorgabe am Fahrzeug prüfen.',
-      'Reichweite, Fahrmodi und Spannungsanzeige sind Orientierungswerte aus Community-Unterlagen, keine universellen Controller-Defaults.',
-      'Arbeiten an Hochvolt, Akku, Controller und Bremsen gehören in qualifizierte Hände.',
+  {
+    title: 'Maße & Gewicht',
+    items: [
+      { label: 'Abmessungen', value: '1.900 × 700 × 1.250 mm', note: 'L × B × H' },
+      { label: 'Radstand', value: '1.300 mm', note: 'Handbuchangabe' },
+      { label: 'Gewicht', value: '87 / 110 kg', note: 'trocken / mit 2 Akkus' },
+      { label: 'Zul. Gesamtgewicht', value: '260 kg', note: 'Handbuchangabe' },
     ],
   },
-};
+  {
+    title: 'Reifen & Bremsen',
+    items: [
+      { label: 'Reifen Straße', value: '90/90-18 · 110/80-18', note: 'vorn · hinten' },
+      { label: 'Reifen Offroad', value: '3.50-18 · 110/80-18', note: 'vorn · hinten' },
+      { label: 'Reifendruck', value: '230 kPa · 2,3 bar', note: 'Handbuchangabe' },
+      { label: 'Bremse', value: 'CBS · hydraulisch', note: '265 mm vorn · 180 mm hinten' },
+    ],
+  },
+];
 
 const normalizePath = (value: string) => value.replace(/\/+$/, '') || '/';
 const slugify = (value: string) => value
@@ -1647,36 +1571,6 @@ function getSeoMetadata(path: string, guide?: RepairGuide, part?: HistoricalShop
     };
   }
 
-  const wikiPage = bikeWikiPages[path];
-  if (wikiPage) {
-    return {
-      title: `${wikiPage.title} — Black Tea Hilfe`,
-      description: wikiPage.intro,
-      canonicalPath: wikiPage.path,
-      robots: 'index,follow,max-image-preview:large',
-      jsonLd: {
-        '@context': 'https://schema.org',
-        '@graph': [
-          websiteSchema,
-          {
-            '@type': 'TechArticle',
-            '@id': `${siteOrigin}${wikiPage.path}#article`,
-            name: wikiPage.title,
-            description: wikiPage.intro,
-            url: `${siteOrigin}${wikiPage.path}`,
-            inLanguage: 'de-DE',
-            isPartOf: { '@id': `${siteOrigin}/#website` },
-          },
-          breadcrumbSchema([
-            { name: 'Startseite', url: `${siteOrigin}/` },
-            { name: 'Wiki', url: `${siteOrigin}/wiki` },
-            { name: wikiPage.model, url: `${siteOrigin}${wikiPage.path}` },
-          ]),
-        ],
-      },
-    };
-  }
-
   const metadata: Record<string, { title: string; description: string }> = {
     '/': {
       title: 'Black Tea Hilfe — Dokumente, Ersatzteile & Updates',
@@ -1708,7 +1602,7 @@ function getSeoMetadata(path: string, guide?: RepairGuide, part?: HistoricalShop
     },
     '/wiki': {
       title: 'Wiki — Black Tea Hilfe',
-      description: 'Technische Modellseiten für Black Tea Bonfire und Wildfire — mit Daten, Quellen und klar markierten Unsicherheiten.',
+      description: 'Das BTM-Wiki wird vorbereitet.',
     },
   };
   const page = metadata[path] ?? metadata['/'];
@@ -1803,7 +1697,6 @@ function App() {
   const [path, hash = ''] = locationKey.split('#');
   const guide = repairGuides.find((candidate) => candidate.path === path || (path === '/' && hash === candidate.id));
   const part = historicalShopParts.find((candidate) => candidate.path === path);
-  const wikiPage = bikeWikiPages[path];
   const seoMetadata = getSeoMetadata(path, guide, part);
 
   useEffect(() => {
@@ -1819,7 +1712,6 @@ function App() {
   if (path === '/quellen' || (path === '/' && hash === 'quellen')) return <SourcesPage />;
   if (path === '/impressum' || (path === '/' && hash === 'impressum')) return <LegalPage kind="impressum" />;
   if (path === '/datenschutz' || (path === '/' && hash === 'datenschutz')) return <LegalPage kind="datenschutz" />;
-  if (wikiPage) return <BikeWikiPage page={wikiPage} />;
   if (path === '/wiki') return <WikiPage />;
   return <HomePage />;
 }
@@ -1992,6 +1884,34 @@ function HomePage() {
             <span>□ Quelle öffnen</span>
           </div>
         </div>
+
+        <section className="technical-section section-pad">
+          <div className="technical-inner">
+            <div className="technical-copy">
+              <div className="eyebrow handwritten">für werkstatt & ersatzteilsuche</div>
+              <h2>Bonfire: die Daten, die beim Abgleich helfen.</h2>
+              <p>Maße, Akku, Reifen und Bremsen auf einen Blick — genau die Angaben, die du vor einer Bestellung, Wartung oder Reparatur am eigenen Fahrzeug gegenprüfen kannst.</p>
+              <a href={sourceLinks[1].href} target="_blank" rel="nofollow noreferrer" className="text-link">Bonfire-Handbuch öffnen ↗</a>
+            </div>
+            <div className="technical-groups">
+              {technicalGroups.map((group) => (
+                <section className="technical-group" key={group.title}>
+                  <h3>{group.title}</h3>
+                  <dl className="technical-list">
+                    {group.items.map((item) => (
+                      <div className="technical-item" key={item.label}>
+                        <dt>{item.label}</dt>
+                        <dd>{item.value}</dd>
+                        <small>{item.note}</small>
+                      </div>
+                    ))}
+                  </dl>
+                </section>
+              ))}
+            </div>
+            <p className="technical-note">Handbuchstand, keine pauschale Freigabe: Varianten und Baujahre können abweichen. Reifen, Bremsen, Akku und Zulassung am konkreten Bike prüfen.</p>
+          </div>
+        </section>
 
         <section id="chronik" className="timeline-section section-pad">
           <div className="section-heading compact">
@@ -2189,84 +2109,7 @@ function WikiPage() {
   return (
     <div className="site-shell">
       <GuideHeader />
-      <main className="wiki-page-main" aria-label="Wiki">
-        <section className="wiki-page-hero section-pad">
-          <div className="eyebrow handwritten">modellwissen, sauber eingeordnet</div>
-          <h1>Bonfire oder Wildfire?</h1>
-          <p>Eigene Wiki-Seiten für die beiden BTM-Modelle: technische Werte, praktische Abgleichpunkte und die jeweilige Quellenlage an einem Ort.</p>
-        </section>
-        <section className="wiki-index-section section-pad">
-          <div className="wiki-bike-grid">
-            {Object.values(bikeWikiPages).map((page, index) => (
-              <article className={`wiki-bike-card card-doodle ${index % 2 === 1 ? 'wiki-bike-card-tilt-right' : 'wiki-bike-card-tilt-left'}`} key={page.path}>
-                <div className="wiki-card-topline"><span className="kind-chip community">Wiki</span><span>{page.model}</span></div>
-                <h2><a href={page.path}>{page.title}</a></h2>
-                <p>{page.intro}</p>
-                <a className="text-link" href={page.path}>Artikel öffnen ↗</a>
-              </article>
-            ))}
-          </div>
-        </section>
-      </main>
-      <GuideFooter />
-    </div>
-  );
-}
-
-function BikeWikiPage({ page }: { page: BikeWikiPageData }) {
-  useEffect(() => {
-    document.title = `${page.title} — Black Tea Hilfe`;
-    window.scrollTo(0, 0);
-  }, [page.title]);
-
-  return (
-    <div className="site-shell">
-      <GuideHeader />
-      <main className="wiki-page-main">
-        <section className="wiki-page-hero section-pad">
-          <a className="repair-back" href="/wiki">← Zur Wiki-Übersicht</a>
-          <div className="eyebrow handwritten">{page.model}</div>
-          <h1>{page.title}</h1>
-          <p>{page.intro}</p>
-        </section>
-        <section className="wiki-spec-section section-pad">
-          <div className="wiki-spec-layout">
-            <article className="wiki-spec-card card-doodle">
-              <div className="eyebrow handwritten">für Abgleich, Wartung & Ersatzteilsuche</div>
-              <h2>Die Werte, die am Bike weiterhelfen.</h2>
-              <div className="technical-groups wiki-spec-groups">
-                {page.groups.map((group) => (
-                  <section className="technical-group" key={group.title}>
-                    <h3>{group.title}</h3>
-                    <dl className="technical-list">
-                      {group.items.map((item) => (
-                        <div className="technical-item" key={item.label}>
-                          <dt>{item.label}</dt>
-                          <dd>{item.value}</dd>
-                          <small>{item.note}</small>
-                        </div>
-                      ))}
-                    </dl>
-                  </section>
-                ))}
-              </div>
-            </article>
-            <aside className="wiki-source-card card-doodle">
-              <div className="eyebrow handwritten">quellen & einordnung</div>
-              <h2>Vor Bestellung oder Reparatur</h2>
-              <p>{page.sourceNote}</p>
-              <ul className="wiki-notes">
-                {page.notes.map((note) => <li key={note}>{note}</li>)}
-              </ul>
-              <div className="wiki-source-links">
-                {page.sources.map((source) => (
-                  <a className="text-link" href={source.href} key={source.href}>{source.label} ↗</a>
-                ))}
-              </div>
-            </aside>
-          </div>
-        </section>
-      </main>
+      <main className="wiki-page-main" aria-label="Wiki" />
       <GuideFooter />
     </div>
   );
