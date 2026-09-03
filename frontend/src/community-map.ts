@@ -2,7 +2,15 @@ import mapData from './community-map-data.json';
 import subdivisionData from './community-map-subdivisions.json';
 
 export type PostalCountry = 'D' | 'A' | 'CH';
-export type CommunityMapRegion = { country: PostalCountry; prefix: string; memberCount: number };
+export type CommunityMapModel = 'Bonfire' | 'Wildfire';
+export type CommunityMapRegion = {
+  country: PostalCountry;
+  prefix: string;
+  memberCount: number;
+  modelCounts?: Partial<Record<CommunityMapModel, number>>;
+  totalKilometers?: number;
+  kilometersByModel?: Partial<Record<CommunityMapModel, number>>;
+};
 export type CommunityMapPoint = { x: number; y: number; label: string; countryLabel: string };
 
 const countryLabels: Record<PostalCountry, string> = { D: 'Deutschland', A: 'Österreich', CH: 'Schweiz' };

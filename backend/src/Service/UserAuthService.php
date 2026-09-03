@@ -107,12 +107,77 @@ final class UserAuthService
 
     public function notifyReply(string $userId, array $answer, array $parent): void
     {
+        $this->notifyReplyForUser($userId, $answer, $parent, false);
+    }
+
+    /** @param list<string> $userIds */
+    public function notifyRepairSubscribers(array $userIds, array $answer, array $parent): void
+    {
+        foreach (array_values(array_unique($userIds)) as $userId) {
+            if (is_string($userId)) {
+                $this->notifyReplyForUser($userId, $answer, $parent, true);
+            }
+        }
+    }
+
+    /** @param list<string> $userIds */
+    public function notifyRepairRequestStatus(array $userIds, array $request): void
+    {
+        $requestId = (string) ($request['id'] ?? '');
+        if ($requestId === '') {
+            return;
+        }
+
+        $notification = [
+            'id' => bin2hex(random_bytes(16)),
+            'type' => 'repair_status',
+            'requestId' => $requestId,
+            'title' => 'Deine Reparaturanfrage ist jetzt sichtbar',
+            'body' => 'Die Anfrage wurde geprüft und für die Community freigegeben.',
+            'href' => '/hilfe/anfragen/' . $requestId,
+            'createdAt' => (new DateTimeImmutable())->format(DATE_ATOM),
+            'readAt' => null,
+        ];
+
+        foreach (array_values(array_unique($userIds)) as $userId) {
+            if (!is_string($userId) || $userId === '') {
+                continue;
+            }
+            $user = $this->users->findById($userId);
+            if ($user === null || ($user['status'] ?? null) !== 'active') {
+                continue;
+            }
+            $alreadyNotified = false;
+            $this->users->update(static function (array &$data) use ($userId, $requestId, $notification, &$alreadyNotified): void {
+                foreach ($data['users'] as &$candidate) {
+                    if (($candidate['id'] ?? null) !== $userId) {
+                        continue;
+                    }
+                    foreach (($candidate['notifications'] ?? []) as $existing) {
+                        if (($existing['requestId'] ?? null) === $requestId && ($existing['type'] ?? null) === 'repair_status') {
+                            $alreadyNotified = true;
+                            break 2;
+                        }
+                    }
+                    $candidate['notifications'] = array_slice(array_merge([$notification], $candidate['notifications'] ?? []), 0, 30);
+                    break;
+                }
+                unset($candidate);
+            });
+            if ($alreadyNotified) {
+                continue;
+            }
+        }
+    }
+
+    private function notifyReplyForUser(string $userId, array $answer, array $parent, bool $subscribed): void
+    {
         if ($userId === '') {
             return;
         }
 
         $user = $this->users->findById($userId);
-        if ($user === null || ($user['status'] ?? null) !== 'active' || ($user['notifyReplies'] ?? true) !== true) {
+        if ($user === null || ($user['status'] ?? null) !== 'active' || (!$subscribed && ($user['notifyReplies'] ?? true) !== true)) {
             return;
         }
 
@@ -147,7 +212,7 @@ final class UserAuthService
             unset($candidate);
         });
 
-        if ($alreadyNotified || $answerId === '' || !$this->community->allowRate('reply-notification-email', strtolower((string) $user['email']), 5, 3600)) {
+        if ($alreadyNotified || $answerId === '' || ($user['notifyReplies'] ?? true) !== true || !$this->community->allowRate('reply-notification-email', strtolower((string) $user['email']), 5, 3600)) {
             return;
         }
 

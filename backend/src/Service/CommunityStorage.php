@@ -232,6 +232,25 @@ final class CommunityStorage
         $comments = [];
         foreach (($data['comments'] ?? []) as $comment) {
             if (is_array($comment) && isset($comment['id'], $comment['guide'])) {
+                $subscriberUserIds = is_array($comment['subscriberUserIds'] ?? null) ? $comment['subscriberUserIds'] : [];
+                $comment['subscriberUserIds'] = array_values(array_unique(array_filter(
+                    $subscriberUserIds,
+                    static fn ($userId): bool => is_string($userId) && preg_match('/^[a-f0-9]{32}$/', $userId) === 1,
+                )));
+                if (($comment['kind'] ?? null) === 'repair_answer') {
+                    $rawVotes = is_array($comment['votes'] ?? null) ? $comment['votes'] : [];
+                    $voterKeys = [];
+                    foreach (($rawVotes['voterKeys'] ?? []) as $voterKey => $vote) {
+                        if (is_string($voterKey) && preg_match('/^[a-f0-9]{64}$/', $voterKey) === 1 && in_array($vote, ['up', 'down'], true)) {
+                            $voterKeys[$voterKey] = $vote;
+                        }
+                    }
+                    $comment['votes'] = [
+                        'up' => max(0, (int) ($rawVotes['up'] ?? 0)),
+                        'down' => max(0, (int) ($rawVotes['down'] ?? 0)),
+                        'voterKeys' => $voterKeys,
+                    ];
+                }
                 $comments[] = $comment;
             }
         }

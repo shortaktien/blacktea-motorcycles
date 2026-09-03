@@ -3,8 +3,8 @@ import faqContent from '../../content/faq.json';
 import partsCatalog from '../../research/parts.json';
 import partDetailsCatalog from '../../research/parts-details.json';
 import siteConfig from './site-config.json';
-import { communityMapCountries, communityMapSubdivisions, communityMapViewBox, getCommunityMapPoint, type CommunityMapRegion, type PostalCountry } from './community-map';
-import { searchBtmKnowledge, type WebMcpKnowledgeEntry } from './webmcp-search';
+import { communityMapCountries, communityMapSubdivisions, communityMapViewBox, getCommunityMapPoint, type CommunityMapModel, type CommunityMapRegion, type PostalCountry } from './community-map';
+import { cleanWebMcpText, searchBtmKnowledge, webMcpExcerpt, type WebMcpKnowledgeEntry } from './webmcp-search';
 
 type CardKind = 'Dokument' | 'Ersatzteil' | 'Community';
 type Filter = 'Alle' | CardKind;
@@ -113,6 +113,12 @@ type PublicComment = {
   imageUrl: string | null;
   avatarStyle?: number | null;
   avatarUrl?: string | null;
+  upVotes?: number;
+  downVotes?: number;
+  score?: number;
+  viewerVote?: 'up' | 'down' | null;
+  solutionAnswerId?: string | null;
+  isRequestOwner?: boolean;
 };
 
 type AdminComment = PublicComment & {
@@ -1996,6 +2002,12 @@ const webMcpKnowledgeEntries: WebMcpKnowledgeEntry[] = [
     ].join(' '),
     href: guide.path,
   })),
+  ...resources.filter((resource) => resource.kind === 'Dokument').map((resource) => ({
+    kind: 'pdf' as const,
+    title: resource.title,
+    text: `${resource.title} ${resource.description} ${resource.tags.join(' ')}`,
+    href: resource.href,
+  })),
 ];
 
 function WebMcpTools() {
@@ -2006,12 +2018,12 @@ function WebMcpTools() {
     const controller = new AbortController();
     void modelContext.registerTool({
       name: 'search_btm_knowledge',
-      description: 'Search the public Black Tea Motorbikes FAQ, bike wiki, and repair guides. Returns short excerpts and links; it never accesses private data or changes state.',
+      description: 'Search the public Black Tea Motorbikes FAQ, bike wiki, PDFs, and repair guides. Returns short excerpts and links; it never accesses private data or changes state.',
       inputSchema: {
         type: 'object',
         properties: {
           query: { type: 'string', description: 'Search term, symptom, model, part, or question.' },
-          scope: { type: 'string', enum: ['all', 'faq', 'wiki', 'repair'], description: 'Optional area to search; defaults to all.' },
+          scope: { type: 'string', enum: ['all', 'faq', 'wiki', 'repair', 'pdf'], description: 'Optional area to search; defaults to all.' },
         },
         required: ['query'],
         additionalProperties: false,
@@ -2024,6 +2036,105 @@ function WebMcpTools() {
   }, []);
 
   return null;
+}
+
+type GlobalSearchScope = 'all' | 'faq' | 'wiki' | 'repair' | 'pdf';
+type GlobalSearchEntry = WebMcpKnowledgeEntry & { label: string; description: string };
+
+const globalSearchEntries: GlobalSearchEntry[] = webMcpKnowledgeEntries.map((entry) => ({
+  ...entry,
+  label: entry.kind === 'faq' ? 'FAQ' : entry.kind === 'wiki' ? 'Wiki' : entry.kind === 'repair' ? 'Reparaturhilfe' : 'PDF',
+  description: cleanWebMcpText(entry.text).slice(0, 220),
+}));
+
+function searchGlobalKnowledge(entries: GlobalSearchEntry[], query: string, scope: GlobalSearchScope): GlobalSearchEntry[] {
+  const normalizedQuery = query.trim().toLocaleLowerCase('de');
+  if (!normalizedQuery) return [];
+  const terms = normalizedQuery.split(/[^\p{L}\p{N}]+/u).filter((term) => term.length > 1);
+
+  return entries
+    .map((entry) => {
+      if (scope !== 'all' && entry.kind !== scope) return { entry, score: -1 };
+      const searchable = `${entry.title} ${entry.text}`.toLocaleLowerCase('de');
+      if (!searchable.includes(normalizedQuery) && (terms.length === 0 || !terms.every((term) => searchable.includes(term)))) {
+        return { entry, score: -1 };
+      }
+      const score = (searchable.includes(normalizedQuery) ? 12 : 0)
+        + (entry.title.toLocaleLowerCase('de').includes(normalizedQuery) ? 8 : 0)
+        + terms.reduce((total, term) => total + (entry.title.toLocaleLowerCase('de').includes(term) ? 2 : 0), 0);
+      return { entry, score };
+    })
+    .filter(({ score }) => score >= 0)
+    .sort((left, right) => right.score - left.score || left.entry.title.localeCompare(right.entry.title, 'de'))
+    .map(({ entry }) => entry);
+}
+
+function SearchPage() {
+  const [query, setQuery] = useState('');
+  const [scope, setScope] = useState<GlobalSearchScope>('all');
+  const [repairEntries, setRepairEntries] = useState<GlobalSearchEntry[]>([]);
+
+  useEffect(() => {
+    document.title = 'Suche — Black Tea Motorbikes – Hilfe';
+    window.scrollTo(0, 0);
+    let active = true;
+    void apiJson<FeedbackSummary>('/api/feedback/hilfe-anfragen').then((payload) => {
+      if (!active) return;
+      const comments = payload.comments ?? [];
+      const entries = comments
+        .filter((comment) => comment.kind === 'repair_request')
+        .map((request) => {
+          const answers = comments.filter((comment) => comment.kind === 'repair_answer' && comment.parentId === request.id);
+          const text = [request.topic ?? 'Reparaturanfrage', request.section ?? '', request.body, ...answers.map((answer) => answer.body)].join(' ');
+          return {
+            kind: 'repair' as const,
+            title: request.topic ?? 'Reparaturanfrage',
+            text,
+            href: repairRequestDetailPath(request.id),
+            label: 'Reparaturfall',
+            description: cleanWebMcpText(text).slice(0, 220),
+          };
+        });
+      setRepairEntries(entries);
+    }).catch(() => undefined);
+    return () => { active = false; };
+  }, []);
+
+  const entries = useMemo(() => [...globalSearchEntries, ...repairEntries], [repairEntries]);
+  const results = useMemo(() => searchGlobalKnowledge(entries, query, scope), [entries, query, scope]);
+  const suggestions = ['Akku wird nicht erkannt', 'Fehlercode 13', 'Display CT-22', 'Bonfire X'];
+
+  return (
+    <div className="site-shell">
+      <GuideHeader />
+      <main className="repair-page-main search-page-main">
+        <section className="repair-page-hero search-page-hero section-pad">
+          <a className="repair-back" href="/">← Zur Sammelmappe</a>
+          <div className="eyebrow handwritten">ein suchfeld für alles wichtige</div>
+          <h1>Wissen finden.</h1>
+          <p>Durchsuche FAQ, Wiki, gesicherte PDFs, Reparaturhilfen und freigegebene Reparaturfälle an einem Ort.</p>
+        </section>
+        <section className="search-page-section section-pad">
+          <div className="global-search-toolbar card-doodle">
+            <label className="search-box">
+              <span aria-hidden="true">⌕</span>
+              <span className="sr-only">Wissen durchsuchen</span>
+              <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="z. B. Akku, Fehlercode 13, CT-22 …" autoFocus />
+            </label>
+            <label className="global-search-scope">Bereich<select value={scope} onChange={(event) => setScope(event.target.value as GlobalSearchScope)}><option value="all">Alles</option><option value="faq">FAQ</option><option value="wiki">Wiki</option><option value="pdf">PDFs</option><option value="repair">Reparatur</option></select></label>
+            <span className="global-search-count">{query.trim() ? `${results.length} Treffer` : 'FAQ · Wiki · PDFs · Reparatur'}</span>
+          </div>
+          {!query.trim() && <div className="global-search-suggestions card-doodle"><div className="eyebrow handwritten">schnellstart</div><p>Starte mit einem dieser häufigen Suchbegriffe:</p><div>{suggestions.map((suggestion) => <button className="search-suggestion" type="button" key={suggestion} onClick={() => setQuery(suggestion)}>{suggestion} ↗</button>)}</div></div>}
+          {query.trim() && <div className="global-search-results">{results.map((entry) => {
+            const external = entry.href.startsWith('http');
+            return <article className="global-search-result card-doodle" key={`${entry.kind}-${entry.href}-${entry.title}`}><div className="global-search-result-topline"><span className="kind-chip community">{entry.label}</span><span>{external ? 'Externe Quelle' : 'BTM-Hilfe'}</span></div><h2><a href={entry.href} target={external ? '_blank' : undefined} rel={external ? 'nofollow noreferrer' : undefined}>{entry.title} ↗</a></h2><p>{webMcpExcerpt(entry.text, query)}</p><a className="global-search-result-link" href={entry.href} target={external ? '_blank' : undefined} rel={external ? 'nofollow noreferrer' : undefined}>Ergebnis öffnen ↗</a></article>;
+          })}</div>}
+          {query.trim() && results.length === 0 && <div className="empty-state card-doodle">Nichts gefunden. Versuch es mit „Akku“, „Wildfire“, „Fehlercode“ oder „Display“.</div>}
+        </section>
+      </main>
+      <GuideFooter />
+    </div>
+  );
 }
 
 async function apiJson<T>(input: RequestInfo | URL, init?: RequestInit): Promise<T> {
@@ -2173,10 +2284,10 @@ const breadcrumbSchema = (items: Array<{ name: string; url: string }>) => ({
 });
 
 function getSeoMetadata(path: string, guide?: RepairGuide, part?: HistoricalShopPart, bike?: BikeProfile, wikiArticle?: WikiArticle): SeoMetadata {
-  if (path === '/admin' || path === '/login' || path === '/registrieren' || path === '/konto' || path === '/passwort-zuruecksetzen') {
+  if (path === '/admin' || path === '/login' || path === '/registrieren' || path === '/konto' || path === '/passwort-zuruecksetzen' || path === '/suche') {
     return {
-      title: path === '/konto' ? 'Mein Bereich — Black Tea Motorbikes – Hilfe' : path === '/registrieren' ? 'Registrieren — Black Tea Motorbikes – Hilfe' : path === '/login' ? 'Einloggen — Black Tea Motorbikes – Hilfe' : path === '/passwort-zuruecksetzen' ? 'Passwort zurücksetzen — Black Tea Motorbikes – Hilfe' : 'Admin — Black Tea Motorbikes – Hilfe',
-      description: 'Persönlicher Bereich von Black Tea Motorbikes – Hilfe.',
+      title: path === '/konto' ? 'Mein Bereich — Black Tea Motorbikes – Hilfe' : path === '/registrieren' ? 'Registrieren — Black Tea Motorbikes – Hilfe' : path === '/login' ? 'Einloggen — Black Tea Motorbikes – Hilfe' : path === '/passwort-zuruecksetzen' ? 'Passwort zurücksetzen — Black Tea Motorbikes – Hilfe' : path === '/suche' ? 'Suche — Black Tea Motorbikes – Hilfe' : 'Admin — Black Tea Motorbikes – Hilfe',
+      description: path === '/suche' ? 'Zentrale Suche über FAQ, Wiki, gesicherte PDFs und Reparaturhilfen für Black Tea Motorbikes.' : 'Persönlicher Bereich von Black Tea Motorbikes – Hilfe.',
       canonicalPath: path,
       robots: 'noindex,nofollow,noarchive',
       jsonLd: {},
@@ -2517,6 +2628,7 @@ function AppContent({ initialPath }: { initialPath?: string } = {}) {
     || path === '/community'
     || path === '/karte'
     || path === '/faq'
+    || path === '/suche'
     || path === '/quellen'
     || path === '/impressum'
     || path === '/datenschutz'
@@ -2544,6 +2656,7 @@ function AppContent({ initialPath }: { initialPath?: string } = {}) {
   if (path === '/community') return <CommunityPage />;
   if (path === '/karte') return <CommunityMapPage />;
   if (path === '/faq') return <FaqPage />;
+  if (path === '/suche') return <SearchPage />;
   if (path === '/quellen' || (path === '/' && hash === 'quellen')) return <SourcesPage />;
   if (path === '/impressum' || (path === '/' && hash === 'impressum')) return <LegalPage kind="impressum" />;
   if (path === '/datenschutz' || (path === '/' && hash === 'datenschutz')) return <LegalPage kind="datenschutz" />;
@@ -2788,7 +2901,7 @@ function RegisterPage() {
 }
 
 function AccountPage() {
-  const { user, loading, csrfToken, updateProfile, uploadAvatar, markNotificationRead, logout } = useAuth();
+  const { user, loading, csrfToken, updateProfile, uploadAvatar, markNotificationRead } = useAuth();
   const [name, setName] = useState('');
   const [model, setModel] = useState<'Bonfire' | 'Wildfire' | ''>('');
   const [kilometers, setKilometers] = useState(0);
@@ -2904,7 +3017,6 @@ function AccountPage() {
             <h2>Antworten für dich{unread.length ? ` · ${unread.length} neu` : ''}</h2>
             <p className="account-notification-intro">Wenn jemand auf deine freigegebene Reparaturanfrage antwortet, findest du hier den Hinweis – und optional zusätzlich in deinem E-Mail-Postfach.</p>
             <div className="account-notifications">{user.notifications.length ? user.notifications.map((notification) => <article className={`account-notification ${notification.readAt ? 'is-read' : 'is-unread'}`} key={notification.id}><div><strong>{notification.title}</strong><p>{notification.body}</p><time dateTime={notification.createdAt}>{new Date(notification.createdAt).toLocaleDateString('de-DE')}</time></div><div className="account-notification-actions"><a href={notification.href}>Öffnen ↗</a>{!notification.readAt && <button type="button" onClick={() => { void markNotificationRead(notification.id); }}>Als gelesen markieren</button>}</div></article>) : <p className="no-comments">Noch keine Antworten. Wir sagen dir Bescheid, sobald es etwas Neues gibt.</p>}</div>
-            <button className="account-logout-button" type="button" onClick={() => { void logout().then(() => { window.location.href = '/'; }); }}>Ausloggen</button>
           </section>
         </div>}
       </main>
@@ -3129,6 +3241,7 @@ function HomePage() {
           <a href="/ersatzteile">Ersatzteile</a>
           <BikeMenu />
           <a href="/faq">FAQ</a>
+          <a href="/suche">Suche</a>
         </nav>
         <AccountMenu />
       </header>
@@ -3331,8 +3444,9 @@ function SourcesPage() {
 
 function CommunityMapPage() {
   const [regions, setRegions] = useState<CommunityMapRegion[]>([]);
-  const [memberCount, setMemberCount] = useState(0);
-  const [totalKilometers, setTotalKilometers] = useState(0);
+  const [countryFilter, setCountryFilter] = useState<'all' | PostalCountry>('all');
+  const [modelFilter, setModelFilter] = useState<'all' | CommunityMapModel>('all');
+  const [prefixFilter, setPrefixFilter] = useState('all');
   const [activeKey, setActiveKey] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -3343,11 +3457,9 @@ function CommunityMapPage() {
     let active = true;
     const loadMap = async () => {
       try {
-        const response = await apiJson<{ regions: CommunityMapRegion[]; memberCount: number; totalKilometers: number }>('/api/community/map');
+        const response = await apiJson<{ regions: CommunityMapRegion[] }>('/api/community/map');
         if (!active) return;
         setRegions(response.regions ?? []);
-        setMemberCount(response.memberCount ?? 0);
-        setTotalKilometers(response.totalKilometers ?? 0);
         setError('');
       } catch (reason) {
         if (active) setError(reason instanceof Error ? reason.message : 'Die Community-Karte konnte gerade nicht geladen werden.');
@@ -3363,12 +3475,31 @@ function CommunityMapPage() {
     };
   }, []);
 
-  const points = useMemo(() => regions.flatMap((region) => {
+  const prefixOptions = useMemo(() => Array.from(new Set(regions
+    .filter((region) => countryFilter === 'all' || region.country === countryFilter)
+    .filter((region) => modelFilter === 'all' || (region.modelCounts?.[modelFilter] ?? 0) > 0)
+    .map((region) => region.prefix))).sort(), [regions, countryFilter, modelFilter]);
+
+  const filteredRegions = useMemo(() => regions.flatMap((region) => {
+    if (countryFilter !== 'all' && region.country !== countryFilter) return [];
+    if (prefixFilter !== 'all' && region.prefix !== prefixFilter) return [];
+    const memberCount = modelFilter === 'all' ? region.memberCount : region.modelCounts?.[modelFilter] ?? 0;
+    if (memberCount < 1) return [];
+    return [{
+      ...region,
+      memberCount,
+      totalKilometers: modelFilter === 'all' ? region.totalKilometers ?? 0 : region.kilometersByModel?.[modelFilter] ?? 0,
+    }];
+  }), [regions, countryFilter, modelFilter, prefixFilter]);
+
+  const points = useMemo(() => filteredRegions.flatMap((region) => {
     const point = getCommunityMapPoint(region);
     return point ? [{ region, point, key: `${region.country}:${region.prefix}` }] : [];
-  }), [regions]);
+  }), [filteredRegions]);
   const activePoint = points.find((entry) => entry.key === activeKey) ?? null;
-  const membersByCountry = regions.reduce<Record<PostalCountry, number>>((counts, region) => {
+  const memberCount = filteredRegions.reduce((total, region) => total + region.memberCount, 0);
+  const totalKilometers = filteredRegions.reduce((total, region) => total + (region.totalKilometers ?? 0), 0);
+  const membersByCountry = filteredRegions.reduce<Record<PostalCountry, number>>((counts, region) => {
     counts[region.country] += region.memberCount;
     return counts;
   }, { D: 0, A: 0, CH: 0 });
@@ -3385,6 +3516,15 @@ function CommunityMapPage() {
         </section>
 
         <section className="community-map-section section-pad">
+          <div className="community-map-filters card-doodle" aria-label="Kartenfilter">
+            <div className="eyebrow handwritten">ansicht eingrenzen</div>
+            <div className="community-map-filter-grid">
+              <label>Land<select value={countryFilter} onChange={(event) => { setCountryFilter(event.target.value as 'all' | PostalCountry); setPrefixFilter('all'); }}><option value="all">Alle Länder</option><option value="D">Deutschland</option><option value="A">Österreich</option><option value="CH">Schweiz</option></select></label>
+              <label>Modell<select value={modelFilter} onChange={(event) => setModelFilter(event.target.value as 'all' | CommunityMapModel)}><option value="all">Alle Modelle</option><option value="Bonfire">Bonfire</option><option value="Wildfire">Wildfire</option></select></label>
+              <label>PLZ-Bereich<select value={prefixFilter} onChange={(event) => setPrefixFilter(event.target.value)}><option value="all">Alle Bereiche</option>{prefixOptions.map((prefix) => <option key={prefix} value={prefix}>PLZ-Bereich {prefix}</option>)}</select></label>
+              {(countryFilter !== 'all' || modelFilter !== 'all' || prefixFilter !== 'all') && <button className="button button-ghost community-map-filter-reset" type="button" onClick={() => { setCountryFilter('all'); setModelFilter('all'); setPrefixFilter('all'); }}>Filter zurücksetzen</button>}
+            </div>
+          </div>
           <div className="community-map-stats" aria-label="Zusammenfassung der Community-Karte">
             <div><strong>{memberCount}</strong><span>Mitglieder gesamt</span></div>
             <div><strong>{membersByCountry.D}</strong><span>Deutschland</span></div>
@@ -3435,7 +3575,9 @@ function CommunityMapPage() {
                 })}
               </svg>
             </div>
-            {activePoint ? (
+            {!loading && filteredRegions.length === 0 ? (
+              <p className="community-map-hint">Für diese Filter sind aktuell keine Fahrer eingetragen.</p>
+            ) : activePoint ? (
               <div className="community-map-selection" role="status">
                 <strong>{activePoint.point.countryLabel} · {activePoint.point.label}</strong>
                 <span>{activePoint.region.memberCount} {activePoint.region.memberCount === 1 ? 'Mitglied' : 'Mitglieder'} in diesem groben PLZ-Bereich</span>
@@ -3445,7 +3587,7 @@ function CommunityMapPage() {
             )}
           </div>
           <p className="community-map-note"><strong>Privatsphäre zuerst:</strong> Es werden nur aktive Konten mit freiwillig eingetragener Land-/PLZ-Kombination gezählt. Namen, E-Mail-Adressen und die vollständige PLZ bleiben verborgen; die Darstellung fasst jeweils die ersten beiden PLZ-Ziffern zusammen.</p>
-          {!loading && regions.length > points.length && <p className="community-map-note">{regions.length - points.length} PLZ-Bereiche konnten noch nicht geografisch zugeordnet werden.</p>}
+          {!loading && filteredRegions.length > points.length && <p className="community-map-note">{filteredRegions.length - points.length} PLZ-Bereiche konnten noch nicht geografisch zugeordnet werden.</p>}
           <p className="community-map-note">Kartendaten: <a href="https://www.naturalearthdata.com/" target="_blank" rel="noreferrer">Natural Earth</a> · PLZ-Regionen: <a href="https://www.geonames.org/" target="_blank" rel="noreferrer">GeoNames</a> (<a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">CC BY 4.0</a>), zu regionalen Übersichtspunkten zusammengefasst.</p>
         </section>
       </main>
@@ -3627,6 +3769,7 @@ function GuideHeader() {
           <BikeMenu />
           <a href="/#wissen">PDFs</a>
           <a href="/faq">FAQ</a>
+          <a href="/suche">Suche</a>
         </nav>
         <AccountMenu />
       </header>
@@ -4378,8 +4521,11 @@ function RepairRequestBoard({ refreshKey }: { refreshKey: number }) {
 }
 
 function RepairRequestDetailPage({ requestId }: { requestId: string }) {
+  const { user, csrfToken, loading: authLoading } = useAuth();
   const [summary, setSummary] = useState<FeedbackSummary | null>(null);
   const [detailError, setDetailError] = useState('');
+  const [solutionError, setSolutionError] = useState('');
+  const [solutionBusy, setSolutionBusy] = useState(false);
   const detailPath = repairRequestDetailPath(requestId);
 
   const loadRequest = async () => {
@@ -4396,12 +4542,44 @@ function RepairRequestDetailPage({ requestId }: { requestId: string }) {
   useEffect(() => {
     document.title = 'Reparaturanfrage — Black Tea Motorbikes – Hilfe';
     window.scrollTo(0, 0);
-    void loadRequest();
-  }, [requestId]);
+    if (!authLoading) void loadRequest();
+  }, [requestId, authLoading, user?.id]);
 
   const comments = summary?.comments ?? [];
   const request = comments.find((comment) => comment.id === requestId && comment.kind === 'repair_request');
-  const answers = comments.filter((comment) => comment.kind === 'repair_answer' && comment.parentId === requestId);
+  const answers = useMemo(() => comments
+    .filter((comment) => comment.kind === 'repair_answer' && comment.parentId === requestId)
+    .sort((left, right) => {
+      const leftIsSolution = request?.solutionAnswerId === left.id;
+      const rightIsSolution = request?.solutionAnswerId === right.id;
+      if (leftIsSolution !== rightIsSolution) return leftIsSolution ? -1 : 1;
+      const scoreDifference = (right.score ?? ((right.upVotes ?? 0) - (right.downVotes ?? 0))) - (left.score ?? ((left.upVotes ?? 0) - (left.downVotes ?? 0)));
+      return scoreDifference || right.createdAt.localeCompare(left.createdAt);
+    }), [comments, request?.solutionAnswerId, requestId]);
+
+  const handleAnswerVoted = (answerId: string, vote: { upVotes: number; downVotes: number; score: number; viewerVote: 'up' | 'down' | null }) => {
+    setSummary((current) => current ? {
+      ...current,
+      comments: current.comments.map((comment) => comment.id === answerId ? { ...comment, ...vote } : comment),
+    } : current);
+  };
+
+  const chooseSolution = async (answerId: string) => {
+    setSolutionBusy(true);
+    setSolutionError('');
+    try {
+      await apiJson<{ requestId: string; solutionAnswerId: string; resolved: boolean }>(`/api/repair-requests/${encodeURIComponent(requestId)}/solution`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
+        body: JSON.stringify({ answerId }),
+      });
+      await loadRequest();
+    } catch (error) {
+      setSolutionError(error instanceof Error ? error.message : 'Die Lösung konnte nicht ausgewählt werden.');
+    } finally {
+      setSolutionBusy(false);
+    }
+  };
 
   useEffect(() => {
     if (!request) return;
@@ -4437,18 +4615,24 @@ function RepairRequestDetailPage({ requestId }: { requestId: string }) {
               <article className="repair-request-detail-card card-doodle">
                 <div className="repair-request-card-topline"><span className="kind-chip community">Frage</span><time dateTime={request.createdAt}>{new Date(request.createdAt).toLocaleDateString('de-DE')}</time></div>
                 <div className="approved-comment-topline"><PublicCommentAuthor comment={request} /><span>{request.section ?? 'Modell noch offen'}</span></div>
+                {request.solutionAnswerId ? <div className="repair-solved-banner"><span className="repair-solved-badge">✓ Gelöst</span><span>Die beste Antwort wurde vom Ersteller gekürt.</span></div> : request.isRequestOwner && <p className="repair-owner-hint">Du bist der Ersteller dieser Anfrage. Wähle unten die Antwort aus, die dein Problem am besten löst.</p>}
+                <RepairRequestSubscription requestId={request.id} />
                 <h2>Fehlerbild und bisherige Angaben</h2>
                 <p className="repair-request-detail-body">{request.body}</p>
                 {request.source && <p className="repair-request-source"><strong>Weitere Info:</strong> {request.source}</p>}
                 <div className="repair-answers repair-request-detail-answers">
                   <div className="repair-answers-heading"><span className="eyebrow handwritten">antworten und lösungen</span><span className="comment-count">{answers.length}</span></div>
+                  {solutionError && <p className="form-message form-message-error" role="alert">{solutionError}</p>}
                   {answers.length ? answers.map((answer) => (
-                    <article className="repair-answer" key={answer.id}>
-                      <div className="approved-comment-topline"><PublicCommentAuthor comment={answer} /><time dateTime={answer.createdAt}>{new Date(answer.createdAt).toLocaleDateString('de-DE')}</time></div>
-                      <p>{answer.body}</p>
-                      {answer.source && <small>Quelle: {answer.source}</small>}
-                      {answer.imageUrl && <img src={answer.imageUrl} alt={`Bild von ${answer.name}`} loading="lazy" />}
-                    </article>
+                    <RepairAnswerCard
+                      key={answer.id}
+                      answer={answer}
+                      isSolution={request.solutionAnswerId === answer.id}
+                      canSelectSolution={request.isRequestOwner === true}
+                      solutionBusy={solutionBusy}
+                      onVote={handleAnswerVoted}
+                      onChooseSolution={chooseSolution}
+                    />
                   )) : <p className="no-comments">Noch keine Antwort. Vielleicht kennst du den ersten Lösungsansatz?</p>}
                 </div>
               </article>
@@ -4467,12 +4651,119 @@ function RepairRequestDetailPage({ requestId }: { requestId: string }) {
   );
 }
 
+function RepairAnswerCard({
+  answer,
+  isSolution,
+  canSelectSolution,
+  solutionBusy,
+  onVote,
+  onChooseSolution,
+}: {
+  answer: PublicComment;
+  isSolution: boolean;
+  canSelectSolution: boolean;
+  solutionBusy: boolean;
+  onVote: (answerId: string, vote: { upVotes: number; downVotes: number; score: number; viewerVote: 'up' | 'down' | null }) => void;
+  onChooseSolution: (answerId: string) => Promise<void>;
+}) {
+  const [upVotes, setUpVotes] = useState(answer.upVotes ?? 0);
+  const [downVotes, setDownVotes] = useState(answer.downVotes ?? 0);
+  const [viewerVote, setViewerVote] = useState<'up' | 'down' | null>(answer.viewerVote ?? null);
+  const [voteBusy, setVoteBusy] = useState(false);
+  const [voteError, setVoteError] = useState('');
+
+  const handleVote = async (value: 'up' | 'down') => {
+    setVoteBusy(true);
+    setVoteError('');
+    try {
+      const response = await apiJson<{ upVotes: number; downVotes: number; score: number; viewerVote: 'up' | 'down' | null }>(`/api/repair-answers/${encodeURIComponent(answer.id)}/vote`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ value }),
+      });
+      setUpVotes(response.upVotes);
+      setDownVotes(response.downVotes);
+      setViewerVote(response.viewerVote);
+      onVote(answer.id, response);
+    } catch (error) {
+      setVoteError(error instanceof Error ? error.message : 'Die Bewertung konnte nicht gespeichert werden.');
+    } finally {
+      setVoteBusy(false);
+    }
+  };
+
+  return (
+    <article className={`repair-answer ${isSolution ? 'is-solution' : ''}`}>
+      <div className="repair-answer-topline">
+        <div className="approved-comment-topline"><PublicCommentAuthor comment={answer} /><time dateTime={answer.createdAt}>{new Date(answer.createdAt).toLocaleDateString('de-DE')}</time></div>
+        {isSolution && <span className="repair-solved-badge">✓ Beste Lösung</span>}
+      </div>
+      <p>{answer.body}</p>
+      {answer.source && <small>Quelle: {answer.source}</small>}
+      {answer.imageUrl && <img src={answer.imageUrl} alt={`Bild von ${answer.name}`} loading="lazy" />}
+      <div className="repair-answer-footer">
+        <div className="repair-answer-votes" aria-label="Antwort bewerten">
+          <button className={`vote-button repair-answer-vote-button ${viewerVote === 'up' ? 'is-selected' : ''}`} type="button" onClick={() => { void handleVote('up'); }} disabled={voteBusy} aria-pressed={viewerVote === 'up'} title="Diese Antwort war hilfreich">
+            <span aria-hidden="true">👍</span><span>Hilfreich</span><strong>{upVotes}</strong>
+          </button>
+          <button className={`vote-button repair-answer-vote-button ${viewerVote === 'down' ? 'is-selected' : ''}`} type="button" onClick={() => { void handleVote('down'); }} disabled={voteBusy} aria-pressed={viewerVote === 'down'} title="Diese Antwort war nicht hilfreich">
+            <span aria-hidden="true">👎</span><span>Nicht hilfreich</span><strong>{downVotes}</strong>
+          </button>
+        </div>
+        {canSelectSolution && !isSolution && <button className="button button-ghost repair-solution-button" type="button" onClick={() => { void onChooseSolution(answer.id); }} disabled={solutionBusy}>Als Lösung markieren</button>}
+        {canSelectSolution && isSolution && <span className="repair-solution-owner-note">Von dir ausgewählt</span>}
+      </div>
+      {voteError && <small className="form-message-error repair-answer-error" role="alert">{voteError}</small>}
+    </article>
+  );
+}
+
+function RepairRequestSubscription({ requestId }: { requestId: string }) {
+  const { user, loading: authLoading, csrfToken } = useAuth();
+  const [subscribed, setSubscribed] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (authLoading || !user) {
+      setSubscribed(false);
+      return;
+    }
+    let active = true;
+    void apiJson<{ subscribed: boolean }>(`/api/repair-requests/${encodeURIComponent(requestId)}/subscription`).then((response) => {
+      if (active) setSubscribed(response.subscribed === true);
+    }).catch(() => undefined);
+    return () => { active = false; };
+  }, [authLoading, requestId, user]);
+
+  if (authLoading) return null;
+  if (!user) return <p className="repair-request-subscription-login"><a href="/login">Einloggen</a>, um Antworten und Freigaben dieser Anfrage zu abonnieren.</p>;
+
+  const toggleSubscription = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const response = await apiJson<{ subscribed: boolean }>(`/api/repair-requests/${encodeURIComponent(requestId)}/subscription`, {
+        method: subscribed ? 'DELETE' : 'POST',
+        headers: { 'X-CSRF-Token': csrfToken },
+      });
+      setSubscribed(response.subscribed === true);
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : 'Das Abo konnte nicht geändert werden.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return <div className="repair-request-subscription"><button className="button button-ghost" type="button" onClick={() => { void toggleSubscription(); }} disabled={loading}>{loading ? 'Wird gespeichert …' : subscribed ? 'Abo beenden' : 'Antworten abonnieren'}</button><span>{subscribed ? 'Du erhältst Hinweise zu neuen Antworten und Freigaben.' : 'Du kannst dich über neue Antworten und Freigaben informieren lassen.'}</span>{error && <small className="form-message-error">{error}</small>}</div>;
+}
+
 function RepairRequestCard({ request, answerCount, index }: { request: PublicComment; answerCount: number; index: number }) {
   const detailPath = repairRequestDetailPath(request.id);
 
   return (
     <article className={`repair-request-card card-doodle ${index % 2 ? 'repair-request-card-tilt-right' : 'repair-request-card-tilt-left'}`}>
-      <div className="repair-request-card-topline"><span className="kind-chip community">Frage</span><span>{request.section ?? 'Modell noch offen'}</span></div>
+      <div className="repair-request-card-topline"><span className="kind-chip community">Frage</span>{request.solutionAnswerId ? <span className="repair-solved-badge">✓ Gelöst</span> : <span>{request.section ?? 'Modell noch offen'}</span>}</div>
       <h3><a className="repair-request-title-link" href={detailPath}>{request.topic ?? 'Reparaturanfrage'} ↗</a></h3>
       <div className="approved-comment-topline"><PublicCommentAuthor comment={request} /><time dateTime={request.createdAt}>{new Date(request.createdAt).toLocaleDateString('de-DE')}</time></div>
       <p className="repair-request-body">{request.body}</p>

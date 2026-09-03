@@ -50,6 +50,9 @@ final class CommunityController
         }
 
         $data = $this->storage->read();
+        $viewer = $this->users->currentUser();
+        $viewerUserId = is_array($viewer) && is_string($viewer['id'] ?? null) ? $viewer['id'] : null;
+        $viewerVoteKey = $this->answerVoteKey($viewer);
         $counts = $data['feedback'][$guide] ?? ['up' => 0, 'down' => 0];
         $expectedKinds = $this->expectedKinds($guide);
         $comments = array_values(array_filter(
@@ -64,10 +67,230 @@ final class CommunityController
             'guide' => $guide,
             'up' => (int) ($counts['up'] ?? 0),
             'down' => (int) ($counts['down'] ?? 0),
-            'comments' => array_map(fn (array $comment): array => $this->publicComment($comment), $comments),
+            'comments' => array_map(fn (array $comment): array => $this->publicComment($comment, $viewerUserId, $viewerVoteKey), $comments),
         ]);
         $response->headers->set('Cache-Control', 'no-store');
         return $response;
+    }
+
+    #[Route('/api/repair-requests/{id}/subscription', name: 'api_repair_request_subscription', methods: ['GET', 'POST', 'DELETE'])]
+    public function repairRequestSubscription(string $id, Request $request): JsonResponse
+    {
+        if (preg_match('/^[a-f0-9]{32}$/', $id) !== 1) {
+            return $this->error('Die Reparaturanfrage wurde nicht erkannt.', Response::HTTP_BAD_REQUEST);
+        }
+
+        $repairRequest = $this->findComment($id);
+        if ($repairRequest === null
+            || ($repairRequest['guide'] ?? null) !== self::REPAIR_REQUEST_GUIDE
+            || ($repairRequest['kind'] ?? null) !== 'repair_request'
+            || ($repairRequest['status'] ?? null) !== 'approved'
+        ) {
+            return $this->error('Die Reparaturanfrage wurde nicht gefunden.', Response::HTTP_NOT_FOUND);
+        }
+
+        $user = $this->users->currentUser();
+        if ($request->isMethod('GET')) {
+            $userId = is_array($user) ? (string) ($user['id'] ?? '') : '';
+            $subscriberUserIds = is_array($repairRequest['subscriberUserIds'] ?? null) ? $repairRequest['subscriberUserIds'] : [];
+            return new JsonResponse([
+                'authenticated' => $user !== null,
+                'subscribed' => $userId !== '' && in_array($userId, $subscriberUserIds, true),
+            ]);
+        }
+
+        if ($user === null) {
+            return $this->unauthorized();
+        }
+        if (!$this->users->validCsrfToken($request->headers->get('X-CSRF-Token', ''))) {
+            return $this->error('Ungültige Sitzung.', Response::HTTP_FORBIDDEN);
+        }
+
+        $userId = (string) ($user['id'] ?? '');
+        $subscribe = $request->isMethod('POST');
+        $updated = null;
+        $this->storage->update(static function (array &$data) use ($id, $userId, $subscribe, &$updated): void {
+            foreach ($data['comments'] as &$comment) {
+                if (($comment['id'] ?? null) !== $id
+                    || ($comment['guide'] ?? null) !== self::REPAIR_REQUEST_GUIDE
+                    || ($comment['kind'] ?? null) !== 'repair_request'
+                    || ($comment['status'] ?? null) !== 'approved'
+                ) {
+                    continue;
+                }
+                $subscriberUserIds = is_array($comment['subscriberUserIds'] ?? null) ? $comment['subscriberUserIds'] : [];
+                $subscriberUserIds = array_values(array_unique(array_filter($subscriberUserIds, static fn ($candidate): bool => is_string($candidate))));
+                if ($subscribe) {
+                    $subscriberUserIds[] = $userId;
+                    $comment['subscriberUserIds'] = array_values(array_unique($subscriberUserIds));
+                } else {
+                    $comment['subscriberUserIds'] = array_values(array_filter($subscriberUserIds, static fn (string $candidate): bool => $candidate !== $userId));
+                }
+                $updated = $comment;
+                break;
+            }
+            unset($comment);
+        });
+
+        if (!is_array($updated)) {
+            return $this->error('Die Reparaturanfrage wurde nicht gefunden.', Response::HTTP_NOT_FOUND);
+        }
+
+        return new JsonResponse(['subscribed' => in_array($userId, $updated['subscriberUserIds'] ?? [], true)]);
+    }
+
+    #[Route('/api/repair-answers/{id}/vote', name: 'api_repair_answer_vote', methods: ['POST'])]
+    public function voteRepairAnswer(string $id, Request $request): JsonResponse
+    {
+        if ($response = $this->rateLimited($request, 'repair-answer-vote', 60, 60)) {
+            return $response;
+        }
+
+        if (preg_match('/^[a-f0-9]{32}$/', $id) !== 1) {
+            return $this->error('Die Antwort wurde nicht erkannt.', Response::HTTP_BAD_REQUEST);
+        }
+
+        $user = $this->users->currentUser();
+        if (($user['communicationBlocked'] ?? false) === true) {
+            return $this->error('Dein Konto ist für neue Community-Kommunikation gesperrt.', Response::HTTP_FORBIDDEN);
+        }
+
+        $value = $this->jsonPayload($request)['value'] ?? null;
+        if (!in_array($value, ['up', 'down'], true)) {
+            return $this->error('Ungültige Bewertung.', Response::HTTP_BAD_REQUEST);
+        }
+
+        $answer = $this->findComment($id);
+        $parentId = is_array($answer) && is_string($answer['parentId'] ?? null) ? $answer['parentId'] : null;
+        $parent = $parentId !== null ? $this->findComment($parentId) : null;
+        if ($answer === null
+            || ($answer['guide'] ?? null) !== self::REPAIR_REQUEST_GUIDE
+            || ($answer['kind'] ?? null) !== 'repair_answer'
+            || ($answer['status'] ?? null) !== 'approved'
+            || $parent === null
+            || ($parent['kind'] ?? null) !== 'repair_request'
+            || ($parent['status'] ?? null) !== 'approved'
+        ) {
+            return $this->error('Die Antwort wurde nicht gefunden.', Response::HTTP_NOT_FOUND);
+        }
+
+        $voteKey = $this->answerVoteKey($user);
+        $updated = null;
+        $this->storage->update(static function (array &$data) use ($id, $value, $voteKey, &$updated): void {
+            foreach ($data['comments'] as &$comment) {
+                if (($comment['id'] ?? null) !== $id || ($comment['kind'] ?? null) !== 'repair_answer') {
+                    continue;
+                }
+
+                $votes = is_array($comment['votes'] ?? null) ? $comment['votes'] : [];
+                $voterKeys = is_array($votes['voterKeys'] ?? null) ? $votes['voterKeys'] : [];
+                $previous = isset($voterKeys[$voteKey]) && in_array($voterKeys[$voteKey], ['up', 'down'], true)
+                    ? $voterKeys[$voteKey]
+                    : null;
+                $counts = [
+                    'up' => max(0, (int) ($votes['up'] ?? 0)),
+                    'down' => max(0, (int) ($votes['down'] ?? 0)),
+                ];
+
+                if ($previous !== $value) {
+                    if ($previous !== null) {
+                        $counts[$previous] = max(0, $counts[$previous] - 1);
+                    }
+                    $counts[$value]++;
+                    $voterKeys[$voteKey] = $value;
+                }
+
+                $comment['votes'] = [
+                    'up' => $counts['up'],
+                    'down' => $counts['down'],
+                    'voterKeys' => $voterKeys,
+                ];
+                $updated = [
+                    'upVotes' => $counts['up'],
+                    'downVotes' => $counts['down'],
+                    'score' => $counts['up'] - $counts['down'],
+                    'viewerVote' => $value,
+                ];
+                break;
+            }
+            unset($comment);
+        });
+
+        if (!is_array($updated)) {
+            return $this->error('Die Antwort wurde nicht gefunden.', Response::HTTP_NOT_FOUND);
+        }
+
+        return new JsonResponse($updated);
+    }
+
+    #[Route('/api/repair-requests/{id}/solution', name: 'api_repair_request_solution', methods: ['POST'])]
+    public function chooseRepairSolution(string $id, Request $request): JsonResponse
+    {
+        if ($response = $this->rateLimited($request, 'repair-solution', 20, 60)) {
+            return $response;
+        }
+
+        if (preg_match('/^[a-f0-9]{32}$/', $id) !== 1) {
+            return $this->error('Die Reparaturanfrage wurde nicht erkannt.', Response::HTTP_BAD_REQUEST);
+        }
+
+        $user = $this->users->currentUser();
+        if ($user === null) {
+            return $this->unauthorized();
+        }
+        if (!$this->users->validCsrfToken($request->headers->get('X-CSRF-Token', ''))) {
+            return $this->error('Ungültige Sitzung.', Response::HTTP_FORBIDDEN);
+        }
+
+        $parent = $this->findComment($id);
+        if ($parent === null
+            || ($parent['guide'] ?? null) !== self::REPAIR_REQUEST_GUIDE
+            || ($parent['kind'] ?? null) !== 'repair_request'
+            || ($parent['status'] ?? null) !== 'approved'
+        ) {
+            return $this->error('Die Reparaturanfrage wurde nicht gefunden.', Response::HTTP_NOT_FOUND);
+        }
+        if (!is_string($parent['userId'] ?? null) || $parent['userId'] !== ($user['id'] ?? null)) {
+            return $this->error('Nur der Ersteller der Anfrage kann eine Lösung auswählen.', Response::HTTP_FORBIDDEN);
+        }
+
+        $answerId = $this->jsonPayload($request)['answerId'] ?? null;
+        if (!is_string($answerId) || preg_match('/^[a-f0-9]{32}$/', $answerId) !== 1) {
+            return $this->error('Die Antwort wurde nicht erkannt.', Response::HTTP_BAD_REQUEST);
+        }
+
+        $answer = $this->findComment($answerId);
+        if ($answer === null
+            || ($answer['guide'] ?? null) !== self::REPAIR_REQUEST_GUIDE
+            || ($answer['kind'] ?? null) !== 'repair_answer'
+            || ($answer['parentId'] ?? null) !== $id
+            || ($answer['status'] ?? null) !== 'approved'
+        ) {
+            return $this->error('Diese Antwort gehört nicht zu der Anfrage oder ist noch nicht freigegeben.', Response::HTTP_BAD_REQUEST);
+        }
+
+        $updated = null;
+        $this->storage->update(static function (array &$data) use ($id, $answerId, &$updated): void {
+            foreach ($data['comments'] as &$comment) {
+                if (($comment['id'] ?? null) !== $id || ($comment['kind'] ?? null) !== 'repair_request') {
+                    continue;
+                }
+                $comment['solutionAnswerId'] = $answerId;
+                $updated = $comment;
+                break;
+            }
+            unset($comment);
+        });
+
+        if (!is_array($updated)) {
+            return $this->error('Die Reparaturanfrage wurde nicht gefunden.', Response::HTTP_NOT_FOUND);
+        }
+
+        return new JsonResponse([
+            'requestId' => $id,
+            'solutionAnswerId' => $answerId,
+            'resolved' => true,
+        ]);
     }
 
     #[Route('/api/community/map', name: 'api_community_map', methods: ['GET'])]
@@ -80,11 +303,6 @@ final class CommunityController
                 continue;
             }
 
-            $kilometers = filter_var($user['kilometers'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 0, 'max_range' => 999999]]);
-            if ($kilometers !== false) {
-                $totalKilometers += $kilometers;
-            }
-
             $country = $user['country'] ?? null;
             $postalCode = $user['postalCode'] ?? null;
             $postalPattern = $country === 'D' ? '/^\d{5}$/' : '/^[1-9]\d{3}$/';
@@ -92,6 +310,9 @@ final class CommunityController
                 continue;
             }
 
+            $kilometers = filter_var($user['kilometers'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 0, 'max_range' => 999999]]);
+            $kilometers = $kilometers === false ? 0 : $kilometers;
+            $model = in_array($user['model'] ?? null, ['Bonfire', 'Wildfire'], true) ? $user['model'] : null;
             $prefix = substr($postalCode, 0, 2);
             $key = $country . ':' . $prefix;
             if (!isset($regions[$key])) {
@@ -99,9 +320,18 @@ final class CommunityController
                     'country' => $country,
                     'prefix' => $prefix,
                     'memberCount' => 0,
+                    'modelCounts' => ['Bonfire' => 0, 'Wildfire' => 0],
+                    'totalKilometers' => 0,
+                    'kilometersByModel' => ['Bonfire' => 0, 'Wildfire' => 0],
                 ];
             }
             $regions[$key]['memberCount']++;
+            $regions[$key]['totalKilometers'] += $kilometers;
+            $totalKilometers += $kilometers;
+            if ($model !== null) {
+                $regions[$key]['modelCounts'][$model]++;
+                $regions[$key]['kilometersByModel'][$model] += $kilometers;
+            }
         }
 
         $regionList = array_values($regions);
@@ -283,6 +513,7 @@ final class CommunityController
             'createdAt' => (new \DateTimeImmutable())->format(DATE_ATOM),
             'approvedAt' => null,
             'emailConfirmedAt' => $authenticatedUser !== null ? (new \DateTimeImmutable())->format(DATE_ATOM) : null,
+            'subscriberUserIds' => $kind === 'repair_request' && $authenticatedUser !== null ? [(string) $authenticatedUser['id']] : [],
         ];
         if (is_array($confirmation)) {
             $comment['emailConfirmationTokenHash'] = $confirmation['tokenHash'];
@@ -1020,6 +1251,15 @@ final class CommunityController
                     $wasApproved = ($comment['status'] ?? null) === 'approved';
                     $comment['status'] = $status;
                     $comment['approvedAt'] = $status === 'approved' ? (new \DateTimeImmutable())->format(DATE_ATOM) : null;
+                    if ($status !== 'approved' && ($comment['kind'] ?? null) === 'repair_answer' && is_string($comment['parentId'] ?? null)) {
+                        foreach ($data['comments'] as &$parentComment) {
+                            if (($parentComment['id'] ?? null) === $comment['parentId'] && ($parentComment['solutionAnswerId'] ?? null) === $id) {
+                                $parentComment['solutionAnswerId'] = null;
+                                break;
+                            }
+                        }
+                        unset($parentComment);
+                    }
                     $newlyApproved = $status === 'approved' && !$wasApproved;
                     $updated = $comment;
                     break;
@@ -1045,9 +1285,23 @@ final class CommunityController
             if ($parent !== null) {
                 try {
                     $this->users->notifyReply((string) ($parent['userId'] ?? ''), $updated, $parent);
+                    $subscriberUserIds = is_array($parent['subscriberUserIds'] ?? null) ? $parent['subscriberUserIds'] : [];
+                    $this->users->notifyRepairSubscribers($subscriberUserIds, $updated, $parent);
                 } catch (\Throwable $exception) {
                     error_log('[reply-notification] ' . $exception->getMessage());
                 }
+            }
+        }
+
+        if ($newlyApproved && ($updated['kind'] ?? null) === 'repair_request') {
+            $recipientIds = is_array($updated['subscriberUserIds'] ?? null) ? $updated['subscriberUserIds'] : [];
+            if (is_string($updated['userId'] ?? null) && $updated['userId'] !== '') {
+                $recipientIds[] = $updated['userId'];
+            }
+            try {
+                $this->users->notifyRepairRequestStatus($recipientIds, $updated);
+            } catch (\Throwable $exception) {
+                error_log('[repair-status-notification] ' . $exception->getMessage());
             }
         }
 
@@ -1082,6 +1336,12 @@ final class CommunityController
                 $remaining[] = $comment;
             }
             $data['comments'] = $remaining;
+            foreach ($data['comments'] as &$comment) {
+                if (($comment['kind'] ?? null) === 'repair_request' && ($comment['solutionAnswerId'] ?? null) === $id) {
+                    $comment['solutionAnswerId'] = null;
+                }
+            }
+            unset($comment);
         });
 
         if ($moderatorScopeViolation) {
@@ -1157,7 +1417,16 @@ final class CommunityController
         return null;
     }
 
-    private function publicComment(array $comment): array
+    private function answerVoteKey(?array $user): string
+    {
+        $identity = is_array($user) && is_string($user['id'] ?? null) && $user['id'] !== ''
+            ? 'user:' . $user['id']
+            : 'session:' . session_id();
+
+        return hash('sha256', $identity);
+    }
+
+    private function publicComment(array $comment, ?string $viewerUserId = null, ?string $viewerVoteKey = null): array
     {
         $avatarStyle = null;
         $avatarUrl = null;
@@ -1172,7 +1441,7 @@ final class CommunityController
             }
         }
 
-        return [
+        $public = [
             'id' => (string) $comment['id'],
             'kind' => (string) ($comment['kind'] ?? 'comment'),
             'name' => (string) $comment['name'],
@@ -1186,6 +1455,26 @@ final class CommunityController
             'avatarStyle' => $avatarStyle,
             'avatarUrl' => $avatarUrl,
         ];
+
+        if (($comment['kind'] ?? null) === 'repair_answer') {
+            $votes = is_array($comment['votes'] ?? null) ? $comment['votes'] : [];
+            $voterKeys = is_array($votes['voterKeys'] ?? null) ? $votes['voterKeys'] : [];
+            $public += [
+                'upVotes' => max(0, (int) ($votes['up'] ?? 0)),
+                'downVotes' => max(0, (int) ($votes['down'] ?? 0)),
+                'score' => max(0, (int) ($votes['up'] ?? 0)) - max(0, (int) ($votes['down'] ?? 0)),
+                'viewerVote' => $viewerVoteKey !== null && in_array($voterKeys[$viewerVoteKey] ?? null, ['up', 'down'], true) ? $voterKeys[$viewerVoteKey] : null,
+            ];
+        }
+
+        if (($comment['kind'] ?? null) === 'repair_request') {
+            $public += [
+                'solutionAnswerId' => is_string($comment['solutionAnswerId'] ?? null) ? $comment['solutionAnswerId'] : null,
+                'isRequestOwner' => $viewerUserId !== null && ($comment['userId'] ?? null) === $viewerUserId,
+            ];
+        }
+
+        return $public;
     }
 
     private function adminComment(array $comment): array
