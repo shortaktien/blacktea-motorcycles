@@ -129,6 +129,10 @@ jobs:
 
           docker compose version
           docker compose config >/dev/null
+          # Das Named Volume kann ältere node_modules enthalten als das aktuelle Image.
+          # Vor dem Start mit dem Lockfile synchronisieren, damit neue Frontend-Pakete
+          # trotz des Bind-Mounts auf /app verfügbar sind.
+          docker compose run --rm --no-deps --build frontend npm ci
           docker compose up -d --build --remove-orphans
 
           for attempt in $(seq 1 30); do
