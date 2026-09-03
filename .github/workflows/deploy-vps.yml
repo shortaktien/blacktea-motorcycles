@@ -40,6 +40,35 @@ jobs:
       - name: Build frontend
         run: npm run build
 
+      - name: Start static preview for link tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          nohup npm run preview -- --host 127.0.0.1 > "$RUNNER_TEMP/btm-preview.log" 2>&1 &
+          echo $! > "$RUNNER_TEMP/btm-preview.pid"
+          for attempt in $(seq 1 20); do
+            if curl --fail --silent --show-error --max-time 5 http://127.0.0.1:4173/ >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat "$RUNNER_TEMP/btm-preview.log"
+          echo "Static preview konnte nicht gestartet werden." >&2
+          exit 1
+
+      - name: Test SEO and public links
+        env:
+          LINKTEST_BASE_URL: http://127.0.0.1:4173
+        run: npm run check:seo
+
+      - name: Stop static preview
+        if: always()
+        shell: bash
+        run: |
+          if [ -f "$RUNNER_TEMP/btm-preview.pid" ]; then
+            kill "$(cat "$RUNNER_TEMP/btm-preview.pid")" 2>/dev/null || true
+          fi
+
   deploy:
     name: Sync and restart Docker stack
     needs: quality
@@ -137,6 +166,24 @@ jobs:
               && curl --fail --silent --show-error --max-time 5 http://127.0.0.1:5173/api/auth/session >/dev/null \
               && curl --fail --silent --show-error --max-time 5 http://127.0.0.1:8000/api/health >/dev/null; then
               echo "BTM-Stack ist erreichbar."
+
+              for path in \
+                /sitemap.xml \
+                /llms.txt \
+                /llms-full.txt \
+                /full-llms.txt \
+                /pdfs/index.html \
+                /login \
+                /registrieren \
+                /konto \
+                '/passwort-zuruecksetzen?token=link-test'; do
+                curl --fail --silent --show-error --max-time 10 "http://127.0.0.1:5173$path" >/dev/null \
+                  || { echo "Live-Linktest fehlgeschlagen: $path" >&2; exit 1; }
+              done
+
+              unknown_status=$(curl --silent --show-error --max-time 10 -o /dev/null -w '%{http_code}' http://127.0.0.1:5173/does-not-exist)
+              test "$unknown_status" = "404" || { echo "Unbekannte Route liefert HTTP $unknown_status statt 404." >&2; exit 1; }
+
               docker compose -f docker-compose.prod.yml ps
               exit 0
             fi

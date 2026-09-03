@@ -61,6 +61,13 @@ button, input { font: inherit; }
 .auth-card { width: min(650px, 100%); margin: 0 auto; padding: 34px 36px 31px; background: rgba(251,250,247,.88); }
 .auth-card h1 { margin: 9px 0 17px; font-size: clamp(45px, 7vw, 72px); }
 .auth-card > p { max-width: 560px; color: var(--muted); line-height: 1.6; }
+.auth-benefits { margin: 23px 0 24px; padding: 17px 18px 15px; border: 1.5px dashed var(--line); border-radius: 8px 6px 9px 5px; background: rgba(227,225,255,.28); }
+.auth-benefits h2 { margin: 7px 0 8px; font-size: 25px; line-height: 1.08; }
+.auth-benefits p { margin: 0; color: #6d6b76; font-size: 13px; line-height: 1.55; }
+.auth-benefits ul { display: grid; gap: 7px; margin: 14px 0 0; padding: 0; list-style: none; }
+.auth-benefits li { position: relative; padding-left: 19px; color: #5c5967; font-size: 13px; line-height: 1.45; }
+.auth-benefits li::before { position: absolute; left: 0; color: var(--ink); content: '✓'; font-weight: 900; }
+.auth-benefits .auth-benefits-note { margin-top: 13px; color: var(--ink); font-weight: 800; }
 .auth-form { display: grid; gap: 14px; margin-top: 24px; }
 .auth-form label, .avatar-upload label { display: grid; gap: 7px; color: #5c5967; font-size: 12px; font-weight: 800; }
 .auth-form input, .auth-form select, .avatar-upload input { width: 100%; min-height: 43px; padding: 9px 11px; border: 1.5px solid var(--line); border-radius: 7px 9px 6px 8px; color: var(--charcoal); background: rgba(255,255,255,.55); outline: 0; }

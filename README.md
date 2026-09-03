@@ -168,6 +168,14 @@ Für einen Produktions-Build:
 npm run build
 ```
 
+Der Build-Qualitätscheck prüft die erzeugte Sitemap, alle internen LLM-Links, den PDF-Index samt lokalen PDF-Dateien und die noindex Auth-Routen:
+
+```bash
+npm run check:seo
+```
+
+Der Deploy-Workflow führt diesen Check zusätzlich über einen statischen HTTP-Preview aus und prüft nach dem VPS-Neustart die öffentlichen SEO- und Auth-Endpunkte erneut.
+
 ### Backend
 
 Das Backend benötigt PHP 8.2 oder neuer sowie Composer. Abhängigkeiten installieren und den Entwicklungsserver starten:
