@@ -230,7 +230,7 @@ docker compose -f docker-compose.prod.yml up --build -d
 
 `frontend/Dockerfile.prod` baut zuerst mit `npm run build`, inklusive SEO-Dateigenerierung und serverseitigem Prerendering. Das fertige `dist/` wird anschließend ausschließlich über den Caddy-Container auf Port 80 ausgeliefert. Der Vite-Dev-Server ist in diesem Stack nicht enthalten und wird nicht öffentlich betrieben. API-Anfragen werden intern von Caddy an `backend:8000` weitergeleitet.
 
-Der Site-Block aus [deploy/Caddyfile.btm.example](deploy/Caddyfile.btm.example) wird in die bestehende TLS-Caddy-Konfiguration übernommen. Unbekannte Pfade fallen nicht auf `index.html` zurück, sondern erhalten HTTP 404. `/pdfs/` wird auf den kanonischen PDF-Index `/pdfs/index.html` weitergeleitet.
+Der Site-Block aus [deploy/Caddyfile.btm.example](deploy/Caddyfile.btm.example) wird in die bestehende TLS-Caddy-Konfiguration übernommen. Der `/api/*`-Pfad muss dabei direkt an den `backend:8000`-Dienst gehen; die übrigen Anfragen gehen an den statischen `frontend:80`-Dienst. So kann kein älterer API-Upstream neue Auth-, Community- oder Bugreport-Routen verdecken. Unbekannte Pfade fallen nicht auf `index.html` zurück, sondern erhalten HTTP 404. `/pdfs/` wird auf den kanonischen PDF-Index `/pdfs/index.html` weitergeleitet.
 
 Die Sitemap wird bei jedem Build aus den tatsächlich vorhandenen Reparatur-, Wiki-, Ersatzteil- und PDF-Dateien erzeugt. `lastmod` bleibt standardmäßig weg, weil ein Build allein keine Inhaltsänderung beweist. Für bewusst dokumentierte Änderungen können `SEO_LASTMOD_MAP` (JSON mit URL-Pfaden und ISO-Daten) oder – nur bei einer echten Gesamtänderung – `SEO_LASTMOD` gesetzt werden.
 

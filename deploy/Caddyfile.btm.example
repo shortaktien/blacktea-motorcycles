@@ -15,5 +15,13 @@ btm.shortaktien.de {
         -Server
     }
 
-    reverse_proxy frontend:80
+    # Route the API directly to the current production backend. Keeping this
+    # explicit prevents a legacy API upstream from shadowing new routes.
+    handle /api/* {
+        reverse_proxy backend:8000
+    }
+
+    handle {
+        reverse_proxy frontend:80
+    }
 }
