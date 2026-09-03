@@ -1,0 +1,46 @@
+# Black Tea Hilfe
+
+> Unabhängige deutschsprachige Sammelstelle für Black Tea Motorbikes mit lokalen Dokumenten, Ersatzteilspuren, Reparaturhilfen und überprüfbaren Quellen.
+
+Die Website richtet sich an Besitzerinnen und Besitzer von Bonfire- und Wildfire-Modellen. Historische Angaben, Community-Hinweise und Ersatzteilkandidaten sind keine Herstellerfreigabe. Sicherheitskritische Arbeiten gehören in qualifizierte Hände.
+
+## Kernseiten
+
+- [Black Tea Hilfe — Dokumente, Ersatzteile & Updates](https://btm.shortaktien.de/): Unabhängige Sammelstelle für Black Tea Motorbikes: lokale PDFs, Ersatzteile, Reparaturhilfen und nachvollziehbare Quellen.
+- [Reparaturhilfe — Black Tea Hilfe](https://btm.shortaktien.de/hilfe): Redaktionell geordnete Reparaturhilfen für typische Bonfire- und Wildfire-Fehlerbilder — mit Kurzablauf, ausführlicher Prüfung, Sicherheit und Quelle.
+- [Ersatzteile — Black Tea Hilfe](https://btm.shortaktien.de/ersatzteile): Historischer BTM-Ersatzteilkatalog mit Modellbezug, Teilenamen und Quellen. Bestand und Preise vor dem Kauf prüfen.
+- [BTM Community-Wissen — Black Tea Hilfe](https://btm.shortaktien.de/community): Technische Hinweise aus der Black Tea Community verständlich zusammengefasst, mit lokalen PDFs und Originalquellen.
+- [Quellen — Black Tea Hilfe](https://btm.shortaktien.de/quellen): Nachvollziehbare Quellen zu Insolvenzstatus, Handbüchern, lokalen PDFs, Ersatzteilspuren und Community-Wissen.
+- [Impressum — Black Tea Hilfe](https://btm.shortaktien.de/impressum): Anbieterinformationen und rechtliche Hinweise zu Black Tea Hilfe.
+- [Datenschutz — Black Tea Hilfe](https://btm.shortaktien.de/datenschutz): Datenschutzhinweise zu Kommentaren, Bildanhängen und dem Betrieb von Black Tea Hilfe.
+- [Wiki — Black Tea Hilfe](https://btm.shortaktien.de/wiki): Das BTM-Wiki wird vorbereitet.
+
+## Reparaturhilfen
+
+- [12-V-Versorgung prüfen](https://btm.shortaktien.de/hilfe/dcdc): Wildfire · DC/DC-Wandler. Wenn Licht, Steuerung oder andere 12-V-Verbraucher ausfallen, nicht blind ein ähnliches Netzteil bestellen.
+- [Akku wird nicht erkannt](https://btm.shortaktien.de/hilfe/akku-bms): Bonfire & Wildfire · Akku / BMS. Laden sofort stoppen und den Akku nicht auf Verdacht weiterverwenden.
+- [Fehlerbild systematisch eingrenzen](https://btm.shortaktien.de/hilfe/fehleranalyse): Bonfire & Wildfire · Diagnose. Erst Fahrzeug und Symptom sauber einordnen, dann gezielt prüfen lassen — so vermeidest du Teiletausch auf Verdacht.
+- [MOSFET-Fehler: Wildfire bleibt stehen](https://btm.shortaktien.de/hilfe/mosfet): Wildfire · FarDriver / Antrieb. MOSFET-Fehler und fehlende Gasannahme gehören in eine sichere Antriebsdiagnose — nicht in einen weiteren Probefahrt-Test.
+- [Controller-Ausfall richtig zuordnen](https://btm.shortaktien.de/hilfe/controller): Bonfire Performance · FarDriver / CAN. Abschalten bei Rekuperation oder Last kann vom Controller kommen — genauso aber von BMS, Verkabelung oder falschen Einstellungen.
+- [Vibrationen und Schläge aus dem Antrieb](https://btm.shortaktien.de/hilfe/vibrationen): Wildfire · Motor, Rad und Controller. Vibrationen zwischen bestimmten Geschwindigkeiten können mechanisch oder elektrisch entstehen. Erst eingrenzen, dann einstellen oder reparieren.
+- [Gabelbrücke: Schrauben gerissen](https://btm.shortaktien.de/hilfe/gabelbruecke): Wildfire · Fahrwerk / sicherheitskritisch. Gerissene oder unklare Befestigungsschrauben an der Gabelbrücke sind ein Abbruchsignal und keine schnelle Standardreparatur.
+- [Undichte Gabel abdichten](https://btm.shortaktien.de/hilfe/gabelabdichtung): Wildfire · USD-Gabel. Öl an der Gabel ist nicht nur ein Komfortproblem: Es kann die Bremsanlage und die Kontrolle über das Vorderrad beeinträchtigen.
+- [Vorderrad ausbauen und wieder einsetzen](https://btm.shortaktien.de/hilfe/vorderrad): Bonfire · Vorderrad / Bremse. Der Ausbau ist machbar, aber Spacer, Bremsanlage, Achse und Drehmoment müssen in der richtigen Reihenfolge dokumentiert werden.
+- [Hinterrad und Nabenmotor prüfen](https://btm.shortaktien.de/hilfe/hinterrad): Wildfire · Hinterrad / Nabenmotor. Am Hinterrad treffen Reifen, Bremse, Lager, Achse und Motorleitung zusammen. Deshalb wird jeder Arbeitsschritt dokumentiert.
+- [Laden bricht ab oder Typ 2 startet nicht](https://btm.shortaktien.de/hilfe/laden): Bonfire & Wildfire · Laden / BMS. Wenn der Ladeziegel oder eine öffentliche AC-Säule nicht lädt, werden Strompfad, Kabel, Akkuzustand und BMS getrennt geprüft.
+- [NFC / Keyless nachrüsten und prüfen](https://btm.shortaktien.de/hilfe/nfc): Wildfire · Startsystem. Beim NFC-Umbau zählen Modul, Stecker, Einbauort und Funktionsprüfung — nicht das Verbinden von Kabeln nach Farben.
+- [QS8-Akkuanschluss sicher prüfen](https://btm.shortaktien.de/hilfe/qs8): Bonfire · Akkuanschluss / Hochstrom. Ein QS8-Ersatz oder eine externe Lademöglichkeit darf nicht nach Optik ausgewählt werden. Stecker, Polung und BMS müssen zusammenpassen.
+- [Reifen, Bremsen und Lager warten](https://btm.shortaktien.de/hilfe/wartung): Bonfire & Wildfire · Wartung. Regelmäßige Sicht- und Funktionskontrollen verhindern, dass aus Reifen-, Brems- oder Lagerspiel ein Sicherheitsproblem wird.
+
+## Ersatzteile
+
+- [Ersatzteilkatalog](https://btm.shortaktien.de/ersatzteile): Historische BTM-Shop-Einträge mit eigener Detailseite, lokal gesicherten Archivdaten und einem nur bei belegter Passform veröffentlichten Kauf-Link.
+
+## Dokumente
+
+- [PDF-Index](https://btm.shortaktien.de/pdfs/index.html): Übersicht der lokal gesicherten Handbücher, Schaltpläne, Datenblätter und Community-PDFs.
+
+## Optional
+
+- [Vollständiger LLM-Index](https://btm.shortaktien.de/full-llms.txt): Ausführliche Seiten-, Reparatur- und Dokumentübersicht.
+- [Sitemap](https://btm.shortaktien.de/sitemap.xml): Indexierbare HTML- und PDF-URLs.

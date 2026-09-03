@@ -1,0 +1,689 @@
+# Black Tea Hilfe — vollständiger Inhaltsindex
+
+> Vollständige, maschinenlesbare Übersicht der öffentlich zugänglichen Inhalte von https://btm.shortaktien.de. Stand: 2026-09-03.
+
+## Einordnung
+
+- Black Tea Hilfe ist eine unabhängige private Sammelstelle und nicht mit der Black Tea Motorbikes GmbH verbunden.
+- Die offiziellen Seiten und Shopangaben können historisch sein. Preise, Bestand, Modellzuordnung und Passform müssen vor jeder Bestellung geprüft werden.
+- Community-Hinweise werden redaktionell gekürzt und mit Quellen versehen. Sie ersetzen keine Reparatur-, Rechts- oder Garantieberatung.
+- Akku, BMS, Hochvolt, Controller, Fahrwerk und Bremsen sind sicherheitskritisch. Keine Arbeiten unter Spannung oder ohne passende Fachkenntnis empfehlen.
+
+## Übersichtsseiten
+
+- [Black Tea Hilfe — Dokumente, Ersatzteile & Updates](https://btm.shortaktien.de/): Unabhängige Sammelstelle für Black Tea Motorbikes: lokale PDFs, Ersatzteile, Reparaturhilfen und nachvollziehbare Quellen.
+- [Reparaturhilfe — Black Tea Hilfe](https://btm.shortaktien.de/hilfe): Redaktionell geordnete Reparaturhilfen für typische Bonfire- und Wildfire-Fehlerbilder — mit Kurzablauf, ausführlicher Prüfung, Sicherheit und Quelle.
+- [Ersatzteile — Black Tea Hilfe](https://btm.shortaktien.de/ersatzteile): Historischer BTM-Ersatzteilkatalog mit Modellbezug, Teilenamen und Quellen. Bestand und Preise vor dem Kauf prüfen.
+- [BTM Community-Wissen — Black Tea Hilfe](https://btm.shortaktien.de/community): Technische Hinweise aus der Black Tea Community verständlich zusammengefasst, mit lokalen PDFs und Originalquellen.
+- [Quellen — Black Tea Hilfe](https://btm.shortaktien.de/quellen): Nachvollziehbare Quellen zu Insolvenzstatus, Handbüchern, lokalen PDFs, Ersatzteilspuren und Community-Wissen.
+- [Impressum — Black Tea Hilfe](https://btm.shortaktien.de/impressum): Anbieterinformationen und rechtliche Hinweise zu Black Tea Hilfe.
+- [Datenschutz — Black Tea Hilfe](https://btm.shortaktien.de/datenschutz): Datenschutzhinweise zu Kommentaren, Bildanhängen und dem Betrieb von Black Tea Hilfe.
+- [Wiki — Black Tea Hilfe](https://btm.shortaktien.de/wiki): Das BTM-Wiki wird vorbereitet.
+
+## Reparaturhilfen
+
+### 12-V-Versorgung prüfen
+
+- [Reparaturhilfe öffnen](https://btm.shortaktien.de/hilfe/dcdc)
+- Modell-/Themenbezug: Wildfire · DC/DC-Wandler
+- Kurzbeschreibung: Wenn Licht, Steuerung oder andere 12-V-Verbraucher ausfallen, nicht blind ein ähnliches Netzteil bestellen.
+- Aufbau: Kurzablauf, Sicherheitswarnung, ausführliche Reparaturhilfe, moderierte Erfahrungsberichte und Quellenangabe.
+
+### Akku wird nicht erkannt
+
+- [Reparaturhilfe öffnen](https://btm.shortaktien.de/hilfe/akku-bms)
+- Modell-/Themenbezug: Bonfire & Wildfire · Akku / BMS
+- Kurzbeschreibung: Laden sofort stoppen und den Akku nicht auf Verdacht weiterverwenden.
+- Aufbau: Kurzablauf, Sicherheitswarnung, ausführliche Reparaturhilfe, moderierte Erfahrungsberichte und Quellenangabe.
+
+### Fehlerbild systematisch eingrenzen
+
+- [Reparaturhilfe öffnen](https://btm.shortaktien.de/hilfe/fehleranalyse)
+- Modell-/Themenbezug: Bonfire & Wildfire · Diagnose
+- Kurzbeschreibung: Erst Fahrzeug und Symptom sauber einordnen, dann gezielt prüfen lassen — so vermeidest du Teiletausch auf Verdacht.
+- Aufbau: Kurzablauf, Sicherheitswarnung, ausführliche Reparaturhilfe, moderierte Erfahrungsberichte und Quellenangabe.
+
+### MOSFET-Fehler: Wildfire bleibt stehen
+
+- [Reparaturhilfe öffnen](https://btm.shortaktien.de/hilfe/mosfet)
+- Modell-/Themenbezug: Wildfire · FarDriver / Antrieb
+- Kurzbeschreibung: MOSFET-Fehler und fehlende Gasannahme gehören in eine sichere Antriebsdiagnose — nicht in einen weiteren Probefahrt-Test.
+- Aufbau: Kurzablauf, Sicherheitswarnung, ausführliche Reparaturhilfe, moderierte Erfahrungsberichte und Quellenangabe.
+
+### Controller-Ausfall richtig zuordnen
+
+- [Reparaturhilfe öffnen](https://btm.shortaktien.de/hilfe/controller)
+- Modell-/Themenbezug: Bonfire Performance · FarDriver / CAN
+- Kurzbeschreibung: Abschalten bei Rekuperation oder Last kann vom Controller kommen — genauso aber von BMS, Verkabelung oder falschen Einstellungen.
+- Aufbau: Kurzablauf, Sicherheitswarnung, ausführliche Reparaturhilfe, moderierte Erfahrungsberichte und Quellenangabe.
+
+### Vibrationen und Schläge aus dem Antrieb
+
+- [Reparaturhilfe öffnen](https://btm.shortaktien.de/hilfe/vibrationen)
+- Modell-/Themenbezug: Wildfire · Motor, Rad und Controller
+- Kurzbeschreibung: Vibrationen zwischen bestimmten Geschwindigkeiten können mechanisch oder elektrisch entstehen. Erst eingrenzen, dann einstellen oder reparieren.
+- Aufbau: Kurzablauf, Sicherheitswarnung, ausführliche Reparaturhilfe, moderierte Erfahrungsberichte und Quellenangabe.
+
+### Gabelbrücke: Schrauben gerissen
+
+- [Reparaturhilfe öffnen](https://btm.shortaktien.de/hilfe/gabelbruecke)
+- Modell-/Themenbezug: Wildfire · Fahrwerk / sicherheitskritisch
+- Kurzbeschreibung: Gerissene oder unklare Befestigungsschrauben an der Gabelbrücke sind ein Abbruchsignal und keine schnelle Standardreparatur.
+- Aufbau: Kurzablauf, Sicherheitswarnung, ausführliche Reparaturhilfe, moderierte Erfahrungsberichte und Quellenangabe.
+
+### Undichte Gabel abdichten
+
+- [Reparaturhilfe öffnen](https://btm.shortaktien.de/hilfe/gabelabdichtung)
+- Modell-/Themenbezug: Wildfire · USD-Gabel
+- Kurzbeschreibung: Öl an der Gabel ist nicht nur ein Komfortproblem: Es kann die Bremsanlage und die Kontrolle über das Vorderrad beeinträchtigen.
+- Aufbau: Kurzablauf, Sicherheitswarnung, ausführliche Reparaturhilfe, moderierte Erfahrungsberichte und Quellenangabe.
+
+### Vorderrad ausbauen und wieder einsetzen
+
+- [Reparaturhilfe öffnen](https://btm.shortaktien.de/hilfe/vorderrad)
+- Modell-/Themenbezug: Bonfire · Vorderrad / Bremse
+- Kurzbeschreibung: Der Ausbau ist machbar, aber Spacer, Bremsanlage, Achse und Drehmoment müssen in der richtigen Reihenfolge dokumentiert werden.
+- Aufbau: Kurzablauf, Sicherheitswarnung, ausführliche Reparaturhilfe, moderierte Erfahrungsberichte und Quellenangabe.
+
+### Hinterrad und Nabenmotor prüfen
+
+- [Reparaturhilfe öffnen](https://btm.shortaktien.de/hilfe/hinterrad)
+- Modell-/Themenbezug: Wildfire · Hinterrad / Nabenmotor
+- Kurzbeschreibung: Am Hinterrad treffen Reifen, Bremse, Lager, Achse und Motorleitung zusammen. Deshalb wird jeder Arbeitsschritt dokumentiert.
+- Aufbau: Kurzablauf, Sicherheitswarnung, ausführliche Reparaturhilfe, moderierte Erfahrungsberichte und Quellenangabe.
+
+### Laden bricht ab oder Typ 2 startet nicht
+
+- [Reparaturhilfe öffnen](https://btm.shortaktien.de/hilfe/laden)
+- Modell-/Themenbezug: Bonfire & Wildfire · Laden / BMS
+- Kurzbeschreibung: Wenn der Ladeziegel oder eine öffentliche AC-Säule nicht lädt, werden Strompfad, Kabel, Akkuzustand und BMS getrennt geprüft.
+- Aufbau: Kurzablauf, Sicherheitswarnung, ausführliche Reparaturhilfe, moderierte Erfahrungsberichte und Quellenangabe.
+
+### NFC / Keyless nachrüsten und prüfen
+
+- [Reparaturhilfe öffnen](https://btm.shortaktien.de/hilfe/nfc)
+- Modell-/Themenbezug: Wildfire · Startsystem
+- Kurzbeschreibung: Beim NFC-Umbau zählen Modul, Stecker, Einbauort und Funktionsprüfung — nicht das Verbinden von Kabeln nach Farben.
+- Aufbau: Kurzablauf, Sicherheitswarnung, ausführliche Reparaturhilfe, moderierte Erfahrungsberichte und Quellenangabe.
+
+### QS8-Akkuanschluss sicher prüfen
+
+- [Reparaturhilfe öffnen](https://btm.shortaktien.de/hilfe/qs8)
+- Modell-/Themenbezug: Bonfire · Akkuanschluss / Hochstrom
+- Kurzbeschreibung: Ein QS8-Ersatz oder eine externe Lademöglichkeit darf nicht nach Optik ausgewählt werden. Stecker, Polung und BMS müssen zusammenpassen.
+- Aufbau: Kurzablauf, Sicherheitswarnung, ausführliche Reparaturhilfe, moderierte Erfahrungsberichte und Quellenangabe.
+
+### Reifen, Bremsen und Lager warten
+
+- [Reparaturhilfe öffnen](https://btm.shortaktien.de/hilfe/wartung)
+- Modell-/Themenbezug: Bonfire & Wildfire · Wartung
+- Kurzbeschreibung: Regelmäßige Sicht- und Funktionskontrollen verhindern, dass aus Reifen-, Brems- oder Lagerspiel ein Sicherheitsproblem wird.
+- Aufbau: Kurzablauf, Sicherheitswarnung, ausführliche Reparaturhilfe, moderierte Erfahrungsberichte und Quellenangabe.
+
+## Ersatzteile
+
+### Alu-Topcase
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/alu-topcase)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Lenkerendenspiegel
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/bar-end-mirrors)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Lager
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/bearings)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Farbauswahl Offroad-Schutz
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/change-the-color-of-my-off-road-protection)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Blinkerhalterung (vorne)
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/blinkerhalterung-vorne)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Bluetooth Dongle
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/bluetooth-dongle)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Bremsbeläge
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/bremsbelage)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Bremsen
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/bremsen)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Bremsleitung
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/bremsleitung)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Bremslichtkabel
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/bremslichtkabel)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Bremsscheibe
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/bremsscheibe)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Bremszylinder
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/bremszylinder)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Bremszylinder und -hebel
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/bremszylinder-und-hebel)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### 10A Charger Upgrade
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/charger-upgrade)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Charging Bundle
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/charging-bundle)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### 52 V Batterie
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/copy-of-52-v-batterie)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Schwinge
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/copy-of-beifahrerfussrasten)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Beifahrerfußrasten
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/copy-of-achse)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Achse
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/copy-of-federbeine)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Motorhalterung-Set
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/copy-of-gabelbruckenset)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Mutterabdeckung-Set
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/copy-of-motorhalterung-set)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Dual Sport Lenker
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/copy-of-off-road-schutz)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Klassische Blinker
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/classic-indicator)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Klassische Spiegel
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/classic-mirrors)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### DC/DC-Wandler
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/dcdc-converter)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Display
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/display)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Dual-Sport-Reifen-Upgrade
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/dual-sport-reifen-upgrade)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Enduro-Kotflügel
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/enduro-fender)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Felge
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/felge)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Gabelstabilisator
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/fork-stabiliser)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Vorderrad
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/front-wheel)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Fußrasten-Set
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/foot-pegs-set)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Gabelbrückenset
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/gabelbrucke-mit-lenkerklemmen)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Gabelset
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/gabelset)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Gasdruck-Federbeine
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/gasdruck-federbeine)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Goldene USD-Gabel
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/goldene-usd-gabel)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Aluminium Handguards
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/handguards)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Lenker-Sturzbügel
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/handlebar-crash-bars)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Lenkererhöhung
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/handlebar-risers)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Scheinwerfer
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/headlight)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Scheinwerfergitter
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/headlight-grill)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Hintere Stoßdämpfer
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/hintere-stossdampfer)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Hinterer Radschutz
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/hinterer-radschutz)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Radnabenmotor
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/hub-motor)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Kabel
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/kabel)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Schlüsselsatz
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/key-set)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Keyless Go
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/keyless-go)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Keyless-Go-Retrofit
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/keyless-go-retro-fit)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Kill-Switch
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/kill-switch)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Ladegerät
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/ladegerat)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Langer Alu-Radschutz
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/langer-alu-radschutz)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Langer Bonfire-Sitz
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/langer-bonfire-sitz)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### LED-Blinker
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/led-blinker)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### LED Blinker
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/led-indicators)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Lenker
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/lenker)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Scheinwerferhalter
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/light-holder)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Lower Foot Rests
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/lower-foot-rests)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Luftgekühlt
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/luftgekuhlt)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Modern-Bundle
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/modern-bundle)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Moped-Kennzeichenhalter
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/moped-license-plate-holder)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Mutterabdeckung Set
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/mutterabdeckung-set)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### NFC-Karte / Nachrüstkit
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/nfc-karte-nachrustkit)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Offroad-Bundle
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/off-road-bundle)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Offroad-Schutz
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/off-road-schutz)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Soziushalter
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/passenger-hold)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Performance-Bundle
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/performance-bundle)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Radabdeckung
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/radabdeckung)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Reichweiten-Bundle
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/range-extender-bundle)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Rücklicht
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/rear-light)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Gepäckträger hinten
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/rear-rack)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Reflektoren
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/reflektoren)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### QS8-S-Stecker-Reparatur
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/reparatur-qs8s-stecker)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Retro-Windschild
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/retro-windschild)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Fahrmodi-Taster
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/ride-mode-button)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Schaltereinheit
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/schaltereinheit)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Scheinwerfer-Retrofit
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/scheinwerfer-retrofit)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Schuko-auf-Typ-2-Adapter
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/schuko-auf-typ-2-adapter)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Schuko-Ladekabel für Wildfire
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/schuko-ladekabel-fur-wildfire)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Sitz
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/seat)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Seitenständer Kill Switch
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/seitenstander-kill-switch)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Seitentasche
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/side-bag)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Seitenabdeckung
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/side-cover)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Seitenständer
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/side-stand)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Seitenständer-Feder-Set
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/side-stand-spring-set)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Sitz (B-Ware / gebraucht)
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/sitz-b-ware-gebraucht)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Speiche mit Nippel
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/speiche-mit-nippel)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Montageständer
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/stand)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Ständer
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/stander-copy)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### 12-V-Starterrelais
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/starter-relais-12-v)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Sticker-Set
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/sticker-set)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Surf-Rack
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/surf-rack)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Tall-Rider-Bundle
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/tall-rider-bundle)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Tank
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/tank)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Tank (B-Ware)
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/tank-b-ware)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Tankgummi Set
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/tankgummi-set)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### TFT-Touchdisplay-Retrofit
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/tft-touch-display-retrofit)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Typ-2-Kabel
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/typ-2-kabel)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### USB-Ladeport
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/usb-charging-port)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### USD-Gabel-Set
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/usd-gabelset)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Wildfire
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/wildfire)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Wildfire ABS
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/wildfire-abs)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Wildfire-Gabelbrücken-Set
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/wildfire-gabelbruckenset)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Wildfire-Konfiguration
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/wildfire-konfiguration)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Wildfire Performance
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/wildfire-performance)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### Windschild
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/windschild)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+### XLR-Ladeport
+
+- [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/xlr-charging-port)
+- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
+
+## Lokale PDFs
+
+- [PDF-Index](https://btm.shortaktien.de/pdfs/index.html): Vollständige Übersicht der gesicherten Dokumente.
+- [01-wildfire-willkommenshinweis.pdf](https://btm.shortaktien.de/pdfs/01-wildfire-willkommenshinweis.pdf): Lokale PDF-Kopie im Dokumentenarchiv.
+- [02-wildfire-kabelbaum.pdf](https://btm.shortaktien.de/pdfs/02-wildfire-kabelbaum.pdf): Lokale PDF-Kopie im Dokumentenarchiv.
+- [03-wildfire-system-harness-12v.pdf](https://btm.shortaktien.de/pdfs/03-wildfire-system-harness-12v.pdf): Lokale PDF-Kopie im Dokumentenarchiv.
+- [04-wildfire-software.pdf](https://btm.shortaktien.de/pdfs/04-wildfire-software.pdf): Lokale PDF-Kopie im Dokumentenarchiv.
+- [05-btm-vib.pdf](https://btm.shortaktien.de/pdfs/05-btm-vib.pdf): Lokale PDF-Kopie im Dokumentenarchiv.
+- [06-gasgriff-domino-hall.pdf](https://btm.shortaktien.de/pdfs/06-gasgriff-domino-hall.pdf): Lokale PDF-Kopie im Dokumentenarchiv.
+- [07-manual-bonfire-x-de.pdf](https://btm.shortaktien.de/pdfs/07-manual-bonfire-x-de.pdf): Lokale PDF-Kopie im Dokumentenarchiv.
+- [08-kabelbaum-extended.pdf](https://btm.shortaktien.de/pdfs/08-kabelbaum-extended.pdf): Lokale PDF-Kopie im Dokumentenarchiv.
+- [09-tacho-bonfire-ct22.pdf](https://btm.shortaktien.de/pdfs/09-tacho-bonfire-ct22.pdf): Lokale PDF-Kopie im Dokumentenarchiv.
+- [10-wildfire-tipps-community.pdf](https://btm.shortaktien.de/pdfs/10-wildfire-tipps-community.pdf): Lokale PDF-Kopie im Dokumentenarchiv.
+- [11-wildfire-handbuch-1-3-community.pdf](https://btm.shortaktien.de/pdfs/11-wildfire-handbuch-1-3-community.pdf): Lokale PDF-Kopie im Dokumentenarchiv.
+- [12-wildfire-handbuch-1-4-community.pdf](https://btm.shortaktien.de/pdfs/12-wildfire-handbuch-1-4-community.pdf): Lokale PDF-Kopie im Dokumentenarchiv.
+- [13-fardriver-einstellungen-community.pdf](https://btm.shortaktien.de/pdfs/13-fardriver-einstellungen-community.pdf): Lokale PDF-Kopie im Dokumentenarchiv.
+- [14-ct22-dashboard-manual.pdf](https://btm.shortaktien.de/pdfs/14-ct22-dashboard-manual.pdf): Lokale PDF-Kopie im Dokumentenarchiv.
+- [15-bonfire-handbuch-lokal.pdf](https://btm.shortaktien.de/pdfs/15-bonfire-handbuch-lokal.pdf): Lokale PDF-Kopie im Dokumentenarchiv.
+- [17-ips-dtd110s1210-datasheet.pdf](https://btm.shortaktien.de/pdfs/17-ips-dtd110s1210-datasheet.pdf): Lokale PDF-Kopie im Dokumentenarchiv.
+- [18-mean-well-ddr-120d12-datasheet.pdf](https://btm.shortaktien.de/pdfs/18-mean-well-ddr-120d12-datasheet.pdf): Lokale PDF-Kopie im Dokumentenarchiv.
+- [19-wildfire-handbuch-community.pdf](https://btm.shortaktien.de/pdfs/19-wildfire-handbuch-community.pdf): Lokale PDF-Kopie im Dokumentenarchiv.
+- [20-wildfire-wartung-community.pdf](https://btm.shortaktien.de/pdfs/20-wildfire-wartung-community.pdf): Lokale PDF-Kopie im Dokumentenarchiv.
+- [21-gabelabdichtung-community.pdf](https://btm.shortaktien.de/pdfs/21-gabelabdichtung-community.pdf): Lokale PDF-Kopie im Dokumentenarchiv.
+- [22-wildfire-fardriver-settings-community.pdf](https://btm.shortaktien.de/pdfs/22-wildfire-fardriver-settings-community.pdf): Lokale PDF-Kopie im Dokumentenarchiv.
+
+## Bezugs- und Quellenlogik
+
+- Ersatzteilkandidaten werden zuerst über Amazon geprüft; wenn dort kein belastbarer Treffer existiert, werden deutsche oder EU-Fachhändler berücksichtigt.
+- Alibaba wird nicht als Bezugsquelle verwendet.
+- Externe Links sind als Quellen oder Gegenprüfmöglichkeiten gekennzeichnet. Lokale PDF-Links bleiben auf dieser Website verfügbar.
+
+## Daten und Aktualität
+
+- Letzte automatische Index-Aktualisierung: 2026-09-03.
+- Für aktuelle Verfügbarkeit, Preise und rechtliche Verfahrensstände immer die jeweils verlinkte Quelle und den eigenen Modell-/Baujahrstand prüfen.

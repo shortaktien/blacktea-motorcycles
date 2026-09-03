@@ -1,0 +1,146 @@
+name: Deploy to BTM VPS (manuell nach Review)
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_deploy:
+        description: Produktionsänderungen und separat verwaltete VPS-PDFs geprüft
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: btm-production-deploy
+  cancel-in-progress: false
+
+jobs:
+  quality:
+    name: Frontend build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Build frontend
+        run: npm run build
+
+  deploy:
+    name: Sync and restart Docker stack
+    needs: quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment:
+      name: production
+    env:
+      VPS_HOST: ${{ secrets.VPS_HOST }}
+      VPS_USER: ${{ secrets.VPS_USER }}
+      VPS_PORT: ${{ secrets.VPS_PORT || '22' }}
+      VPS_APP_PATH: ${{ secrets.VPS_APP_PATH }}
+      VPS_SSH_PRIVATE_KEY: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+      VPS_SSH_KNOWN_HOSTS: ${{ secrets.VPS_SSH_KNOWN_HOSTS }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Validate deployment configuration
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${{ inputs.confirm_deploy }}" = "true" || { echo "Deployment wurde nicht bestätigt." >&2; exit 1; }
+          test "$GITHUB_REF_NAME" = "main" || { echo "Deployments sind nur vom main-Branch erlaubt." >&2; exit 1; }
+          test -n "$VPS_HOST" || { echo "VPS_HOST fehlt in den production-Environment-Secrets." >&2; exit 1; }
+          test -n "$VPS_USER" || { echo "VPS_USER fehlt in den production-Environment-Secrets." >&2; exit 1; }
+          test -n "$VPS_APP_PATH" || { echo "VPS_APP_PATH fehlt in den production-Environment-Secrets." >&2; exit 1; }
+          test -n "$VPS_SSH_PRIVATE_KEY" || { echo "VPS_SSH_PRIVATE_KEY fehlt in den GitHub Secrets." >&2; exit 1; }
+          test -n "$VPS_SSH_KNOWN_HOSTS" || { echo "VPS_SSH_KNOWN_HOSTS fehlt in den GitHub Secrets." >&2; exit 1; }
+          test "$VPS_USER" != "root" || { echo "VPS_USER darf nicht root sein. Verwende einen dedizierten Deploy-Benutzer." >&2; exit 1; }
+          case "$VPS_PORT" in (*[!0-9]*|'') echo "VPS_PORT muss numerisch sein." >&2; exit 1;; esac
+          test "$VPS_APP_PATH" = "/opt/btm" || { echo "Unerwarteter VPS_APP_PATH: $VPS_APP_PATH" >&2; exit 1; }
+
+      - name: Configure SSH
+        shell: bash
+        run: |
+          set -euo pipefail
+          install -d -m 700 "$HOME/.ssh"
+          printf '%s\n' "$VPS_SSH_PRIVATE_KEY" > "$HOME/.ssh/btm_deploy_key"
+          chmod 600 "$HOME/.ssh/btm_deploy_key"
+          printf '%s\n' "$VPS_SSH_KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
+          chmod 644 "$HOME/.ssh/known_hosts"
+
+      - name: Synchronize application files
+        shell: bash
+        run: |
+          set -euo pipefail
+          rsync -az --delete \
+            --exclude='.git/' \
+            --exclude='.github/' \
+            --exclude='.DS_Store' \
+            --exclude='frontend/node_modules/' \
+            --exclude='frontend/dist/' \
+            --exclude='frontend/.env*' \
+            --exclude='backend/vendor/' \
+            --exclude='backend/var/' \
+            --exclude='backend/.env' \
+            --exclude='frontend/public/pdfs/*.pdf' \
+            --exclude='.env' \
+            -e "ssh -i $HOME/.ssh/btm_deploy_key -p $VPS_PORT -o BatchMode=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts" \
+            ./ "$VPS_USER@$VPS_HOST:$VPS_APP_PATH/"
+
+      - name: Build and restart on VPS
+        shell: bash
+        run: |
+          set -euo pipefail
+          remote_path=$(printf '%q' "$VPS_APP_PATH")
+          ssh -i "$HOME/.ssh/btm_deploy_key" \
+            -p "$VPS_PORT" \
+            -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            -o UserKnownHostsFile="$HOME/.ssh/known_hosts" \
+            "$VPS_USER@$VPS_HOST" "VPS_APP_PATH=$remote_path bash -s" <<'REMOTE'
+          set -euo pipefail
+          cd "$VPS_APP_PATH"
+
+          if [ ! -f backend/.env ]; then
+            echo "backend/.env fehlt auf dem VPS. Lege die Produktions-Konfiguration einmalig unter $VPS_APP_PATH/backend/.env an." >&2
+            exit 1
+          fi
+
+          if grep -Eq '^(APP_SECRET|ADMIN_PASSWORD_HASH)=replace-with-' backend/.env; then
+            echo "backend/.env enthält noch Platzhalter. Setze APP_SECRET und ADMIN_PASSWORD_HASH vor dem Deployment." >&2
+            exit 1
+          fi
+
+          docker compose version
+          docker compose config >/dev/null
+          docker compose up -d --build --remove-orphans
+
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent --show-error --max-time 5 http://127.0.0.1:5173/ >/dev/null \
+              && curl --fail --silent --show-error --max-time 5 http://127.0.0.1:8000/api/health >/dev/null; then
+              echo "BTM-Stack ist erreichbar."
+              docker compose ps
+              exit 0
+            fi
+            sleep 2
+          done
+
+          docker compose ps
+          echo "Health-Check nach dem Deployment fehlgeschlagen." >&2
+          exit 1
+          REMOTE

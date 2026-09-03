@@ -1,0 +1,2244 @@
+{
+  "retrieved_at": "2026-09-02",
+  "source": "Wayback CDX + archived BTM Shopify pages",
+  "entries": [
+    {
+      "slug": "alu-topcase",
+      "archive": "https://web.archive.org/web/20240416181434id_/https://www.blackteamotorbikes.com/products/alu-topcase",
+      "timestamp": "20240416181434",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Alu-Topcase",
+      "description": "Dein Alu-Topcase ist innerhalb von 2 Minuten montiert und bietet genug Stauraum für deinen Helm. Natürlich kannst dein Topcase am Fahrzeug abschließen, so dass niemand dein Topcase entfernen kann. Stauraum: 40 Liter",
+      "price_min_eur": 150,
+      "price_max_eur": 150,
+      "variants": [],
+      "available": false
+    },
+    {
+      "slug": "bar-end-mirrors",
+      "archive": "https://web.archive.org/web/20230514052827id_/https://www.blackteamotorbikes.com/products/bar-end-mirrors",
+      "timestamp": "20230514052827",
+      "ok": true,
+      "source_format": "shopify-product-json",
+      "title": "Lenkerendenspiegel",
+      "description": "Kompatibel mit allen Bonfires. Straßenzulassung : EU & Schweiz. Material : CNC gefräster Stahl mit schwarzer Lackierung Verpasse deiner Bonfire einen modernen Look mit diesen coolen Spiegeln.",
+      "price_min_eur": 60,
+      "price_max_eur": 79,
+      "available": true,
+      "variants": [
+        {
+          "title": "Normal",
+          "name": "Lenkerendenspiegel - Normal",
+          "price_eur": 79,
+          "available": true,
+          "sku": ""
+        },
+        {
+          "title": "Upgrade",
+          "name": "Lenkerendenspiegel - Upgrade",
+          "price_eur": 60,
+          "available": true,
+          "sku": ""
+        }
+      ]
+    },
+    {
+      "slug": "bearings",
+      "archive": "https://web.archive.org/web/20240623012125id_/https://www.blackteamotorbikes.com/products/bearings",
+      "timestamp": "20240623012125",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Lenkkopflager",
+      "description": "Bearings for your steering stem.",
+      "price_min_eur": 69,
+      "price_max_eur": 69,
+      "variants": [],
+      "available": false
+    },
+    {
+      "slug": "blinkerhalterung-vorne",
+      "archive": "https://web.archive.org/web/20230928050545id_/https://www.blackteamotorbikes.com/products/blinkerhalterung-vorne",
+      "timestamp": "20230928050545",
+      "ok": true,
+      "source_format": "shopify-product-json",
+      "title": "Blinkerhalterung (vorne)",
+      "description": "",
+      "price_min_eur": 15,
+      "price_max_eur": 15,
+      "available": true,
+      "variants": [
+        {
+          "title": "Default Title",
+          "name": "Blinkerhalterung (vorne)",
+          "price_eur": 15,
+          "available": true,
+          "sku": ""
+        }
+      ]
+    },
+    {
+      "slug": "bluetooth-dongle",
+      "archive": "https://web.archive.org/web/20241214015001id_/https://www.blackteamotorbikes.com/products/bluetooth-dongle",
+      "timestamp": "20241214015001",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Bluetooth Dongle",
+      "description": "Kompatibel mit allen Wildfires, der neuen Bonfire ab 2024 und allen Bonfire X. Mit diesem Bluetooth Dongle kannst du dich in den Controller einloggen und folgende Änderungen am Antriebsstrang ändern: Anpassung der Rekuperation (Energierückgewinnung) Anpassung der Spitzenleistung Anpassung der Dauerleistung Anpassung des Drehmoments Anpassung der Maximalgeschwindigkeit Anpassung der Gasgriff-Sensitivität Anpassung der Fahr-Modi (Eco, Normal & Sport) Übersicht über Leistung, Controller-Temperatur und Motortemperatur",
+      "price_min_eur": 79,
+      "price_max_eur": 79,
+      "variants": [],
+      "available": false
+    },
+    {
+      "slug": "bremsbelage",
+      "archive": "https://web.archive.org/web/20231130201331id_/https://www.blackteamotorbikes.com/products/bremsbelage",
+      "timestamp": "20231130201331",
+      "ok": true,
+      "source_format": "shopify-product-json",
+      "title": "Bremsbeläge",
+      "description": "",
+      "price_min_eur": 15,
+      "price_max_eur": 15,
+      "available": true,
+      "variants": [
+        {
+          "title": "Hinten",
+          "name": "Bremsbeläge - Hinten",
+          "price_eur": 15,
+          "available": true,
+          "sku": null
+        },
+        {
+          "title": "Vorne (220 mm)",
+          "name": "Bremsbeläge - Vorne (220 mm)",
+          "price_eur": 15,
+          "available": true,
+          "sku": null
+        },
+        {
+          "title": "CBS Vorne (265 mm)",
+          "name": "Bremsbeläge - CBS Vorne (265 mm)",
+          "price_eur": 15,
+          "available": true,
+          "sku": null
+        }
+      ]
+    },
+    {
+      "slug": "bremsen",
+      "archive": "https://web.archive.org/web/20250317152751id_/https://www.blackteamotorbikes.com/products/bremsen",
+      "timestamp": "20250317152751",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Bremsen",
+      "description": "Nutzung für den Konfigurator",
+      "price_min_eur": 1,
+      "price_max_eur": 1,
+      "variants": [],
+      "available": false
+    },
+    {
+      "slug": "bremsleitung",
+      "archive": "https://web.archive.org/web/20231130195649id_/https://www.blackteamotorbikes.com/products/bremsleitung",
+      "timestamp": "20231130195649",
+      "ok": true,
+      "source_format": "shopify-product-json",
+      "title": "Bremsleitung",
+      "description": "",
+      "price_min_eur": 25,
+      "price_max_eur": 25,
+      "available": true,
+      "variants": [
+        {
+          "title": "Rechts Vorne (90 cm)",
+          "name": "Bremsleitung - Rechts Vorne (90 cm)",
+          "price_eur": 25,
+          "available": true,
+          "sku": null
+        },
+        {
+          "title": "Links Vorne (80 cm)",
+          "name": "Bremsleitung - Links Vorne (80 cm)",
+          "price_eur": 25,
+          "available": true,
+          "sku": null
+        },
+        {
+          "title": "Links Hinten (180 cm)",
+          "name": "Bremsleitung - Links Hinten (180 cm)",
+          "price_eur": 25,
+          "available": true,
+          "sku": null
+        }
+      ]
+    },
+    {
+      "slug": "bremslichtkabel",
+      "archive": "https://web.archive.org/web/20240524171025id_/https://www.blackteamotorbikes.com/products/bremslichtkabel",
+      "timestamp": "20240524171025",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Bremslichtkabel",
+      "description": "Kabel mit Schalter für das Bremslicht",
+      "price_min_eur": 9,
+      "price_max_eur": 9,
+      "variants": [
+        {
+          "title": "Links",
+          "name": "Links"
+        },
+        {
+          "title": "Rechts",
+          "name": "Rechts"
+        }
+      ],
+      "available": false
+    },
+    {
+      "slug": "bremsscheibe",
+      "archive": "https://web.archive.org/web/20231130205640id_/https://www.blackteamotorbikes.com/products/bremsscheibe",
+      "timestamp": "20231130205640",
+      "ok": true,
+      "source_format": "shopify-product-json",
+      "title": "Bremsscheibe",
+      "description": "",
+      "price_min_eur": 25,
+      "price_max_eur": 25,
+      "available": true,
+      "variants": [
+        {
+          "title": "Hinten (220 mm)",
+          "name": "Bremsscheibe - Hinten (220 mm)",
+          "price_eur": 25,
+          "available": true,
+          "sku": null
+        },
+        {
+          "title": "Hinten (180 mm)",
+          "name": "Bremsscheibe - Hinten (180 mm)",
+          "price_eur": 25,
+          "available": true,
+          "sku": null
+        },
+        {
+          "title": "Vorne (220 mm)",
+          "name": "Bremsscheibe - Vorne (220 mm)",
+          "price_eur": 25,
+          "available": true,
+          "sku": null
+        },
+        {
+          "title": "Vorne (265 mm)",
+          "name": "Bremsscheibe - Vorne (265 mm)",
+          "price_eur": 25,
+          "available": true,
+          "sku": ""
+        }
+      ]
+    },
+    {
+      "slug": "bremszylinder",
+      "archive": "https://web.archive.org/web/20231130213148id_/https://www.blackteamotorbikes.com/products/bremszylinder",
+      "timestamp": "20231130213148",
+      "ok": true,
+      "source_format": "shopify-product-json",
+      "title": "Bremszylinder",
+      "description": "",
+      "price_min_eur": 29,
+      "price_max_eur": 49,
+      "available": true,
+      "variants": [
+        {
+          "title": "Rear Brake",
+          "name": "Bremszylinder - Rear Brake",
+          "price_eur": 29,
+          "available": true,
+          "sku": ""
+        },
+        {
+          "title": "Front Brake (220 mm Disc)",
+          "name": "Bremszylinder - Front Brake (220 mm Disc)",
+          "price_eur": 29,
+          "available": true,
+          "sku": ""
+        },
+        {
+          "title": "CBS Front Brake (265 mm)",
+          "name": "Bremszylinder - CBS Front Brake (265 mm)",
+          "price_eur": 49,
+          "available": true,
+          "sku": ""
+        }
+      ]
+    },
+    {
+      "slug": "bremszylinder-und-hebel",
+      "archive": "https://web.archive.org/web/20230928052714id_/https://www.blackteamotorbikes.com/products/bremszylinder-und-hebel",
+      "timestamp": "20230928052714",
+      "ok": true,
+      "source_format": "shopify-product-json",
+      "title": "Bremszylinder und -hebel",
+      "description": "Kompatibel mit allen Bonfires Wähle zwischen Bremszylinder inklusive Hebel oder einfach nur den Bremshebeln einzeln.",
+      "price_min_eur": 9,
+      "price_max_eur": 29,
+      "available": true,
+      "variants": [
+        {
+          "title": "Bremszylinder / Links",
+          "name": "Bremszylinder und -hebel - Bremszylinder / Links",
+          "price_eur": 29,
+          "available": true,
+          "sku": ""
+        },
+        {
+          "title": "Bremszylinder / Rechts",
+          "name": "Bremszylinder und -hebel - Bremszylinder / Rechts",
+          "price_eur": 29,
+          "available": true,
+          "sku": ""
+        },
+        {
+          "title": "Bremshebel / Links",
+          "name": "Bremszylinder und -hebel - Bremshebel / Links",
+          "price_eur": 9,
+          "available": true,
+          "sku": ""
+        },
+        {
+          "title": "Bremshebel / Rechts",
+          "name": "Bremszylinder und -hebel - Bremshebel / Rechts",
+          "price_eur": 9,
+          "available": true,
+          "sku": ""
+        }
+      ]
+    },
+    {
+      "slug": "change-the-color-of-my-off-road-protection",
+      "archive": "https://web.archive.org/web/20250317135835id_/https://www.blackteamotorbikes.com/products/change-the-color-of-my-off-road-protection",
+      "timestamp": "20250317135835",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Farbkombination deiner Wildfire ändern",
+      "description": "Bitte benutze dieses Tool, um die Farbe deiner Wildfire zu ändern.",
+      "price_min_eur": 200,
+      "price_max_eur": 200,
+      "variants": [
+        {
+          "title": "Red Devil",
+          "name": "Red Devil"
+        },
+        {
+          "title": "Stealth",
+          "name": "Stealth"
+        },
+        {
+          "title": "Classic",
+          "name": "Classic"
+        },
+        {
+          "title": "Modern",
+          "name": "Modern"
+        },
+        {
+          "title": "All Black",
+          "name": "All Black"
+        }
+      ],
+      "available": false
+    },
+    {
+      "slug": "charger-upgrade",
+      "archive": "https://web.archive.org/web/20210423150236id_/https://blackteamotorbikes.com/products/charger-upgrade",
+      "timestamp": "20210423150236",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "10A Charger Upgrade",
+      "description": "Tax included. Shipping calculated at checkout.",
+      "price_min_eur": 149,
+      "price_max_eur": 149,
+      "variants": [],
+      "available": true
+    },
+    {
+      "slug": "charging-bundle",
+      "archive": "https://web.archive.org/web/20230928044452id_/https://www.blackteamotorbikes.com/products/charging-bundle",
+      "timestamp": "20230928044452",
+      "ok": true,
+      "source_format": "shopify-product-json",
+      "title": "Charging Bundle",
+      "description": "Du brauchst das komplette Paket? Also Batterien im eingebauten Zustand laden und während der Fährt dein Smartphone laden? Kein Problem, hier bist du genau richtig. Mit dem XLR-Ladeanschluss schließt du dein Ladekabel nur noch an deiner Bonfire an und schon wird dein E-Moped geladen. Kein Entnehmen der Batterien mehr nötig. Der USB-Anschluss hat eine wasserdichte Kappe und einen An-Aus-Schalter, so dass du komfortabel laden kannst, wann du willst. Bonfire S & E: Mit dem XLR Ladeanschluss erhältst du noch einen Adapter, dann kannst du einfach dein normales Ladegerät benutzen. Super easy! Bonfire X & Y: Da die Batterien in Serie angeschlossen sind, erhältst du ein zusätzliches Ladegerät mit doppelter Spannung. Hier hast fu wieder die Möglichkeit zwischen „Upgrade“ & „Normal“ zu wählen: Normal : Du erhältst neben deinen zwei normalen Ladegeräten noch ein drittes XLR Ladegerät. Upgrade : Eins von deinen normalen Ladegeräten wird gegen das XLR-Ladegerät getauscht. Das kannst du nur auswählen, wenn du deine Bonfire noch nicht erhalten hast. Du hast bereits deine Bonfire, aber willst auch einen XLR und USB-Ladeanschluss? So funktioniert‘s: Wir schicken dir ein leeres Paket mit einem Versandetikett zu. Du demontierst ein Seitenteil deiner Bonfire und legst es in das Paket und schickst es an uns. Wir bauen den XLR-Ladeanschluss in dein Seitenteil ein und schicken es mit dem USB-Anschluss dir zurück. Jetzt musst du das Seitenteil einbauen, die zwei Kabel am Controller verbinden und den USB-Anschluss montieren Die Videoanleitungen findest du auf unserer Support-Seite Informationen : XLR : Keine allgemeine Straßenzulassung, daher nicht auf öffentlichen Straßen nutzen. USB : Allgemeine Straßenzulassung",
+      "price_min_eur": 100,
+      "price_max_eur": 350,
+      "available": true,
+      "variants": [
+        {
+          "title": "Bonfire S or E / Normal",
+          "name": "Charging Bundle - Bonfire S or E / Normal",
+          "price_eur": 100,
+          "available": true,
+          "sku": ""
+        },
+        {
+          "title": "Bonfire X or Y / Normal",
+          "name": "Charging Bundle - Bonfire X or Y / Normal",
+          "price_eur": 350,
+          "available": true,
+          "sku": ""
+        },
+        {
+          "title": "Bonfire X or Y / Upgrade",
+          "name": "Charging Bundle - Bonfire X or Y / Upgrade",
+          "price_eur": 250,
+          "available": true,
+          "sku": ""
+        }
+      ]
+    },
+    {
+      "slug": "classic-indicator",
+      "archive": "https://web.archive.org/web/20240623025205id_/https://www.blackteamotorbikes.com/products/classic-indicator",
+      "timestamp": "20240623025205",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Klassische Blinker",
+      "description": "Im Lieferumfang enthalten: 4 klassische Halogen-Blinker. Informationen : Diese Blinker sind serienmäßig auf jeder Bonfire installiert. Straßenzulassung für EU & Schweiz",
+      "price_min_eur": 29,
+      "price_max_eur": 29,
+      "variants": [],
+      "available": false
+    },
+    {
+      "slug": "classic-mirrors",
+      "archive": "https://web.archive.org/web/20240522024120id_/https://www.blackteamotorbikes.com/products/classic-mirrors",
+      "timestamp": "20240522024120",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Klassische Spiegel",
+      "description": "Im Lieferumfang enthalten: 2 klassische Spiegel Informationen : Diese Spiegel sind serienmäßig auf der Bonfire installiert. Straßenzulassung für EU & Schweiz",
+      "price_min_eur": 29,
+      "price_max_eur": 29,
+      "variants": [],
+      "available": false
+    },
+    {
+      "slug": "copy-of-52-v-batterie",
+      "archive": "https://web.archive.org/web/20230929070936id_/https://www.blackteamotorbikes.com/products/copy-of-52-v-batterie",
+      "timestamp": "20230929070936",
+      "ok": true,
+      "source_format": "shopify-product-json",
+      "title": "52 V Batterie",
+      "description": "Jetzt kannst du zwischen der 1.8 kWh und der 3.1 kWh Batterie wählen.",
+      "price_min_eur": 750,
+      "price_max_eur": 1200,
+      "available": true,
+      "variants": [
+        {
+          "title": "Normal Range (1.8 kWh)",
+          "name": "52 V Batterie - Normal Range (1.8 kWh)",
+          "price_eur": 750,
+          "available": true,
+          "sku": ""
+        },
+        {
+          "title": "Long Range (3.1 kWh)",
+          "name": "52 V Batterie - Long Range (3.1 kWh)",
+          "price_eur": 1200,
+          "available": true,
+          "sku": ""
+        }
+      ]
+    },
+    {
+      "slug": "copy-of-achse",
+      "archive": "https://web.archive.org/web/20240229092106id_/https://www.blackteamotorbikes.com/products/copy-of-achse",
+      "timestamp": "20240229092106",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Beifahrerfußrasten",
+      "description": "",
+      "price_min_eur": 12,
+      "price_max_eur": 12,
+      "variants": [
+        {
+          "title": "Paar",
+          "name": "Paar"
+        },
+        {
+          "title": "Links",
+          "name": "Links"
+        },
+        {
+          "title": "Rechts",
+          "name": "Rechts"
+        }
+      ],
+      "available": false
+    },
+    {
+      "slug": "copy-of-beifahrerfussrasten",
+      "archive": "https://web.archive.org/web/20240229082559id_/https://www.blackteamotorbikes.com/products/copy-of-beifahrerfussrasten",
+      "timestamp": "20240229082559",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Schwinge",
+      "description": "",
+      "price_min_eur": 99,
+      "price_max_eur": 99,
+      "variants": [
+        {
+          "title": "Schwinge mit Beifahrerfußrasten",
+          "name": "Schwinge mit Beifahrerfußrasten"
+        },
+        {
+          "title": "Schwinge ohne Beifahrerfußrasten",
+          "name": "Schwinge ohne Beifahrerfußrasten"
+        }
+      ],
+      "available": false
+    },
+    {
+      "slug": "copy-of-federbeine",
+      "archive": "https://web.archive.org/web/20240229094639id_/https://www.blackteamotorbikes.com/products/copy-of-federbeine",
+      "timestamp": "20240229094639",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Achse",
+      "description": "",
+      "price_min_eur": 5,
+      "price_max_eur": 5,
+      "variants": [
+        {
+          "title": "Vorderrad-Achse",
+          "name": "Vorderrad-Achse"
+        },
+        {
+          "title": "Schwingen-Achse",
+          "name": "Schwingen-Achse"
+        }
+      ],
+      "available": false
+    },
+    {
+      "slug": "copy-of-gabelbruckenset",
+      "archive": "https://web.archive.org/web/20240229094407id_/https://www.blackteamotorbikes.com/products/copy-of-gabelbruckenset",
+      "timestamp": "20240229094407",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Motorhalterung-Set",
+      "description": "",
+      "price_min_eur": 20,
+      "price_max_eur": 20,
+      "variants": [
+        {
+          "title": "Komplettes Set",
+          "name": "Komplettes Set"
+        },
+        {
+          "title": "M16 Mutter",
+          "name": "M16 Mutter"
+        },
+        {
+          "title": "M16 Kontermutter",
+          "name": "M16 Kontermutter"
+        },
+        {
+          "title": "M16 Distanzhülse",
+          "name": "M16 Distanzhülse"
+        },
+        {
+          "title": "Halterung",
+          "name": "Halterung"
+        }
+      ],
+      "available": false
+    },
+    {
+      "slug": "copy-of-motorhalterung-set",
+      "archive": "https://web.archive.org/web/20240229073833id_/https://www.blackteamotorbikes.com/products/copy-of-motorhalterung-set",
+      "timestamp": "20240229073833",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Mutterabdeckung-Set",
+      "description": "Ein komplettes Set an Mutterabdeckungen für deine Bonfire. 2 x M16 Abdeckungen 2 x M12 Abdeckungen 2 x M10 Abdeckungen 2 x M8 Abdeckungen",
+      "price_min_eur": 5,
+      "price_max_eur": 5,
+      "variants": [],
+      "available": false
+    },
+    {
+      "slug": "copy-of-off-road-schutz",
+      "archive": "https://web.archive.org/web/20240416162934id_/https://www.blackteamotorbikes.com/products/copy-of-off-road-schutz",
+      "timestamp": "20240416162934",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Dual Sport Lenker",
+      "description": "Dual Sport Lenker mit Mittelstrebe: Dieser Lenker ist für alle, die eine etwas aufrechtere Sitzposition haben möchten und einen noch stabileren Lenker benötigen. Zusätzlich zur Mittelstrebe ist dieser Lenker auch konifiziert, dass heißt im Innern ist der Außendurchmesser auf 28 mm erhöht. Nur kompatibel mit der Wildfire",
+      "price_min_eur": 100,
+      "price_max_eur": 100,
+      "variants": [],
+      "available": false
+    },
+    {
+      "slug": "dcdc-converter",
+      "archive": "https://web.archive.org/web/20240623020107id_/https://www.blackteamotorbikes.com/products/dcdc-converter",
+      "timestamp": "20240623020107",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "DCDC Converter",
+      "description": "Im Lieferumfang enthalten: Ein DCDC-Wandler mit passendem Stecker für deine Bonfire.",
+      "price_min_eur": 69,
+      "price_max_eur": 69,
+      "variants": [
+        {
+          "title": "Bonfire S",
+          "name": "Bonfire S"
+        },
+        {
+          "title": "Bonfire E",
+          "name": "Bonfire E"
+        },
+        {
+          "title": "Bonfire X",
+          "name": "Bonfire X"
+        }
+      ],
+      "available": false
+    },
+    {
+      "slug": "display",
+      "archive": "https://web.archive.org/web/20240623024019id_/https://www.blackteamotorbikes.com/products/display",
+      "timestamp": "20240623024019",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Display",
+      "description": "Im Lieferumfang enthalten: Eine Anzeige (Tachometer) für deine Bonfire.",
+      "price_min_eur": 149,
+      "price_max_eur": 149,
+      "variants": [
+        {
+          "title": "Bonfire S",
+          "name": "Bonfire S"
+        },
+        {
+          "title": "Bonfire E",
+          "name": "Bonfire E"
+        },
+        {
+          "title": "Bonfire X",
+          "name": "Bonfire X"
+        }
+      ],
+      "available": false
+    },
+    {
+      "slug": "dual-sport-reifen-upgrade",
+      "archive": "https://web.archive.org/web/20230929061318id_/https://www.blackteamotorbikes.com/products/dual-sport-reifen-upgrade",
+      "timestamp": "20230929061318",
+      "ok": true,
+      "source_format": "shopify-product-json",
+      "title": "Dual Sport Reifen Upgrade",
+      "description": "Du findest die K60 Heidenau Dual Sport Reifen schicken? Dann ändere deine Straßenbereifung auf eine Off-Road-Bereifung mit diesem Upgrade.",
+      "price_min_eur": 50,
+      "price_max_eur": 50,
+      "available": true,
+      "variants": [
+        {
+          "title": "Default Title",
+          "name": "Dual Sport Reifen Upgrade",
+          "price_eur": 50,
+          "available": true,
+          "sku": ""
+        }
+      ]
+    },
+    {
+      "slug": "enduro-fender",
+      "archive": "https://web.archive.org/web/20241202164631id_/https://www.blackteamotorbikes.com/products/enduro-fender",
+      "timestamp": "20241202164631",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Enduro Fender",
+      "description": "Kompatibel mit der Bonfire und Wildfire",
+      "price_min_eur": 39,
+      "price_max_eur": 39,
+      "variants": [
+        {
+          "title": "Bonfire",
+          "name": "Bonfire"
+        },
+        {
+          "title": "Wildfire",
+          "name": "Wildfire"
+        }
+      ],
+      "available": false
+    },
+    {
+      "slug": "felge",
+      "archive": "https://web.archive.org/web/20240623005132id_/https://www.blackteamotorbikes.com/products/felge",
+      "timestamp": "20240623005132",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Felge",
+      "description": "18 Zoll Felge für dein Vorder- oder Hinterrad in Schwarz.",
+      "price_min_eur": 80,
+      "price_max_eur": 80,
+      "variants": [
+        {
+          "title": "Vorne",
+          "name": "Vorne"
+        },
+        {
+          "title": "Hinten",
+          "name": "Hinten"
+        }
+      ],
+      "available": false
+    },
+    {
+      "slug": "foot-pegs-set",
+      "archive": "https://web.archive.org/web/20250917142630id_/https://www.blackteamotorbikes.com/products/foot-pegs-set",
+      "timestamp": "20250917142630",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Fußrasten",
+      "description": "Im Lieferumfang enthalten: Ein Satz Fußrasten Kompatibel mit allen Bonfires Black Tea Motorbikes",
+      "price_min_eur": 25,
+      "price_max_eur": 25,
+      "variants": [],
+      "available": true
+    },
+    {
+      "slug": "fork-stabiliser",
+      "archive": "https://web.archive.org/web/20210423143255id_/https://blackteamotorbikes.com/products/fork-stabiliser",
+      "timestamp": "20210423143255",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Fork Stabiliser",
+      "description": "Tax included. Shipping calculated at checkout.",
+      "price_min_eur": 45,
+      "price_max_eur": 45,
+      "variants": [],
+      "available": true
+    },
+    {
+      "slug": "front-wheel",
+      "archive": "https://web.archive.org/web/20250917145425id_/https://www.blackteamotorbikes.com/products/front-wheel",
+      "timestamp": "20250917145425",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Vorderrad-Set",
+      "description": "Kompatibel mit allen Elektro-Enduros und Elektro-Rollern der 50-ccm- und 125-ccm-Klasse.",
+      "price_min_eur": 219,
+      "price_max_eur": 219,
+      "variants": [],
+      "available": true
+    },
+    {
+      "slug": "gabelbrucke-mit-lenkerklemmen",
+      "archive": "https://web.archive.org/web/20230928043527id_/https://www.blackteamotorbikes.com/products/gabelbrucke-mit-lenkerklemmen",
+      "timestamp": "20230928043527",
+      "ok": true,
+      "source_format": "shopify-product-json",
+      "title": "Gabelbrückenset",
+      "description": "",
+      "price_min_eur": 9,
+      "price_max_eur": 79,
+      "available": true,
+      "variants": [
+        {
+          "title": "Komplette Gabelbrücke mit Lager und Muttern",
+          "name": "Gabelbrückenset - Komplette Gabelbrücke mit Lager und Muttern",
+          "price_eur": 79,
+          "available": true,
+          "sku": ""
+        },
+        {
+          "title": "Nur obere Gabelbrücke mit Lenkerklemmen",
+          "name": "Gabelbrückenset - Nur obere Gabelbrücke mit Lenkerklemmen",
+          "price_eur": 39,
+          "available": true,
+          "sku": ""
+        },
+        {
+          "title": "Nur untere Gabelbrücke",
+          "name": "Gabelbrückenset - Nur untere Gabelbrücke",
+          "price_eur": 39,
+          "available": true,
+          "sku": ""
+        },
+        {
+          "title": "Nur Mutternset",
+          "name": "Gabelbrückenset - Nur Mutternset",
+          "price_eur": 9,
+          "available": true,
+          "sku": ""
+        }
+      ]
+    },
+    {
+      "slug": "gabelset",
+      "archive": "https://web.archive.org/web/20230929064906id_/https://www.blackteamotorbikes.com/products/gabelset",
+      "timestamp": "20230929064906",
+      "ok": true,
+      "source_format": "shopify-product-json",
+      "title": "Gabelset",
+      "description": "",
+      "price_min_eur": 99,
+      "price_max_eur": 99,
+      "available": true,
+      "variants": [
+        {
+          "title": "Default Title",
+          "name": "Gabelset",
+          "price_eur": 99,
+          "available": true,
+          "sku": ""
+        }
+      ]
+    },
+    {
+      "slug": "gasdruck-federbeine",
+      "archive": "https://web.archive.org/web/20240524161652id_/https://www.blackteamotorbikes.com/products/gasdruck-federbeine",
+      "timestamp": "20240524161652",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Gasdruck-Federbeine",
+      "description": "Die Gasdruck-Federbeine passen in jede Bonfire und werden mit den gleichen Schrauben und Muttern montiert. Die Federn sind weicher, erzeugen dadurch mehr Negativ-Federweg, die Länge der Federbeine kann verstellt werden von 330 mm bis 360 mm, um die Sitzhöhe zu ändern und die Feder-Vorspannung kann stufenlos verstellt werden. Die Gasdruck-Federbeine werden im Juni ausgeliefert.",
+      "price_min_eur": 250,
+      "price_max_eur": 250,
+      "variants": [],
+      "available": false
+    },
+    {
+      "slug": "goldene-usd-gabel",
+      "archive": "https://web.archive.org/web/20241108005431id_/https://www.blackteamotorbikes.com/products/goldene-usd-gabel",
+      "timestamp": "20241108005431",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Goldene USD-Gabel",
+      "description": "Du willst deine Wildfire etwas auffälliger haben. Dann wechsele zur goldenen USD-Gabel.",
+      "price_min_eur": 100,
+      "price_max_eur": 100,
+      "variants": [],
+      "available": false
+    },
+    {
+      "slug": "handguards",
+      "archive": "https://web.archive.org/web/20240416164841id_/https://www.blackteamotorbikes.com/products/handguards",
+      "timestamp": "20240416164841",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Aluminium Handguards",
+      "description": "Diese Handguards aus Aluminium schützen deine Hände vor Kälte, Nässe und Fahrtwind. Schäden durch Stößen und Umfallen werden durch sie deutlich reduziert.",
+      "price_min_eur": 75,
+      "price_max_eur": 75,
+      "variants": [],
+      "available": false
+    },
+    {
+      "slug": "handlebar-crash-bars",
+      "archive": "https://web.archive.org/web/20230928051418id_/https://www.blackteamotorbikes.com/products/handlebar-crash-bars",
+      "timestamp": "20230928051418",
+      "ok": true,
+      "source_format": "shopify-product-json",
+      "title": "Crash Bars",
+      "description": "Die Crash Bars schützen deine Lenkerenden vor Stürzen. Sie sind schnell am Lenker befestigt, sehen nicht nur cool aus, sondern sind auch richtig praktisch. Wähle zwischen Schwarz und Silber. Nicht kompatibel mit Bar End Mirrors.",
+      "price_min_eur": 15,
+      "price_max_eur": 15,
+      "available": true,
+      "variants": [
+        {
+          "title": "Black",
+          "name": "Crash Bars - Black",
+          "price_eur": 15,
+          "available": true,
+          "sku": ""
+        },
+        {
+          "title": "Silver",
+          "name": "Crash Bars - Silver",
+          "price_eur": 15,
+          "available": true,
+          "sku": ""
+        }
+      ]
+    },
+    {
+      "slug": "handlebar-risers",
+      "archive": "https://web.archive.org/web/20220119080322id_/https://blackteamotorbikes.com/products/handlebar-risers",
+      "timestamp": "20220119080322",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Handlebar Risers",
+      "description": "Tax included. Shipping calculated at checkout.",
+      "price_min_eur": 59,
+      "price_max_eur": 59,
+      "variants": [],
+      "available": true
+    },
+    {
+      "slug": "headlight",
+      "archive": "https://web.archive.org/web/20240623022347id_/https://www.blackteamotorbikes.com/products/headlight",
+      "timestamp": "20240623022347",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Headlight",
+      "description": "Compatible with all Bonfires Delivery time: Currently in stock and will be shipped the next day.",
+      "price_min_eur": 200,
+      "price_max_eur": 200,
+      "variants": [],
+      "available": false
+    },
+    {
+      "slug": "headlight-grill",
+      "archive": "https://web.archive.org/web/20210423132508id_/https://blackteamotorbikes.com/products/headlight-grill",
+      "timestamp": "20210423132508",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Headlight Grill",
+      "description": "Tax included. Shipping calculated at checkout.",
+      "price_min_eur": 19,
+      "price_max_eur": 19,
+      "variants": [],
+      "available": true
+    },
+    {
+      "slug": "hintere-stossdampfer",
+      "archive": "https://web.archive.org/web/20230929064518id_/https://www.blackteamotorbikes.com/products/hintere-stossdampfer",
+      "timestamp": "20230929064518",
+      "ok": true,
+      "source_format": "shopify-product-json",
+      "title": "Hintere Stoßdämpfer",
+      "description": "",
+      "price_min_eur": 59,
+      "price_max_eur": 59,
+      "available": true,
+      "variants": [
+        {
+          "title": "Default Title",
+          "name": "Hintere Stoßdämpfer",
+          "price_eur": 59,
+          "available": true,
+          "sku": ""
+        }
+      ]
+    },
+    {
+      "slug": "hinterer-radschutz",
+      "archive": "https://web.archive.org/web/20240623012928id_/https://www.blackteamotorbikes.com/products/hinterer-radschutz",
+      "timestamp": "20240623012928",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Hinterer Radschutz",
+      "description": "Das hier ist die neue Version des hinteren Radschutzes",
+      "price_min_eur": 49,
+      "price_max_eur": 49,
+      "variants": [],
+      "available": false
+    },
+    {
+      "slug": "hub-motor",
+      "archive": "https://web.archive.org/web/20241012160510id_/https://www.blackteamotorbikes.com/products/hub-motor",
+      "timestamp": "20241012160510",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Radnabenmotor",
+      "description": "Im Lieferumfang enthalten : Radnabenmotor 2.15-18 schwarz matte Felge 36 Speichen & Nippel Eingespeicht und zentriert",
+      "price_min_eur": 790,
+      "price_max_eur": 790,
+      "variants": [
+        {
+          "title": "3 kW (Bonfire S/ E)",
+          "name": "3 kW (Bonfire S/ E)"
+        },
+        {
+          "title": "5 kW (Bonfire X)",
+          "name": "5 kW (Bonfire X)"
+        },
+        {
+          "title": "11 kW",
+          "name": "11 kW"
+        },
+        {
+          "title": "Dual Sport",
+          "name": "Dual Sport"
+        },
+        {
+          "title": "Street",
+          "name": "Street"
+        },
+        {
+          "title": "Ohne Reifen",
+          "name": "Ohne Reifen"
+        }
+      ],
+      "available": false
+    },
+    {
+      "slug": "kabel",
+      "archive": "https://web.archive.org/web/20240229080137id_/https://www.blackteamotorbikes.com/products/kabel",
+      "timestamp": "20240229080137",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Kabel",
+      "description": "Batterie und Controller Kabel für die Bonfire S, E und X.",
+      "price_min_eur": 29,
+      "price_max_eur": 29,
+      "variants": [
+        {
+          "title": "Bonfire S & E",
+          "name": "Bonfire S & E"
+        },
+        {
+          "title": "Bonfire X",
+          "name": "Bonfire X"
+        }
+      ],
+      "available": false
+    },
+    {
+      "slug": "key-set",
+      "archive": "https://web.archive.org/web/20240524160306id_/https://www.blackteamotorbikes.com/products/key-set",
+      "timestamp": "20240524160306",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Schlüsselset",
+      "description": "Kompatibel mit allen Bonfires Im Lieferumfang enthalten: Lenkradschloss Zündschloss Tankkappe mit Schloss 2 Schlüssel",
+      "price_min_eur": 49,
+      "price_max_eur": 49,
+      "variants": [],
+      "available": false
+    },
+    {
+      "slug": "keyless-go",
+      "archive": "https://web.archive.org/web/20230928044821id_/https://www.blackteamotorbikes.com/products/keyless-go",
+      "timestamp": "20230928044821",
+      "ok": true,
+      "source_format": "shopify-product-json",
+      "title": "Keyless Go (lautlos)",
+      "description": "Kompatibel mit allen Bonfires Sollte dein Keyless Go mal defekt gehen, kannst du hier ein neues Set bestellen. Im Lieferumfang enthalten: Keyless Go System 2 Fernbedienungen Jetzt endlich lautlos",
+      "price_min_eur": 30,
+      "price_max_eur": 30,
+      "available": true,
+      "variants": [
+        {
+          "title": "Bonfire S oder E",
+          "name": "Keyless Go (lautlos) - Bonfire S oder E",
+          "price_eur": 30,
+          "available": true,
+          "sku": ""
+        },
+        {
+          "title": "Bonfire X oder Y",
+          "name": "Keyless Go (lautlos) - Bonfire X oder Y",
+          "price_eur": 30,
+          "available": true,
+          "sku": ""
+        }
+      ]
+    },
+    {
+      "slug": "keyless-go-retro-fit",
+      "archive": "https://web.archive.org/web/20230530151253id_/https://www.blackteamotorbikes.com/products/keyless-go-retro-fit",
+      "timestamp": "20230530151253",
+      "ok": true,
+      "source_format": "shopify-product-json",
+      "title": "Keyless Go Retrofit für Bonfire S",
+      "description": "Kompatibel mit Bonfire S Mit diesem Set kannst du die Alarm- und Keyless-Go-Funktion für deine Bonfire S nachrüsten, wenn du eine Zündung hast. Im Lieferumfang enthalten: Keyless Go System Extra-Kabel für den Retrofit in Bonfire S mit Zündschloss 2 5 A Sicherungen 2 Fernbedienungen",
+      "price_min_eur": 35,
+      "price_max_eur": 35,
+      "available": true,
+      "variants": [
+        {
+          "title": "Default Title",
+          "name": "Keyless Go Retrofit für Bonfire S",
+          "price_eur": 35,
+          "available": true,
+          "sku": ""
+        }
+      ]
+    },
+    {
+      "slug": "kill-switch",
+      "archive": "https://web.archive.org/web/20230929081544id_/https://www.blackteamotorbikes.com/products/kill-switch",
+      "timestamp": "20230929081544",
+      "ok": true,
+      "source_format": "shopify-product-json",
+      "title": "Kill Switch",
+      "description": "",
+      "price_min_eur": 19,
+      "price_max_eur": 19,
+      "available": true,
+      "variants": [
+        {
+          "title": "Default Title",
+          "name": "Kill Switch",
+          "price_eur": 19,
+          "available": true,
+          "sku": ""
+        }
+      ]
+    },
+    {
+      "slug": "ladegerat",
+      "archive": "https://web.archive.org/web/20230929073950id_/https://www.blackteamotorbikes.com/products/ladegerat",
+      "timestamp": "20230929073950",
+      "ok": true,
+      "source_format": "shopify-product-json",
+      "title": "Ladegerät",
+      "description": "Wir haben nun 3 Ladegeräte zur Auswahl. 5 A, 10 A oder 20 A Ladegerät. Kompatibel mit allen Bonfires 5 A Ladedauer (Normal Range): 6 Stunden Ladedauer (Long Range): 10 Stunden Größe: 15 x 7 x 4 cm Gewicht: 0,8 kg Leistung: 58,8 V x 5 A = 300 Watt 10 A Ladegerät Ladedauer (Normal Range) : 3 Stunden Ladedauer (Long Range): 5 Stunden Größe: 18 x 9 x 6 cm Gewicht: 1,1 kg Leistung: 58,8 V x 10 A = 600 Watt 20 A Ladegerät Ladedauer (Normal Range) : 1,5 Stunden Ladedauer (Long Range): 2,5 Stunden Größe: 21 x 12 x 7 cm Gewicht: 1,4 kg Leistung: 58,8 V x 20 A = 1.200 Watt Lieferzeit : Das 5 A und 10 A Ladegerät ist sofort verfügbar. Das 20 A Ladegerät gibt es ab April 2024.",
+      "price_min_eur": 100,
+      "price_max_eur": 200,
+      "available": true,
+      "variants": [
+        {
+          "title": "5 A",
+          "name": "Ladegerät - 5 A",
+          "price_eur": 100,
+          "available": true,
+          "sku": null
+        },
+        {
+          "title": "10 A",
+          "name": "Ladegerät - 10 A",
+          "price_eur": 150,
+          "available": true,
+          "sku": null
+        },
+        {
+          "title": "20 A",
+          "name": "Ladegerät - 20 A",
+          "price_eur": 200,
+          "available": true,
+          "sku": ""
+        }
+      ]
+    },
+    {
+      "slug": "langer-alu-radschutz",
+      "archive": "https://web.archive.org/web/20241108015839id_/https://www.blackteamotorbikes.com/products/langer-alu-radschutz",
+      "timestamp": "20241108015839",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Langer Alu-Radschutz",
+      "description": "Du willst einen etwas längeren Radschutz für deine Wildfire. Mit diesem Alu-Radschutz bekommst du einen hochwertigen Radschutz aus geschliffenem Aluminium, der dich perfekt vor Regen und Dreck schützt.",
+      "price_min_eur": 150,
+      "price_max_eur": 150,
+      "variants": [],
+      "available": false
+    },
+    {
+      "slug": "langer-bonfire-sitz",
+      "archive": "https://web.archive.org/web/20240523123259id_/https://www.blackteamotorbikes.com/products/langer-bonfire-sitz",
+      "timestamp": "20240523123259",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Langer Bonfire-Sitz",
+      "description": "Der lange Sitz passt auf jede Bonfire und wird genauso montiert wie der normale Sitz. Er ist außerdem nicht nur länger, sondern auch dicker gepolstert. Dadurch ist die Sitzhöhe um einige cm höher und der Abstand zu den Fußrasten ist etwas länger, somit ist es etwas bequemer für Fahrer mit langen Beinen. Der Sitz kann bis Ende April vorbestellt werden und wird im Juni ausgeliefert.",
+      "price_min_eur": 150,
+      "price_max_eur": 150,
+      "variants": [],
+      "available": false
+    },
+    {
+      "slug": "led-blinker",
+      "archive": "https://web.archive.org/web/20250917141127id_/https://www.blackteamotorbikes.com/products/led-blinker",
+      "timestamp": "20250917141127",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "LED-Blinker",
+      "description": "Kompatibel mit allen Elektro-Enduros und Elektro-Rollern der 50-ccm- und 125-ccm-Klasse.",
+      "price_min_eur": 29,
+      "price_max_eur": 29,
+      "variants": [],
+      "available": true
+    },
+    {
+      "slug": "led-indicators",
+      "archive": "https://web.archive.org/web/20230514052827id_/https://www.blackteamotorbikes.com/products/led-indicators",
+      "timestamp": "20230514052827",
+      "ok": true,
+      "source_format": "shopify-product-json",
+      "title": "LED Blinker",
+      "description": "Verleihe deiner Bonfire einen modernen Look. Im Lieferumfang enthalten: 4 x LED Blinker Informationen : Straßenzulassung in der EU und Schweiz Kompatibel mit allen Bonfires",
+      "price_min_eur": 30,
+      "price_max_eur": 45,
+      "available": true,
+      "variants": [
+        {
+          "title": "Normal",
+          "name": "LED Blinker - Normal",
+          "price_eur": 45,
+          "available": true,
+          "sku": ""
+        },
+        {
+          "title": "Upgrade",
+          "name": "LED Blinker - Upgrade",
+          "price_eur": 30,
+          "available": true,
+          "sku": ""
+        }
+      ]
+    },
+    {
+      "slug": "lenker",
+      "archive": "https://web.archive.org/web/20230928044110id_/https://www.blackteamotorbikes.com/products/lenker",
+      "timestamp": "20230928044110",
+      "ok": true,
+      "source_format": "shopify-product-json",
+      "title": "Lenker",
+      "description": "Sehr bequemer Aluminium-Lenker für die optimale Sitzposition. Farbe: Schwarz Breite: 800 mm Höhe: 120 mm Mit 5 mm Bohrung für die linke Schaltereinheit.",
+      "price_min_eur": 25,
+      "price_max_eur": 25,
+      "available": true,
+      "variants": [
+        {
+          "title": "Default Title",
+          "name": "Lenker",
+          "price_eur": 25,
+          "available": true,
+          "sku": ""
+        }
+      ]
+    },
+    {
+      "slug": "light-holder",
+      "archive": "https://web.archive.org/web/20240524160356id_/https://www.blackteamotorbikes.com/products/light-holder",
+      "timestamp": "20240524160356",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Scheinwerferhalter",
+      "description": "Kompatibel mit allen Bonfires",
+      "price_min_eur": 15,
+      "price_max_eur": 15,
+      "variants": [],
+      "available": false
+    },
+    {
+      "slug": "lower-foot-rests",
+      "archive": "https://web.archive.org/web/20220119075545id_/https://blackteamotorbikes.com/products/lower-foot-rests",
+      "timestamp": "20220119075545",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Lower Foot Rests",
+      "description": "Tax included. Shipping calculated at checkout.",
+      "price_min_eur": 89,
+      "price_max_eur": 89,
+      "variants": [],
+      "available": true
+    },
+    {
+      "slug": "luftgekuhlt",
+      "archive": "https://web.archive.org/web/20240229080451id_/https://www.blackteamotorbikes.com/products/luftgekuhlt",
+      "timestamp": "20240229080451",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Luftgekühlt",
+      "description": "Jetzt bis zum 30. November für 110 € statt 150 € vorbestellen und im Januar 2024 erhalten. Das Luftgekühlt Kit besteht aus Kühlrippen, Ferrofluid und Thermalpaste. Es ist ein Wundermittel gegen heiße Motoren und sorgt dafür, dass du länger Spaß hast und weniger stehst. Was bringt das Luftgekühlt Kit? Dein Motor läuft 30 % kühler Dein Motor kühlt doppelt so schnell ab Du hast 5 % mehr Reichweite Du kannst dir auch das November-Update anschauen, hier zeigen wir echte Vergleichswerte von der Bonfire X: https://www.youtube.com/watch?v=0LFI3J4MZcE Wie wird das Luftgekühlt Kit eingebaut? Schaue dir dafür das Einbauvideo hier an: https://www.youtube.com/watch?v=yCcpYLdSnaA Kann Black Tea Motorbikes das Luftgekühlt Kit bei mir einbauen? Ja, bestell das Kit und buche einfach eine Inspektion bei uns hier: Gibt es im Internet noch mehr Informationen dazu? https://ebikes.ca/product-info/grin-products/statorade.html https://ebikes.ca/documents/BionX_Statorade_Study.pdf https://www.electricbike.com/ferrofluid-shell-fins-direct-drive/ Kann ich meine Bonfire schneller machen? Ja, das ist nur für die Bonfire X möglich. Wir können dir einen Bluetooth Dongle mit den neuen Software-Werten zuschicken, die du nehmen kannst. Dadurch wird deine Bonfire X schneller beschleunigen können und evtl. auch eine höhere Maximalgeschwindigkeit erreichen.",
+      "price_min_eur": 150,
+      "price_max_eur": 150,
+      "variants": [
+        {
+          "title": "Kühlrippen & Ferrofluid",
+          "name": "Kühlrippen & Ferrofluid"
+        },
+        {
+          "title": "Kühlrippen",
+          "name": "Kühlrippen"
+        },
+        {
+          "title": "Ferrofluid",
+          "name": "Ferrofluid"
+        }
+      ],
+      "available": false
+    },
+    {
+      "slug": "modern-bundle",
+      "archive": "https://web.archive.org/web/20231130210336id_/https://www.blackteamotorbikes.com/products/modern-bundle",
+      "timestamp": "20231130210336",
+      "ok": true,
+      "source_format": "shopify-product-json",
+      "title": "Modern Bundle",
+      "description": "Kompatibel mit allen Bonfires Bundle aus LED-Blinkern, Lenkerendspiegeln und Diamemt-Griffen für einen modernen Look.",
+      "price_min_eur": 90,
+      "price_max_eur": 90,
+      "available": true,
+      "variants": [
+        {
+          "title": "Black",
+          "name": "Modern Bundle - Black",
+          "price_eur": 90,
+          "available": true,
+          "sku": "LED, Bar End & Grips"
+        },
+        {
+          "title": "Brown",
+          "name": "Modern Bundle - Brown",
+          "price_eur": 90,
+          "available": true,
+          "sku": "LED, Bar End & Grips-2"
+        }
+      ]
+    },
+    {
+      "slug": "moped-license-plate-holder",
+      "archive": "https://web.archive.org/web/20230928043605id_/https://www.blackteamotorbikes.com/products/moped-license-plate-holder",
+      "timestamp": "20230928043605",
+      "ok": true,
+      "source_format": "shopify-product-json",
+      "title": "Kennzeichenhalter",
+      "description": "The Bonfire E & X license plate holder is for the license plates with the size 255 x 130 mm. You can also use it for your Bonfire S if you make a voluntary registration. If you ride a Bonfire S and have to change the moped license plate very year, then the Bonfire S license Plate Holder is perfect for you. The exchange of the license plate is done within a minute. Important : Note that for the Bonfire S only moped license plates fit. Should you make a voluntary registration, then you should choose the Bonfire E & X motorcycle license plate and make sure you get the size 255 x 130 mm.",
+      "price_min_eur": 10,
+      "price_max_eur": 20,
+      "available": true,
+      "variants": [
+        {
+          "title": "Bonfire S",
+          "name": "Kennzeichenhalter - Bonfire S",
+          "price_eur": 10,
+          "available": true,
+          "sku": ""
+        },
+        {
+          "title": "Bonfire E, X, Y (255 x 130 mm)",
+          "name": "Kennzeichenhalter - Bonfire E, X, Y (255 x 130 mm)",
+          "price_eur": 20,
+          "available": true,
+          "sku": ""
+        }
+      ]
+    },
+    {
+      "slug": "nfc-karte-nachrustkit",
+      "archive": "https://web.archive.org/web/20250804095643id_/https://www.blackteamotorbikes.com/products/nfc-karte-nachrustkit",
+      "timestamp": "20250804095643",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "NFC-Karte Nachrüstkit",
+      "description": "Kompatibel mit allen Bonfire- und Wildfire-Elektro-Scramblers der 50-ccm- und 125-ccm-Klasse.",
+      "price_min_eur": 75,
+      "price_max_eur": 75,
+      "variants": [],
+      "available": true
+    },
+    {
+      "slug": "off-road-bundle",
+      "archive": "https://web.archive.org/web/20230928050835id_/https://www.blackteamotorbikes.com/products/off-road-bundle",
+      "timestamp": "20230928050835",
+      "ok": true,
+      "source_format": "shopify-product-json",
+      "title": "Off-Road Bundle",
+      "description": "Kompatibel mit allen Bonfires Bundle aus Gitter & Off-Road Protection für optimalen Schutz, wenn du mal im Gelände fährst.",
+      "price_min_eur": 95,
+      "price_max_eur": 95,
+      "available": true,
+      "variants": [
+        {
+          "title": "Silver",
+          "name": "Off-Road Bundle - Silver",
+          "price_eur": 95,
+          "available": true,
+          "sku": "Grill & Offroad-Protection"
+        },
+        {
+          "title": "Black Matt",
+          "name": "Off-Road Bundle - Black Matt",
+          "price_eur": 95,
+          "available": true,
+          "sku": "Grill & Offroad-Protection-2"
+        }
+      ]
+    },
+    {
+      "slug": "passenger-hold",
+      "archive": "https://web.archive.org/web/20240524155112id_/https://www.blackteamotorbikes.com/products/passenger-hold",
+      "timestamp": "20240524155112",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Soziushalter",
+      "description": "Kompatibel mit allen Bonfires",
+      "price_min_eur": 59,
+      "price_max_eur": 59,
+      "variants": [],
+      "available": false
+    },
+    {
+      "slug": "performance-bundle",
+      "archive": "https://web.archive.org/web/20230928034448id_/https://www.blackteamotorbikes.com/products/performance-bundle",
+      "timestamp": "20230928034448",
+      "ok": true,
+      "source_format": "shopify-product-json",
+      "title": "Performance Bundle",
+      "description": "Bundle aus Gabelstabilisator und Retro-Windschild für ein angenehmeres Fahren bei höheren Geschwindigkeiten und für einen cooleren Look.",
+      "price_min_eur": 95,
+      "price_max_eur": 95,
+      "available": true,
+      "variants": [
+        {
+          "title": "Default Title",
+          "name": "Performance Bundle",
+          "price_eur": 95,
+          "available": true,
+          "sku": "Fork Stabi & Windshield"
+        }
+      ]
+    },
+    {
+      "slug": "radabdeckung",
+      "archive": "https://web.archive.org/web/20230929073204id_/https://www.blackteamotorbikes.com/products/radabdeckung",
+      "timestamp": "20230929073204",
+      "ok": true,
+      "source_format": "shopify-product-json",
+      "title": "Radabdeckung",
+      "description": "",
+      "price_min_eur": 15,
+      "price_max_eur": 15,
+      "available": true,
+      "variants": [
+        {
+          "title": "Default Title",
+          "name": "Radabdeckung",
+          "price_eur": 15,
+          "available": true,
+          "sku": ""
+        }
+      ]
+    },
+    {
+      "slug": "range-extender-bundle",
+      "archive": "https://web.archive.org/web/20230610153458id_/https://www.blackteamotorbikes.com/products/range-extender-bundle",
+      "timestamp": "20230610153458",
+      "ok": true,
+      "source_format": "shopify-product-json",
+      "title": "Range Extender Bundle",
+      "description": "Bundle aus 52 V Batterie & Ladegerät.",
+      "price_min_eur": 950,
+      "price_max_eur": 1000,
+      "available": true,
+      "variants": [
+        {
+          "title": "5 A",
+          "name": "Range Extender Bundle - 5 A",
+          "price_eur": 950,
+          "available": true,
+          "sku": "Battery Bundle"
+        },
+        {
+          "title": "10 A",
+          "name": "Range Extender Bundle - 10 A",
+          "price_eur": 1000,
+          "available": true,
+          "sku": "Battery Bundle-2"
+        }
+      ]
+    },
+    {
+      "slug": "rear-light",
+      "archive": "https://web.archive.org/web/20240524163349id_/https://www.blackteamotorbikes.com/products/rear-light",
+      "timestamp": "20240524163349",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Rücklicht",
+      "description": "Kompatibel mit allen Bonfires",
+      "price_min_eur": 19,
+      "price_max_eur": 19,
+      "variants": [],
+      "available": false
+    },
+    {
+      "slug": "rear-rack",
+      "archive": "https://web.archive.org/web/20210423140141id_/https://blackteamotorbikes.com/products/rear-rack",
+      "timestamp": "20210423140141",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Rear Rack",
+      "description": "Tax included. Shipping calculated at checkout.",
+      "price_min_eur": 99,
+      "price_max_eur": 99,
+      "variants": [],
+      "available": true
+    },
+    {
+      "slug": "reflektoren",
+      "archive": "https://web.archive.org/web/20240229080801id_/https://www.blackteamotorbikes.com/products/reflektoren",
+      "timestamp": "20240229080801",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Reflektoren",
+      "description": "Kompatibel mit allen Bonfires",
+      "price_min_eur": 9.9,
+      "price_max_eur": 9.9,
+      "variants": [
+        {
+          "title": "Roter Reflektor für hinten (1 Stück)",
+          "name": "Roter Reflektor für hinten (1 Stück)"
+        },
+        {
+          "title": "Orangener Reflektor seitlich  (1 Stück)",
+          "name": "Orangener Reflektor seitlich  (1 Stück)"
+        }
+      ],
+      "available": false
+    },
+    {
+      "slug": "reparatur-qs8s-stecker",
+      "archive": "https://web.archive.org/web/20250917142000id_/https://www.blackteamotorbikes.com/products/reparatur-qs8s-stecker",
+      "timestamp": "20250917142000",
+      "ok": false,
+      "source_format": "archived-html-generic",
+      "error": "Snapshot lieferte nur eine generische Archivseite ohne Produktdaten.",
+      "variants": [],
+      "available": false
+    },
+    {
+      "slug": "retro-windschild",
+      "archive": "https://web.archive.org/web/20220522135645id_/https://blackteamotorbikes.com/products/retro-windschild",
+      "timestamp": "20220522135645",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Retro Windschild",
+      "description": "Tax included. Shipping calculated at checkout.",
+      "price_min_eur": 49,
+      "price_max_eur": 49,
+      "variants": [],
+      "available": true
+    },
+    {
+      "slug": "ride-mode-button",
+      "archive": "https://web.archive.org/web/20240623020705id_/https://www.blackteamotorbikes.com/products/ride-mode-button",
+      "timestamp": "20240623020705",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Ride Mode Schalter",
+      "description": "Kompatibel mit allen Bonfires",
+      "price_min_eur": 19,
+      "price_max_eur": 19,
+      "variants": [],
+      "available": false
+    },
+    {
+      "slug": "schaltereinheit",
+      "archive": "https://web.archive.org/web/20230929080546id_/https://www.blackteamotorbikes.com/products/schaltereinheit",
+      "timestamp": "20230929080546",
+      "ok": true,
+      "source_format": "shopify-product-json",
+      "title": "Schaltereinheit",
+      "description": "",
+      "price_min_eur": 29,
+      "price_max_eur": 29,
+      "available": true,
+      "variants": [
+        {
+          "title": "Default Title",
+          "name": "Schaltereinheit",
+          "price_eur": 29,
+          "available": true,
+          "sku": ""
+        }
+      ]
+    },
+    {
+      "slug": "scheinwerfer-retrofit",
+      "archive": "https://web.archive.org/web/20250804091728id_/https://www.blackteamotorbikes.com/products/scheinwerfer-retrofit",
+      "timestamp": "20250804091728",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Scheinwerfer-Retrofit",
+      "description": "Kompatibel mit allen Bonfire- und Wildfire-Elektro-Scramblers der 50-ccm- und 125-ccm-Klasse.",
+      "price_min_eur": 190,
+      "price_max_eur": 190,
+      "variants": [],
+      "available": true
+    },
+    {
+      "slug": "schuko-auf-typ-2-adapter",
+      "archive": "https://web.archive.org/web/20240804120422id_/https://www.blackteamotorbikes.com/products/schuko-auf-typ-2-adapter",
+      "timestamp": "20240804120422",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Schuko auf Typ-2 Adapter",
+      "description": "Mit diesem Adapter kannst du mit deinem Ladegerät an jeder Ladesäule mit Typ-2 laden. Lieferbar ab Oktober 2024.",
+      "price_min_eur": 199,
+      "price_max_eur": 199,
+      "variants": [],
+      "available": false
+    },
+    {
+      "slug": "schuko-ladekabel-fur-wildfire",
+      "archive": "https://web.archive.org/web/20250804085718id_/https://www.blackteamotorbikes.com/products/schuko-ladekabel-fur-wildfire",
+      "timestamp": "20250804085718",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Schuko-Ladekabel für WIldfire",
+      "description": "Kompatibel mit allen Bonfire- und Wildfire-Elektro-Scramblers der 50-ccm- und 125-ccm-Klasse.",
+      "price_min_eur": 150,
+      "price_max_eur": 150,
+      "variants": [],
+      "available": true
+    },
+    {
+      "slug": "seat",
+      "archive": "https://web.archive.org/web/20240623004757id_/https://www.blackteamotorbikes.com/products/seat",
+      "timestamp": "20240623004757",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Sitz",
+      "description": "Kompatibel mit allen Bonfires Länge : 50 cm Material : Veganes Leder",
+      "price_min_eur": 119,
+      "price_max_eur": 119,
+      "variants": [
+        {
+          "title": "Black",
+          "name": "Black"
+        },
+        {
+          "title": "Brown",
+          "name": "Brown"
+        }
+      ],
+      "available": false
+    },
+    {
+      "slug": "seitenstander-kill-switch",
+      "archive": "https://web.archive.org/web/20230929073809id_/https://www.blackteamotorbikes.com/products/seitenstander-kill-switch",
+      "timestamp": "20230929073809",
+      "ok": true,
+      "source_format": "shopify-product-json",
+      "title": "Seitenständer Kill Switch",
+      "description": "",
+      "price_min_eur": 19,
+      "price_max_eur": 19,
+      "available": true,
+      "variants": [
+        {
+          "title": "Default Title",
+          "name": "Seitenständer Kill Switch",
+          "price_eur": 19,
+          "available": true,
+          "sku": ""
+        }
+      ]
+    },
+    {
+      "slug": "side-bag",
+      "archive": "https://web.archive.org/web/20230609033448id_/https://www.blackteamotorbikes.com/products/side-bag",
+      "timestamp": "20230609033448",
+      "ok": true,
+      "source_format": "shopify-product-json",
+      "title": "Seitentaschen",
+      "description": "Mit diesen Seitentaschen musst du auf dem Motorrad nie wieder deinen Rucksack auf dem Rücken tragen. Dank des wasser- und schmutzabweisenden Materials, des Zahlenschlosses und des Innenverschlusses ist die Tasche ein Allrounder in Sachen Praktikabilität. Du kannst die Tasche mit einem Klick an dein Bike klemmen und mit einem Klick wieder abnehmen. Wenn du deine Seitentasche nicht mitnehmen willst, kannst du sie an der Motorradhalterung befestigen und mit einem Zahlenschloss abschließen. So kann niemand deine Tasche stehlen oder sie gar öffnen. Außerdem hat sie die perfekte Größe: Im Inneren hast du 37 x 28 x 12 cm Platz für deine Habseligkeiten und deinen 15-Zoll-Laptop. Wir haben zwei Modelle. Das Adventure-Modell hat zwei Clips, um deine Sachen zu sichern, und das Urban-Modell kommt mit einem Dokumentenfach und einem Schultergurt. Du hast die Möglichkeit, je eine Seitentasche auf der linken und rechten Seite des Gepäckträgers zu befestigen. Für die Befestigung am Gepäckträger erhältst du für jede Seite eine Halterung. Du kannst den Gepäckträger here finden",
+      "price_min_eur": 310,
+      "price_max_eur": 374,
+      "available": true,
+      "variants": [
+        {
+          "title": "Urban / Left",
+          "name": "Seitentaschen - Urban / Left",
+          "price_eur": 374,
+          "available": false,
+          "sku": ""
+        },
+        {
+          "title": "Urban / Right",
+          "name": "Seitentaschen - Urban / Right",
+          "price_eur": 374,
+          "available": false,
+          "sku": ""
+        },
+        {
+          "title": "Adventure / Left",
+          "name": "Seitentaschen - Adventure / Left",
+          "price_eur": 310,
+          "available": false,
+          "sku": ""
+        },
+        {
+          "title": "Adventure / Right",
+          "name": "Seitentaschen - Adventure / Right",
+          "price_eur": 310,
+          "available": true,
+          "sku": ""
+        }
+      ]
+    },
+    {
+      "slug": "side-cover",
+      "archive": "https://web.archive.org/web/20240623011033id_/https://www.blackteamotorbikes.com/products/side-cover",
+      "timestamp": "20240623011033",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Side Cover",
+      "description": "",
+      "price_min_eur": 150,
+      "price_max_eur": 150,
+      "variants": [
+        {
+          "title": "Links",
+          "name": "Links"
+        },
+        {
+          "title": "Rechts",
+          "name": "Rechts"
+        }
+      ],
+      "available": false
+    },
+    {
+      "slug": "side-stand",
+      "archive": "https://web.archive.org/web/20240623020054id_/https://www.blackteamotorbikes.com/products/side-stand",
+      "timestamp": "20240623020054",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Seitenständer",
+      "description": "Kompatibel mit allen Bonfires",
+      "price_min_eur": 99,
+      "price_max_eur": 99,
+      "variants": [],
+      "available": false
+    },
+    {
+      "slug": "side-stand-spring-set",
+      "archive": "https://web.archive.org/web/20240623023908id_/https://www.blackteamotorbikes.com/products/side-stand-spring-set",
+      "timestamp": "20240623023908",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Doppelfeder für Seitenständer",
+      "description": "Kompatibel mit allen Bonfires",
+      "price_min_eur": 29,
+      "price_max_eur": 29,
+      "variants": [],
+      "available": false
+    },
+    {
+      "slug": "sitz-b-ware-gebraucht",
+      "archive": "https://web.archive.org/web/20240416175559id_/https://www.blackteamotorbikes.com/products/sitz-b-ware-gebraucht",
+      "timestamp": "20240416175559",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Sitz (B-Ware & Gebraucht)",
+      "description": "Kompatibel mit allen Bonfires Länge : 50 cm Material : Veganes Leder",
+      "price_min_eur": 69,
+      "price_max_eur": 69,
+      "variants": [
+        {
+          "title": "Black",
+          "name": "Black"
+        },
+        {
+          "title": "Brown",
+          "name": "Brown"
+        }
+      ],
+      "available": false
+    },
+    {
+      "slug": "speiche-mit-nippel",
+      "archive": "https://web.archive.org/web/20240523225106id_/https://www.blackteamotorbikes.com/products/speiche-mit-nippel",
+      "timestamp": "20240523225106",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Speiche mit Nippel",
+      "description": "Bestelle hier eine Speiche inklusive Nippel für dein Vorderrad oder Hinterrad",
+      "price_min_eur": 3,
+      "price_max_eur": 3,
+      "variants": [
+        {
+          "title": "Vorderrad",
+          "name": "Vorderrad"
+        },
+        {
+          "title": "Hinterrad",
+          "name": "Hinterrad"
+        }
+      ],
+      "available": false
+    },
+    {
+      "slug": "stand",
+      "archive": "https://web.archive.org/web/20240416170443id_/https://www.blackteamotorbikes.com/products/stand",
+      "timestamp": "20240416170443",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Ständer",
+      "description": "Hol dir einen Ständer für deine Bonfire, um Reparaturen einfacher und schneller zu machen.",
+      "price_min_eur": 120,
+      "price_max_eur": 120,
+      "variants": [],
+      "available": false
+    },
+    {
+      "slug": "stander-copy",
+      "archive": "https://web.archive.org/web/20240804120812id_/https://www.blackteamotorbikes.com/products/stander-copy",
+      "timestamp": "20240804120812",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Ständerschraube",
+      "description": "Hier findest du die spezielle Bundschraube für deinen Ständer. Die Schraube wird mit der passenden Mutter versendet.",
+      "price_min_eur": 6,
+      "price_max_eur": 6,
+      "variants": [],
+      "available": false
+    },
+    {
+      "slug": "starter-relais-12-v",
+      "archive": "https://web.archive.org/web/20230929081310id_/https://www.blackteamotorbikes.com/products/starter-relais-12-v",
+      "timestamp": "20230929081310",
+      "ok": true,
+      "source_format": "shopify-product-json",
+      "title": "Starter-Relais 12 V",
+      "description": "",
+      "price_min_eur": 9,
+      "price_max_eur": 9,
+      "available": true,
+      "variants": [
+        {
+          "title": "Default Title",
+          "name": "Starter-Relais 12 V",
+          "price_eur": 9,
+          "available": true,
+          "sku": ""
+        }
+      ]
+    },
+    {
+      "slug": "sticker-set",
+      "archive": "https://web.archive.org/web/20230610145248id_/https://www.blackteamotorbikes.com/products/sticker-set",
+      "timestamp": "20230610145248",
+      "ok": true,
+      "source_format": "shopify-product-json",
+      "title": "Sticker Set",
+      "description": "Als BTM-Fan bist du Teil einer großen Familie. Werde Teil des exklusiven Kreises und personalisiere deine Bonfire mit diesem Aufkleber-Set. Inhalt : 2 x Ride Tastefully, 2 x Blacktea, 2 x Hell & 2 x B/T",
+      "price_min_eur": 19,
+      "price_max_eur": 19,
+      "available": true,
+      "variants": [
+        {
+          "title": "Default Title",
+          "name": "Sticker Set",
+          "price_eur": 19,
+          "available": true,
+          "sku": ""
+        }
+      ]
+    },
+    {
+      "slug": "surf-rack",
+      "archive": "https://web.archive.org/web/20210423141549id_/https://blackteamotorbikes.com/products/surf-rack",
+      "timestamp": "20210423141549",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Surf Rack",
+      "description": "Tax included. Shipping calculated at checkout.",
+      "price_min_eur": 99,
+      "price_max_eur": 99,
+      "variants": [],
+      "available": true
+    },
+    {
+      "slug": "tall-rider-bundle",
+      "archive": "https://web.archive.org/web/20230610135946id_/https://www.blackteamotorbikes.com/products/tall-rider-bundle",
+      "timestamp": "20230610135946",
+      "ok": true,
+      "source_format": "shopify-product-json",
+      "title": "Tall Rider Bundle",
+      "description": "Bundle aus Lenkererhöhungen und unteren Fußrastenadaptern für große Fahrer (+185 cm).",
+      "price_min_eur": 90,
+      "price_max_eur": 90,
+      "available": true,
+      "variants": [
+        {
+          "title": "Default Title",
+          "name": "Tall Rider Bundle",
+          "price_eur": 90,
+          "available": true,
+          "sku": "Handlebar Risers & Lower Footrests"
+        }
+      ]
+    },
+    {
+      "slug": "tank",
+      "archive": "https://web.archive.org/web/20240524171856id_/https://www.blackteamotorbikes.com/products/tank",
+      "timestamp": "20240524171856",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Tank",
+      "description": "Kompatibel mit allen Bonfire Stil : Der silberne und der schwarz-matte Tank haben einen Tankdeckel. Die grünen, orangen und grauen Tanks werden ohne Tankdeckel geliefert.",
+      "price_min_eur": 69,
+      "price_max_eur": 69,
+      "variants": [
+        {
+          "title": "Black Matt",
+          "name": "Black Matt"
+        },
+        {
+          "title": "Silver",
+          "name": "Silver"
+        },
+        {
+          "title": "Orange",
+          "name": "Orange"
+        }
+      ],
+      "available": false
+    },
+    {
+      "slug": "tank-b-ware",
+      "archive": "https://web.archive.org/web/20231130213355id_/https://www.blackteamotorbikes.com/products/tank-b-ware",
+      "timestamp": "20231130213355",
+      "ok": true,
+      "source_format": "shopify-product-json",
+      "title": "Tank (B-Ware)",
+      "description": "Die Tanks haben leichte Kratzer, aber keine Dellen. Stil : Der silberne und der schwarz-matte Tank haben einen Tankdeckel. Die grünen, orangen und grauen Tanks werden ohne Tankdeckel geliefert.",
+      "price_min_eur": 15,
+      "price_max_eur": 15,
+      "available": true,
+      "variants": [
+        {
+          "title": "Black Matt",
+          "name": "Tank (B-Ware) - Black Matt",
+          "price_eur": 15,
+          "available": true,
+          "sku": null
+        },
+        {
+          "title": "Silver",
+          "name": "Tank (B-Ware) - Silver",
+          "price_eur": 15,
+          "available": true,
+          "sku": null
+        },
+        {
+          "title": "Olive",
+          "name": "Tank (B-Ware) - Olive",
+          "price_eur": 15,
+          "available": true,
+          "sku": null
+        },
+        {
+          "title": "Orange",
+          "name": "Tank (B-Ware) - Orange",
+          "price_eur": 15,
+          "available": true,
+          "sku": null
+        },
+        {
+          "title": "Grey",
+          "name": "Tank (B-Ware) - Grey",
+          "price_eur": 15,
+          "available": true,
+          "sku": null
+        }
+      ]
+    },
+    {
+      "slug": "tankgummi-set",
+      "archive": "https://web.archive.org/web/20230929065701id_/https://www.blackteamotorbikes.com/products/tankgummi-set",
+      "timestamp": "20230929065701",
+      "ok": true,
+      "source_format": "shopify-product-json",
+      "title": "Tankgummi Set",
+      "description": "",
+      "price_min_eur": 5,
+      "price_max_eur": 5,
+      "available": true,
+      "variants": [
+        {
+          "title": "Default Title",
+          "name": "Tankgummi Set",
+          "price_eur": 5,
+          "available": true,
+          "sku": ""
+        }
+      ]
+    },
+    {
+      "slug": "tft-touch-display-retrofit",
+      "archive": "https://web.archive.org/web/20250804085158id_/https://www.blackteamotorbikes.com/products/tft-touch-display-retrofit",
+      "timestamp": "20250804085158",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "TFT-Touch-Display Retrofit",
+      "description": "Kompatibel mit allen Bonfire- und Wildfire-Elektro-Scramblers der 50-ccm- und 125-ccm-Klasse.",
+      "price_min_eur": 390,
+      "price_max_eur": 390,
+      "variants": [],
+      "available": true
+    },
+    {
+      "slug": "typ-2-kabel",
+      "archive": "https://web.archive.org/web/20241012165318id_/https://www.blackteamotorbikes.com/products/typ-2-kabel",
+      "timestamp": "20241012165318",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Typ-2-Kabel",
+      "description": "Sollte die Ladesäule kein Typ-2-Ladekabel besitzen, wirst du eins dabei haben müssen. Dieses Typ-2-Ladekabel ist 3 m lang und passt in das Staufach deiner Wildfire. Super praktisch.",
+      "price_min_eur": 99,
+      "price_max_eur": 99,
+      "variants": [],
+      "available": false
+    },
+    {
+      "slug": "usb-charging-port",
+      "archive": "https://web.archive.org/web/20230514052827id_/https://www.blackteamotorbikes.com/products/usb-charging-port",
+      "timestamp": "20230514052827",
+      "ok": true,
+      "source_format": "shopify-product-json",
+      "title": "USB Ladeanschluss",
+      "description": "Wie praktisch wäre es, wenn du dein Smartphone laden könntest während du fährst. Das ist nun möglich mit dem USB Ladeanschluss. Der USB-Anschluss hat eine wasserdichte Kappe und einen An-Aus-Schalter, so dass du komfortabel laden kannst, wann du willst. Informationen Kompatibel mit jeder Bonfire Allgemeine Straßenzulassung",
+      "price_min_eur": 40,
+      "price_max_eur": 40,
+      "available": true,
+      "variants": [
+        {
+          "title": "Normal / Bonfire S",
+          "name": "USB Ladeanschluss - Normal / Bonfire S",
+          "price_eur": 40,
+          "available": true,
+          "sku": ""
+        },
+        {
+          "title": "Normal / Bonfire E",
+          "name": "USB Ladeanschluss - Normal / Bonfire E",
+          "price_eur": 40,
+          "available": true,
+          "sku": ""
+        },
+        {
+          "title": "Normal / Bonfire X",
+          "name": "USB Ladeanschluss - Normal / Bonfire X",
+          "price_eur": 40,
+          "available": true,
+          "sku": ""
+        },
+        {
+          "title": "Upgrade / Bonfire S",
+          "name": "USB Ladeanschluss - Upgrade / Bonfire S",
+          "price_eur": 40,
+          "available": true,
+          "sku": ""
+        },
+        {
+          "title": "Upgrade / Bonfire E",
+          "name": "USB Ladeanschluss - Upgrade / Bonfire E",
+          "price_eur": 40,
+          "available": true,
+          "sku": ""
+        },
+        {
+          "title": "Upgrade / Bonfire X",
+          "name": "USB Ladeanschluss - Upgrade / Bonfire X",
+          "price_eur": 40,
+          "available": true,
+          "sku": ""
+        }
+      ]
+    },
+    {
+      "slug": "usd-gabelset",
+      "archive": "https://web.archive.org/web/20251013055424id_/https://www.blackteamotorbikes.com/products/usd-gabelset",
+      "timestamp": "20251013055424",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "USD-Gabelset",
+      "description": "Du willst deine Wildfire etwas auffälliger haben. Dann wechsele zur goldenen USD-Gabel. Black Tea Motorbikes",
+      "price_min_eur": 200,
+      "price_max_eur": 200,
+      "variants": [],
+      "available": true
+    },
+    {
+      "slug": "wildfire",
+      "archive": "https://web.archive.org/web/20240416172408id_/https://www.blackteamotorbikes.com/products/wildfire",
+      "timestamp": "20240416172408",
+      "ok": true,
+      "source_format": "shopify-product-json",
+      "title": "Dual Sport Lenker",
+      "description": "Dual Sport Lenker mit Mittelstrebe: Dieser Lenker ist für alle, die eine etwas aufrechtere Sitzposition haben möchten und einen noch stabileren Lenker benötigen. Zusätzlich zur Mittelstrebe ist dieser Lenker auch konifiziert, dass heißt im Innern ist der Außendurchmesser auf 28 mm erhöht. Nur kompatibel mit der Wildfire",
+      "price_min_eur": 100,
+      "price_max_eur": 100,
+      "available": true,
+      "variants": [
+        {
+          "title": "Default Title",
+          "name": "Dual Sport Lenker",
+          "price_eur": 100,
+          "available": true,
+          "sku": null
+        }
+      ]
+    },
+    {
+      "slug": "wildfire-abs",
+      "archive": "https://web.archive.org/web/20240416163819id_/https://www.blackteamotorbikes.com/products/wildfire-abs",
+      "timestamp": "20240416163819",
+      "ok": true,
+      "source_format": "shopify-product-json",
+      "title": "Dual Sport Lenker",
+      "description": "Dual Sport Lenker mit Mittelstrebe: Dieser Lenker ist für alle, die eine etwas aufrechtere Sitzposition haben möchten und einen noch stabileren Lenker benötigen. Zusätzlich zur Mittelstrebe ist dieser Lenker auch konifiziert, dass heißt im Innern ist der Außendurchmesser auf 28 mm erhöht. Nur kompatibel mit der Wildfire",
+      "price_min_eur": 100,
+      "price_max_eur": 100,
+      "available": true,
+      "variants": [
+        {
+          "title": "Default Title",
+          "name": "Dual Sport Lenker",
+          "price_eur": 100,
+          "available": true,
+          "sku": null
+        }
+      ]
+    },
+    {
+      "slug": "wildfire-gabelbruckenset",
+      "archive": "https://web.archive.org/web/20251013061324id_/https://www.blackteamotorbikes.com/products/wildfire-gabelbruckenset",
+      "timestamp": "20251013061324",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Wildfire-Gabelbrückenset",
+      "description": "Kompatibel mit allen Bonfire- und Wildfire-Elektro-Scramblers der 50-ccm- und 125-ccm-Klasse.",
+      "price_min_eur": 29,
+      "price_max_eur": 29,
+      "variants": [],
+      "available": true
+    },
+    {
+      "slug": "wildfire-konfiguration",
+      "archive": "https://web.archive.org/web/20240416160406id_/https://www.blackteamotorbikes.com/products/wildfire-konfiguration",
+      "timestamp": "20240416160406",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Wildfire Konfiguration",
+      "description": "Wenn du eine Bonfire Y vorbestellt hast, dann erhältst du zu dem Preis zu dem du deine Bonfire Y vorbestellt hast, nun die Wildfire mit 2 kW externem Ladegerät und einer Batterie. Wenn du gerne einen Typ-2-Ladeanschluss oder die Performance Variante mit Motorkühlrippen haben möchtest, dann kannst du deine Änderungen über dieses Tool bestellen. Wenn du dieses Tool nicht nutzt, wirst du die Wildfire standardmäßig mit 2 kW externem Ladegerät und einer Batterie erhalten. Wenn du Handprotektoren, tiefere Sitzhöhe, Dual Sport-Lenker oder die Straßenreifen haben möchtest, dann bestelle diese einfach über unser Zubehör. Bitte nutze dieses Tool bis Ende April 2024.",
+      "price_min_eur": 0,
+      "price_max_eur": 0,
+      "variants": [
+        {
+          "title": "All Black",
+          "name": "All Black"
+        },
+        {
+          "title": "Classic",
+          "name": "Classic"
+        },
+        {
+          "title": "Modern",
+          "name": "Modern"
+        },
+        {
+          "title": "Stealth",
+          "name": "Stealth"
+        },
+        {
+          "title": "Standard (2 kW externes Ladegferät)",
+          "name": "Standard (2 kW externes Ladegferät)"
+        },
+        {
+          "title": "Typ-2-Ladeanschluss mit 2 kW",
+          "name": "Typ-2-Ladeanschluss mit 2 kW"
+        },
+        {
+          "title": "Typ-2-Ladeanschluss mit 3.3 kW",
+          "name": "Typ-2-Ladeanschluss mit 3.3 kW"
+        },
+        {
+          "title": "Standard (1 Batterie & 10 kW Spitzenleistung)",
+          "name": "Standard (1 Batterie & 10 kW Spitzenleistung)"
+        },
+        {
+          "title": "Performance (1 Batterie & 20 kW Spitzenleistung)",
+          "name": "Performance (1 Batterie & 20 kW Spitzenleistung)"
+        }
+      ],
+      "available": false
+    },
+    {
+      "slug": "wildfire-performance",
+      "archive": "https://web.archive.org/web/20240229094130id_/https://www.blackteamotorbikes.com/products/wildfire-performance",
+      "timestamp": "20240229094130",
+      "ok": true,
+      "source_format": "archived-html",
+      "title": "Wildfire Performance",
+      "description": "Highlights: ABS-Bremsanlage von Continental, Spitzenleistung von 20 kW und Beschleunigung von unter 10 Sekunden von 0 auf 100 km/h. Am 28. Februar wird die Wildfire offiziell vorgestellt.",
+      "price_min_eur": 10.2,
+      "price_max_eur": 10.2,
+      "variants": [
+        {
+          "title": "All Black",
+          "name": "All Black"
+        },
+        {
+          "title": "Aluminium eloxidiert",
+          "name": "Aluminium eloxidiert"
+        },
+        {
+          "title": "Extern (2 kW",
+          "name": "Extern (2 kW"
+        },
+        {
+          "title": "Typ-2 (2 kW)",
+          "name": "Typ-2 (2 kW)"
+        },
+        {
+          "title": "Typ-2 (3.3 kW)",
+          "name": "Typ-2 (3.3 kW)"
+        }
+      ],
+      "available": false
+    },
+    {
+      "slug": "xlr-charging-port",
+      "archive": "https://web.archive.org/web/20230928031437id_/https://www.blackteamotorbikes.com/products/xlr-charging-port",
+      "timestamp": "20230928031437",
+      "ok": true,
+      "source_format": "shopify-product-json",
+      "title": "XLR Ladeanschluss",
+      "description": "Warum die Batterien zum Aufladen herausnehmen, wenn du sie einfach im eingebauten Zustand aufladen kannst? Mit dem XLR-Ladeanschluss ist das endlich möglich. Mit dem XLR-Ladeanschluss schließt du dein Ladekabel nur noch an deiner Bonfire an und schon wird dein E-Moped geladen. Kein Entnehmen der Batterien mehr nötig. Bei der Bonfire S & E kannst du immer eine Batterie im eingebauten Zustand laden und bei der Bonfire X & Y werden immer beide Batterien geladen. Bonfire S & E: Mit dem XLR Ladeanschluss erhältst du noch einen Adapter, dann kannst du einfach dein normales Ladegerät benutzen. Super easy! Bonfire X & Y: Da die Batterien in Serie angeschlossen sind, erhältst du ein zusätzliches Ladegerät mit doppelter Spannung. Hier hast fu wieder die Möglichkeit zwischen „Upgrade“ & „Normal“ zu wählen: Normal : Du erhältst neben deinen zwei normalen Ladegeräten noch ein drittes XLR Ladegerät. Upgrade : Eins von deinen normalen Ladegeräten wird gegen das XLR-Ladegerät getauscht. Das kannst du nur auswählen, wenn du deine Bonfire noch nicht erhalten hast. Du hast bereits deine Bonfire, aber willst auch einen XLR-Ladeanschluss? So funktioniert‘s: Wir schicken dir ein leeres Paket mit einem Versandetikett zu. Du demontierst ein Seitenteil deiner Bonfire und legst es in das Paket und schickst es an uns. Wir bauen den XLR-Ladeanschluss in dein Seitenteil ein und schicken es wieder dir zurück. Jetzt musst du das Seitenteil einbauen und die zwei Kabel am Controller verbinden In diesem Video erklären wir dir alles noch einmal ganz genau: https://www.youtube.com/watch?v=jLQxL5hGTbs Informationen : Keine allgemeine Straßenzulassung, daher nicht auf öffentlichen Straßen nutzen.",
+      "price_min_eur": 80,
+      "price_max_eur": 330,
+      "available": true,
+      "variants": [
+        {
+          "title": "Bonfire S or E / Normal",
+          "name": "XLR Ladeanschluss - Bonfire S or E / Normal",
+          "price_eur": 80,
+          "available": true,
+          "sku": ""
+        },
+        {
+          "title": "Bonfire X / Normal",
+          "name": "XLR Ladeanschluss - Bonfire X / Normal",
+          "price_eur": 330,
+          "available": true,
+          "sku": ""
+        },
+        {
+          "title": "Bonfire X / Upgrade",
+          "name": "XLR Ladeanschluss - Bonfire X / Upgrade",
+          "price_eur": 230,
+          "available": true,
+          "sku": ""
+        }
+      ]
+    },
+    {
+      "slug": "mutterabdeckung-set",
+      "ok": false,
+      "archive": "https://web.archive.org/web/*/https://www.blackteamotorbikes.com/products/mutterabdeckung-set"
+    },
+    {
+      "slug": "off-road-schutz",
+      "ok": false,
+      "archive": "https://web.archive.org/web/*/https://www.blackteamotorbikes.com/products/off-road-schutz"
+    },
+    {
+      "slug": "windschild",
+      "ok": false,
+      "archive": "https://web.archive.org/web/*/https://www.blackteamotorbikes.com/products/windschild"
+    }
+  ]
+}

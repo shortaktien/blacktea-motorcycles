@@ -1,0 +1,26 @@
+{
+  "schema_version": "0.1",
+  "researched_at": "2026-09-02",
+  "public_base": "/pdfs/",
+  "policy": "Serve secured copies locally first. Keep provenance and rights status visible. Do not expose dead BTM URLs as the primary document link.",
+  "files": [
+    {"filename":"01-wildfire-willkommenshinweis.pdf","title":"Wildfire - Willkommenshinweis","source_type":"official_archived_btm_asset","original_url":"https://cdn.shopify.com/s/files/1/0459/0888/5659/files/WIllkommenshinweis.pdf?v=1728543836","rights_status":"historical_source_rights_to_clear"},
+    {"filename":"02-wildfire-kabelbaum.pdf","title":"Wildfire - Kabelbaum / Schaltplan","source_type":"official_archived_btm_asset","original_url":"https://cdn.shopify.com/s/files/1/0459/0888/5659/files/Kabelbaum.pdf?v=1632759460","rights_status":"historical_source_rights_to_clear"},
+    {"filename":"03-wildfire-system-harness-12v.pdf","title":"Wildfire - System Harness mit 12-V-Ausgang","source_type":"official_archived_btm_asset","original_url":"https://cdn.shopify.com/s/files/1/0459/0888/5659/files/System_Harness-20230309_12V_output_update.pdf?v=1681809686","rights_status":"historical_source_rights_to_clear"},
+    {"filename":"04-wildfire-software.pdf","title":"Wildfire - Software","source_type":"official_archived_btm_asset","original_url":"https://cdn.shopify.com/s/files/1/0459/0888/5659/files/Wildfire_Software.pdf?v=1752836092","rights_status":"historical_source_rights_to_clear"},
+    {"filename":"05-btm-vib.pdf","title":"BTM - VIB-Dokument","source_type":"official_archived_btm_asset","original_url":"https://cdn.shopify.com/s/files/1/0459/0888/5659/files/VermAnlG_VIB_Black_Tea_Motors_GmbH_231211.pdf?v=1702568103","rights_status":"historical_source_rights_to_clear"},
+    {"filename":"06-gasgriff-domino-hall.pdf","title":"Gasgriff Domino Hall","source_type":"forum_attachment","original_url":"https://www.elektroroller-forum.de/download/file.php?id=80223","rights_status":"permission_to_republish_unknown"},
+    {"filename":"07-manual-bonfire-x-de.pdf","title":"Bonfire X - deutsches Handbuch","source_type":"forum_attachment","original_url":"https://www.elektroroller-forum.de/download/file.php?id=80224","rights_status":"permission_to_republish_unknown"},
+    {"filename":"08-kabelbaum-extended.pdf","title":"Kabelbaum extended","source_type":"forum_attachment","original_url":"https://www.elektroroller-forum.de/download/file.php?id=80225","rights_status":"permission_to_republish_unknown"},
+    {"filename":"09-tacho-bonfire-ct22.pdf","title":"Bonfire CT-22 - Tacho","source_type":"forum_attachment","original_url":"https://www.elektroroller-forum.de/download/file.php?id=80226","rights_status":"permission_to_republish_unknown"},
+    {"filename":"10-wildfire-tipps-community.pdf","title":"Wildfire - Tipps","source_type":"forum_attachment","original_url":"https://www.elektroroller-forum.de/download/file.php?id=77307","rights_status":"permission_to_republish_unknown"},
+    {"filename":"11-wildfire-handbuch-1-3-community.pdf","title":"Wildfire - Handbuch 1.3","source_type":"forum_attachment","original_url":"https://www.elektroroller-forum.de/download/file.php?id=78951","rights_status":"permission_to_republish_unknown"},
+    {"filename":"12-wildfire-handbuch-1-4-community.pdf","title":"Wildfire - Handbuch 1.4","source_type":"forum_attachment","original_url":"https://www.elektroroller-forum.de/download/file.php?id=80483","rights_status":"permission_to_republish_unknown"},
+    {"filename":"13-fardriver-einstellungen-community.pdf","title":"FarDriver - Einstellungen","source_type":"forum_attachment","original_url":"https://www.elektroroller-forum.de/download/file.php?id=77298","rights_status":"permission_to_republish_unknown"},
+    {"filename":"14-ct22-dashboard-manual.pdf","title":"CT-22 Dashboard Manual","source_type":"forum_attachment","original_url":"https://www.elektroroller-forum.de/download/file.php?id=77380","rights_status":"permission_to_republish_unknown"},
+    {"filename":"15-bonfire-handbuch-lokal.pdf","title":"Bonfire Series - Handbuch","source_type":"user_secured_third_party_copy","original_url":"https://manuals.plus/m/c374252e2a1938ad4bab34d2fc4ad30b88c6343854702327a8fa919749e75752_optim.pdf","rights_status":"permission_to_republish_unknown"},
+    {"filename":"17-ips-dtd110s1210-datasheet.pdf","title":"IPS-DTD110S1210 - Datenblatt","source_type":"manufacturer_datasheet","original_url":"https://www.idealplusing.com/storage/uploads/files/product/IPS-DTD110S12%20DC%20DC%20Converter.pdf","rights_status":"technical_reference_check_rights"},
+    {"filename":"18-mean-well-ddr-120d12-datasheet.pdf","title":"Mean Well DDR-120D-12 - Datenblatt","source_type":"manufacturer_datasheet","original_url":"https://www.meanwell.com/Upload/PDF/DDR-120/DDR-120-SPEC.PDF","rights_status":"technical_reference_check_rights"},
+    {"filename":null,"title":"Digital Engineering Magazin Ausgabe 5/2025","source_type":"external_pdf_link","original_url":"https://p7f.vogel.de/wcms/68/89/6889c08432d/digital-engineering-magazin-ausgabe-5-2025.pdf","status":"not_downloaded_source_returned_404","rights_status":"not_applicable"}
+  ]
+}

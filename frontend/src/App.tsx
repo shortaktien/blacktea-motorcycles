@@ -1,0 +1,2758 @@
+import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent } from 'react';
+import partsCatalog from '../../research/parts.json';
+import partDetailsCatalog from '../../research/parts-details.json';
+import siteConfig from './site-config.json';
+
+type CardKind = 'Dokument' | 'Ersatzteil' | 'Community';
+type Filter = 'Alle' | CardKind;
+
+type Resource = {
+  kind: CardKind;
+  title: string;
+  description: string;
+  label: string;
+  href: string;
+  tags: string[];
+  external?: boolean;
+  guidePath?: string;
+  sourceHref?: string;
+  sourceLabel?: string;
+};
+
+type RepairSection = {
+  title: string;
+  paragraphs: string[];
+  bullets?: string[];
+};
+
+type RepairGuide = {
+  id: string;
+  path: string;
+  title: string;
+  model: string;
+  intro: string;
+  steps: string[];
+  safety: string;
+  sourceLabel: string;
+  sourceHref: string;
+  detailSections: RepairSection[];
+};
+
+type FeedbackSummary = {
+  guide: string;
+  up: number;
+  down: number;
+  comments: PublicComment[];
+};
+
+type PublicComment = {
+  id: string;
+  name: string;
+  body: string;
+  createdAt: string;
+  imageUrl: string | null;
+};
+
+type AdminComment = PublicComment & {
+  guide: string;
+  email: string;
+  status: 'pending' | 'approved';
+  approvedAt: string | null;
+};
+
+type SourcingCard = {
+  title: string;
+  category: string;
+  status: string;
+  summary: string;
+  amazon?: { label: string; href: string };
+  fallback?: { label: string; href: string };
+};
+
+type PartCategory = 'Bremsen' | 'Fahrwerk & Räder' | 'Elektrik & Laden' | 'Antrieb & Controller' | 'Karosserie & Halter' | 'Bundles' | 'Zubehör';
+type PartsFilter = 'Alle' | PartCategory;
+
+type PartResearchEntry = {
+  id?: string;
+  part_name?: string;
+  category?: string;
+  model_family?: string[];
+  variants?: string[];
+  historical_price_eur?: number;
+  historical_old_price_eur?: number;
+  specification_lead?: string;
+  compatibility_note?: string;
+  source_type?: string;
+  source_url?: string;
+  archive_lookup?: string;
+  amazon_url?: string;
+  amazon_search_url?: string;
+  fallbacks?: Array<{ name: string; url: string; fit_status?: string }>;
+  supplier_link?: string;
+  supplier_leads?: string[];
+  service_leads?: string[];
+  confidence?: string;
+  safety_class?: string;
+  purchase_status?: 'confirmed' | 'manual-match' | 'candidate' | 'not-found';
+  purchase_note?: string;
+  purchase_heading?: string;
+  purchase_options?: Array<{ name: string; url: string; fit_status?: string }>;
+  rights_status?: string;
+};
+
+type ArchivedPartDetail = {
+  slug: string;
+  archive: string;
+  timestamp?: string;
+  ok: boolean;
+  title?: string;
+  description?: string;
+  price_min_eur?: number;
+  price_max_eur?: number;
+  available?: boolean;
+  variants?: Array<{ title?: string; name?: string; price_eur?: number; available?: boolean; sku?: string | null }>;
+};
+
+type HistoricalShopPart = {
+  id: string;
+  path: string;
+  title: string;
+  category: PartCategory;
+  model: string;
+  price?: number;
+  priceMax?: number;
+  variants?: string[];
+  variantDetails?: Array<{ label: string; price?: number; available?: boolean }>;
+  archiveHref: string;
+  historicalSummary: string;
+  compatibilityNote: string;
+  confidence: string;
+  safetyClass: string;
+  purchaseStatus: 'confirmed' | 'manual-match' | 'candidate' | 'not-confirmed';
+  purchaseNote: string;
+  purchaseHeading?: string;
+  purchaseOptions?: Array<{ label: string; href: string; fitStatus?: string }>;
+  technicalEvidence?: { text: string; href: string; label: string; eyebrow?: string };
+  amazonHref?: string;
+  amazonLabel?: string;
+  fallbackHref?: string;
+  fallbackLabel?: string;
+  fallbackFitStatus?: string;
+  archiveTimestamp?: string;
+  historicalAvailability: string;
+};
+
+type CommunityKnowledge = {
+  title: string;
+  model: string;
+  intro: string;
+  points: string[];
+  sourceLabel: string;
+  sourceHref: string;
+};
+
+const localPartArchiveHref = '/quellen#ersatzteil-archiv';
+
+const sourceLinks = [
+  {
+    title: 'Verfahrensstatus',
+    detail: 'Versteigerungskalender · Aktenzeichen 1513 IN 2588/26',
+    href: 'https://www.versteigerungskalender.de/insolvenzkalender/blaeck-tea-motorbikes-gmbh',
+  },
+  {
+    title: 'Bonfire-Handbuch',
+    detail: 'Lokale Kopie des gesicherten 44-seitigen Handbuchs',
+    href: '/pdfs/15-bonfire-handbuch-lokal.pdf',
+  },
+  {
+    title: 'Wildfire-Datenblätter',
+    detail: 'Lokaler PDF-Index mit Schaltplänen, Software und Datenblättern',
+    href: '/pdfs/index.html',
+  },
+  {
+    title: 'Technische Daten',
+    detail: 'ADAC Motorradkatalog · Bonfire X',
+    href: 'https://www.adac.de/rund-ums-fahrzeug/zweirad/motorrad-roller/motorradkatalog/marken/black-tea/black-tea-bonfire-x-11066/',
+  },
+  {
+    title: 'Lokale PDF-Sammlung',
+    detail: 'Alle derzeit gesicherten Dokumente auf dieser Website',
+    href: '/pdfs/index.html',
+  },
+  {
+    title: 'ElektroRoller-Forum',
+    detail: 'Community-Unterforum mit Selbsthilfe und Ersatzteilspuren',
+    href: 'https://www.elektroroller-forum.de/viewforum.php?f=159',
+  },
+  {
+    title: 'BTM Community',
+    detail: 'Unabhängige Community-Aufbereitung für Bonfire und Wildfire',
+    href: 'https://btm-community.org/',
+  },
+  {
+    title: 'Ersatzteil-Archiv',
+    detail: 'Lokal gesicherte Produktnamen, Beschreibungen, Varianten und historische Preise',
+    href: localPartArchiveHref,
+  },
+];
+
+const partTitleOverrides: Record<string, string> = {
+  'alu-topcase': 'Alu-Topcase',
+  'bar-end-mirrors': 'Lenkerendenspiegel',
+  bearings: 'Lager',
+  'change-the-color-of-my-off-road-protection': 'Farbauswahl Offroad-Schutz',
+  'classic-indicator': 'Klassische Blinker',
+  'classic-mirrors': 'Klassische Spiegel',
+  'dcdc-converter': 'DC/DC-Wandler',
+  'dual-sport-reifen-upgrade': 'Dual-Sport-Reifen-Upgrade',
+  'enduro-fender': 'Enduro-Kotflügel',
+  'fork-stabiliser': 'Gabelstabilisator',
+  'front-wheel': 'Vorderrad',
+  'foot-pegs-set': 'Fußrasten-Set',
+  'gasdruck-federbeine': 'Gasdruck-Federbeine',
+  'goldene-usd-gabel': 'Goldene USD-Gabel',
+  'handlebar-crash-bars': 'Lenker-Sturzbügel',
+  'handlebar-risers': 'Lenkererhöhung',
+  headlight: 'Scheinwerfer',
+  'headlight-grill': 'Scheinwerfergitter',
+  'hub-motor': 'Radnabenmotor',
+  'key-set': 'Schlüsselsatz',
+  'keyless-go': 'Keyless Go',
+  'keyless-go-retro-fit': 'Keyless-Go-Retrofit',
+  'kill-switch': 'Kill-Switch',
+  'light-holder': 'Scheinwerferhalter',
+  'modern-bundle': 'Modern-Bundle',
+  'moped-license-plate-holder': 'Moped-Kennzeichenhalter',
+  'nfc-karte-nachrustkit': 'NFC-Karte / Nachrüstkit',
+  'off-road-bundle': 'Offroad-Bundle',
+  'off-road-schutz': 'Offroad-Schutz',
+  'passenger-hold': 'Soziushalter',
+  'performance-bundle': 'Performance-Bundle',
+  'range-extender-bundle': 'Reichweiten-Bundle',
+  'rear-light': 'Rücklicht',
+  'rear-rack': 'Gepäckträger hinten',
+  'reparatur-qs8s-stecker': 'QS8-S-Stecker-Reparatur',
+  'retro-windschild': 'Retro-Windschild',
+  'ride-mode-button': 'Fahrmodi-Taster',
+  schaltereinheit: 'Schaltereinheit',
+  'scheinwerfer-retrofit': 'Scheinwerfer-Retrofit',
+  'schuko-auf-typ-2-adapter': 'Schuko-auf-Typ-2-Adapter',
+  'schuko-ladekabel-fur-wildfire': 'Schuko-Ladekabel für Wildfire',
+  seat: 'Sitz',
+  'side-bag': 'Seitentasche',
+  'side-cover': 'Seitenabdeckung',
+  'side-stand': 'Seitenständer',
+  'side-stand-spring-set': 'Seitenständer-Feder-Set',
+  'sitz-b-ware-gebraucht': 'Sitz (B-Ware / gebraucht)',
+  stand: 'Montageständer',
+  'stander-copy': 'Ständer',
+  'starter-relais-12-v': '12-V-Starterrelais',
+  'sticker-set': 'Sticker-Set',
+  'surf-rack': 'Surf-Rack',
+  'tall-rider-bundle': 'Tall-Rider-Bundle',
+  'tank-b-ware': 'Tank (B-Ware)',
+  'tft-touch-display-retrofit': 'TFT-Touchdisplay-Retrofit',
+  'typ-2-kabel': 'Typ-2-Kabel',
+  'usb-charging-port': 'USB-Ladeport',
+  'usd-gabelset': 'USD-Gabel-Set',
+  wildfire: 'Wildfire',
+  'wildfire-abs': 'Wildfire ABS',
+  'wildfire-gabelbruckenset': 'Wildfire-Gabelbrücken-Set',
+  'wildfire-konfiguration': 'Wildfire-Konfiguration',
+  'wildfire-performance': 'Wildfire Performance',
+  windschild: 'Windschild',
+  'xlr-charging-port': 'XLR-Ladeport',
+};
+
+const partWordOverrides: Record<string, string> = {
+  alu: 'Alu',
+  belage: 'Beläge',
+  blinker: 'Blinker',
+  bremsen: 'Bremsen',
+  bremsleitung: 'Bremsleitung',
+  bremslichtkabel: 'Bremslichtkabel',
+  bremszylinder: 'Bremszylinder',
+  dcdc: 'DC/DC',
+  federbeine: 'Federbeine',
+  fender: 'Kotflügel',
+  fussrasten: 'Fußrasten',
+  gabelbrucke: 'Gabelbrücke',
+  gabelset: 'Gabel-Set',
+  geladen: 'Laden',
+  ladegerat: 'Ladegerät',
+  led: 'LED',
+  lenker: 'Lenker',
+  mutterabdeckung: 'Mutterabdeckung',
+  nachrustkit: 'Nachrüstkit',
+  radabdeckung: 'Radabdeckung',
+  reflektoren: 'Reflektoren',
+  reifen: 'Reifen',
+  seitenstander: 'Seitenständer',
+  scheinwerfer: 'Scheinwerfer',
+  speiche: 'Speiche',
+  stossdampfer: 'Stoßdämpfer',
+  tankgummi: 'Tankgummi',
+  tft: 'TFT',
+  typ: 'Typ',
+  wildfire: 'Wildfire',
+  xlr: 'XLR',
+};
+
+const historicalPartDetails: Record<string, { model: string; price?: number; variants?: string[] }> = {
+  bremszylinder: { model: 'Bonfire', price: 59, variants: ['Rear Brake', 'Front Brake (220 mm)', 'CBS Front Brake (265 mm)'] },
+  'copy-of-beifahrerfussrasten': { model: 'Bonfire', price: 15, variants: ['Paar', 'Links', 'Rechts'] },
+  tank: { model: 'Bonfire', price: 99, variants: ['Black Matt', 'Silver', 'Orange', 'Grau', 'Olive', 'Blau', 'Halter mit/ohne'] },
+  'passenger-hold': { model: 'Bonfire', price: 29, variants: ['B-Ware', 'historischer Vergleichspreis 69 €'] },
+};
+
+const historicalPartCategories: Array<[PartCategory, string[]]> = [
+  ['Bremsen', ['brems', 'bremsscheibe']],
+  ['Antrieb & Controller', ['motor', 'hub-motor', 'wildfire-performance']],
+  ['Fahrwerk & Räder', ['achse', 'bearing', 'feder', 'gabel', 'rad', 'reifen', 'speiche', 'felge', 'lenker', 'foot-peg', 'fussrasten', 'stand']],
+  ['Elektrik & Laden', ['akku', 'battery', 'charger', 'charging', 'lade', 'dcdc', 'display', 'dongle', 'keyless', 'nfc', 'blink', 'light', 'scheinwerfer', 'kill', 'relais', 'kabel', 'usb', 'typ-2', 'schuko', 'xlr', 'button', 'schaltereinheit']],
+  ['Bundles', ['bundle', 'configuration']],
+  ['Karosserie & Halter', ['tank', 'sitz', 'seat', 'cover', 'rack', 'halter', 'schutz', 'topcase', 'windschild', 'fender', 'reflektor', 'sticker', 'bag', 'surf']],
+];
+
+const humanizePartSlug = (slug: string) => {
+  if (partTitleOverrides[slug]) return partTitleOverrides[slug];
+  const cleanedSlug = slug.replace(/^copy-of-/, '');
+  return cleanedSlug.split('-').map((word) => partWordOverrides[word] ?? `${word.slice(0, 1).toUpperCase()}${word.slice(1)}`).join(' ');
+};
+
+const inferPartCategory = (slug: string): PartCategory => {
+  const match = historicalPartCategories.find(([, keywords]) => keywords.some((keyword) => slug.includes(keyword)));
+  return match?.[0] ?? 'Zubehör';
+};
+
+const partResearchEntries = ((partsCatalog as unknown as { entries?: PartResearchEntry[] }).entries ?? []);
+const archivedPartDetails = ((partDetailsCatalog as unknown as { entries?: ArchivedPartDetail[] }).entries ?? []);
+const researchEntryBySlug: Record<string, PartResearchEntry | undefined> = {
+  bremsbelage: partResearchEntries.find((entry) => entry.id === 'bonfire-mcb833-amazon-candidate'),
+  bremszylinder: partResearchEntries.find((entry) => entry.id === 'btm-bremszylinder'),
+  'copy-of-beifahrerfussrasten': partResearchEntries.find((entry) => entry.id === 'btm-beifahrerfussrasten'),
+  tank: partResearchEntries.find((entry) => entry.id === 'btm-tank'),
+  'passenger-hold': partResearchEntries.find((entry) => entry.id === 'btm-passenger-hold-b-grade'),
+  'dcdc-converter': partResearchEntries.find((entry) => entry.id === 'wildfire-dcdc-ips-dtd110s1210'),
+  'reparatur-qs8s-stecker': partResearchEntries.find((entry) => entry.id === 'wildfire-qs8-antispark-amazon-candidates'),
+  'dual-sport-reifen-upgrade': partResearchEntries.find((entry) => entry.id === 'bonfire-heidenau-manual-matches'),
+  ladegerat: partResearchEntries.find((entry) => entry.id === 'bonfire-tangspower-588v-10a-xlr-candidate'),
+  'usb-charging-port': partResearchEntries.find((entry) => entry.id === 'wildfire-usb-charging-port-amazon-candidate'),
+};
+
+const partTechnicalEvidence: Record<string, { text: string; href: string; label: string; eyebrow?: string }> = {
+  'side-stand': {
+    text: 'Das lokale Bonfire-Handbuch bestätigt die Funktion des Seitenständers und seines Sicherheitsschalters, nennt aber keine Teilenummer, Maße oder normierte Austauschgröße. Deshalb wird kein Fahrrad- oder Universalständer als passend ausgegeben.',
+    href: '/pdfs/15-bonfire-handbuch-lokal.pdf',
+    label: 'Bonfire-Handbuch öffnen',
+  },
+  'seitenstander-kill-switch': {
+    text: 'Das lokale Bonfire-Handbuch beschreibt den Seitenständer-Schalter als sicherheitsrelevante Motorabschaltung. Eine konkrete Schalter- oder Steckerteilenummer ist dort nicht angegeben.',
+    href: '/pdfs/15-bonfire-handbuch-lokal.pdf',
+    label: 'Bonfire-Handbuch öffnen',
+  },
+  bremsbelage: {
+    text: 'Das lokale Bonfire-Handbuch nennt Bremsbeläge als Wartungsteil und unterscheidet die Fahrzeug-/Bremsscheibenvarianten. MCB833 wird zusätzlich als Community-Spur genannt; Belagform, Dicke, Halterung und Fahrzeugvariante müssen am Fahrzeug bestätigt werden.',
+    href: '/pdfs/15-bonfire-handbuch-lokal.pdf',
+    label: 'Bonfire-Handbuch öffnen',
+  },
+  bearings: {
+    text: 'Der lokale Bonfire-Eintrag bezeichnet das Teil nur als Lenkkopflager. Im Handbuch und im Archiv fehlen Lagermaße, Norm, Teilenummer und Dichtungsangaben. Deshalb wird kein allgemeines Amazon-Lager als passend ausgegeben.',
+    href: '/pdfs/15-bonfire-handbuch-lokal.pdf',
+    label: 'Bonfire-Handbuch öffnen',
+  },
+  bremsscheibe: {
+    text: 'Das lokale Handbuch nennt je nach Fahrzeugstand unterschiedliche Scheibengrößen. Ohne Lochkreis, Offset, Stärke und Befestigung darf daraus kein beliebiger Marktplatzartikel abgeleitet werden.',
+    href: '/pdfs/15-bonfire-handbuch-lokal.pdf',
+    label: 'Bonfire-Handbuch öffnen',
+  },
+  'dual-sport-reifen-upgrade': {
+    text: 'Das lokale Handbuch nennt Heidenau K60/K36 und die Größen 90/90-18 vorn sowie 110/80-18 hinten. Dazu sind unten technische Amazon-Treffer mit genau diesen Modell-/Größenangaben hinterlegt. Die konkrete Reifenfreigabe muss trotzdem zur Fahrzeugvariante und Zulassung passen.',
+    href: '/pdfs/15-bonfire-handbuch-lokal.pdf',
+    label: 'Bonfire-Handbuch öffnen',
+  },
+  ladegerat: {
+    text: 'Die lokal gesicherte Bonfire-Produktbeschreibung nennt 58,8 V und Varianten mit 5 A, 10 A und 20 A; ein XLR-Ladeanschluss ist für bestimmte Konfigurationen archiviert. Der unten verlinkte Amazon-Treffer deckt 58,8 V/10 A, 14S-Lithium und 3-poliges XLR ab. Pinbelegung, Ladekennlinie und BTM-Freigabe bleiben zu prüfen.',
+    href: '/quellen#ersatzteil-archiv',
+    label: 'Lokales Ersatzteil-Archiv öffnen',
+    eyebrow: 'Abgleich mit lokalem Archiv',
+  },
+  'speiche-mit-nippel': {
+    text: 'Die lokale Community-PDF weist darauf hin, dass Speichen nach Länge, Biegung und Durchmesser bestellt werden müssen. Ein allgemeiner Speichenlink wäre deshalb keine bestätigte Passform.',
+    href: '/pdfs/12-wildfire-handbuch-1-4-community.pdf',
+    label: 'Community-PDF öffnen',
+  },
+  'dcdc-converter': {
+    text: 'Die lokale Datenblatt-Sammlung identifiziert den historischen IPS-DTD110S1210. Ein Mean-Well-Ersatz ist ausdrücklich keine Drop-in-Lösung; ein bestätigter Austausch ist nicht hinterlegt.',
+    href: '/pdfs/17-ips-dtd110s1210-datasheet.pdf',
+    label: 'IPS-Datenblatt öffnen',
+  },
+};
+
+const partSafetyByCategory: Record<PartCategory, string> = {
+  Bremsen: 'sicherheitskritisch',
+  'Fahrwerk & Räder': 'sicherheitskritisch',
+  'Elektrik & Laden': 'elektrisch prüfen',
+  'Antrieb & Controller': 'sicherheitskritisch',
+  'Karosserie & Halter': 'Kompatibilität prüfen',
+  Bundles: 'Konfiguration prüfen',
+  Zubehör: 'Kompatibilität prüfen',
+};
+
+const partSummaryOverrides: Record<string, string> = {
+  'alu-topcase': 'Aluminium-Topcase mit rund 40 Litern Stauraum. Vor dem Kauf die Trägerplatte, Befestigung und Verriegelung am eigenen Fahrzeug vergleichen.',
+  'bar-end-mirrors': 'Lenkerendenspiegel für die Bonfire. Archiviert sind die Varianten Normal und Upgrade; vor dem Kauf Lenkeraufnahme, Abmessungen, Gewinde und E-Prüfzeichen vergleichen.',
+  bearings: 'Lenkkopflager für die Steuerrohr-/Lenkkopflagerung. Innen- und Außendurchmesser, Bauhöhe, Dichtung und Lagernorm sind lokal nicht belegt und müssen am Fahrzeug vermessen werden.',
+  'bluetooth-dongle': 'Bluetooth-Dongle für die Kommunikation mit bestimmten Wildfire- und Bonfire-Controllern. Modellstand, Steckverbindung und unterstützte Controller-Version vor dem Kauf prüfen.',
+  bremsen: 'Sammel- und Konfigurationseintrag für die Bremsanlage. Bremssattel, Scheibe, Belagform, Leitungen und Fahrzeugvariante müssen getrennt geprüft werden.',
+  bremslichtkabel: 'Kabel- und Schaltereinheit für die Bremslichtansteuerung. Kabellänge, Stecker und Schaltlogik müssen zur Fahrzeugvariante passen.',
+  'bremszylinder-und-hebel': 'Bremszylinder und Hebel als kombinierte oder getrennte Variante. Seite, Kolbendurchmesser, Anschluss und Hebelgeometrie vor dem Kauf vergleichen.',
+  'change-the-color-of-my-off-road-protection': 'Farbvariante für den Offroad-Schutz der Wildfire. Dieses Angebot beschreibt eine Konfiguration, kein universelles Schutzteil.',
+  'charger-upgrade': '10-A-Ladegerät als archivierte Upgrade-Option. Ausgangsspannung, Stecker, Ladekennlinie und Akku-Freigabe vor dem Ersatz prüfen.',
+  'charging-bundle': 'Lade- und USB-Bundle mit XLR-Ladeanschluss und USB-Port. Modellvariante, Adapter, Kabelweg, Sicherung und Zulassung vor dem Einbau prüfen.',
+  'classic-indicator': 'Satz aus vier klassischen Halogenblinkern. Stecker, Relais, Befestigung und E-Prüfzeichen müssen mit dem vorhandenen Fahrzeug übereinstimmen.',
+  'classic-mirrors': 'Satz aus zwei klassischen Spiegeln. Gewinde, Adapter, Sichtfeld und E-Prüfzeichen vor dem Kauf mit dem vorhandenen Fahrzeug abgleichen.',
+  'copy-of-52-v-batterie': '52-V-Akkuvarianten mit 1,8 kWh oder 3,1 kWh. Zellaufbau, BMS, Gehäuse, Steckverbindungen, Ladegerät und Fahrzeugrevision müssen exakt zusammenpassen.',
+  'copy-of-achse': 'Beifahrerfußrasten in den archivierten Varianten Paar, links oder rechts. Aufnahme, Gewinde, Klappmechanik und Fahrzeugseite vor dem Kauf vergleichen.',
+  'copy-of-beifahrerfussrasten': 'Schwinge mit oder ohne Beifahrerfußrasten. Achsaufnahme, Breite, Lagerung und Rahmenvariante müssen vor dem Ersatz abgeglichen werden.',
+  'copy-of-federbeine': 'Achsen für Vorderrad und Schwinge. Durchmesser, Länge, Gewinde, Distanzhülsen und Fahrzeugvariante vor dem Kauf messen.',
+  'copy-of-gabelbruckenset': 'Motorhalterungs-Set mit archivierten M16-Muttern, Kontermuttern und Distanzhülsen. Gewinde, Abstände und Rahmenaufnahme vor dem Ersatz prüfen.',
+  'copy-of-motorhalterung-set': 'Mutterabdeckungen für M16-, M12-, M10- und M8-Gewinde. Gewinde, Bundmaß und benötigte Stückzahl vor dem Kauf prüfen.',
+  'copy-of-off-road-schutz': 'Dual-Sport-Lenker mit Mittelstrebe und 28-mm-Konifizierung im angegebenen Bereich. Klemmmaß, Biegung und Bedienelemente müssen zur Wildfire passen.',
+  'dcdc-converter': 'DC/DC-Wandler für die Fahrzeug-Elektrik. Eingang, Ausgang, Strom, Pinout, Stecker und Einbauraum müssen vor einem Ersatz abgeglichen werden.',
+  'dual-sport-reifen-upgrade': 'Heidenau K60/K36 in den lokal dokumentierten Größen 90/90-18 vorn, 3.50-18 vorn/offroad und 110/80-18 hinten. Traglast, Index, Felge und Zulassung prüfen.',
+  display: 'Tachometer-/Anzeigeeinheit für die Bonfire. Anzeigeversion, Protokoll, Stecker und Halterung müssen vor dem Ersatz verglichen werden.',
+  'enduro-fender': 'Enduro-Kotflügel für Bonfire oder Wildfire. Länge, Befestigung, Reifenfreiheit und Fahrzeugvariante vor dem Kauf prüfen.',
+  felge: '18-Zoll-Felge für Vorder- oder Hinterrad. Nabe, Achse, Felgenbreite, Speichenbohrung und Felgenbett müssen zur konkreten Radvariante passen.',
+  'foot-pegs-set': 'Fußrasten-Set für die Bonfire. Aufnahme, Gewinde, Position, Klappmechanik und Fahrzeugseite vor dem Kauf vergleichen.',
+  'gabelbrucke-mit-lenkerklemmen': 'Gabelbrückenset mit möglichen Varianten für komplette, obere oder untere Brücke sowie Lenkerklemmen und Muttern. Gabelmaß, Lager und Klemmung müssen passen.',
+  gabelset: 'Gabelset für die Vorderradführung. Standrohrmaß, Achsaufnahme, Bremssattelhalterung, Lager und Fahrzeugvariante vor dem Ersatz prüfen.',
+  'gasdruck-federbeine': 'Verstellbare Gasdruck-Federbeine mit archivierter Länge von 330 bis 360 mm. Auge, Buchsenbreite, Bolzendurchmesser und Belastbarkeit vor dem Kauf messen.',
+  'goldene-usd-gabel': 'USD-Gabel in goldener Ausführung für die Wildfire. Standrohrmaß, Achsaufnahme, Bremse, Gabelbrücke und Fahrzeugrevision vergleichen.',
+  handguards: 'Aluminium-Handprotektoren für Schutz vor Fahrtwind und leichten Stößen. Lenkeraufnahme, Freigängigkeit und Bedienelemente vor dem Kauf prüfen.',
+  'handlebar-crash-bars': 'Lenker-Sturzbügel in Schwarz oder Silber. Archiviert als nicht kompatibel mit Lenkerendenspiegeln; Lenkeraufnahme und Befestigung vor dem Kauf prüfen.',
+  headlight: 'Scheinwerfer für die Bonfire. Gehäuse, Halterung, Spannung, Stecker und Leuchtmittel müssen zur Fahrzeugvariante passen.',
+  'headlight-grill': 'Schutzgitter für den Scheinwerfer. Außenmaß, Befestigung und Abstand zum Scheinwerfer vor dem Kauf abgleichen.',
+  'hintere-stossdampfer': 'Hintere Federbeine für die Bonfire. Länge, Auge, Buchsenbreite, Bolzendurchmesser und Belastbarkeit vor dem Ersatz messen.',
+  'hinterer-radschutz': 'Hinterer Radschutz in einer archivierten neueren Ausführung. Länge, Halterung, Reifenfreiheit und Fahrzeugrevision vor dem Kauf prüfen.',
+  'hub-motor': 'Radnabenmotor mit schwarzer 2.15-18-Felge, 36 Speichen und Nippeln, eingespeicht und zentriert. Nabe, Achse, Leistung, Kabel und Controller müssen zur Variante passen.',
+  'key-set': 'Schloss-Set mit Lenkradschloss, Zündschloss, Tankkappe und zwei Schlüsseln. Schlosskörper, Stecker und Befestigung vor dem Kauf vergleichen.',
+  'keyless-go': 'Keyless-Go-System mit zwei Fernbedienungen für die Bonfire. Steuergerät, Kabelsatz, Frequenz und Fahrzeugvariante müssen übereinstimmen.',
+  'keyless-go-retro-fit': 'Keyless-Go-Nachrüstset für die Bonfire S mit Steuergerät, Zusatzkabel, zwei 5-A-Sicherungen und zwei Fernbedienungen. Fahrzeug- und Zündschlossvariante prüfen.',
+  ladegerat: 'Bonfire-Ladegerät mit 58,8 V und archivierten Varianten mit 5 A, 10 A und 20 A. Die historischen Gehäusemaße unterscheiden sich je Variante; Stecker, Ladekennlinie und Akku-Freigabe prüfen.',
+  'langer-alu-radschutz': 'Längerer Radschutz aus geschliffenem Aluminium für die Wildfire. Länge, Halterung, Reifenfreiheit und Fahrzeugvariante vor dem Kauf prüfen.',
+  'langer-bonfire-sitz': 'Längerer und stärker gepolsterter Bonfire-Sitz. Sitzlänge, Höhe, Befestigungspunkte und Abstand zu den Fußrasten vor dem Kauf vergleichen.',
+  lenker: 'Schwarzer Aluminiumlenker, archiviert mit 800 mm Breite, 120 mm Höhe und 5-mm-Bohrung für die linke Schaltereinheit. Klemmmaß, Biegung und Leitungsführung vergleichen.',
+  'led-blinker': 'LED-Blinker für Elektro-Enduros beziehungsweise Roller der 50- und 125-ccm-Klasse. Spannung, Relais, Stecker, Befestigung und E-Prüfzeichen prüfen.',
+  'led-indicators': 'Satz aus vier LED-Blinkern für die Bonfire, archiviert mit Normal- und Upgrade-Varianten. Stecker, Relais, Befestigung und E-Prüfzeichen vergleichen.',
+  'light-holder': 'Scheinwerferhalter für die Bonfire. Rohrmaß, Lochabstand, Gehäuse und Befestigung vor dem Kauf prüfen.',
+  luftgekuhlt: 'Kühlkit mit Kühlrippen, Ferrofluid und Wärmeleitpaste. Motorbauform, Einbaufläche und Anwendungshinweise vor dem Einbau prüfen.',
+  'moped-license-plate-holder': 'Kennzeichenhalter für das archivierte Maß 255 × 130 mm bei Bonfire E und X; bei der S gelten andere Zulassungsbedingungen. Halterung und Kennzeichenformat vor dem Kauf prüfen.',
+  'modern-bundle': 'Modern-Bundle aus LED-Blinkern, Lenkerendenspiegeln und Griffen. Kompatibilität der Einzelteile und gewünschte Farbe vor dem Kauf vergleichen.',
+  'mutterabdeckung-set': 'Mutterabdeckungs-Set für die Bonfire. Gewindegrößen, Bundmaß und benötigte Abdeckungen vor dem Kauf vergleichen.',
+  'nfc-karte-nachrustkit': 'NFC-Karte beziehungsweise Nachrüstkit für bestimmte Bonfire- und Wildfire-Varianten. Lesegerät, Systemversion und Fahrzeugkonfiguration müssen passen.',
+  'off-road-bundle': 'Offroad-Bundle aus Gitter und Offroad-Schutz. Fahrzeugvariante, Befestigung und Freigängigkeit beider Komponenten vor dem Kauf prüfen.',
+  'off-road-schutz': 'Offroad-Schutz für die Karosserie. Fahrzeugvariante, Material, Befestigung und Freigängigkeit zu Lenker und Beleuchtung vor dem Kauf prüfen.',
+  'passenger-hold': 'Soziushalter für die Bonfire. Rahmenaufnahme, Befestigung und Variante müssen zum konkreten Fahrzeug passen.',
+  'performance-bundle': 'Performance-Bundle aus Gabelstabilisator und Retro-Windschild. Gabelmaß, Befestigung und Freigängigkeit vor dem Kauf prüfen.',
+  'radabdeckung': 'Radabdeckung für die Bonfire. Position, Länge, Befestigung und Reifenfreiheit müssen zur konkreten Rad- und Rahmenvariante passen.',
+  'rear-light': 'Rücklicht für die Bonfire. Spannung, Stecker, Befestigung und Zulassung vor dem Ersatz vergleichen.',
+  'rear-rack': 'Gepäckträger für den hinteren Fahrzeugbereich. Rahmenaufnahme, Traglast, Lochabstände und Freigängigkeit vor dem Kauf prüfen.',
+  reflektoren: 'Roter Reflektor für hinten und orangener Reflektor für die Seite, jeweils archiviert als Einzelstück. Position, Maß und Zulassung vergleichen.',
+  'range-extender-bundle': 'Reichweiten-Bundle aus Batterie und Ladegerät, archiviert mit 5-A- und 10-A-Varianten. Akkuspannung, BMS, Stecker und Ladekennlinie müssen zusammenpassen.',
+  'retro-windschild': 'Retro-Windschild für die Bonfire. Halterung, Abmessungen, Sichtfeld und Freigängigkeit vor dem Kauf prüfen.',
+  'ride-mode-button': 'Taster für die Fahrmodi der Bonfire. Schaltertyp, Stecker, Einbauposition und Softwareunterstützung vor dem Ersatz prüfen.',
+  'schuko-auf-typ-2-adapter': 'Adapter für das Laden an einer Typ-2-Ladesäule. Steckerbelegung, Stromstärke, Ladegerät und Sicherheitsfunktionen vor der Verwendung prüfen.',
+  'schuko-ladekabel-fur-wildfire': 'Schuko-Ladekabel für die Wildfire. Netzseite, Gerätestecker, Stromstärke und Fahrzeug-/Ladegerätvariante vor dem Kauf vergleichen.',
+  schaltereinheit: 'Lenker-Schaltereinheit für die Bonfire. Seite, Tasterbelegung, Stecker, Spannung und Leitungsführung müssen passen.',
+  'scheinwerfer-retrofit': 'Scheinwerfer-Nachrüstkit für bestimmte Bonfire- und Wildfire-Varianten. Spannung, Stecker, Halterung und Zulassung vor dem Einbau prüfen.',
+  'side-cover': 'Seitenabdeckung für die Bonfire, archiviert als linke und rechte Variante. Form, Befestigung und Fahrzeugrevision vergleichen.',
+  seat: 'Sitz mit archivierter Länge von 50 cm und veganem Leder. Befestigungspunkte, Sitzhöhe und Fahrzeugvariante vor dem Kauf vergleichen.',
+  'side-bag': 'Seitentasche mit archivierten Außenmaßen von etwa 37 × 28 × 12 cm und fahrzeugspezifischer Halterung. Montage, Freigängigkeit und Verriegelung am Fahrzeug prüfen.',
+  'side-stand': 'Seitenständer für die Bonfire. Ständerfuß, Gelenk, Feder und Sicherheitsschalter müssen zur konkreten Rahmen- und Kabelvariante passen.',
+  'side-stand-spring-set': 'Doppelfeder-Set für den Seitenständer der Bonfire. Federlänge, Hakenform und Montageposition vor dem Kauf vergleichen.',
+  'sitz-b-ware-gebraucht': 'Sitz als B-Ware beziehungsweise Gebrauchtteil, archiviert mit 50 cm Länge und veganem Leder. Zustand, Befestigung und Fahrzeugvariante prüfen.',
+  'speiche-mit-nippel': 'Speiche mit Nippel für Vorder- oder Hinterrad. Länge, Kröpfung, Durchmesser, Gewinde, Nippeltyp und Radseite vor der Bestellung messen.',
+  'stander-copy': 'Spezielle Bundschraube mit passender Mutter für den Ständer. Gewinde, Länge, Bundmaß und Festigkeit vor dem Einbau vergleichen.',
+  'sticker-set': 'Sticker-Set mit archiviertem Inhalt aus Ride-Tastefully-, Blacktea-, Hell- und B/T-Aufklebern. Oberfläche, Maße und gewünschte Position prüfen.',
+  'surf-rack': 'Surf-Rack für die Bonfire. Rahmenaufnahme, Traglast, Abmessungen und Freigängigkeit vor dem Kauf prüfen.',
+  'tall-rider-bundle': 'Bundle aus Lenkererhöhung und unteren Fußrastenadaptern für größere Fahrer ab etwa 185 cm. Einbauhöhe, Leitungsreserve und Fußrastenposition prüfen.',
+  tank: 'Bonfire-Tank in mehreren Farbvarianten; je nach Variante mit oder ohne Tankdeckel. Befestigung, Tankdeckel und Fahrzeugrevision vor dem Kauf abgleichen.',
+  'tank-b-ware': 'Bonfire-Tank als B-Ware; archiviert mit leichten Kratzern, aber ohne Dellen sowie mit Varianten mit oder ohne Tankdeckel. Befestigung und Fahrzeugrevision prüfen.',
+  'tft-touch-display-retrofit': 'TFT-Touch-Display als Nachrüstkomponente für bestimmte Bonfire- und Wildfire-Varianten. Stecker, Protokoll, Halterung und Softwarestand müssen passen.',
+  'typ-2-kabel': 'Typ-2-Ladekabel mit archivierter Länge von 3 m. Steckerstandard, Stromstärke, Ladegerät und Fahrzeugseite vor dem Kauf prüfen.',
+  'usb-charging-port': 'USB-Ladeanschluss mit wasserdichter Kappe und Ein-/Aus-Schalter. Spannung, Sicherung, Kabelweg und Befestigung müssen zur Bonfire passen.',
+  'usd-gabelset': 'USD-Gabel-Set für bestimmte Wildfire-Varianten. Standrohrmaß, Achsaufnahme, Bremse, Gabelbrücke und Zulassung vor dem Kauf prüfen.',
+  wildfire: 'Dual-Sport-Lenker mit Mittelstrebe und 28-mm-Konifizierung im angegebenen Bereich. Klemmmaß, Biegung und Bedienelemente müssen zur Wildfire passen.',
+  'wildfire-abs': 'Konfigurationsvariante für eine Wildfire mit ABS-Bezug. Bremsanlage, Sensorik, Halterung und Fahrzeugrevision vor dem Ersatz prüfen.',
+  'wildfire-gabelbruckenset': 'Gabelbrückenset für die Wildfire. Gabelmaß, Lager, Klemmung, Lenkeraufnahme und Fahrzeugrevision vor dem Kauf vergleichen.',
+  'wildfire-konfiguration': 'Historische Wildfire-Konfiguration mit Auswahl von Ladeanschluss, Ladeleistung, Batterie- und Performance-Variante. Nicht als einzelnes Ersatzteil verstehen.',
+  'wildfire-performance': 'Historische Wildfire-Performance-Konfiguration mit ABS-Bezug und Antriebskomponenten. Nicht als freigegebenes Austauschset verwenden; Modellstand und Zulassung prüfen.',
+  windschild: 'Windschild für die Bonfire. Abmessungen, Halterung, Sichtfeld und Freigängigkeit vor dem Kauf prüfen.',
+  'xlr-charging-port': 'XLR-Ladeanschluss für bestimmte Bonfire-Konfigurationen. Modell, Adapter, Pinbelegung, Kabelweg und Zulassung vor dem Einbau fachkundig prüfen.',
+};
+
+const historicalShopParts: HistoricalShopPart[] = partsCatalog.historical_product_slugs.map((slug) => {
+  const details = historicalPartDetails[slug];
+  const research = researchEntryBySlug[slug];
+  const archived = archivedPartDetails.find((entry) => entry.slug === slug && entry.ok);
+  const model = details?.model ?? (slug.includes('wildfire') || archived?.title?.toLowerCase().includes('wildfire') ? 'Wildfire' : 'Bonfire-Familie, Variante prüfen');
+  const category = inferPartCategory(slug);
+  const title = partTitleOverrides[slug] ?? archived?.title ?? humanizePartSlug(slug);
+  const archivedVariants = archived?.variants?.map((variant) => variant.title ?? variant.name ?? '').filter(Boolean) as string[] | undefined;
+  const archivedVariantDetails = archived?.variants?.map((variant) => ({ label: variant.title ?? variant.name ?? '', price: variant.price_eur, available: variant.available })).filter((variant) => variant.label);
+  const confirmedPurchase = research?.purchase_status === 'confirmed' && Boolean(research.amazon_url || research.fallbacks?.length || research.supplier_link);
+  const candidatePurchase = research?.purchase_status === 'candidate' && Boolean(research.amazon_url);
+  const confirmedFallback = confirmedPurchase ? research?.fallbacks?.[0] ?? (research?.supplier_link ? { name: 'Hersteller-/Fachquelle', url: research.supplier_link } : undefined) : undefined;
+  const purchaseOptions = research?.purchase_status === 'manual-match'
+    ? research.purchase_options?.map((option) => ({ label: option.name, href: option.url, fitStatus: option.fit_status }))
+    : confirmedPurchase || candidatePurchase
+      ? [
+        ...(research?.amazon_url ? [{ label: candidatePurchase ? 'Amazon-Treffer öffnen' : 'Bestätigten Amazon-Artikel öffnen', href: research.amazon_url, fitStatus: research.purchase_note }] : []),
+        ...(confirmedFallback ? [{ label: confirmedFallback.name, href: confirmedFallback.url, fitStatus: confirmedFallback.fit_status }] : []),
+      ]
+      : undefined;
+  const hasPurchaseOptions = Boolean(purchaseOptions?.length);
+  const technicalEvidence = partTechnicalEvidence[slug];
+  return {
+    id: slug,
+    path: `/ersatzteile/${slug}`,
+    title,
+    category,
+    model,
+    price: archived?.price_min_eur ?? research?.historical_price_eur ?? details?.price,
+    priceMax: archived?.price_max_eur,
+    variants: archivedVariants?.length ? archivedVariants : research?.variants ?? details?.variants,
+    variantDetails: archivedVariantDetails?.length ? archivedVariantDetails : undefined,
+    archiveHref: localPartArchiveHref,
+    historicalSummary: partSummaryOverrides[slug] ?? research?.specification_lead ?? `Historischer Ersatzteil-Eintrag für ${model}. Die archivierten Varianten und der alte Preis dienen nur als Orientierung; konkrete Maße, Befestigung, Stecker und Modellstand müssen vor dem Kauf geprüft werden.`,
+    compatibilityNote: research?.compatibility_note ?? 'Die archivierten Angaben ersetzen keine Passformprüfung. Vor einer Bestellung Modellvariante, Maße, Befestigung, Stecker und Zulassung am Fahrzeug abgleichen.',
+    confidence: research?.confidence ?? 'historischer Produktname; aktuelle Verfügbarkeit ungeprüft',
+    safetyClass: research?.safety_class ?? partSafetyByCategory[category],
+    purchaseStatus: research?.purchase_status === 'manual-match' && hasPurchaseOptions ? 'manual-match' : candidatePurchase ? 'candidate' : confirmedPurchase ? 'confirmed' : 'not-confirmed',
+    purchaseNote: research?.purchase_note ?? 'Wenn du einen passenden Artikel gefunden und erfolgreich eingebaut hast, schreib uns gern in die Kommentare. Wir prüfen den Hinweis und ergänzen ihn, wenn er sich als passend bestätigt.',
+    purchaseHeading: research?.purchase_heading,
+    purchaseOptions,
+    technicalEvidence,
+    amazonHref: confirmedPurchase || candidatePurchase ? research?.amazon_url : undefined,
+    amazonLabel: (confirmedPurchase || candidatePurchase) && research?.amazon_url ? candidatePurchase ? 'Amazon-Treffer öffnen' : 'Bestätigten Amazon-Artikel öffnen' : undefined,
+    fallbackHref: confirmedFallback?.url,
+    fallbackLabel: confirmedFallback?.name,
+    fallbackFitStatus: confirmedFallback?.fit_status,
+    archiveTimestamp: archived?.timestamp,
+    historicalAvailability: archived ? (archived.available ? 'im Snapshot verfügbar markiert' : 'im Snapshot nicht verfügbar markiert') : 'keine auslesbare Snapshot-Angabe',
+  };
+});
+
+const communityKnowledge: CommunityKnowledge[] = [
+  {
+    title: 'Bonfire: Modellstände sauber trennen',
+    model: 'Bonfire · S / E / X',
+    intro: 'Die Community-Aufbereitung macht klar: S, E und X teilen viele Chassis-Teile, sind elektrisch aber nicht automatisch identisch.',
+    points: ['Frühe Bonfire und Bonfire X unterscheiden sich unter anderem bei Spannung, Motor, Vorderradbremse und Bereifung.', 'Für die frühe X werden 265 mm vorne genannt; bei der normalen Bonfire 220 mm.', 'Controller, Akku und Stecker immer nach konkretem Modellstand beurteilen.'],
+    sourceLabel: 'BTM Community · Bonfire',
+    sourceHref: 'https://btm-community.org/bonfire/',
+  },
+  {
+    title: 'Bonfire: Wartung und Retrofits',
+    model: 'Bonfire · Wartung',
+    intro: 'Aus vielen einzelnen How-tos wird eine brauchbare Arbeitslandkarte für typische Wartungs- und Umbaufragen.',
+    points: ['Batterie laden, Hochstromstecker vollständig verbinden und Sitz, Tank sowie Seitenteile korrekt demontieren.', 'Gasgriff, Blinker, Spiegel, Fußrasten, Scheinwerfergitter und Keyless-System sind als eigene Arbeitsschritte dokumentiert.', 'Bremsen, Räder, Lenkkopflager, Federbeine und Korrosionsschutz bleiben sicherheits- bzw. versionsabhängig.'],
+    sourceLabel: 'BTM Community · Wartungsarbeiten',
+    sourceHref: 'https://btm-community.org/bonfire/wartungsarbeiten-bonfire/',
+  },
+  {
+    title: 'Wildfire: Serienstand und Fehlerbilder',
+    model: 'Wildfire · Serie 2025',
+    intro: 'Die stärkste Ergänzung für unsere Reparaturhilfe ist die Trennung zwischen ausgeliefertem Fahrzeug, Konfiguration und typischer Kinderkrankheit.',
+    points: ['Reifendruck, Drehmomente und Wartungshinweise stammen aus dem dokumentierten Serienfahrzeug.', '5-V-DC/DC-Wandler, falsche Controllerwerte, BMS-Neustart und Ladeabbrüche bei einer Batterie sind als Fehlerbilder beschrieben.', 'Controller- und BMS-Daten werden getrennt betrachtet; FarDriver-Werte sind keine universellen Standardwerte.'],
+    sourceLabel: 'BTM Community · Wildfire',
+    sourceHref: 'https://btm-community.org/wildfire/',
+  },
+  {
+    title: 'Historie: Generationenwechsel verstehen',
+    model: 'Bonfire & Wildfire · Historie',
+    intro: 'Die Historie ist besonders wertvoll, weil sie Prototypen, Serienfahrzeuge und spätere Retrofits nicht in einen Topf wirft.',
+    points: ['Bonfire Y und frühe Wildfire-Prototypen werden als Entwicklung, nicht als Serienreferenz geführt.', '2025 markiert bei der Wildfire die wichtige Grenze zum tatsächlich ausgelieferten Serienstand.', '2026 ändern sich unter anderem Akku, CAN-Kommunikation, Ladeintegration, Fahrwerk und Bremsvarianten.'],
+    sourceLabel: 'BTM Community · Historie',
+    sourceHref: 'https://btm-community.org/historie/',
+  },
+];
+
+const resources: Resource[] = [
+  {
+    kind: 'Dokument',
+    title: 'Bonfire-Handbuch',
+    description: 'Bedienung, Sicherheit, Fahrzeugübersicht, Batterie, Display, Wartung und Fehlersuche in der lokal gesicherten Handbuchdatei.',
+    label: 'PDF',
+    href: '/pdfs/15-bonfire-handbuch-lokal.pdf',
+    tags: ['Bonfire', 'Handbuch', 'PDF', 'lokal'],
+    external: false,
+  },
+  {
+    kind: 'Dokument',
+    title: 'Bonfire Owner’s Manual als PDF',
+    description: 'Gesicherte 44-seitige lokale Kopie des Bonfire-Series-Handbuchs. Drittanbieter-Herkunft ist vermerkt; Rechte zur Weiterveröffentlichung müssen noch geklärt werden.',
+    label: 'PDF',
+    href: '/pdfs/15-bonfire-handbuch-lokal.pdf',
+    tags: ['Bonfire', 'PDF', 'lokal'],
+    external: false,
+  },
+  {
+    kind: 'Dokument',
+    title: 'Wildfire: Schaltplan & Kabelbaum',
+    description: 'Lokale PDFs für Willkommenshinweis, Schaltplan und Kabelbaum. Vor Nutzung auf Versionsstand und Modell prüfen.',
+    label: 'PDF',
+    href: '/pdfs/02-wildfire-kabelbaum.pdf',
+    tags: ['Wildfire', 'Schaltplan', 'Elektrik'],
+    external: true,
+  },
+  {
+    kind: 'Dokument',
+    title: 'Wildfire: Software, BMS & Drehmomente',
+    description: 'Lokale Software-PDF. Die darin enthaltenen Angaben können je nach Baujahr und Softwarestand abweichen.',
+    label: 'PDF',
+    href: '/pdfs/04-wildfire-software.pdf',
+    tags: ['Wildfire', 'Software', 'BMS'],
+    external: true,
+  },
+  {
+    kind: 'Dokument',
+    title: 'Wildfire: Willkommenshinweis',
+    description: 'Historische BTM-PDF lokal gesichert. Vor dem Einsatz prüfen, ob die Version zum Fahrzeug passt.',
+    label: 'PDF',
+    href: '/pdfs/01-wildfire-willkommenshinweis.pdf',
+    tags: ['Wildfire', 'PDF', 'Archiv'],
+    external: true,
+  },
+  {
+    kind: 'Dokument',
+    title: 'Wildfire: Kabelbaum / System Harness',
+    description: 'Historische System-Harness-PDF lokal gesichert. Elektrische Arbeiten gehören in qualifizierte Hände.',
+    label: 'PDF',
+    href: '/pdfs/03-wildfire-system-harness-12v.pdf',
+    tags: ['Wildfire', 'PDF', 'Elektrik'],
+    external: true,
+  },
+  {
+    kind: 'Dokument',
+    title: 'Bonfire X: deutsches Handbuch',
+    description: 'Forum-Anhang aus der Community-Sammlung, lokal gesichert. Rechte zur erneuten Veröffentlichung sind nicht geklärt.',
+    label: 'Community-Anhang',
+    href: '/pdfs/07-manual-bonfire-x-de.pdf',
+    tags: ['Bonfire X', 'PDF', 'Community'],
+    external: true,
+  },
+  {
+    kind: 'Dokument',
+    title: 'Bonfire X: technische Daten',
+    description: 'Externer Referenzdatensatz mit Leistungs-, Maß-, Batterie-, Fahrwerks- und Reifendaten. Herstellerangaben und Varianten können abweichen.',
+    label: 'Referenzdaten',
+    href: 'https://www.adac.de/rund-ums-fahrzeug/zweirad/motorrad-roller/motorradkatalog/marken/black-tea/black-tea-bonfire-x-11066/',
+    tags: ['Bonfire X', 'Datenblatt'],
+    external: true,
+  },
+  {
+    kind: 'Dokument',
+    title: 'Alle lokalen PDFs',
+    description: 'Ein zentraler Index mit allen derzeit gesicherten Handbüchern, Schaltplänen, Community-Anhängen und Datenblättern.',
+    label: 'Lokale Sammlung',
+    href: '/pdfs/index.html',
+    tags: ['PDF', 'Archiv', 'lokal'],
+    external: false,
+  },
+  {
+    kind: 'Dokument',
+    title: 'Wildfire-Handbuch der Community',
+    description: 'Lokale Kopie des 28-seitigen Wildfire-Handbuchs aus der BTM Community. Rechte zur erneuten Veröffentlichung bitte beachten.',
+    label: 'PDF',
+    href: '/pdfs/19-wildfire-handbuch-community.pdf',
+    tags: ['Wildfire', 'Handbuch', 'Community'],
+    external: false,
+    sourceHref: 'https://btm-community.org/wildfire/dokumente-wildfire/',
+    sourceLabel: 'BTM Community',
+  },
+  {
+    kind: 'Dokument',
+    title: 'Wildfire-Wartungszusammenfassung',
+    description: 'Lokale 4-seitige Übersicht zum Laden und zur Wartung. Werte und Abläufe vor Nutzung am eigenen Fahrzeug gegenprüfen.',
+    label: 'PDF',
+    href: '/pdfs/20-wildfire-wartung-community.pdf',
+    tags: ['Wildfire', 'Wartung', 'Community'],
+    external: false,
+    sourceHref: 'https://btm-community.org/wildfire/dokumente-wildfire/',
+    sourceLabel: 'BTM Community',
+  },
+  {
+    kind: 'Dokument',
+    title: 'Wildfire: Gabelabdichtung',
+    description: 'Lokale Community-PDF zur Fehlerspur an der Gabel. Fahrwerk sicherheitskritisch; nicht als Freigabe zum Weiterfahren verstehen.',
+    label: 'PDF',
+    href: '/pdfs/21-gabelabdichtung-community.pdf',
+    tags: ['Wildfire', 'Fahrwerk', 'Community'],
+    external: false,
+    sourceHref: 'https://btm-community.org/wildfire/dokumente-wildfire/',
+    sourceLabel: 'BTM Community',
+  },
+  {
+    kind: 'Dokument',
+    title: 'Wildfire: FarDriver-Settings',
+    description: 'Lokale 2-seitige Übersicht zu Controller-Einstellungen. Keine Standardkonfiguration übernehmen; Modell, Akkuanzahl und Softwarestand prüfen.',
+    label: 'PDF',
+    href: '/pdfs/22-wildfire-fardriver-settings-community.pdf',
+    tags: ['Wildfire', 'FarDriver', 'Community'],
+    external: false,
+    sourceHref: 'https://btm-community.org/wildfire/dokumente-wildfire/',
+    sourceLabel: 'BTM Community',
+  },
+  {
+    kind: 'Ersatzteil',
+    title: 'Ersatzteil-Katalog',
+    description: 'Alle historischen Einträge aus dem früheren Hersteller-Shop auf einer eigenen Seite. Bestand, Preise und Abwicklung sind nicht mehr zugesichert.',
+    label: '106 Shop-Einträge',
+    href: '/ersatzteile',
+    tags: ['Katalog', 'Original', 'Verfügbarkeit prüfen'],
+    external: false,
+  },
+  {
+    kind: 'Community',
+    title: 'DC/DC-Wandler: IPS-DTD110S1210',
+    description: 'Kurzfassung zur Wildfire-12-V-Versorgung. Teilenummer und Passform müssen am Fahrzeug geprüft werden.',
+    label: 'Kurzfassung',
+    href: '/hilfe/dcdc',
+    tags: ['Wildfire', 'Elektrik', 'Sicherheitsrelevant'],
+    guidePath: '/hilfe/dcdc',
+  },
+  {
+    kind: 'Community',
+    title: 'Akku / BMS: Reparaturspuren',
+    description: 'Akku wird nicht erkannt? Erst sicher stilllegen, dann BMS, Zellspannung und Wasserschäden fachkundig prüfen lassen.',
+    label: 'Kurzfassung',
+    href: '/hilfe/akku-bms',
+    tags: ['Bonfire', 'Wildfire', 'Akku'],
+    guidePath: '/hilfe/akku-bms',
+  },
+  {
+    kind: 'Community',
+    title: 'BTM Community-Wissen',
+    description: 'Redaktionell geordnete Modell-, Wartungs- und Technikhinweise mit Quellenangabe.',
+    label: 'Aufbereitung',
+    href: '/community',
+    tags: ['Bonfire', 'Wildfire', 'Quelle'],
+  },
+  {
+    kind: 'Community',
+    title: 'BTM Community: Wissen übernommen',
+    description: 'Redaktionell aufbereitete Modell-, Wartungs-, Wildfire- und Historienhinweise — kurz lesbar und jeweils mit Originalquelle.',
+    label: 'Lokale Aufbereitung',
+    href: '/community',
+    tags: ['Bonfire', 'Wildfire', 'Quelle'],
+  },
+];
+
+const repairGuides: RepairGuide[] = [
+  {
+    id: 'hilfe-dcdc',
+    path: '/hilfe/dcdc',
+    title: '12-V-Versorgung prüfen',
+    model: 'Wildfire · DC/DC-Wandler',
+    intro: 'Wenn Licht, Steuerung oder andere 12-V-Verbraucher ausfallen, nicht blind ein ähnliches Netzteil bestellen.',
+    steps: [
+      'Modell, Baujahr und Fehlerbild notieren; Wandler, Stecker, Sicherung und Einbauraum fotografieren.',
+      'Durch eine Fachkraft Eingangsspannung, 12-V-Ausgang, Polung, Sicherung und Steckverbindungen prüfen lassen.',
+      'IPS-DTD110S1210 wird als 110-V-DC-auf-12-V-DC-Wandler mit 10 A genannt. Datenblatt, Stecker, Befestigung und Absicherung müssen gemeinsam passen.'
+    ],
+    safety: 'Nicht unter Spannung umstecken. Arbeiten an der Hochvoltseite gehören in einen Fachbetrieb.',
+    sourceLabel: 'ElektroRoller-Forum · „Ersatzteile BT Wildfire“ · Thema 48272',
+    sourceHref: 'https://www.elektroroller-forum.de/viewtopic.php?t=48272',
+    detailSections: [
+      {
+        title: '1. Fehlerbild sauber eingrenzen',
+        paragraphs: ['Bei einem Ausfall von Licht, Steuerung oder anderen 12-V-Verbrauchern wird zuerst nur das Fehlerbild dokumentiert. Die wichtige Frage für die Werkstatt ist: Fällt nur die 12-V-Seite aus oder reagiert das gesamte Fahrzeug nicht mehr?'],
+        bullets: [
+          'Modell, Baujahr und Zeitpunkt des Ausfalls notieren.',
+          'Ladegerät trennen und Fahrzeug ausgeschaltet lassen.',
+          'Wandler, Sicherung, Stecker und Einbauraum fotografieren — nichts unter Spannung abziehen.'
+        ]
+      },
+      {
+        title: '2. Wandler technisch abgleichen',
+        paragraphs: ['IPS-DTD110S1210 wird im Community-Thread als 110-V-DC-auf-12-V-DC-Wandler mit 10 A genannt. Das ist ein Recherchehinweis und keine offizielle BTM-Freigabe. Ein Ersatzteil ist erst dann plausibel, wenn elektrische und mechanische Daten gemeinsam übereinstimmen.'],
+        bullets: [
+          'Eingangsspannungsbereich und 12-V-Ausgang vergleichen.',
+          'Stecker, Polung, Stromrating, Sicherung und Kabelquerschnitt abgleichen.',
+          'Befestigung, Einbauraum und Schutz gegen Vibrationen berücksichtigen.',
+          'Ein ähnliches Mean-Well-Gerät nicht als Plug-and-play-Ersatz behandeln.'
+        ]
+      },
+      {
+        title: '3. Reparatur dokumentieren und prüfen',
+        paragraphs: ['Passt ein Wandler nach dem Datenabgleich, kann eine Fachkraft den Austausch durchführen. Danach werden 12-V-Ausgang, Sicherung und die angeschlossenen Verbraucher unter realistischer Last geprüft. Die verwendete Teilenummer und die Messwerte gehören anschließend zum Fahrzeugdatensatz.'],
+        bullets: [
+          'Altes und neues Typenschild fotografieren.',
+          'Steckerbelegung und Sicherungswert schriftlich festhalten.',
+          'Bei abweichenden Messwerten nicht weiterprobieren, sondern die Ursache eingrenzen lassen.'
+        ]
+      }
+    ],
+  },
+  {
+    id: 'hilfe-akku-bms',
+    path: '/hilfe/akku-bms',
+    title: 'Akku wird nicht erkannt',
+    model: 'Bonfire & Wildfire · Akku / BMS',
+    intro: 'Laden sofort stoppen und den Akku nicht auf Verdacht weiterverwenden.',
+    steps: [
+      'Fahrzeug ausschalten, Ladegerät trennen und auf Wärme, Geruch, Wasser- oder Gehäuseschäden achten.',
+      'Akku-, Controller- und Fahrzeugdaten sowie auffällige Stecker oder Kabel fotografieren und notieren.',
+      'BMS, Zellspannungen, Kommunikation und mögliche Wasserschäden fachkundig prüfen lassen. Erst danach über Reparatur oder Ersatz entscheiden.'
+    ],
+    safety: 'Akku nicht öffnen, überbrücken oder durch einen beliebigen Ersatzakku ersetzen. Es besteht Hochvolt- und Brandrisiko.',
+    sourceLabel: 'ElektroRoller-Forum · „Reparatur Bonfire-Akku“ · Thema 48850',
+    sourceHref: 'https://www.elektroroller-forum.de/viewtopic.php?t=48850',
+    detailSections: [
+      {
+        title: '1. Laden und Nutzung stoppen',
+        paragraphs: ['„Akku wird nicht erkannt“ ist nicht automatisch nur ein Bluetooth- oder Kontaktproblem. In den Community-Berichten werden auch BMS-Probleme, Wassereintritt und stark abweichende Zellspannungen als mögliche Ursachen diskutiert.'],
+        bullets: [
+          'Fahrzeug ausschalten, Ladegerät trennen und keinen weiteren Ladeversuch starten.',
+          'Auf Wärme, Geruch, Feuchtigkeit, Verformung oder beschädigte Kabel achten.',
+          'Bei auffälligem Akku Abstand halten und direkt einen qualifizierten Akku-Fachbetrieb kontaktieren.'
+        ]
+      },
+      {
+        title: '2. Befund für die Diagnose sammeln',
+        paragraphs: ['Eine gute Dokumentation spart der Werkstatt Zeit und verhindert Teiletausch auf Verdacht. Der Akku bleibt dabei geschlossen; es werden nur äußere Informationen gesammelt.'],
+        bullets: [
+          'Modell, Baujahr, Akku- und Controllernummer sowie den genauen Fehlertext notieren.',
+          'Gehäuse, Kabel, Steckkontakte und mögliche Wasserspuren fotografieren.',
+          'Festhalten, ob der Fehler nach Regen, Standzeit, Tiefentladung oder einem Umbau auftrat.'
+        ]
+      },
+      {
+        title: '3. BMS und Zellseite fachkundig prüfen',
+        paragraphs: ['Die Fachdiagnose trennt Akku-, BMS-, Ladegerät- und Fahrzeugseite. Dazu gehören je nach Befund Kommunikationsprüfung, Zellspannungen, Steckverbindungen und Hinweise auf Wasserschäden. Erst danach lässt sich entscheiden, ob eine Reparatur, ein BMS-Tausch oder ein Ersatzakku überhaupt vertretbar ist.'],
+        bullets: [
+          'Keinen beliebigen Ersatzakku anhand der Nennspannung auswählen.',
+          'BMS niemals überbrücken und Zellen nicht selbst ausgleichen oder öffnen.',
+          'Reparatur- und Prüfbericht mit Akkuvariante und Datum aufbewahren.'
+        ]
+      }
+    ],
+  },
+];
+
+repairGuides.push(
+  {
+    id: 'hilfe-fehleranalyse',
+    path: '/hilfe/fehleranalyse',
+    title: 'Fehlerbild systematisch eingrenzen',
+    model: 'Bonfire & Wildfire · Diagnose',
+    intro: 'Erst Fahrzeug und Symptom sauber einordnen, dann gezielt prüfen lassen — so vermeidest du Teiletausch auf Verdacht.',
+    steps: [
+      'Modell, Baujahr, Akkuzahl, Kilometerstand und den genauen Zeitpunkt des Fehlers notieren.',
+      'Das Fahrzeug sicher abstellen und nur äußerlich prüfen: Wärme, Geruch, Feuchtigkeit, lose Stecker, Kabel und sichtbare Schäden dokumentieren.',
+      'Das Symptom einem Bereich zuordnen: Start/12 V, Laden, Akku/BMS, Controller/Motor oder Fahrwerk. Erst danach die passende Reparaturhilfe öffnen.'
+    ],
+    safety: 'Keine Hochvolt-Messung, keine Steckerprüfung unter Spannung und kein Öffnen von Akku oder Controller in Eigenregie.',
+    sourceLabel: 'ElektroRoller-Forum · „Fehleranalyse an der Bonfire/Wildfire“ · Thema 49336',
+    sourceHref: 'https://www.elektroroller-forum.de/viewtopic.php?t=49336',
+    detailSections: [
+      {
+        title: '1. Fahrzeugstand festhalten',
+        paragraphs: ['Bonfire, Bonfire X und Wildfire unterscheiden sich bei Akku, Controller, Display, Kabelbaum und Fahrwerk. Deshalb gehören Modell, Baujahr, Akkuzahl und Umbauten immer an den Anfang des Reparaturdatensatzes.'],
+        bullets: [
+          'Typenschild, Akku- und Controllerdaten fotografieren.',
+          'Fehlertext, Pieptöne, Kontrollleuchten und Kilometerstand notieren.',
+          'Nach Regen, Standzeit, Tiefentladung, Sturz oder Umbau aufgetretene Fehler markieren.'
+        ]
+      },
+      {
+        title: '2. Sichtprüfung ohne Eingriff',
+        paragraphs: ['Die erste Prüfung bleibt äußerlich. Sie soll den Fehler für eine Fachkraft eingrenzen, nicht die Hochvoltseite ersetzen. Auffällige Wärme, Geruch, Wasser, beschädigte Isolierung oder lose Befestigungen sind Abbruchsignale.'],
+        bullets: [
+          'Ladegerät trennen und Fahrzeug ausgeschaltet lassen.',
+          'Keine beschädigten Kabel bewegen oder provisorisch verbinden.',
+          'Fotos mit Übersicht und Detailaufnahme zum Auftrag speichern.'
+        ]
+      },
+      {
+        title: '3. Werkstattauftrag vorbereiten',
+        paragraphs: ['Eine kompakte Fehlerchronik ist hilfreicher als ein langer Forenverlauf. Sie trennt Beobachtung, Messung und Vermutung und verhindert, dass ein teures Teil ohne Diagnose getauscht wird.'],
+        bullets: [
+          'Fehlerbedingungen und reproduzierbare Geschwindigkeit, Last oder Temperatur angeben.',
+          'Bisherige Änderungen und bereits getauschte Teile aufführen.',
+          'Nach der Prüfung Messwerte, Teilenummer und Ergebnis zum Fahrzeugdatensatz ergänzen.'
+        ]
+      }
+    ],
+  },
+  {
+    id: 'hilfe-mosfet',
+    path: '/hilfe/mosfet',
+    title: 'MOSFET-Fehler: Wildfire bleibt stehen',
+    model: 'Wildfire · FarDriver / Antrieb',
+    intro: 'MOSFET-Fehler und fehlende Gasannahme gehören in eine sichere Antriebsdiagnose — nicht in einen weiteren Probefahrt-Test.',
+    steps: [
+      'Fehlercode, Pieptonanzahl, Displaymeldung und Situation des Ausfalls fotografieren oder notieren.',
+      'Fahrzeug abstellen, Ladegerät trennen und nicht weiterfahren, wenn Leistung fehlt oder der Controller abschaltet.',
+      'Controller, Phasenleitungen, Hall-Sensoren, Motor und BMS durch einen qualifizierten Betrieb voneinander abgrenzen lassen.'
+    ],
+    safety: 'MOSFET- und Phasenfehler betreffen die Hochvolt- und Antriebsseite. Akku und Controller nicht öffnen, überbrücken oder unter Spannung abstecken.',
+    sourceLabel: 'ElektroRoller-Forum · „MOSFET Error – Wildfire steht“ · Thema 49333',
+    sourceHref: 'https://www.elektroroller-forum.de/viewtopic.php?t=49333',
+    detailSections: [
+      {
+        title: '1. Fehlercode sichern',
+        paragraphs: ['Im Community-Material werden für die Wildfire unter anderem Fehler 13 und 14 als High-Side- beziehungsweise Low-Side-MOSFET-Fehler beschrieben. Der Code zeigt die Fehlerklasse, beweist aber allein noch keinen vollständigen Controllerdefekt.'],
+        bullets: [
+          'Pieptöne zählen und zusammen mit dem Displaytext speichern.',
+          'Notieren, ob vorher Leistungsverlust, Ruckeln, Vibrationen oder ein Schlag im Antrieb auftrat.',
+          'Keine Parameteränderung als erste Gegenmaßnahme durchführen.'
+        ]
+      },
+      {
+        title: '2. Ursache vor Ersatzteil klären',
+        paragraphs: ['Ein neuer Controller kann erneut ausfallen, wenn Phasenkabel, Steckkontakte, Motor, Hall-Sensoren oder BMS die Ursache sind. Die Prüfung muss deshalb den gesamten Antriebsstrang einschließen.'],
+        bullets: [
+          'Controllerdaten und Softwarestand auslesen lassen, ohne Werte auf Verdacht zu verändern.',
+          'Phasen- und Versorgungskabel auf festen Sitz, Beschädigung und Überhitzung prüfen lassen.',
+          'Motor mechanisch und elektrisch getrennt vom Controller bewerten lassen.'
+        ]
+      },
+      {
+        title: '3. Nach der Reparatur',
+        paragraphs: ['Nach einem Austausch gehören Teilenummer, Firmware-/CAN-Stand und die verwendeten Einstellungen in den Fahrzeugdatensatz. Die erste Funktionsprüfung erfolgt kontrolliert und ohne öffentliche Fahrt.'],
+        bullets: [
+          'Fehler löschen und prüfen, ob er ohne Last erneut erscheint.',
+          'Danach Anfahren, Bremsen und Temperaturentwicklung schrittweise kontrollieren.',
+          'Bei erneutem Fehler sofort abbrechen und nicht weiterprobieren.'
+        ]
+      }
+    ],
+  },
+  {
+    id: 'hilfe-controller',
+    path: '/hilfe/controller',
+    title: 'Controller-Ausfall richtig zuordnen',
+    model: 'Bonfire Performance · FarDriver / CAN',
+    intro: 'Abschalten bei Rekuperation oder Last kann vom Controller kommen — genauso aber von BMS, Verkabelung oder falschen Einstellungen.',
+    steps: [
+      'Fehler nur unter Last, beim Rekuperieren oder bei einer bestimmten Geschwindigkeit dokumentieren.',
+      'Typenschild, Modellnummer, CAN-Ausführung und vorhandene FarDriver-Werte sichern.',
+      'Ersatz erst nach Abgleich von Spannung, Strom, CAN, Steckern, Firmware und Motor beschaffen.'
+    ],
+    safety: 'Ein Controller ist kein Plug-and-play-Universalteil. Austausch, Parametrierung und Hochvoltprüfung gehören in qualifizierte Hände.',
+    sourceLabel: 'ElektroRoller-Forum · „Controller-Problem BTM Bonfire Performance“ · Thema 48453',
+    sourceHref: 'https://www.elektroroller-forum.de/viewtopic.php?t=48453',
+    detailSections: [
+      {
+        title: '1. Abschaltbedingungen aufzeichnen',
+        paragraphs: ['Im Forum werden bei der Bonfire Performance Abschaltungen unter Rekuperation und bei höherer Last beschrieben. Das ist ein verwertbares Fehlerbild, aber noch keine eindeutige Bauteildiagnose.'],
+        bullets: [
+          'Geschwindigkeit, Fahrmodus, Akkuzahl und Ladezustand festhalten.',
+          'Displayfehler und Controller-Pieptöne mit Zeitstempel sichern.',
+          'Keine weitere Belastungsfahrt durchführen, wenn das Bike unvermittelt ausgeht.'
+        ]
+      },
+      {
+        title: '2. Identität des Ersatzcontrollers prüfen',
+        paragraphs: ['Für die Performance werden im Community-Thread FarDriver-Controller mit CAN-Kommunikation genannt. Die genaue Variante muss am vorhandenen Typenschild und am Fahrzeugstand geprüft werden; eine ähnliche Modellnummer reicht nicht.'],
+        bullets: [
+          'Nennspannung, Stromgrenzen, CAN, Stecker und Befestigung abgleichen.',
+          'Motor, Display, BMS und Gasgriff als Gesamtsystem berücksichtigen.',
+          'FarDriver-Einstellungen vor dem Ausbau sichern und nach dem Einbau dokumentiert übernehmen.'
+        ]
+      },
+      {
+        title: '3. Inbetriebnahme kontrollieren',
+        paragraphs: ['Nach dem Einbau wird zuerst die Kommunikation geprüft. Erst wenn keine Warnung erscheint, darf eine kontrollierte Funktionsprüfung mit niedriger Last erfolgen.'],
+        bullets: [
+          'Stecker, Kabelverlauf und Befestigung vor dem Einschalten kontrollieren lassen.',
+          'Leerlauf- und Niedriglastprüfung getrennt durchführen.',
+          'Temperatur, Fehlercodes und Abschaltverhalten während der Prüfung protokollieren.'
+        ]
+      }
+    ],
+  },
+  {
+    id: 'hilfe-vibrationen',
+    path: '/hilfe/vibrationen',
+    title: 'Vibrationen und Schläge aus dem Antrieb',
+    model: 'Wildfire · Motor, Rad und Controller',
+    intro: 'Vibrationen zwischen bestimmten Geschwindigkeiten können mechanisch oder elektrisch entstehen. Erst eingrenzen, dann einstellen oder reparieren.',
+    steps: [
+      'Geschwindigkeit, Last, Fahrmodus und Temperatur festhalten; bei einem neuen Schlag oder starken Ruck sofort anhalten.',
+      'Reifen, Radlauf, Achsen, Motorbefestigung, Schwinge und sichtbare lose Teile äußerlich prüfen lassen.',
+      'Erst danach Motor, Hall-/Phasenleitungen und Controllerparameter fachkundig abgleichen lassen.'
+    ],
+    safety: 'Bei starkem Ruckeln, ungewöhnlichem Motorgeräusch oder losem Fahrwerk nicht weiterfahren. PID-Werte nicht blind verändern.',
+    sourceLabel: 'ElektroRoller-Forum · „Wildfire – starke Vibrationen aus dem Antrieb“ · Thema 48425',
+    sourceHref: 'https://www.elektroroller-forum.de/viewtopic.php?t=48425',
+    detailSections: [
+      {
+        title: '1. Mechanik und Rollseite trennen',
+        paragraphs: ['Das Community-Fehlerbild tritt in einem begrenzten Geschwindigkeitsbereich auf. Zuerst werden Reifen, Rad, Achse, Schwinge und Befestigungen betrachtet, weil Unwucht oder Spiel ähnliche Symptome wie ein elektrischer Antriebsfehler erzeugen können.'],
+        bullets: [
+          'Reifendruck und sichtbare Schäden prüfen.',
+          'Rad- und Schwingenbefestigung auf Spiel oder lose Teile prüfen lassen.',
+          'Motorgeräusch ohne Belastung nicht mit einer Probefahrt erzwingen.'
+        ]
+      },
+      {
+        title: '2. Elektrische Ursache prüfen',
+        paragraphs: ['Wenn die Mechanik unauffällig ist, müssen Motor, Hall-Sensoren, Phasenleitungen und Controller gemeinsam bewertet werden. Einzelne PID-Werte können ein Symptom verändern, beheben aber nicht automatisch die Ursache.'],
+        bullets: [
+          'Fehlercodes und Controllerprotokoll vor Änderungen sichern.',
+          'Stecker und Kabel nur spannungsfrei durch eine Fachkraft prüfen lassen.',
+          'Einstellungen nur schrittweise, dokumentiert und fahrzeugspezifisch ändern.'
+        ]
+      },
+      {
+        title: '3. Ergebnis verifizieren',
+        paragraphs: ['Nach einer Reparatur oder Einstellung muss das Verhalten bei niedriger Last und anschließend unter kontrollierten Bedingungen wiederholt werden. Ein verschwundenes Geräusch ist noch kein Freigabekriterium.'],
+        bullets: [
+          'Temperatur und Fehlercodes während der Prüfung beobachten.',
+          'Verwendete Werte, Teile und Datum speichern.',
+          'Bei erneutem Schlag oder Ruck die Prüfung abbrechen.'
+        ]
+      }
+    ],
+  },
+  {
+    id: 'hilfe-gabelbruecke',
+    path: '/hilfe/gabelbruecke',
+    title: 'Gabelbrücke: Schrauben gerissen',
+    model: 'Wildfire · Fahrwerk / sicherheitskritisch',
+    intro: 'Gerissene oder unklare Befestigungsschrauben an der Gabelbrücke sind ein Abbruchsignal und keine schnelle Standardreparatur.',
+    steps: [
+      'Fahrzeug nicht weiterfahren und die betroffene Gabel, Brücke, Schraubenreste und mögliche Sturzspuren fotografieren.',
+      'Schraubengröße, Länge, Festigkeitsklasse und Gewinde erst am tatsächlichen Bauteil prüfen — nicht aus einem ähnlichen Angebot ableiten.',
+      'Gewindereste, Gabelausrichtung und mögliche Risse durch einen Fahrwerksbetrieb beurteilen lassen.'
+    ],
+    safety: 'Die im Thread genannten Drehmomentwerte widersprechen sich. Deshalb hier keinen pauschalen Wert verwenden; Freigabe und Drehmoment müssen zum konkreten Fahrzeugstand passen.',
+    sourceLabel: 'ElektroRoller-Forum · „Wildfire – Gabelbrücke unten – Schrauben gerissen“ · Thema 49324',
+    sourceHref: 'https://www.elektroroller-forum.de/viewtopic.php?t=49324',
+    detailSections: [
+      {
+        title: '1. Schaden sichern',
+        paragraphs: ['An der unteren Gabelbrücke wurden abgerissene Schraubenköpfe und Unsicherheit über Größe und Drehmoment beschrieben. Das ist ein Fahrwerksschaden mit möglicher Auswirkung auf Spur und Lenkung.'],
+        bullets: [
+          'Nicht durch Anziehen einer beliebigen Ersatzschraube wieder fahrbereit machen.',
+          'Gabelrohre, Brücke, Lenker und Radstellung auf sichtbare Verformung prüfen lassen.',
+          'Schraubenreste nicht in die Brücke hineintreiben.'
+        ]
+      },
+      {
+        title: '2. Gewinde fachgerecht wiederherstellen',
+        paragraphs: ['Je nach Lage lässt sich ein Rest ausdrehen oder das Gewinde muss professionell instandgesetzt werden. Vor dem Einbau werden Gewindetiefe, Schraubenlänge und Auflageflächen geprüft.'],
+        bullets: [
+          'Schraubenklasse und Abmessung am Bauteil beziehungsweise in einer passenden Unterlage verifizieren.',
+          'Keine Schraube mit abweichender Länge oder Festigkeit einsetzen.',
+          'Bei beschädigtem Aluminiumgewinde eine fachgerechte Gewindereparatur entscheiden lassen.'
+        ]
+      },
+      {
+        title: '3. Fahrwerk freigeben',
+        paragraphs: ['Nach der Reparatur werden alle betroffenen Klemmungen, die Gabelausrichtung und das Vorderrad geprüft. Erst nach dokumentiertem korrektem Drehmoment und einer kurzen Standprüfung darf eine kontrollierte Probefahrt erfolgen.'],
+        bullets: [
+          'Drehmomentquelle und Fahrzeugrevision im Auftrag vermerken.',
+          'Lenkung, Bremse und Geradeauslauf kontrollieren.',
+          'Bei erneutem Knacken, Spiel oder Verdrehen sofort stoppen.'
+        ]
+      }
+    ],
+  },
+  {
+    id: 'hilfe-gabelabdichtung',
+    path: '/hilfe/gabelabdichtung',
+    title: 'Undichte Gabel abdichten',
+    model: 'Wildfire · USD-Gabel',
+    intro: 'Öl an der Gabel ist nicht nur ein Komfortproblem: Es kann die Bremsanlage und die Kontrolle über das Vorderrad beeinträchtigen.',
+    steps: [
+      'Fahrzeug abstellen und prüfen, ob Öl am Gabelrohr, an der Dichtung oder bereits an Bremsscheibe und Belag sitzt.',
+      'Bei sichtbarem Ölfilm an der Bremse nicht weiterfahren; Gabeltyp und Modellstand fotografieren.',
+      'Dichtung, Gabelrohr und Ölmenge nach der lokalen Community-PDF beziehungsweise durch einen Fahrwerksbetrieb instandsetzen lassen.'
+    ],
+    safety: 'Öl auf Bremsscheibe oder Belag bedeutet Fahrstopp. Dichtungswechsel und Gabelöffnung gehören in einen qualifizierten Fahrwerksbetrieb.',
+    sourceLabel: 'BTM Community · lokale PDF „Gabelabdichtung“',
+    sourceHref: '/pdfs/21-gabelabdichtung-community.pdf',
+    detailSections: [
+      {
+        title: '1. Leckstelle und Bremsrisiko prüfen',
+        paragraphs: ['Die lokale Community-PDF beschreibt die Reparaturspur an der Wildfire-Gabel. Vor jedem Teilekauf wird zuerst geklärt, ob es sich um leichte Verschmutzung, einen beschädigten Dichtlippenbereich oder einen echten Ölverlust handelt.'],
+        bullets: [
+          'Gabelrohr mit sauberem Tuch kontrollieren, ohne Schmutz in die Dichtung zu drücken.',
+          'Bremsscheibe, Belag und Reifen auf Ölspuren prüfen.',
+          'Bei Öl an der Bremse nicht mit Bremsenreiniger eine Freigabe vortäuschen.'
+        ]
+      },
+      {
+        title: '2. Dichtung und Gabelrohr instandsetzen',
+        paragraphs: ['Eine neue Dichtung ist nur dann ausreichend, wenn das Gabelrohr keine Riefen oder Beschädigungen hat. Dichtungsart, Einbaurichtung und Füllmenge müssen zum konkreten Gabelstand passen.'],
+        bullets: [
+          'Gabeltyp und Baujahr vor dem Bestellen abgleichen.',
+          'Dichtfläche und Rohr nach der Demontage auf Schäden prüfen lassen.',
+          'Ölmenge und Anzugswerte aus der passenden Unterlage übernehmen.'
+        ]
+      },
+      {
+        title: '3. Brems- und Funktionsprüfung',
+        paragraphs: ['Nach der Reparatur wird die Gabel mehrfach eingefedert und auf erneuten Ölfilm geprüft. Bremse, Geradeauslauf und Dämpfung werden separat kontrolliert, bevor das Bike wieder bewegt wird.'],
+        bullets: [
+          'Verunreinigte Beläge ersetzen statt nur oberflächlich reinigen.',
+          'Bremsscheibe, Bremsdruck und Reifen nach der Reparatur prüfen.',
+          'Erneuten Ölverlust dokumentieren und die Fahrt abbrechen.'
+        ]
+      }
+    ],
+  },
+  {
+    id: 'hilfe-vorderrad',
+    path: '/hilfe/vorderrad',
+    title: 'Vorderrad ausbauen und wieder einsetzen',
+    model: 'Bonfire · Vorderrad / Bremse',
+    intro: 'Der Ausbau ist machbar, aber Spacer, Bremsanlage, Achse und Drehmoment müssen in der richtigen Reihenfolge dokumentiert werden.',
+    steps: [
+      'Bike sicher entlasten, Vorderrad und beide Seiten fotografieren und die Lage aller Spacer markieren.',
+      'Bremssattel und Bremsleitung nicht am Kabel hängen lassen; Achse und Befestigungen nur spannungsfrei lösen.',
+      'Nach dem Einsetzen Radlauf, Bremsscheibe, Achse, Klemmungen und Bremsfunktion vor der Probefahrt prüfen.'
+    ],
+    safety: 'Arbeiten an Vorderrad und Bremse sind sicherheitskritisch. Das passende Drehmoment kommt aus der fahrzeugspezifischen Unterlage, nicht aus einem allgemeinen Fahrradwert.',
+    sourceLabel: 'ElektroRoller-Forum · „Vorderrad-Ausbau Blacktea Bonfire?“ · Thema 48948',
+    sourceHref: 'https://www.elektroroller-forum.de/viewtopic.php?t=48948',
+    detailSections: [
+      {
+        title: '1. Vorbereitung',
+        paragraphs: ['Vor dem Lösen wird die Einbausituation dokumentiert. Besonders die Reihenfolge und Position von Distanzhülsen, Bremssattel und Achse entscheidet darüber, ob das Rad später mittig läuft.'],
+        bullets: [
+          'Werkzeug, Unterlage und eine sichere Entlastung des Vorderrads vorbereiten.',
+          'Spacer links und rechts getrennt ablegen und beschriften.',
+          'Bremshebel während des ausgebauten Rads nicht betätigen.'
+        ]
+      },
+      {
+        title: '2. Rad ausbauen',
+        paragraphs: ['Das Rad wird ohne Zug auf Bremsschlauch oder Kabel herausgenommen. Wenn Achse, Gabel oder Bremssattel nicht frei laufen, wird nicht mit Gewalt weitergearbeitet.'],
+        bullets: [
+          'Bremssattel bei Bedarf fachgerecht abnehmen und sicher ablegen.',
+          'Achse, Mutter und Klemmungen geordnet aufbewahren.',
+          'Rad, Lager, Reifen und Bremsscheibe auf Schäden prüfen.'
+        ]
+      },
+      {
+        title: '3. Einbau und Prüfung',
+        paragraphs: ['Nach dem Einsetzen muss das Rad frei laufen und die Bremsscheibe mittig im Sattel stehen. Drehmoment, Bremsdruck und Geradeauslauf werden vor jeder öffentlichen Fahrt kontrolliert.'],
+        bullets: [
+          'Spacer in der dokumentierten Position einsetzen.',
+          'Befestigungen mit dem passenden fahrzeugspezifischen Drehmoment anziehen.',
+          'Bremse im Stand mehrfach betätigen und danach eine sehr kurze kontrollierte Prüfung durchführen.'
+        ]
+      }
+    ],
+  },
+  {
+    id: 'hilfe-hinterrad',
+    path: '/hilfe/hinterrad',
+    title: 'Hinterrad und Nabenmotor prüfen',
+    model: 'Wildfire · Hinterrad / Nabenmotor',
+    intro: 'Am Hinterrad treffen Reifen, Bremse, Lager, Achse und Motorleitung zusammen. Deshalb wird jeder Arbeitsschritt dokumentiert.',
+    steps: [
+      'Bike sicher abstellen und Kabelverlauf, Achsseiten, Spacer und Bremse fotografieren.',
+      'Reifen, Felge, Lager, Bremse und sichtbare Motorleitung äußerlich prüfen; nichts am Hochvoltanschluss öffnen.',
+      'Nach der Arbeit Radlauf, Kabelschutz, Bremsfunktion und fahrzeugspezifisches Achsdrehmoment kontrollieren.'
+    ],
+    safety: 'Nabenmotor und Hochvoltverkabelung nicht unter Spannung trennen. Bei beschädigter Motorleitung, Lager-Spiel oder Bremsproblemen Fachbetrieb einschalten.',
+    sourceLabel: 'ElektroRoller-Forum · „Wildfire Hinterrad reparieren“ · Thema 48744',
+    sourceHref: 'https://www.elektroroller-forum.de/viewtopic.php?t=48744',
+    detailSections: [
+      {
+        title: '1. Befund aufnehmen',
+        paragraphs: ['Beim Hinterrad werden zunächst Rollgeräusch, Spiel, Reifenzustand, Bremsscheibe und sichtbare Kabelbeschädigungen getrennt erfasst. Ein schwergängiges Rad kann mechanisch oder elektrisch verursacht sein.'],
+        bullets: [
+          'Rad und Kabel nicht am Boden schleifen lassen.',
+          'Achsseiten, Unterlegteile und Kabelhalter markieren.',
+          'Bei Schleifen, Rissen oder starkem Spiel nicht weiterfahren.'
+        ]
+      },
+      {
+        title: '2. Rad und Motorleitung schützen',
+        paragraphs: ['Der Nabenmotor wird beim Ausbau nicht an der Leitung gezogen oder verdreht. Die Leitung muss spannungsfrei, geschützt und mit ausreichendem Abstand zu Reifen und Bremse verlegt sein.'],
+        bullets: [
+          'Stecker nur nach sicherer Spannungsfreischaltung und durch eine Fachkraft lösen.',
+          'Kabel auf Scheuerstellen, Knicke und lose Zugentlastung prüfen.',
+          'Lager, Achse und Bremse getrennt vom Motor bewerten.'
+        ]
+      },
+      {
+        title: '3. Montage und Laufprüfung',
+        paragraphs: ['Nach der Montage wird das Hinterrad frei von Hand bewegt. Erst wenn Ausrichtung, Bremsanlage, Kabelschutz und Befestigung stimmen, folgt eine kurze kontrollierte Funktionsprüfung.'],
+        bullets: [
+          'Achsmuttern mit dem passenden Fahrzeugwert anziehen.',
+          'Bremse und Reifensitz vor dem Einschalten prüfen.',
+          'Bei ungewöhnlichem Geräusch, Ruckeln oder Kabelzug sofort abbrechen.'
+        ]
+      }
+    ],
+  },
+  {
+    id: 'hilfe-laden',
+    path: '/hilfe/laden',
+    title: 'Laden bricht ab oder Typ 2 startet nicht',
+    model: 'Bonfire & Wildfire · Laden / BMS',
+    intro: 'Wenn der Ladeziegel oder eine öffentliche AC-Säule nicht lädt, werden Strompfad, Kabel, Akkuzustand und BMS getrennt geprüft.',
+    steps: [
+      'Ladegerät, Kabel, Steckdose oder Säule, Akkuzahl und Anzeigezustand dokumentieren.',
+      'Nur das passende Ladegerät und ein passendes Typ-2-Kabel verwenden; bei Abbruch nicht wiederholt unter denselben Bedingungen starten.',
+      'Temperatur, Ladezustand, BMS-Meldung und LED-Verhalten fachkundig prüfen lassen, bevor Ladeparameter geändert werden.'
+    ],
+    safety: 'Nicht laden bei Wärme, Geruch, sichtbarem Akkuschaden oder unter 0 °C. Ladegerät und Akku nicht öffnen und keine Ladeleitung überbrücken.',
+    sourceLabel: 'ElektroRoller-Forum · „Wildfire – Laden Steckdose und Typ 2 öffentlich“ · Thema 44905',
+    sourceHref: 'https://www.elektroroller-forum.de/viewtopic.php?t=44905',
+    detailSections: [
+      {
+        title: '1. Ladefehler unterscheiden',
+        paragraphs: ['Das Forum dokumentiert unterschiedliche Fälle an Schuko, Ladeziegel und öffentlicher Typ-2-Säule. Ein Ladeabbruch kann vom Kabel, Ladegerät, BMS, Akkuzustand, der Temperatur oder der Kommunikation kommen.'],
+        bullets: [
+          'Ort, Beginn und Dauer des Ladevorgangs notieren.',
+          'LEDs, App-Werte und Fehlermeldungen fotografieren.',
+          'Bei nur einem betroffenen Akku die Akkus nicht beliebig vertauschen, sondern getrennt dokumentieren.'
+        ]
+      },
+      {
+        title: '2. Temperatur und Strompfad prüfen',
+        paragraphs: ['Die lokale Wartungszusammenfassung nennt temperaturabhängige Ladegrenzen und eine Abkühlphase nach der Fahrt. Konkrete Stromwerte bleiben modell- und versionsabhängig und dürfen nicht ungeprüft übernommen werden.'],
+        bullets: [
+          'Akku vor dem Laden abkühlen lassen und bei Frost nicht laden.',
+          'Passendes Ladegerät, Kabel, Steckverbindungen und Sicherung prüfen lassen.',
+          'Ladeleistung nicht erhöhen, um einen Abbruch zu erzwingen.'
+        ]
+      },
+      {
+        title: '3. Öffentliche AC-Säule',
+        paragraphs: ['Bei Typ 2 wird die Kommunikation zwischen Säule, Kabel und Fahrzeug betrachtet. Ein passendes Kabel und die freigegebene Fahrzeugkonfiguration sind Voraussetzung; die Säule ist keine Reparaturumgehung für einen BMS- oder Ladefehler.'],
+        bullets: [
+          'Mit einer bekannten funktionierenden Säule und einem geprüften Kabel vergleichen.',
+          'Ladeeinstellungen nur nach dokumentiertem Fahrzeugstand ändern.',
+          'Bei erneutem Abbruch Ladevorgang beenden und Fehlerdaten sichern.'
+        ]
+      }
+    ],
+  },
+  {
+    id: 'hilfe-nfc',
+    path: '/hilfe/nfc',
+    title: 'NFC / Keyless nachrüsten und prüfen',
+    model: 'Wildfire · Startsystem',
+    intro: 'Beim NFC-Umbau zählen Modul, Stecker, Einbauort und Funktionsprüfung — nicht das Verbinden von Kabeln nach Farben.',
+    steps: [
+      'Vor dem Umbau den funktionierenden Keyless-Zustand, Modulstecker und Einbauort fotografieren.',
+      'Akkuversorgung trennen und nur das zum Wildfire-Modell passende NFC-Modul mit passendem Stecker einsetzen.',
+      'Nach dem Einbau Karte, Taster, Signalton und Controllerfreigabe getrennt prüfen.'
+    ],
+    safety: 'Keine Kabel nach Vermutung umstecken oder verbinden. Bei fehlender Freigabe das Originalsystem wieder einsetzen lassen und den Umbau prüfen.',
+    sourceLabel: 'ElektroRoller-Forum · „Wildfire: NFC, aber wie einbauen?“ · Thema 46657',
+    sourceHref: 'https://www.elektroroller-forum.de/viewtopic.php?t=46657',
+    detailSections: [
+      {
+        title: '1. Modul und Fahrzeugstand identifizieren',
+        paragraphs: ['Im Community-Thread werden verschiedene Einbauorte und unterschiedliche Modellstände beschrieben. Deshalb wird zuerst geklärt, welches Keyless-Modul vorhanden ist und welche Wildfire-Revision vorliegt.'],
+        bullets: [
+          'Stecker, Modul, Taster und vorhandene Halterung fotografieren.',
+          'Vorhandene Originalteile aufbewahren und nicht voreilig entsorgen.',
+          'Einbauvideo oder passende Anleitung der eigenen Variante zuordnen.'
+        ]
+      },
+      {
+        title: '2. Einbau ohne Kabel-Experiment',
+        paragraphs: ['Das NFC-Modul wird mechanisch sicher befestigt und über den passenden Steckverbinder eingebunden. Kabel werden nicht nach Farbe oder einem ähnlichen Fahrzeugplan verändert.'],
+        bullets: [
+          'Akkuversorgung vor dem Abstecken trennen.',
+          'Einbauort so wählen, dass Taster, Dichtung und Kabel nicht scheuern.',
+          'Keine Bohrung in abnehmbare Teile setzen, wenn eine feste alternative Position möglich ist.'
+        ]
+      },
+      {
+        title: '3. Funktion testen',
+        paragraphs: ['Eine funktionierende NFC-Freigabe wird durch Reaktion des Tasters, Signalton und das Startverhalten bestätigt. Bluetooth-Kopplung allein ist kein Beweis für eine vollständige Fahrzeugfreigabe.'],
+        bullets: [
+          'Beide Karten beziehungsweise vorhandene Schlüssel getrennt testen.',
+          'Tasterlicht, Signalton und Displayreaktion dokumentieren.',
+          'Bei fehlender Freigabe nicht weiterfahren und Original-Keyless wiederherstellen lassen.'
+        ]
+      }
+    ],
+  },
+  {
+    id: 'hilfe-qs8',
+    path: '/hilfe/qs8',
+    title: 'QS8-Akkuanschluss sicher prüfen',
+    model: 'Bonfire · Akkuanschluss / Hochstrom',
+    intro: 'Ein QS8-Ersatz oder eine externe Lademöglichkeit darf nicht nach Optik ausgewählt werden. Stecker, Polung und BMS müssen zusammenpassen.',
+    steps: [
+      'Vor dem Kauf Steckerhälfte, Kabelquerschnitt, Polung, Anti-Spark-Ausführung und mechanische Verriegelung am eigenen Akku dokumentieren.',
+      'Keine externe Lade- oder Adapterlösung improvisieren und keinen beschädigten Hochstromstecker weiterverwenden.',
+      'Austausch, Crimpung und Isolationsprüfung durch einen qualifizierten Betrieb durchführen lassen.'
+    ],
+    safety: 'QS8-Stecker führen hohe Ströme. Akku nicht kurzschließen, nicht unter Spannung trennen und BMS- oder Ladeleitungen niemals überbrücken.',
+    sourceLabel: 'ElektroRoller-Forum · „Bonfireakkus dauerhaft außerhalb laden: QS8-Alternative?“ · Thema 48743',
+    sourceHref: 'https://www.elektroroller-forum.de/viewtopic.php?t=48743',
+    detailSections: [
+      {
+        title: '1. Vorhandenen Anschluss erfassen',
+        paragraphs: ['Der Stecker wird mit Akkuvariante und Kabelausführung erfasst. QS8 ist keine vollständige Spezifikation für Anti-Spark, Polung, Leitungsquerschnitt oder mechanischen Einbau.'],
+        bullets: [
+          'Steckerhälfte und Kontakte von außen fotografieren.',
+          'Kabelquerschnitt, Länge und Zugentlastung notieren.',
+          'Akku- und Ladeanschluss nicht anhand einer Internetabbildung identifizieren.'
+        ]
+      },
+      {
+        title: '2. Kompatibilität prüfen',
+        paragraphs: ['Ein passender Stecker muss elektrisch und mechanisch zum Akku, Ladegerät und Fahrzeug passen. Die Anti-Spark-Funktion und die BMS-Logik dürfen durch einen Adapter nicht umgangen werden.'],
+        bullets: [
+          'Polung und Steckrichtung fachkundig messen lassen.',
+          'Stromrating und Temperaturfestigkeit vergleichen.',
+          'Adapterlösungen nur mit dokumentierter Freigabe einsetzen.'
+        ]
+      },
+      {
+        title: '3. Montage und Prüfung',
+        paragraphs: ['Nach dem Austausch werden Crimpung, Isolation, Zugentlastung und Erwärmung unter kontrollierter Last geprüft. Ein äußerlich passender Stecker ist ohne diese Prüfung keine Reparaturfreigabe.'],
+        bullets: [
+          'Kontaktflächen sauber und geschützt halten.',
+          'Kabel so verlegen, dass kein Zug oder Scheuern entsteht.',
+          'Bei Wärme, Geruch, Funken oder Verfärbung sofort abschalten.'
+        ]
+      }
+    ],
+  },
+  {
+    id: 'hilfe-wartung',
+    path: '/hilfe/wartung',
+    title: 'Reifen, Bremsen und Lager warten',
+    model: 'Bonfire & Wildfire · Wartung',
+    intro: 'Regelmäßige Sicht- und Funktionskontrollen verhindern, dass aus Reifen-, Brems- oder Lagerspiel ein Sicherheitsproblem wird.',
+    steps: [
+      'Reifendruck, Profil, Speichen, Felgen, Bremsbeläge und Bremsscheiben bei kaltem Fahrzeug prüfen.',
+      'Vorderradlager, Lenkkopflager, Schwinge, Federbeine und Befestigungen auf Spiel oder Korrosion prüfen lassen.',
+      'Drehmomente und Intervalle aus dem passenden Handbuch oder der lokalen Wartungs-PDF übernehmen.'
+    ],
+    safety: 'Bei Rissen, starkem Spiel, beschädigten Speichen, Öl an der Bremse oder schlechter Bremswirkung nicht weiterfahren.',
+    sourceLabel: 'ElektroRoller-Forum · „Zusammenfassung von Tipps“ · Thema 47365',
+    sourceHref: 'https://www.elektroroller-forum.de/viewtopic.php?t=47365',
+    detailSections: [
+      {
+        title: '1. Reifen und Räder',
+        paragraphs: ['Die Community-Zusammenfassung nennt regelmäßige Luftdruckkontrolle und Prüfungen an Reifen, Speichen und Rädern. Die tatsächlichen Werte werden immer mit dem konkreten Reifen und Fahrzeugstand abgeglichen.'],
+        bullets: [
+          'Druck am kalten Reifen messen und dokumentieren.',
+          'Profil, Fremdkörper, Risse, Felgenlauf und Speichenspannung kontrollieren.',
+          'Bei Unwucht oder Seitenschlag Werkstattprüfung veranlassen.'
+        ]
+      },
+      {
+        title: '2. Bremsen und Lager',
+        paragraphs: ['Bremsbelag, Bremsscheibe, Bremsleitung und Bremsflüssigkeit gehören zu den sicherheitsrelevanten Wartungspunkten. Lager und Lenkkopf werden auf Spiel und Rastpunkte geprüft, nicht nur nach Gefühl nachgezogen.'],
+        bullets: [
+          'Bremsbelagstärke und Scheibenoberfläche kontrollieren.',
+          'Bremshebel, Druckpunkt und sichtbare Leckagen prüfen.',
+          'Rad- und Lenkkopflager bei Spiel oder Rastpunkt fachkundig instandsetzen lassen.'
+        ]
+      },
+      {
+        title: '3. Korrosion und Befestigungen',
+        paragraphs: ['Schwarz lackierte Stahlteile, Speichen, Schwinge, Federbeine und elektrische Steckkontakte werden sauber gehalten und gegen Korrosion geschützt. Schutzmittel dürfen nicht auf Bremsflächen gelangen.'],
+        bullets: [
+          'Stecker nur spannungsfrei und äußerlich auf Feuchtigkeit prüfen.',
+          'Korrosionsschutz von Bremsscheibe, Belägen und Reifen fernhalten.',
+          'Geprüfte Drehmomente, Datum und Befund im Wartungsdatensatz speichern.'
+        ]
+      }
+    ],
+  },
+);
+
+const sourcingCards: SourcingCard[] = [
+  {
+    title: 'MCB833 Bremsbelag',
+    category: 'Bonfire · sicherheitskritisch',
+    status: 'Amazon-Treffer · Passform prüfen',
+    summary: 'Die Teilenummer MCB833 ist auf Amazon auffindbar und wird im Forum als mögliche Spur genannt. Belagform, Dicke, Halterung und Bonfire-Variante vor dem Kauf vergleichen.',
+    amazon: { label: 'MCB833 bei Amazon prüfen', href: 'https://www.amazon.de/TRW-Lucas-MCB833-Scheibenbremsbelag-Organisch/dp/B0068NSX98' },
+  },
+  {
+    title: 'Heidenau K60 90/90-18 51S TT',
+    category: 'Bonfire · Reifen vorn',
+    status: 'Handbuchabgleich',
+    summary: 'Modell und Größe entsprechen einem Eintrag im lokal gesicherten Bonfire-Handbuch. Traglast, Geschwindigkeitsindex, Felge und Zulassung vor der Bestellung prüfen.',
+    amazon: { label: 'K60 bei Amazon prüfen', href: 'https://www.amazon.de/dp/B01J15271E' },
+  },
+  {
+    title: 'Heidenau K36 3.50-18 62S',
+    category: 'Bonfire · Reifen vorn/offroad',
+    status: 'Handbuchabgleich',
+    summary: 'Profilbezeichnung und Größe entsprechen dem lokal gesicherten Bonfire-Handbuch. Felge, Traglast, Index, Fahrzeugvariante und Zulassung vor der Bestellung prüfen.',
+    amazon: { label: 'K36 bei Amazon prüfen', href: 'https://www.amazon.de/dp/B005T38X0W' },
+  },
+  {
+    title: 'Heidenau K60 110/80-18 58S TT',
+    category: 'Bonfire · Reifen hinten',
+    status: 'Handbuchabgleich',
+    summary: 'Modell und Größe entsprechen dem lokal gesicherten Bonfire-Handbuch. Reifenfreigabe, Traglast, Geschwindigkeitsindex und Felge am eigenen Fahrzeug prüfen.',
+    amazon: { label: 'K60 hinten bei Amazon prüfen', href: 'https://www.amazon.de/dp/B01J1550QI' },
+  },
+  {
+    title: '58,8-V-/10-A-Ladegerät mit XLR',
+    category: 'Bonfire · Ladegerät',
+    status: 'Technischer Treffer',
+    summary: '58,8 V, 10 A, 14S-Lithium und 3-poliger XLR passen zu archivierten Eckdaten. Pinbelegung und Ladekennlinie bleiben vor der Nutzung zu prüfen.',
+    amazon: { label: 'Ladegerät bei Amazon prüfen', href: 'https://www.amazon.de/dp/B0D8KDB742' },
+  },
+  {
+    title: 'USB-Ladebuchse mit Schalter',
+    category: 'Wildfire · 12-V-Elektrik',
+    status: 'Forum-Bericht · prüfen',
+    summary: 'Dieser USB-Port wurde im Wildfire-Forum erfolgreich nachgerüstet. Bohrung, 12-V-Versorgung, Sicherung und Kabelweg an der eigenen Maschine vergleichen.',
+    amazon: { label: 'USB-Port bei Amazon prüfen', href: 'https://www.amazon.de/dp/B0F9K6QV46' },
+  },
+];
+
+const technicalFacts = [
+  { value: '2 × 52 V', label: 'herausnehmbare Akkupacks · Bonfire-Handbuch' },
+  { value: '3 kW', label: 'Nennleistung des Antriebs · Bonfire-Handbuch' },
+  { value: '35 / 40 / 45 km/h', label: 'Fahrmodi im EU-Handbuchstand' },
+  { value: '1.900 mm', label: 'Fahrzeuglänge · Bonfire-Handbuch' },
+];
+
+const normalizePath = (value: string) => value.replace(/\/+$/, '') || '/';
+const slugify = (value: string) => value
+  .toLowerCase()
+  .normalize('NFD')
+  .replace(/[\u0300-\u036f]/g, '')
+  .replace(/[^a-z0-9]+/g, '-')
+  .replace(/^-|-$/g, '');
+const getLocationKey = () => `${normalizePath(window.location.pathname)}${window.location.hash}`;
+const siteOrigin = (import.meta.env.VITE_SITE_URL || siteConfig.siteOrigin).replace(/\/+$/, '');
+
+async function apiJson<T>(input: RequestInfo | URL, init?: RequestInit): Promise<T> {
+  const response = await fetch(input, init);
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(typeof payload === 'object' && payload !== null && 'error' in payload ? String(payload.error) : 'Die Anfrage konnte nicht verarbeitet werden.');
+  }
+  return payload as T;
+}
+
+type SeoMetadata = {
+  title: string;
+  description: string;
+  canonicalPath: string;
+  robots: string;
+  jsonLd: Record<string, unknown>;
+};
+
+const websiteSchema = {
+  '@type': 'WebSite',
+  '@id': `${siteOrigin}/#website`,
+  name: 'Black Tea Hilfe',
+  url: `${siteOrigin}/`,
+  inLanguage: 'de-DE',
+};
+
+const breadcrumbSchema = (items: Array<{ name: string; url: string }>) => ({
+  '@type': 'BreadcrumbList',
+  itemListElement: items.map((item, index) => ({
+    '@type': 'ListItem',
+    position: index + 1,
+    name: item.name,
+    item: item.url,
+  })),
+});
+
+function getSeoMetadata(path: string, guide?: RepairGuide, part?: HistoricalShopPart): SeoMetadata {
+  if (path === '/admin') {
+    return {
+      title: 'Admin — Black Tea Hilfe',
+      description: 'Interner Bereich zur redaktionellen Prüfung von Kommentaren.',
+      canonicalPath: '/admin',
+      robots: 'noindex,nofollow,noarchive',
+      jsonLd: {},
+    };
+  }
+
+  if (guide) {
+    return {
+      title: `${guide.title} — Black Tea Hilfe`,
+      description: guide.intro,
+      canonicalPath: guide.path,
+      robots: 'index,follow,max-image-preview:large',
+      jsonLd: {
+        '@context': 'https://schema.org',
+        '@graph': [
+          websiteSchema,
+          {
+            '@type': 'HowTo',
+            '@id': `${siteOrigin}${guide.path}#howto`,
+            name: guide.title,
+            description: guide.intro,
+            url: `${siteOrigin}${guide.path}`,
+            inLanguage: 'de-DE',
+            dateModified: '2026-09-02',
+            step: guide.steps.map((step, index) => ({
+              '@type': 'HowToStep',
+              position: index + 1,
+              name: `Prüfschritt ${index + 1}`,
+              text: step,
+            })),
+          },
+          breadcrumbSchema([
+            { name: 'Startseite', url: `${siteOrigin}/` },
+            { name: 'Reparaturhilfe', url: `${siteOrigin}/hilfe` },
+            { name: guide.title, url: `${siteOrigin}${guide.path}` },
+          ]),
+        ],
+      },
+    };
+  }
+
+  if (part) {
+    const description = `${part.title} für ${part.model}: historischer BTM-Shop-Eintrag mit lokal gesicherten Archivdaten und Bezugsstatus ohne unbestätigte Kaufempfehlung.`;
+    return {
+      title: `${part.title} — Ersatzteil — Black Tea Hilfe`,
+      description,
+      canonicalPath: part.path,
+      robots: 'index,follow,max-image-preview:large',
+      jsonLd: {
+        '@context': 'https://schema.org',
+        '@graph': [
+          websiteSchema,
+          {
+            '@type': 'Product',
+            '@id': `${siteOrigin}${part.path}#product`,
+            name: part.title,
+            description,
+            url: `${siteOrigin}${part.path}`,
+            category: part.category,
+            sku: `btm-${part.id}`,
+            brand: { '@type': 'Brand', name: 'Black Tea Motorbikes' },
+            isRelatedTo: { '@type': 'Vehicle', name: part.model },
+          },
+          breadcrumbSchema([
+            { name: 'Startseite', url: `${siteOrigin}/` },
+            { name: 'Ersatzteile', url: `${siteOrigin}/ersatzteile` },
+            { name: part.title, url: `${siteOrigin}${part.path}` },
+          ]),
+        ],
+      },
+    };
+  }
+
+  const metadata: Record<string, { title: string; description: string }> = {
+    '/': {
+      title: 'Black Tea Hilfe — Dokumente, Ersatzteile & Updates',
+      description: 'Unabhängige Sammelstelle für Black Tea Motorbikes: lokale PDFs, Ersatzteile, Reparaturhilfen und nachvollziehbare Quellen.',
+    },
+    '/hilfe': {
+      title: 'Reparaturhilfe — Black Tea Hilfe',
+      description: 'Redaktionell geordnete Reparaturhilfen für typische Bonfire- und Wildfire-Fehlerbilder — mit Kurzablauf, ausführlicher Prüfung, Sicherheit und Quelle.',
+    },
+    '/ersatzteile': {
+      title: 'Ersatzteile — Black Tea Hilfe',
+      description: 'Historischer BTM-Ersatzteilkatalog mit Modellbezug, Teilenamen und Quellen. Bestand und Preise vor dem Kauf prüfen.',
+    },
+    '/community': {
+      title: 'BTM Community-Wissen — Black Tea Hilfe',
+      description: 'Technische Hinweise aus der Black Tea Community verständlich zusammengefasst, mit lokalen PDFs und Originalquellen.',
+    },
+    '/quellen': {
+      title: 'Quellen — Black Tea Hilfe',
+      description: 'Nachvollziehbare Quellen zu Insolvenzstatus, Handbüchern, lokalen PDFs, Ersatzteilspuren und Community-Wissen.',
+    },
+    '/impressum': {
+      title: 'Impressum — Black Tea Hilfe',
+      description: 'Anbieterinformationen und rechtliche Hinweise zu Black Tea Hilfe.',
+    },
+    '/datenschutz': {
+      title: 'Datenschutz — Black Tea Hilfe',
+      description: 'Datenschutzhinweise zu Kommentaren, Bildanhängen und dem Betrieb von Black Tea Hilfe.',
+    },
+    '/wiki': {
+      title: 'Wiki — Black Tea Hilfe',
+      description: 'Das BTM-Wiki wird vorbereitet.',
+    },
+  };
+  const page = metadata[path] ?? metadata['/'];
+  const collectionItems = path === '/hilfe'
+    ? repairGuides.map((item) => ({ name: item.title, url: `${siteOrigin}${item.path}` }))
+    : path === '/ersatzteile'
+      ? historicalShopParts.map((item) => ({ name: item.title, url: `${siteOrigin}${item.path}` }))
+      : path === '/community'
+        ? communityKnowledge.map((item) => ({ name: item.title, url: `${siteOrigin}/community#${slugify(item.title)}` }))
+        : [];
+  const jsonLd = collectionItems.length ? {
+    '@context': 'https://schema.org',
+    '@graph': [
+      websiteSchema,
+      {
+        '@type': 'CollectionPage',
+        name: page.title,
+        description: page.description,
+        url: `${siteOrigin}${path === '/' ? '/' : path}`,
+        inLanguage: 'de-DE',
+        mainEntity: {
+          '@type': 'ItemList',
+          numberOfItems: path === '/ersatzteile' ? historicalShopParts.length : collectionItems.length,
+          itemListElement: collectionItems.map((item, index) => ({ '@type': 'ListItem', position: index + 1, name: item.name, url: item.url })),
+        },
+      },
+    ],
+  } : { '@context': 'https://schema.org', ...websiteSchema };
+
+  return {
+    ...page,
+    canonicalPath: path === '/' ? '/' : path,
+    robots: 'index,follow,max-image-preview:large',
+    jsonLd,
+  };
+}
+
+function upsertMeta(attribute: 'name' | 'property', key: string, content: string): void {
+  let element = document.head.querySelector<HTMLMetaElement>(`meta[${attribute}="${key}"]`);
+  if (!element) {
+    element = document.createElement('meta');
+    element.setAttribute(attribute, key);
+    document.head.appendChild(element);
+  }
+  element.content = content;
+}
+
+function applySeoMetadata(metadata: SeoMetadata): void {
+  document.title = metadata.title;
+  upsertMeta('name', 'description', metadata.description);
+  upsertMeta('name', 'robots', metadata.robots);
+  upsertMeta('property', 'og:title', metadata.title);
+  upsertMeta('property', 'og:description', metadata.description);
+  upsertMeta('property', 'og:url', `${siteOrigin}${metadata.canonicalPath === '/' ? '/' : metadata.canonicalPath}`);
+  upsertMeta('property', 'og:image', `${siteOrigin}/images/bonfire-konzept-skizze.png`);
+  upsertMeta('property', 'og:image:alt', 'Designer-Konzeptskizze einer Black Tea Bonfire');
+  upsertMeta('name', 'twitter:title', metadata.title);
+  upsertMeta('name', 'twitter:description', metadata.description);
+  upsertMeta('name', 'twitter:image', `${siteOrigin}/images/bonfire-konzept-skizze.png`);
+
+  let canonical = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+  if (!canonical) {
+    canonical = document.createElement('link');
+    canonical.rel = 'canonical';
+    document.head.appendChild(canonical);
+  }
+  canonical.href = `${siteOrigin}${metadata.canonicalPath === '/' ? '/' : metadata.canonicalPath}`;
+
+  let structuredData = document.head.querySelector<HTMLScriptElement>('#site-jsonld');
+  if (!structuredData) {
+    structuredData = document.createElement('script');
+    structuredData.id = 'site-jsonld';
+    structuredData.type = 'application/ld+json';
+    document.head.appendChild(structuredData);
+  }
+  structuredData.textContent = JSON.stringify(metadata.jsonLd);
+}
+
+function App() {
+  const [locationKey, setLocationKey] = useState(() => getLocationKey());
+
+  useEffect(() => {
+    const handleLocationChange = () => setLocationKey(getLocationKey());
+    window.addEventListener('popstate', handleLocationChange);
+    window.addEventListener('hashchange', handleLocationChange);
+    return () => {
+      window.removeEventListener('popstate', handleLocationChange);
+      window.removeEventListener('hashchange', handleLocationChange);
+    };
+  }, []);
+
+  const [path, hash = ''] = locationKey.split('#');
+  const guide = repairGuides.find((candidate) => candidate.path === path || (path === '/' && hash === candidate.id));
+  const part = historicalShopParts.find((candidate) => candidate.path === path);
+  const seoMetadata = getSeoMetadata(path, guide, part);
+
+  useEffect(() => {
+    applySeoMetadata(seoMetadata);
+  }, [seoMetadata.canonicalPath, seoMetadata.description, seoMetadata.robots, seoMetadata.title, guide?.id, part?.id]);
+
+  if (guide) return <RepairGuidePage guide={guide} />;
+  if (path === '/admin') return <AdminPage />;
+  if (path === '/hilfe') return <RepairGuideIndexPage />;
+  if (part) return <PartDetailPage part={part} />;
+  if (path === '/ersatzteile' || (path === '/' && hash === 'teile')) return <PartsPage />;
+  if (path === '/community') return <CommunityPage />;
+  if (path === '/quellen' || (path === '/' && hash === 'quellen')) return <SourcesPage />;
+  if (path === '/impressum' || (path === '/' && hash === 'impressum')) return <LegalPage kind="impressum" />;
+  if (path === '/datenschutz' || (path === '/' && hash === 'datenschutz')) return <LegalPage kind="datenschutz" />;
+  if (path === '/wiki') return <WikiPage />;
+  return <HomePage />;
+}
+
+function HomePage() {
+  const [filter, setFilter] = useState<Filter>('Alle');
+  const [query, setQuery] = useState('');
+
+  useEffect(() => {
+    document.title = 'Black Tea Hilfe — Dokumente, Ersatzteile & Updates';
+  }, []);
+
+  const filteredResources = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase();
+
+    return resources.filter((resource) => {
+      const matchesFilter = filter === 'Alle' || resource.kind === filter;
+      const searchable = `${resource.title} ${resource.description} ${resource.tags.join(' ')}`.toLowerCase();
+      return matchesFilter && (!normalizedQuery || searchable.includes(normalizedQuery));
+    });
+  }, [filter, query]);
+
+  const featuredSourcingCards = useMemo(() => {
+    const cards = [...sourcingCards];
+    for (let index = cards.length - 1; index > 0; index -= 1) {
+      const swapIndex = Math.floor(Math.random() * (index + 1));
+      [cards[index], cards[swapIndex]] = [cards[swapIndex], cards[index]];
+    }
+    return cards.slice(0, 4);
+  }, []);
+
+  return (
+    <div className="site-shell">
+      <header className="site-header">
+        <a className="wordmark" href="#top" aria-label="Black Tea Hilfe Startseite">
+          <span className="wordmark-mark" aria-hidden="true">BTM</span>
+          <span>blacktea <strong>hilfe</strong></span>
+        </a>
+        <nav className="main-nav" aria-label="Hauptnavigation">
+          <a href="#status">Status</a>
+          <a href="#wissen">PDFs</a>
+          <a href="/hilfe">Reparatur</a>
+          <a href="/ersatzteile">Ersatzteile</a>
+          <a href="/quellen">Quellen</a>
+          <a href="/wiki">Wiki</a>
+        </nav>
+        <a className="header-link" href={localPartArchiveHref}>
+          Quellen & Archivstand ↗
+        </a>
+      </header>
+
+      <main id="top">
+        <section className="hero section-pad">
+          <div className="hero-copy">
+            <div className="eyebrow handwritten">eine unabhängige sammelstelle</div>
+            <h1>Damit gute Bikes<br /><span className="scribble-underline">weiterfahren.</span></h1>
+            <p className="hero-lede">Dokumente, Ersatzteile und verlässliche Hinweise für die Black Tea Community — gesammelt an einem Ort, solange sich die offizielle Lage sortiert.</p>
+            <div className="hero-actions">
+              <a className="button button-ink" href="#wissen">Unterlagen finden <span aria-hidden="true">↓</span></a>
+              <a className="button button-ghost" href="#status">Was ist passiert?</a>
+            </div>
+            <p className="micro-note handwritten">↳ zuletzt geprüft: 02.09.2026</p>
+          </div>
+
+          <div className="hero-doodle">
+            <picture className="hero-concept-picture">
+              <source srcSet="/images/bonfire-konzept-skizze.webp" type="image/webp" />
+              <img className="hero-concept-image" src="/images/bonfire-konzept-skizze.png" width="1536" height="1024" alt="Designer-Konzeptskizze einer Black Tea Bonfire" />
+            </picture>
+          </div>
+        </section>
+
+        <section id="status" className="status-section section-pad">
+          <div className="status-card card-doodle">
+            <div className="status-topline">
+              <span className="status-dot" />
+              <span className="status-label">Stand der Dinge</span>
+              <span className="status-date">02.09.2026</span>
+            </div>
+            <div className="status-grid">
+              <div>
+                <h2>Vorläufige Insolvenzverwaltung angeordnet.</h2>
+                <p>Das Amtsgericht München hat am 14.07.2026 Sicherungsmaßnahmen im Verfahren gegen die Black Tea Motorbikes GmbH angeordnet. Das ist ein laufender Verfahrensstand — keine Aussage darüber, welche Fahrzeuge, Teile oder Services am Ende verfügbar bleiben.</p>
+              </div>
+              <dl className="fact-list">
+                <div><dt>Gericht</dt><dd>Amtsgericht München</dd></div>
+                <div><dt>Aktenzeichen</dt><dd>1513 IN 2588/26</dd></div>
+                <div><dt>Verwalter</dt><dd>Florian Loserth</dd></div>
+                <div><dt>Adresse</dt><dd>Herzogstraße 9 · 80803 München</dd></div>
+              </dl>
+            </div>
+            <div className="status-footer">
+              <span>⚠ Verfügbarkeit, Garantie und Forderungen bitte nicht aus dieser Seite ableiten.</span>
+              <a href="#chronik">Zeitliche Einordnung ↓</a>
+              <a href={sourceLinks[0].href} target="_blank" rel="nofollow noreferrer">Verfahrensquelle öffnen ↗</a>
+            </div>
+          </div>
+        </section>
+
+        <section id="wissen" className="library-section section-pad">
+          <div className="section-heading">
+            <div>
+              <div className="eyebrow handwritten">wissen, das nicht verschwinden soll</div>
+              <h2>Die Sammelmappe</h2>
+            </div>
+            <div className="section-arrow handwritten">sortieren, suchen,<br />weitergeben →</div>
+          </div>
+
+          <div className="toolbar card-doodle">
+            <label className="search-box">
+              <span aria-hidden="true">⌕</span>
+              <span className="sr-only">Dokumente und Teile durchsuchen</span>
+              <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="z. B. Batterie, Wildfire, Schaltplan …" />
+            </label>
+            <div className="filter-tabs" role="group" aria-label="Inhalte filtern">
+              {(['Alle', 'Dokument', 'Ersatzteil', 'Community'] as Filter[]).map((item) => (
+                <button key={item} className={filter === item ? 'filter-tab active' : 'filter-tab'} onClick={() => setFilter(item)} type="button">
+                  {item === 'Alle' ? 'Alles' : item === 'Dokument' ? 'PDFs & Wissen' : item === 'Ersatzteil' ? 'Ersatzteile' : 'Community'}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="resource-grid">
+            {filteredResources.map((resource, index) => <ResourceCard key={`${resource.kind}-${resource.title}`} resource={resource} index={index} />)}
+          </div>
+          {filteredResources.length === 0 && <div className="empty-state card-doodle">Nichts gefunden. Versuch es mit „Bonfire“, „Wildfire“ oder „Akku“.</div>}
+          <p className="content-note handwritten">Alle Links führen zur Originalquelle oder zu einer klar gekennzeichneten Spiegelung. Bestand und Preise können sich ändern.</p>
+        </section>
+
+        <section id="teile" className="parts-section section-pad">
+          <div className="section-heading compact">
+            <div>
+              <div className="eyebrow handwritten">erst prüfen, dann schrauben</div>
+              <h2>Ersatzteile</h2>
+            </div>
+            <a className="button button-ghost" href="/ersatzteile">Alle Ersatzteile ansehen ↗</a>
+          </div>
+          <p className="parts-section-lede">Im Ersatzteilkatalog findest du alle früheren BTM-Shop-Einträge. Kaufbare Treffer zeigen wir unten direkt mit Link; die vollständigen Archivdaten liegen auf der eigenen Ersatzteilseite.</p>
+        </section>
+
+        <section id="bezugsquellen" className="sourcing-section section-pad">
+          <div className="section-heading compact">
+            <div>
+              <div className="eyebrow handwritten">kauf-links · amazon zuerst</div>
+              <h2>Gefundene Kaufoptionen</h2>
+            </div>
+            <a className="button button-ghost" href="/ersatzteile">Ersatzteilkatalog öffnen ↗</a>
+          </div>
+          <div className="sourcing-intro card-doodle">
+            <span className="sourcing-badge">1. Amazon</span>
+            <p>Hier erscheinen nur Produkte mit einem konkreten Kauf-Link. Die Auswahl wechselt zufällig, wenn mehr als vier Treffer vorhanden sind. Den Passformstatus findest du direkt am jeweiligen Artikel.</p>
+            <strong>Alibaba bleibt draußen.</strong>
+          </div>
+          <div className="sourcing-grid">
+            {featuredSourcingCards.map((card, index) => <SourcingCard key={card.title} card={card} index={index} />)}
+          </div>
+          <p className="content-note handwritten">Preise und Lagerbestand ändern sich. Vor dem Bestellen immer Teilenummer, Fotos und Fahrzeugvariante gegenprüfen.</p>
+        </section>
+
+        <div className="parts-callout card-doodle parts-callout-bottom section-pad">
+          <div className="parts-icon" aria-hidden="true">⚙</div>
+          <div>
+            <h3>Historischer Ersatzteilkatalog</h3>
+            <p>106 frühere BTM-Shop-Einträge sind lokal gesichert. Nicht jedes Teil ist heute verfügbar oder passt ohne weitere Prüfung. Wenn du einen passenden Artikel gefunden und erfolgreich eingebaut hast, teile ihn bitte direkt auf der jeweiligen Ersatzteilseite in den Kommentaren — die Community profitiert davon.</p>
+          </div>
+          <div className="parts-checklist">
+            <span>□ Modell prüfen</span>
+            <span>□ Maße prüfen</span>
+            <span>□ Quelle öffnen</span>
+          </div>
+        </div>
+
+        <section className="technical-section section-pad">
+          <div className="technical-inner">
+            <div className="technical-copy">
+              <div className="eyebrow handwritten">zum einordnen</div>
+              <h2>Technische Daten der Bonfire.</h2>
+              <p>Diese vier Werte stammen aus den technischen Angaben des lokal gesicherten Bonfire-Handbuchs. Varianten, Baujahre und Softwarestände können voneinander abweichen.</p>
+              <a href={sourceLinks[1].href} target="_blank" rel="nofollow noreferrer" className="text-link">Handbuch gegenprüfen ↗</a>
+            </div>
+            <div className="fact-cards">
+              {technicalFacts.map((fact) => <div className="fact-card" key={fact.value}><strong>{fact.value}</strong><span>{fact.label}</span></div>)}
+            </div>
+          </div>
+        </section>
+
+        <section id="chronik" className="timeline-section section-pad">
+          <div className="section-heading compact">
+            <div>
+              <div className="eyebrow handwritten">kurze chronik</div>
+              <h2>Was bisher bekannt ist</h2>
+            </div>
+            <p className="timeline-intro">Die wichtigsten öffentlich dokumentierten Schritte zum Verfahren — kompakt zusammengefasst.</p>
+          </div>
+          <div className="timeline">
+            <TimelineItem date="14.07.2026" title="Sicherungsmaßnahmen angeordnet" text="Das Amtsgericht München ordnet vorläufige Insolvenzverwaltung an. Aktenzeichen: 1513 IN 2588/26." sourceHref={sourceLinks[0].href} sourceLabel="Verfahrensquelle" />
+            <TimelineItem date="16.07.2026" title="Erste öffentliche Berichte" text="Die ersten Berichte ordnen die Situation ein. Welche Folgen das für Bestellungen, Reparaturen und Ersatzteile hat, war zu diesem Zeitpunkt noch offen." sourceHref={sourceLinks[0].href} sourceLabel="Verfahrensquelle" />
+            <TimelineItem date="01.09.2026" title="Verfahrensstand erneut veröffentlicht" text="Der laufende Verfahrensstand ist erneut öffentlich dokumentiert. Für verbindliche rechtliche Fragen ist die zuständige Stelle maßgeblich." sourceHref={sourceLinks[0].href} sourceLabel="Verfahrensquelle" />
+          </div>
+        </section>
+
+      </main>
+
+      <footer className="site-footer">
+        <span className="wordmark"><span className="wordmark-mark" aria-hidden="true">BTM</span>blacktea <strong>hilfe</strong></span>
+        <span className="handwritten">gebaut für die leute, die weiterfahren wollen.</span>
+        <span className="footer-links"><a href="/impressum">Impressum</a><a href="/datenschutz">Datenschutz</a></span>
+        <a href="#top">nach oben ↑</a>
+      </footer>
+    </div>
+  );
+}
+
+function SourcesPage() {
+  useEffect(() => {
+    document.title = 'Quellen — Black Tea Hilfe';
+    window.scrollTo(0, 0);
+  }, []);
+
+  return (
+    <div className="site-shell">
+      <GuideHeader />
+      <main className="repair-page-main sources-page-main">
+        <section className="repair-page-hero sources-page-hero section-pad">
+          <a className="repair-back" href="/">← Zur Sammelmappe</a>
+          <div className="eyebrow handwritten">nachvollziehbar statt hörensagen</div>
+          <h1>Quellen & Weiterleitung</h1>
+          <p>Hier findest du die Ausgangspunkte für Status, technische Daten, lokale PDFs und Community-Wissen. Lokale Kopien bleiben direkt nutzbar; externe Seiten sind zum Gegenprüfen verlinkt.</p>
+        </section>
+
+        <section className="sources-section section-pad">
+          <div id="ersatzteil-archiv" className="sources-card card-doodle">
+            <div className="section-heading compact">
+              <div>
+                <div className="eyebrow handwritten">offen dokumentiert</div>
+                <h2>Unsere Quellen</h2>
+              </div>
+              <span className="source-stamp">OPEN<br />NOTES</span>
+            </div>
+            <p className="sources-local-note"><strong>Ersatzteil-Archiv:</strong> Die historischen Shop-Daten werden auf dieser Website lokal aus unserem gesicherten Datensatz angezeigt. Externe Archivseiten sind dafür nicht erforderlich; sie dienen nur der internen Nachvollziehbarkeit der Recherche.</p>
+            <SourceList />
+            <p className="sources-disclaimer">Dieses Projekt ist unabhängig und keine Rechts-, Garantie- oder Reparaturberatung. Bitte sicherheitsrelevante Arbeiten nur durch qualifizierte Fachbetriebe durchführen lassen.</p>
+          </div>
+        </section>
+      </main>
+      <GuideFooter />
+    </div>
+  );
+}
+
+function SourceList() {
+  return (
+    <div className="source-list">
+      {sourceLinks.map((source) => {
+        const external = source.href.startsWith('http');
+        return (
+          <a className="source-row" key={source.title} href={source.href} target={external ? '_blank' : undefined} rel={external ? 'nofollow noreferrer' : undefined}>
+            <span><strong>{source.title}</strong><small>{source.detail}</small></span>
+            <span aria-hidden="true">↗</span>
+          </a>
+        );
+      })}
+    </div>
+  );
+}
+
+function LegalPage({ kind }: { kind: 'impressum' | 'datenschutz' }) {
+  const isPrivacy = kind === 'datenschutz';
+
+  useEffect(() => {
+    document.title = `${isPrivacy ? 'Datenschutz' : 'Impressum'} — Black Tea Hilfe`;
+    window.scrollTo(0, 0);
+  }, [isPrivacy]);
+
+  return (
+    <div className="site-shell">
+      <GuideHeader />
+      <main className="legal-page-main">
+        <section className="legal-page-hero section-pad">
+          <a className="repair-back" href="/">← Zur Sammelmappe</a>
+          <div className="eyebrow handwritten">rechtliches</div>
+          <h1>{isPrivacy ? 'Datenschutz' : 'Impressum'}</h1>
+          <p>{isPrivacy ? 'Wie Kommentare, Bildanhänge und technisch notwendige Zugriffsdaten bei Black Tea Hilfe verarbeitet werden.' : 'Anbieterinformationen und rechtliche Hinweise zu dieser unabhängigen Sammelstelle.'}</p>
+        </section>
+
+        <section className="legal-page-section section-pad">
+          <article className="legal-card legal-page-card card-doodle">
+            <div className="eyebrow handwritten">{isPrivacy ? 'datenschutz' : 'anbieter'}</div>
+            <h2>{isPrivacy ? 'Datenschutz' : 'Impressum'}</h2>
+            {isPrivacy ? (
+              <>
+                <p className="legal-meta">Stand: 02.09.2026</p>
+                <h3>Verantwortlicher</h3>
+                <p>Alexander Komissarov<br />Teplitzer Str. 104<br />01219 Dresden<br />Deutschland<br /><a href="mailto:hallo@shortaktien.de">hallo@shortaktien.de</a></p>
+                <h3>Besuch der Website</h3>
+                <p>Diese Website stellt Dokumente und Hinweise bereit. Es gibt hier keine Nutzerkonten, Newsletter oder eingebauten Analyse- und Marketingdienste. Unter den Reparaturhilfen können moderierte Kommentare abgegeben werden.</p>
+                <h3>Kommentare und Bildanhänge</h3>
+                <p>Wenn du einen Kommentar abgibst, werden dein Name, deine E-Mail-Adresse, der Kommentartext und optional ein Bild zur redaktionellen Prüfung gespeichert. Die E-Mail-Adresse bleibt intern und wird nicht veröffentlicht. Der Kommentar erscheint erst nach Freigabe; nicht freigegebene oder gelöschte Beiträge werden nicht öffentlich angezeigt.</p>
+                <p>Beim Aufruf können technisch notwendige Zugriffsdaten wie aufgerufene Seite, Datum und Uhrzeit, übertragene Datenmenge, Browser-/Betriebssysteminformationen, Referrer-URL und IP-Adresse in Server-Logs des Hostings verarbeitet werden. Das dient dem sicheren und stabilen Betrieb.</p>
+                <h3>Externe Links und Rechte</h3>
+                <p>Erst beim Anklicken eines externen Links, etwa zu Amazon, einem Fachhändler oder einem Forum, wird eine Verbindung zum jeweiligen Anbieter hergestellt. Es gelten dann dessen Datenschutzbestimmungen.</p>
+                <p>Du hast im Rahmen der gesetzlichen Voraussetzungen insbesondere Rechte auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung, Datenübertragbarkeit und Widerspruch. Anfragen kannst du an die oben genannte E-Mail-Adresse richten. Außerdem besteht ein Beschwerderecht bei einer Datenschutzaufsichtsbehörde.</p>
+                <p className="legal-meta">Diese Hinweise orientieren sich an den Rechtstexten von <a href="https://shortaktien.de/impressum" target="_blank" rel="nofollow noreferrer">shortaktien.de</a> und wurden für diese Sammelstelle angepasst.</p>
+              </>
+            ) : (
+              <>
+                <h3>Anbieter und Verantwortlicher</h3>
+                <p>Alexander Komissarov<br />Teplitzer Str. 104<br />01219 Dresden<br />Deutschland</p>
+                <h3>Kontakt</h3>
+                <p>E-Mail: <a href="mailto:hallo@shortaktien.de">hallo@shortaktien.de</a></p>
+                <p>Black Tea Hilfe ist eine unabhängige private Sammelstelle für Dokumente, Ersatzteilspuren und Community-Hinweise. Es besteht keine Verbindung zur Black Tea Motorbikes GmbH.</p>
+                <h3>Haftung für Inhalte und Links</h3>
+                <p>Die Inhalte werden mit Sorgfalt zusammengestellt. Für Richtigkeit, Vollständigkeit und Aktualität wird keine Gewähr übernommen. Für externe Seiten sind die jeweiligen Anbieter verantwortlich.</p>
+              </>
+            )}
+            <div className="legal-page-links">
+              <a className="text-link" href={isPrivacy ? '/impressum' : '/datenschutz'}>{isPrivacy ? 'Zum Impressum' : 'Zum Datenschutz'} ↗</a>
+            </div>
+          </article>
+        </section>
+      </main>
+      <GuideFooter />
+    </div>
+  );
+}
+
+function ResourceCard({ resource, index }: { resource: Resource; index: number }) {
+  return (
+    <article className={`resource-card card-doodle ${index % 3 === 1 ? 'tilt-right' : index % 3 === 2 ? 'tilt-left' : ''}`}>
+      <div className="resource-card-topline"><span className={resource.kind === 'Dokument' ? 'kind-chip doc' : resource.kind === 'Ersatzteil' ? 'kind-chip part' : 'kind-chip community'}>{resource.kind}</span><span className="resource-label">{resource.label}</span></div>
+      <h3><a href={resource.href} target={resource.external ? '_blank' : undefined} rel={resource.external ? 'nofollow noreferrer' : undefined}>{resource.title}</a></h3>
+      <p>{resource.description}</p>
+      <div className="tag-row">{resource.tags.map((tag) => <span key={tag}>#{tag}</span>)}</div>
+      <div className="resource-card-actions">
+        {resource.sourceHref && <a className="resource-source-link" href={resource.sourceHref} target="_blank" rel="nofollow noreferrer">Quelle: {resource.sourceLabel ?? 'BTM Community'} ↗</a>}
+      </div>
+    </article>
+  );
+}
+
+function GuideHeader() {
+  return (
+    <header className="site-header">
+      <a className="wordmark" href="/" aria-label="Black Tea Hilfe Startseite">
+        <span className="wordmark-mark" aria-hidden="true">BTM</span>
+        <span>blacktea <strong>hilfe</strong></span>
+      </a>
+      <nav className="main-nav" aria-label="Hauptnavigation">
+        <a href="/#status">Status</a>
+        <a href="/#wissen">PDFs</a>
+        <a href="/hilfe">Reparatur</a>
+        <a href="/ersatzteile">Ersatzteile</a>
+        <a href="/quellen">Quellen</a>
+        <a href="/wiki">Wiki</a>
+      </nav>
+      <a className="header-link" href={localPartArchiveHref}>
+        Quellen & Archivstand ↗
+      </a>
+    </header>
+  );
+}
+
+function GuideFooter() {
+  return (
+    <footer className="site-footer">
+      <span className="wordmark"><span className="wordmark-mark" aria-hidden="true">BTM</span>blacktea <strong>hilfe</strong></span>
+      <span className="handwritten">gebaut für die leute, die weiterfahren wollen.</span>
+      <span className="footer-links"><a href="/impressum">Impressum</a><a href="/datenschutz">Datenschutz</a></span>
+      <a href="/hilfe">zur Reparatur ↑</a>
+    </footer>
+  );
+}
+
+function WikiPage() {
+  useEffect(() => {
+    document.title = 'Wiki — Black Tea Hilfe';
+    window.scrollTo(0, 0);
+  }, []);
+
+  return (
+    <div className="site-shell">
+      <GuideHeader />
+      <main className="wiki-page-main" aria-label="Wiki" />
+      <GuideFooter />
+    </div>
+  );
+}
+
+function RepairGuideIndexPage() {
+  useEffect(() => {
+    document.title = 'Reparaturhilfe — Black Tea Hilfe';
+    window.scrollTo(0, 0);
+  }, []);
+
+  return (
+    <div className="site-shell">
+      <GuideHeader />
+      <main className="repair-page-main">
+        <section className="repair-page-hero section-pad">
+          <a className="repair-back" href="/">← Zur Sammelmappe</a>
+          <div className="eyebrow handwritten">kurz erklärt, sauber belegt</div>
+          <h1>Reparaturhilfe</h1>
+          <p>Konkrete, redaktionell geprüfte Reparaturhilfen für typische BTM-Fehlerbilder. Keine Forendiskussionen — nur Ablauf, Prüfung, Sicherheit und Quelle.</p>
+        </section>
+        <section className="repair-index-section section-pad">
+          <div className="repair-index-grid">
+            {repairGuides.map((guide, index) => (
+              <article className={`repair-index-card card-doodle ${index % 2 === 1 ? 'repair-index-card-tilt-right' : 'repair-index-card-tilt-left'}`} key={guide.id}>
+                <div className="repair-guide-topline"><span className="kind-chip community">Anleitung</span><span>{guide.model}</span></div>
+                <h2><a href={guide.path}>{guide.title}</a></h2>
+                <p>{guide.intro}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+      </main>
+      <GuideFooter />
+    </div>
+  );
+}
+
+function RepairGuidePage({ guide }: { guide: RepairGuide }) {
+  useEffect(() => {
+    document.title = `${guide.title} — Black Tea Hilfe`;
+    window.scrollTo(0, 0);
+  }, [guide.title]);
+
+  return (
+    <div className="site-shell">
+      <GuideHeader />
+      <main className="repair-page-main">
+        <section className="repair-page-hero section-pad">
+          <a className="repair-back" href="/hilfe">← Alle Reparaturhilfen</a>
+          <div className="eyebrow handwritten">{guide.model}</div>
+          <h1>{guide.title}</h1>
+          <p>{guide.intro}</p>
+        </section>
+        <section className="repair-detail-section section-pad">
+          <article className="repair-detail card-doodle">
+            <div className="repair-detail-topline"><span className="kind-chip community">Anleitung</span><span>Stand: 02.09.2026</span></div>
+            <h2>Kurzablauf</h2>
+            <ol className="repair-steps">{guide.steps.map((step) => <li key={step}>{step}</li>)}</ol>
+            <RepairFeedback guideSlug={guide.id} />
+            <p className="repair-safety">⚠ {guide.safety}</p>
+            <div className="repair-longread">
+              <div className="eyebrow handwritten">mehr lesen</div>
+              <h2>Ausführliche Reparaturhilfe</h2>
+              {guide.detailSections.map((section) => (
+                <section className="repair-longread-section" key={section.title}>
+                  <h3>{section.title}</h3>
+                  {section.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+                  {section.bullets && <ul>{section.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}</ul>}
+                </section>
+              ))}
+            </div>
+            <RepairComments guideSlug={guide.id} />
+            <div className="repair-source-box">
+              <span className="repair-subhead">Quellenangabe</span>
+              <p>Diese Anleitung ist redaktionell aus den Community-Hinweisen aufbereitet. Die Quelle dient zum Nachvollziehen und Gegenprüfen — sie ersetzt keine Fachprüfung und keine fahrzeugspezifische Freigabe.</p>
+              <a href={guide.sourceHref} target="_blank" rel="nofollow noreferrer">{guide.sourceLabel} ↗</a>
+            </div>
+          </article>
+        </section>
+      </main>
+      <GuideFooter />
+    </div>
+  );
+}
+
+function RepairFeedback({ guideSlug }: { guideSlug: string }) {
+  const [summary, setSummary] = useState<FeedbackSummary | null>(null);
+  const [selectedVote, setSelectedVote] = useState<'up' | 'down' | null>(() => {
+    try {
+      const stored = window.localStorage.getItem(`btm-feedback:${guideSlug}`);
+      return stored === 'up' || stored === 'down' ? stored : null;
+    } catch {
+      return null;
+    }
+  });
+  const [voteNotice, setVoteNotice] = useState('');
+
+  const loadFeedback = async () => {
+    try {
+      const payload = await apiJson<FeedbackSummary>(`/api/feedback/${guideSlug}`);
+      setSummary(payload);
+    } catch {
+      setSummary({ guide: guideSlug, up: 0, down: 0, comments: [] });
+    }
+  };
+
+  useEffect(() => {
+    void loadFeedback();
+  }, [guideSlug]);
+
+  const handleVote = async (value: 'up' | 'down') => {
+    if (selectedVote) {
+      setVoteNotice('Deine Bewertung ist für diese Hilfe bereits gespeichert.');
+      return;
+    }
+    setVoteNotice('');
+    try {
+      const payload = await apiJson<Pick<FeedbackSummary, 'guide' | 'up' | 'down'>>('/api/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ guide: guideSlug, value }),
+      });
+      setSummary((current) => ({ guide: guideSlug, up: payload.up, down: payload.down, comments: current?.comments ?? [] }));
+      setSelectedVote(value);
+      setVoteNotice('Danke für deine Rückmeldung.');
+      try {
+        window.localStorage.setItem(`btm-feedback:${guideSlug}`, value);
+      } catch {
+        // Local storage can be disabled; the server-side vote is still saved.
+      }
+    } catch (error) {
+      setVoteNotice(error instanceof Error ? error.message : 'Die Bewertung konnte nicht gespeichert werden.');
+    }
+  };
+
+  return (
+    <section className="repair-feedback" aria-label="Rückmeldung zur Reparaturhilfe">
+      <div className="repair-feedback-vote card-doodle">
+        <div>
+          <div className="eyebrow handwritten">deine rückmeldung</div>
+          <h3>War diese Hilfe nützlich?</h3>
+          <p>Ein kurzer Daumen zeigt anderen direkt, ob sie hier richtig sind.</p>
+        </div>
+        <div className="repair-vote-actions">
+          <button className={`vote-button ${selectedVote === 'up' ? 'is-selected' : ''}`} type="button" onClick={() => void handleVote('up')} aria-pressed={selectedVote === 'up'}>
+            <span aria-hidden="true">👍</span> Ja <strong>{summary?.up ?? 0}</strong>
+          </button>
+          <button className={`vote-button ${selectedVote === 'down' ? 'is-selected' : ''}`} type="button" onClick={() => void handleVote('down')} aria-pressed={selectedVote === 'down'}>
+            <span aria-hidden="true">👎</span> Noch nicht <strong>{summary?.down ?? 0}</strong>
+          </button>
+        </div>
+        {voteNotice && <p className="feedback-notice" role="status">{voteNotice}</p>}
+      </div>
+    </section>
+  );
+}
+
+function RepairComments({ guideSlug }: { guideSlug: string }) {
+  const [summary, setSummary] = useState<FeedbackSummary | null>(null);
+  const [commentError, setCommentError] = useState('');
+  const [commentNotice, setCommentNotice] = useState('');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  const loadFeedback = async () => {
+    try {
+      const payload = await apiJson<FeedbackSummary>(`/api/feedback/${guideSlug}`);
+      setSummary(payload);
+    } catch {
+      setSummary({ guide: guideSlug, up: 0, down: 0, comments: [] });
+    }
+  };
+
+  useEffect(() => {
+    void loadFeedback();
+  }, [guideSlug]);
+
+  const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] ?? null;
+    setCommentError('');
+    setCommentNotice('');
+    if (file && file.size > 1048576) {
+      setSelectedFile(null);
+      event.target.value = '';
+      setCommentError('Das Bild darf höchstens 1 MB groß sein.');
+      return;
+    }
+    setSelectedFile(file);
+  };
+
+  const handleCommentSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSubmitting(true);
+    setCommentError('');
+    setCommentNotice('');
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    formData.set('guide', guideSlug);
+    formData.delete('image');
+    if (selectedFile) formData.append('image', selectedFile);
+
+    try {
+      await apiJson<{ message: string }>('/api/comments', { method: 'POST', body: formData });
+      form.reset();
+      setSelectedFile(null);
+      setCommentNotice('Danke! Dein Kommentar wartet jetzt auf die redaktionelle Freigabe.');
+      await loadFeedback();
+    } catch (error) {
+      setCommentError(error instanceof Error ? error.message : 'Der Kommentar konnte nicht gesendet werden.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <section className="repair-comments" aria-label="Erfahrung teilen">
+      <div className="repair-comments-heading">
+        <div>
+          <div className="eyebrow handwritten">erfahrung teilen</div>
+          <h3>Hinweis oder Ergänzung?</h3>
+        </div>
+        <span className="comment-count">{summary?.comments.length ?? 0} freigegeben</span>
+      </div>
+      <p className="repair-comments-intro">Schreib kurz, was bei dir funktioniert hat oder wo ein Schritt anders war. Kommentare werden vor der Veröffentlichung geprüft; deine E-Mail bleibt intern.</p>
+      <form className="comment-form" onSubmit={handleCommentSubmit}>
+        <div className="comment-form-grid">
+          <label>Name<input name="name" required minLength={2} maxLength={80} autoComplete="name" /></label>
+          <label>E-Mail<input name="email" type="email" required maxLength={180} autoComplete="email" /><small>wird nicht öffentlich angezeigt</small></label>
+        </div>
+        <label>Kommentar<textarea name="body" required minLength={10} maxLength={4000} rows={5} placeholder="Was hast du geprüft oder repariert?" /></label>
+        <label>Bild (optional, max. 1 MB)<input name="image" type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={handleImageChange} /><small>JPG, PNG, WEBP oder GIF</small></label>
+        <label className="comment-honeypot" aria-hidden="true">Website<input name="website" tabIndex={-1} autoComplete="off" /></label>
+        {commentError && <p className="form-message form-message-error" role="alert">{commentError}</p>}
+        {commentNotice && <p className="form-message form-message-success" role="status">{commentNotice}</p>}
+        <button className="button button-ink" type="submit" disabled={submitting}>{submitting ? 'Wird geprüft …' : 'Kommentar zur Prüfung senden'} <span aria-hidden="true">↗</span></button>
+      </form>
+      <div className="approved-comments">
+        {summary?.comments.length ? summary.comments.map((comment) => (
+          <article className="approved-comment" key={comment.id}>
+            <div className="approved-comment-topline"><strong>{comment.name}</strong><time dateTime={comment.createdAt}>{new Date(comment.createdAt).toLocaleDateString('de-DE')}</time></div>
+            <p>{comment.body}</p>
+            {comment.imageUrl && <img src={comment.imageUrl} alt={`Bild von ${comment.name}`} loading="lazy" />}
+          </article>
+        )) : <p className="no-comments">Noch keine freigegebenen Erfahrungsberichte.</p>}
+      </div>
+    </section>
+  );
+}
+
+function AdminPage() {
+  const [checked, setChecked] = useState(false);
+  const [authenticated, setAuthenticated] = useState(false);
+  const [csrfToken, setCsrfToken] = useState('');
+  const [adminEmail, setAdminEmail] = useState('');
+  const [loginEmail, setLoginEmail] = useState('hallo@shortaktien.de');
+  const [password, setPassword] = useState('');
+  const [comments, setComments] = useState<AdminComment[]>([]);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
+
+  useEffect(() => {
+    document.title = 'Admin — Black Tea Hilfe';
+    window.scrollTo(0, 0);
+    void checkSession();
+  }, []);
+
+  const loadComments = async () => {
+    try {
+      const payload = await apiJson<{ comments: AdminComment[] }>('/api/admin/comments');
+      setComments(payload.comments);
+    } catch (loadError) {
+      if (loadError instanceof Error && loadError.message === 'Nicht autorisiert.') {
+        setAuthenticated(false);
+      } else {
+        setError(loadError instanceof Error ? loadError.message : 'Kommentare konnten nicht geladen werden.');
+      }
+    }
+  };
+
+  const checkSession = async () => {
+    try {
+      const payload = await apiJson<{ authenticated: boolean; email: string | null; csrfToken: string | null }>('/api/admin/session');
+      setAuthenticated(payload.authenticated);
+      setAdminEmail(payload.email ?? '');
+      setCsrfToken(payload.csrfToken ?? '');
+      if (payload.authenticated) await loadComments();
+    } catch (sessionError) {
+      setError(sessionError instanceof Error ? sessionError.message : 'Admin-Sitzung konnte nicht geprüft werden.');
+    } finally {
+      setChecked(true);
+    }
+  };
+
+  const handleLogin = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setBusy(true);
+    setError('');
+    setNotice('');
+    try {
+      const payload = await apiJson<{ authenticated: boolean; email: string; csrfToken: string }>('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: loginEmail, password }),
+      });
+      setAuthenticated(payload.authenticated);
+      setAdminEmail(payload.email);
+      setCsrfToken(payload.csrfToken);
+      setPassword('');
+      await loadComments();
+    } catch (loginError) {
+      setError(loginError instanceof Error ? loginError.message : 'Anmeldung fehlgeschlagen.');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleStatus = async (comment: AdminComment, status: 'pending' | 'approved') => {
+    setBusy(true);
+    setError('');
+    try {
+      const payload = await apiJson<{ comment: AdminComment }>(`/api/admin/comments/${comment.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
+        body: JSON.stringify({ status }),
+      });
+      setComments((current) => current.map((item) => item.id === comment.id ? payload.comment : item));
+      setNotice(status === 'approved' ? 'Kommentar freigegeben.' : 'Kommentar zurückgestellt.');
+    } catch (statusError) {
+      setError(statusError instanceof Error ? statusError.message : 'Status konnte nicht geändert werden.');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleDelete = async (comment: AdminComment) => {
+    if (!window.confirm(`Kommentar von ${comment.name} wirklich löschen?`)) return;
+    setBusy(true);
+    setError('');
+    try {
+      await apiJson<{ deleted: boolean }>(`/api/admin/comments/${comment.id}`, { method: 'DELETE', headers: { 'X-CSRF-Token': csrfToken } });
+      setComments((current) => current.filter((item) => item.id !== comment.id));
+      setNotice('Kommentar gelöscht.');
+    } catch (deleteError) {
+      setError(deleteError instanceof Error ? deleteError.message : 'Kommentar konnte nicht gelöscht werden.');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    await apiJson<{ authenticated: boolean }>('/api/admin/logout', { method: 'POST', headers: { 'X-CSRF-Token': csrfToken } });
+    setAuthenticated(false);
+    setCsrfToken('');
+    setComments([]);
+    setAdminEmail('');
+  };
+
+  return (
+    <div className="site-shell">
+      <GuideHeader />
+      <main className="admin-page-main">
+        <section className="admin-page-hero section-pad">
+          <a className="repair-back" href="/hilfe">← Zur Reparaturhilfe</a>
+          <div className="eyebrow handwritten">redaktion · intern</div>
+          <h1>Kommentarprüfung</h1>
+          <p>Hier werden Erfahrungsberichte geprüft, bevor sie unter einer Reparaturhilfe erscheinen.</p>
+        </section>
+        {!checked ? <p className="admin-loading section-pad">Sitzung wird geprüft …</p> : !authenticated ? (
+          <section className="admin-login-section section-pad">
+            <form className="admin-login card-doodle" onSubmit={handleLogin}>
+              <div className="eyebrow handwritten">geschützter bereich</div>
+              <h2>Anmelden</h2>
+              <label>E-Mail<input value={loginEmail} onChange={(event) => setLoginEmail(event.target.value)} type="email" required autoComplete="username" /></label>
+              <label>Passwort<input value={password} onChange={(event) => setPassword(event.target.value)} type="password" required autoComplete="current-password" /></label>
+              {error && <p className="form-message form-message-error" role="alert">{error}</p>}
+              <button className="button button-ink" type="submit" disabled={busy}>{busy ? 'Anmeldung …' : 'Admin öffnen'} <span aria-hidden="true">↗</span></button>
+            </form>
+          </section>
+        ) : (
+          <section className="admin-comments-section section-pad">
+            <div className="admin-toolbar card-doodle">
+              <div><span className="eyebrow handwritten">eingeloggt als</span><strong>{adminEmail}</strong></div>
+              <button className="button button-ghost" type="button" onClick={() => void handleLogout()}>Abmelden</button>
+            </div>
+            {error && <p className="form-message form-message-error" role="alert">{error}</p>}
+            {notice && <p className="form-message form-message-success" role="status">{notice}</p>}
+            <div className="admin-comment-list">
+              {comments.length ? comments.map((comment) => (
+                <article className={`admin-comment card-doodle ${comment.status === 'pending' ? 'admin-comment-pending' : ''}`} key={comment.id}>
+                  <div className="admin-comment-header">
+                    <div><span className={`admin-status ${comment.status}`}>{comment.status === 'pending' ? 'wartet auf Prüfung' : 'freigegeben'}</span><h2>{comment.name}</h2><p>{comment.email} · {comment.guide} · {new Date(comment.createdAt).toLocaleString('de-DE')}</p></div>
+                    <div className="admin-comment-actions">
+                      {comment.status === 'pending' ? <button className="button button-ink" type="button" disabled={busy} onClick={() => void handleStatus(comment, 'approved')}>Freigeben</button> : <button className="button button-ghost" type="button" disabled={busy} onClick={() => void handleStatus(comment, 'pending')}>Zurückstellen</button>}
+                      <button className="button button-danger" type="button" disabled={busy} onClick={() => void handleDelete(comment)}>Löschen</button>
+                    </div>
+                  </div>
+                  <p className="admin-comment-body">{comment.body}</p>
+                  {comment.imageUrl && <a href={comment.imageUrl} target="_blank" rel="noreferrer"><img className="admin-comment-image" src={comment.imageUrl} alt={`Anhang von ${comment.name}`} /></a>}
+                </article>
+              )) : <div className="admin-empty card-doodle"><h2>Alles ruhig.</h2><p>Aktuell liegen keine Kommentare zur Prüfung vor.</p></div>}
+            </div>
+          </section>
+        )}
+      </main>
+      <GuideFooter />
+    </div>
+  );
+}
+
+function CommunityPage() {
+  useEffect(() => {
+    document.title = 'BTM Community-Wissen — Black Tea Hilfe';
+    window.scrollTo(0, 0);
+  }, []);
+
+  const communityPdfs = [
+    { title: 'Wildfire-Handbuch', detail: '28 Seiten · Bedienung, Sicherheit und Wartung', href: '/pdfs/19-wildfire-handbuch-community.pdf' },
+    { title: 'Wildfire-Wartungszusammenfassung', detail: '4 Seiten · Laden und Wartung', href: '/pdfs/20-wildfire-wartung-community.pdf' },
+    { title: 'Gabelabdichtung', detail: '6 Seiten · Fehlerspur an der Wildfire-Gabel', href: '/pdfs/21-gabelabdichtung-community.pdf' },
+    { title: 'Wildfire FarDriver-Settings', detail: '2 Seiten · Controller-Einstellungen', href: '/pdfs/22-wildfire-fardriver-settings-community.pdf' },
+  ];
+
+  return (
+    <div className="site-shell">
+      <GuideHeader />
+      <main className="community-page-main">
+        <section className="community-page-hero section-pad">
+          <a className="repair-back" href="/">← Zur Sammelmappe</a>
+          <div className="eyebrow handwritten">community-wissen · redaktionell geordnet</div>
+          <h1>BTM Community-Wissen</h1>
+          <p>Die nützlichen technischen Spuren aus der Community — verständlich zusammengefasst, ohne lange Forenverläufe und mit Originalquelle zum Gegenprüfen.</p>
+          <div className="community-source-banner card-doodle">
+            <span className="kind-chip community">Quelle</span>
+            <p>Die Inhalte sind unabhängige Community-Aufbereitungen. Angaben zu Bremsen, Fahrwerk, Akku, Hochvolt und Controller bitte immer am eigenen Modellstand prüfen.</p>
+            <a className="button button-ghost" href="https://btm-community.org/" target="_blank" rel="nofollow noreferrer">BTM Community öffnen ↗</a>
+          </div>
+        </section>
+
+        <section className="community-knowledge-section section-pad">
+          <div className="section-heading">
+            <div>
+              <div className="eyebrow handwritten">was wir daraus nutzen</div>
+              <h2>Die wichtigen Spuren.</h2>
+            </div>
+            <span className="section-arrow handwritten">kurz erklärt,<br />Quelle dabei →</span>
+          </div>
+          <div className="community-knowledge-grid">
+            {communityKnowledge.map((entry, index) => (
+              <article id={slugify(entry.title)} className={`community-knowledge-card card-doodle ${index % 2 === 1 ? 'community-card-tilt-right' : 'community-card-tilt-left'}`} key={entry.title}>
+                <div className="community-card-topline"><span className="kind-chip community">{entry.model}</span><span>Zusammenfassung</span></div>
+                <h2>{entry.title}</h2>
+                <p>{entry.intro}</p>
+                <ul>{entry.points.map((point) => <li key={point}>{point}</li>)}</ul>
+                <a className="community-source-link" href={entry.sourceHref} target="_blank" rel="nofollow noreferrer">Quelle: {entry.sourceLabel} ↗</a>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="community-pdf-section section-pad">
+          <div className="section-heading compact">
+            <div>
+              <div className="eyebrow handwritten">lokal gesichert</div>
+              <h2>Die vier Community-PDFs.</h2>
+            </div>
+            <a className="button button-ghost" href="/pdfs/index.html">Alle PDFs ↗</a>
+          </div>
+          <div className="community-pdf-list card-doodle">
+            {communityPdfs.map((pdf) => (
+              <div className="community-pdf-row" key={pdf.href}>
+                <span><strong>{pdf.title}</strong><small>{pdf.detail}</small></span>
+                <span className="community-pdf-actions"><a href={pdf.href}>PDF öffnen ↗</a><a href="https://btm-community.org/wildfire/dokumente-wildfire/" target="_blank" rel="nofollow noreferrer">Quelle ↗</a></span>
+              </div>
+            ))}
+          </div>
+          <p className="content-note handwritten">Lokale Kopien werden angeboten, damit keine toten Original-Links nötig sind. Rechte und Version vor öffentlicher Weitergabe prüfen.</p>
+        </section>
+      </main>
+      <GuideFooter />
+    </div>
+  );
+}
+
+function PartsPage() {
+  const [filter, setFilter] = useState<PartsFilter>('Alle');
+  const [query, setQuery] = useState('');
+
+  useEffect(() => {
+    document.title = 'Ersatzteile — Black Tea Hilfe';
+    window.scrollTo(0, 0);
+  }, []);
+
+  const filteredParts = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase();
+    return historicalShopParts.filter((part) => {
+      const matchesFilter = filter === 'Alle' || part.category === filter;
+      const searchable = `${part.title} ${part.category} ${part.model} ${part.variants?.join(' ') ?? ''}`.toLowerCase();
+      return matchesFilter && (!normalizedQuery || searchable.includes(normalizedQuery));
+    }).sort((a, b) => {
+      const aHasLink = a.purchaseOptions?.length ? 0 : 1;
+      const bHasLink = b.purchaseOptions?.length ? 0 : 1;
+      return aHasLink - bHasLink || a.title.localeCompare(b.title, 'de', { sensitivity: 'base' });
+    });
+  }, [filter, query]);
+
+  const categories: PartsFilter[] = ['Alle', 'Bremsen', 'Fahrwerk & Räder', 'Elektrik & Laden', 'Antrieb & Controller', 'Karosserie & Halter', 'Bundles', 'Zubehör'];
+
+  return (
+    <div className="site-shell">
+      <GuideHeader />
+      <main className="parts-page-main">
+        <section className="parts-page-hero section-pad">
+          <a className="repair-back" href="/">← Zur Sammelmappe</a>
+          <div className="eyebrow handwritten">historischer katalog · sauber markiert</div>
+          <h1>Ersatzteile</h1>
+          <p>Hier findest du alle Produkte, die im früheren offiziellen BTM-Shop gelistet waren — als Recherchebasis für Ersatz, Reparatur und Gebrauchtteile.</p>
+          <div className="parts-page-facts">
+            <div><strong>{historicalShopParts.length}</strong><span>historische Shop-Einträge</span></div>
+            <div><strong>7</strong><span>Kategorien</span></div>
+            <div><strong>0</strong><span>aktuelle Verfügbarkeitszusagen</span></div>
+          </div>
+        </section>
+
+        <section className="parts-catalog-section section-pad">
+          <div className="toolbar card-doodle parts-page-toolbar">
+            <label className="search-box">
+              <span aria-hidden="true">⌕</span>
+              <span className="sr-only">Ersatzteile durchsuchen</span>
+              <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="z. B. Bremse, Wildfire, Display …" />
+            </label>
+            <div className="filter-tabs parts-filter-tabs" role="group" aria-label="Ersatzteile filtern">
+              {categories.map((item) => (
+                <button key={item} className={filter === item ? 'filter-tab active' : 'filter-tab'} onClick={() => setFilter(item)} type="button">
+                  {item}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="parts-catalog-grid">
+            {filteredParts.map((part, index) => <PartCard key={part.id} part={part} index={index} />)}
+          </div>
+          {filteredParts.length === 0 && <div className="empty-state card-doodle">Kein Ersatzteil gefunden. Versuch es mit „Bremse“, „Akku“ oder „Wildfire“.</div>}
+          <p className="content-note handwritten">Historische Shop-Daten und Preise immer mit dem lokalen Datensatz, dem Fahrzeug und der Teilenummer gegenprüfen.</p>
+          <div className="parts-catalog-note card-doodle">
+            <span className="sourcing-badge">lokal gesichert</span>
+            <p>Die Liste bildet den historischen Shop-Bestand ab. Produktnamen, Beschreibungen, Varianten und historische Preise liegen lokal in unserem Datensatz. Preise, Lagerbestand und Kaufabwicklung sind nicht mehr aktuell zugesichert; ein Eintrag ist kein Beleg für Kompatibilität.</p>
+            <a className="button button-ghost" href={localPartArchiveHref}>Datenquelle ansehen ↗</a>
+          </div>
+        </section>
+      </main>
+      <GuideFooter />
+    </div>
+  );
+}
+
+function PartCard({ part, index }: { part: HistoricalShopPart; index: number }) {
+  return (
+    <article id={part.id} className={`part-catalog-card card-doodle ${index % 3 === 1 ? 'part-catalog-card-tilt-right' : index % 3 === 2 ? 'part-catalog-card-tilt-left' : ''}`}>
+      <div className="part-card-topline">
+        <span className="kind-chip part">Ersatzteil</span>
+        <div className="part-card-statuses">
+          <PartAvailabilityBadge part={part} />
+          <span className="part-card-category">{part.category}</span>
+        </div>
+      </div>
+      <h2><a href={part.path}>{part.title}</a></h2>
+      <div className="part-card-model">{part.model}</div>
+      <p>{part.historicalSummary}</p>
+      {part.variants && <div className="part-card-variants"><strong>Varianten</strong><span>{part.variants.join(' · ')}</span></div>}
+      <div className="part-card-footer">
+        <span>{part.price ? `historisch ${part.priceMax && part.priceMax !== part.price ? `${part.price}–${part.priceMax}` : part.price} €` : 'Preis nicht übernommen'}</span>
+        <a href={part.path}>Detail öffnen ↗</a>
+      </div>
+    </article>
+  );
+}
+
+function PartAvailabilityBadge({ part }: { part: HistoricalShopPart }) {
+  if (!part.purchaseOptions?.length) return null;
+
+  return <span className="part-availability-badge" title="Eine Bezugsquelle ist hinterlegt. Passform und technische Daten bitte vor dem Kauf prüfen.">✓ Vorhanden</span>;
+}
+
+function PartDetailPage({ part }: { part: HistoricalShopPart }) {
+  useEffect(() => {
+    document.title = `${part.title} — Ersatzteil — Black Tea Hilfe`;
+    window.scrollTo(0, 0);
+  }, [part.title]);
+
+  return (
+    <div className="site-shell">
+      <GuideHeader />
+      <main className="parts-detail-main">
+        <section className="parts-detail-hero section-pad">
+          <a className="repair-back" href="/ersatzteile">← Alle Ersatzteile</a>
+          <div className="eyebrow handwritten">ersatzteil · lokal recherchiert</div>
+          <h1>{part.title}</h1>
+          <p>{part.historicalSummary}</p>
+          <div className="parts-detail-meta">
+            <span><strong>Modell</strong>{part.model}</span>
+            <span><strong>Kategorie</strong>{part.category}</span>
+            <span><strong>Status</strong>{part.safetyClass}</span>
+          </div>
+        </section>
+
+        <section className="parts-detail-section section-pad">
+          <article className="parts-detail-card card-doodle">
+            <div className="part-detail-topline"><span className="kind-chip part">Ersatzteil</span><div className="part-detail-topline-status"><PartAvailabilityBadge part={part} /><span>Recherche-Stand: 02.09.2026</span></div></div>
+
+            <div className="part-detail-columns">
+              <section>
+                <h2>Archivdaten</h2>
+                <p>{part.historicalSummary}</p>
+                {part.price !== undefined && <div className="part-detail-fact"><strong>{part.priceMax && part.priceMax !== part.price ? `${part.price}–${part.priceMax}` : part.price} €</strong><span>Alter Originalpreis — nicht aktuell</span></div>}
+                <p className="part-archive-status"><strong>Archivstatus:</strong> {part.historicalAvailability}{part.archiveTimestamp ? ` · Aufnahme ${part.archiveTimestamp.slice(0, 4)}-${part.archiveTimestamp.slice(4, 6)}-${part.archiveTimestamp.slice(6, 8)}` : ''}</p>
+                {part.variants && <div className="part-detail-variants"><strong>{part.variantDetails?.some((variant) => variant.price !== undefined) ? 'Alte Originalpreise' : 'Originalvarianten'}</strong><ul>{part.variantDetails?.length ? part.variantDetails.map((variant) => <li key={variant.label}>{variant.label}{variant.price !== undefined ? ` · ${variant.price} €` : ''}</li>) : part.variants.map((variant) => <li key={variant}>{variant}</li>)}</ul></div>}
+                <a className="text-link" href={part.archiveHref}>Lokalen Ersatzteil-Datensatz öffnen ↗</a>
+              </section>
+
+              <section className="part-detail-check">
+                <div className="eyebrow handwritten">vor dem kauf</div>
+                <h2>Passform gegenprüfen</h2>
+                <p>{part.compatibilityNote}</p>
+                <ul>
+                  <li>Modell, Baujahr und genaue Variante notieren.</li>
+                  <li>Maße, Stecker, Gewinde und Befestigung vergleichen.</li>
+                  <li>Bei Bremsen, Fahrwerk, Akku, Hochvolt oder Controller: Fachbetrieb einbeziehen.</li>
+                </ul>
+                {part.technicalEvidence && <div className="part-technical-evidence"><strong>{part.technicalEvidence.eyebrow ?? 'Abgleich mit lokaler PDF'}</strong><p>{part.technicalEvidence.text}</p><a href={part.technicalEvidence.href}>{part.technicalEvidence.label} ↗</a></div>}
+              </section>
+            </div>
+
+              <section className="part-buy-section">
+              <div className="eyebrow handwritten">Amazon-Link</div>
+              <h2>{part.purchaseOptions?.length ? (part.purchaseHeading ?? `Bezugsquellen für ${part.title}`) : 'Aktuell nichts Passendes gefunden'}</h2>
+              {(part.purchaseStatus === 'manual-match' || part.purchaseStatus === 'candidate') && <p className="part-buy-note">{part.purchaseNote}</p>}
+              {part.purchaseOptions?.length ? <div className="part-buy-grid">
+                {part.purchaseOptions.map((option, optionIndex) => <a key={option.href} className={`part-buy-card ${part.purchaseStatus === 'manual-match' || optionIndex === 0 ? 'amazon' : 'fallback'}`} href={option.href} target="_blank" rel="nofollow noreferrer">
+                  <span className="part-buy-label">{part.purchaseStatus === 'manual-match' ? 'Amazon · Handbuchabgleich' : part.purchaseStatus === 'candidate' ? 'Amazon-Link · Passform prüfen' : optionIndex === 0 ? 'Amazon zuerst' : 'Alternative Bezugsquelle'}</span>
+                  <strong>{option.label} ↗</strong>
+                  <small>{option.fitStatus ?? part.confidence}</small>
+                </a>)}
+              </div> : <div className="part-no-purchase"><span className="part-buy-label">Noch kein passender Link</span><strong>Momentan haben wir keinen passenden Artikel gefunden.</strong><p>{part.purchaseNote}</p></div>}
+            </section>
+
+            <RepairFeedback guideSlug={`ersatzteil-${part.id}`} />
+            <RepairComments guideSlug={`ersatzteil-${part.id}`} />
+
+            <div className="parts-detail-source">
+              <span className="repair-subhead">Quellenangabe</span>
+              <p>Historischer Produktname und die gegebenenfalls übernommenen Varianten stammen aus lokal gesicherten öffentlichen Archivdaten. Die Kaufoptionen sind davon getrennt und müssen vor der Bestellung neu geprüft werden.</p>
+            </div>
+          </article>
+        </section>
+      </main>
+      <GuideFooter />
+    </div>
+  );
+}
+
+function SourcingCard({ card, index }: { card: SourcingCard; index: number }) {
+  return (
+    <article className={`sourcing-card card-doodle ${index % 2 === 1 ? 'sourcing-card-tilt-right' : 'sourcing-card-tilt-left'}`}>
+      <div className="sourcing-card-topline"><span className="sourcing-category">{card.category}</span><span className="sourcing-status">{card.status}</span></div>
+      <h3>{card.title}</h3>
+      <p>{card.summary}</p>
+      <div className="sourcing-links">
+        {card.amazon && <a className="source-action amazon-action" href={card.amazon.href} target="_blank" rel="nofollow noreferrer">{card.amazon.label} ↗</a>}
+        {card.fallback && <a className="source-action fallback-action" href={card.fallback.href} target="_blank" rel="nofollow noreferrer">{card.fallback.label} ↗</a>}
+        {!card.amazon && !card.fallback && <span className="sourcing-no-link">Kein unbestätigter Kauf-Link</span>}
+      </div>
+    </article>
+  );
+}
+
+function TimelineItem({ date, title, text, sourceHref, sourceLabel }: { date: string; title: string; text: string; sourceHref?: string; sourceLabel?: string }) {
+  return <article className="timeline-item"><div className="timeline-date handwritten">{date}</div><div className="timeline-dot" /><div><h3>{title}</h3><p>{text}</p>{sourceHref && <a className="timeline-source" href={sourceHref} target="_blank" rel="nofollow noreferrer">Quelle: {sourceLabel ?? 'Quelle'} ↗</a>}</div></article>;
+}
+
+export { App };

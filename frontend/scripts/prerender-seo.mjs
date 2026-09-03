@@ -1,0 +1,164 @@
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { dirname, join, resolve } from 'node:path';
+
+const frontendRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const distRoot = join(frontendRoot, 'dist');
+const appSource = readFileSync(join(frontendRoot, 'src', 'App.tsx'), 'utf8');
+const siteConfig = JSON.parse(readFileSync(join(frontendRoot, 'src', 'site-config.json'), 'utf8'));
+const partsCatalog = JSON.parse(readFileSync(join(frontendRoot, '..', 'research', 'parts.json'), 'utf8'));
+const partDetailsCatalog = JSON.parse(readFileSync(join(frontendRoot, '..', 'research', 'parts-details.json'), 'utf8'));
+const siteOrigin = (process.env.VITE_SITE_URL || siteConfig.siteOrigin).replace(/\/+$/, '');
+const indexPath = join(distRoot, 'index.html');
+
+const guidePattern = /id:\s*'([^']+)',\s*path:\s*'([^']+)',\s*title:\s*'([^']+)',\s*model:\s*'([^']+)',\s*intro:\s*'([^']+)',\s*steps:\s*\[([\s\S]*?)\]\s*,\s*safety:/g;
+const guides = [...appSource.matchAll(guidePattern)].map((match) => ({
+  id: match[1],
+  path: match[2],
+  title: match[3],
+  model: match[4],
+  intro: match[5],
+  steps: [...match[6].matchAll(/'([^']+)'/g)].map((step) => step[1]),
+}));
+
+const mapFromApp = (name) => {
+  const block = appSource.match(new RegExp(`const ${name}: Record<string, string> = \\{([\\s\\S]*?)\\n\\};`))?.[1] ?? '';
+  const entries = {};
+  const entryPattern = /(?:'([^']+)'|([A-Za-z0-9_-]+)):\s*'([^']+)'/g;
+  for (const match of block.matchAll(entryPattern)) entries[match[1] ?? match[2]] = match[3];
+  return entries;
+};
+const partTitleOverrides = mapFromApp('partTitleOverrides');
+const partWordOverrides = mapFromApp('partWordOverrides');
+const humanizePartSlug = (slug) => {
+  if (partTitleOverrides[slug]) return partTitleOverrides[slug];
+  return slug.replace(/^copy-of-/, '').split('-').map((word) => partWordOverrides[word] ?? `${word.slice(0, 1).toUpperCase()}${word.slice(1)}`).join(' ');
+};
+const parts = (partsCatalog.historical_product_slugs ?? []).map((slug) => ({
+  id: slug,
+  title: partTitleOverrides[slug] ?? partDetailsCatalog.entries?.find((entry) => entry.slug === slug && entry.ok)?.title ?? humanizePartSlug(slug),
+  path: `/ersatzteile/${slug}`,
+}));
+
+if (guides.length === 0 || !readFileSync(indexPath, 'utf8')) {
+  throw new Error('Prerendering konnte keine App oder Reparaturhilfen finden.');
+}
+
+const staticPages = [
+  { path: '/', title: 'Black Tea Hilfe — Dokumente, Ersatzteile & Updates', description: 'Unabhängige Sammelstelle für Black Tea Motorbikes: lokale PDFs, Ersatzteile, Reparaturhilfen und nachvollziehbare Quellen.' },
+  { path: '/hilfe', title: 'Reparaturhilfe — Black Tea Hilfe', description: 'Redaktionell geordnete Reparaturhilfen für typische Bonfire- und Wildfire-Fehlerbilder — mit Kurzablauf, ausführlicher Prüfung, Sicherheit und Quelle.' },
+  { path: '/ersatzteile', title: 'Ersatzteile — Black Tea Hilfe', description: 'Historischer BTM-Ersatzteilkatalog mit Modellbezug, Teilenamen und Quellen. Bestand und Preise vor dem Kauf prüfen.' },
+  { path: '/community', title: 'BTM Community-Wissen — Black Tea Hilfe', description: 'Technische Hinweise aus der Black Tea Community verständlich zusammengefasst, mit lokalen PDFs und Originalquellen.' },
+  { path: '/quellen', title: 'Quellen — Black Tea Hilfe', description: 'Nachvollziehbare Quellen zu Insolvenzstatus, Handbüchern, lokalen PDFs, Ersatzteilspuren und Community-Wissen.' },
+  { path: '/impressum', title: 'Impressum — Black Tea Hilfe', description: 'Anbieterinformationen und rechtliche Hinweise zu Black Tea Hilfe.' },
+  { path: '/datenschutz', title: 'Datenschutz — Black Tea Hilfe', description: 'Datenschutzhinweise zu Kommentaren, Bildanhängen und dem Betrieb von Black Tea Hilfe.' },
+  { path: '/wiki', title: 'Wiki — Black Tea Hilfe', description: 'Das BTM-Wiki wird vorbereitet.' },
+  { path: '/admin', title: 'Admin — Black Tea Hilfe', description: 'Interner Bereich zur redaktionellen Prüfung von Kommentaren.', robots: 'noindex,nofollow,noarchive' },
+];
+
+const pages = [
+  ...staticPages,
+  ...guides.map((guide) => ({ ...guide, title: `${guide.title} — Black Tea Hilfe`, description: guide.intro, robots: 'index,follow,max-image-preview:large', guide })),
+  ...parts.map((part) => ({
+    ...part,
+    title: `${part.title} — Ersatzteil — Black Tea Hilfe`,
+    description: `${part.title} für Black Tea Motorbikes: historischer BTM-Shop-Eintrag mit lokal gesicherten Archivdaten und Bezugsstatus ohne unbestätigte Kaufempfehlung.`,
+    robots: 'index,follow,max-image-preview:large',
+    part,
+  })),
+];
+const source = readFileSync(indexPath, 'utf8');
+const absoluteUrl = (path) => `${siteOrigin}${path === '/' ? '/' : path}`;
+const escapeAttribute = (value) => String(value).replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character]));
+const websiteSchema = {
+  '@type': 'WebSite',
+  '@id': `${siteOrigin}/#website`,
+  name: 'Black Tea Hilfe',
+  url: `${siteOrigin}/`,
+  inLanguage: 'de-DE',
+};
+
+const breadcrumbSchema = (page) => ({
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Startseite', item: `${siteOrigin}/` },
+    ...(page.guide ? [
+      { '@type': 'ListItem', position: 2, name: 'Reparaturhilfe', item: `${siteOrigin}/hilfe` },
+      { '@type': 'ListItem', position: 3, name: page.guide.title, item: absoluteUrl(page.path) },
+    ] : page.part ? [
+      { '@type': 'ListItem', position: 2, name: 'Ersatzteile', item: `${siteOrigin}/ersatzteile` },
+      { '@type': 'ListItem', position: 3, name: page.part.title, item: absoluteUrl(page.path) },
+    ] : page.path !== '/' ? [{ '@type': 'ListItem', position: 2, name: page.title, item: absoluteUrl(page.path) }] : []),
+  ],
+});
+
+const schemaFor = (page) => {
+  if (page.robots?.startsWith('noindex')) return null;
+
+  const pageSchema = page.guide ? {
+    '@type': 'HowTo',
+    '@id': `${absoluteUrl(page.path)}#howto`,
+    name: page.guide.title,
+    description: page.description,
+    url: absoluteUrl(page.path),
+    inLanguage: 'de-DE',
+    step: page.guide.steps.map((step, index) => ({
+      '@type': 'HowToStep',
+      position: index + 1,
+      name: `Prüfschritt ${index + 1}`,
+      text: step,
+    })),
+  } : page.part ? {
+    '@type': 'Product',
+    '@id': `${absoluteUrl(page.path)}#product`,
+    name: page.part.title,
+    description: page.description,
+    url: absoluteUrl(page.path),
+    category: 'Ersatzteil',
+    sku: `btm-${page.part.id}`,
+    brand: { '@type': 'Brand', name: 'Black Tea Motorbikes' },
+  } : {
+    '@type': page.path === '/hilfe' || page.path === '/ersatzteile' || page.path === '/community' || page.path === '/quellen' ? 'CollectionPage' : 'WebPage',
+    '@id': `${absoluteUrl(page.path)}#webpage`,
+    name: page.title,
+    description: page.description,
+    url: absoluteUrl(page.path),
+    inLanguage: 'de-DE',
+    isPartOf: { '@id': `${siteOrigin}/#website` },
+  };
+
+  return { '@context': 'https://schema.org', '@graph': [websiteSchema, pageSchema, breadcrumbSchema(page)] };
+};
+
+const replaceTag = (html, pattern, replacement) => html.replace(pattern, replacement);
+
+for (const page of pages) {
+  let html = source;
+  const robots = page.robots || 'index,follow,max-image-preview:large';
+  const canonical = absoluteUrl(page.path);
+  html = replaceTag(html, /<title>[\s\S]*?<\/title>/, `<title>${escapeAttribute(page.title)}</title>`);
+  html = replaceTag(html, /<meta name="description"[^>]*>/, `<meta name="description" content="${escapeAttribute(page.description)}" />`);
+  html = replaceTag(html, /<meta name="robots"[^>]*>/, `<meta name="robots" content="${robots}" />`);
+  html = replaceTag(html, /<meta property="og:type"[^>]*>/, `<meta property="og:type" content="${page.guide ? 'article' : 'website'}" />`);
+  html = replaceTag(html, /<meta property="og:title"[^>]*>/, `<meta property="og:title" content="${escapeAttribute(page.title)}" />`);
+  html = replaceTag(html, /<meta property="og:description"[^>]*>/, `<meta property="og:description" content="${escapeAttribute(page.description)}" />`);
+  html = replaceTag(html, /<meta property="og:url"[^>]*>/, `<meta property="og:url" content="${canonical}" />`);
+  html = replaceTag(html, /<meta name="twitter:title"[^>]*>/, `<meta name="twitter:title" content="${escapeAttribute(page.title)}" />`);
+  html = replaceTag(html, /<meta name="twitter:description"[^>]*>/, `<meta name="twitter:description" content="${escapeAttribute(page.description)}" />`);
+  html = replaceTag(html, /<link rel="canonical"[^>]*>/, `<link rel="canonical" href="${canonical}" />`);
+
+  const schema = schemaFor(page);
+  const schemaTag = schema ? `<script id="site-jsonld" type="application/ld+json">${JSON.stringify(schema, null, 2).replace(/</g, '\\u003c')}</script>` : '';
+  html = replaceTag(html, /<script id="site-jsonld" type="application\/ld\+json">[\s\S]*?<\/script>/, schemaTag);
+
+  if (page.path === '/') {
+    writeFileSync(indexPath, html);
+    continue;
+  }
+
+  const routeDirectory = join(distRoot, ...page.path.split('/').filter(Boolean));
+  mkdirSync(routeDirectory, { recursive: true });
+  writeFileSync(join(routeDirectory, 'index.html'), html);
+}
+
+console.log(`SEO-Pre-rendering erzeugt: ${pages.length} HTML-Einstiege (${siteOrigin})`);

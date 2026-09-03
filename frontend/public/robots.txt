@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /src/
+Disallow: /node_modules/
+Sitemap: https://btm.shortaktien.de/sitemap.xml
