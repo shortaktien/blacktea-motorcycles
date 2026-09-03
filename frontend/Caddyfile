@@ -1,0 +1,43 @@
+:80 {
+    encode zstd gzip
+    root * /srv
+
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        Permissions-Policy "camera=(), microphone=(), geolocation=()"
+        Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+        -Server
+    }
+
+    # The public URL is the stable HTML entry in the sitemap.
+    redir /pdfs /pdfs/index.html 301
+    redir /pdfs/ /pdfs/index.html 301
+
+    # Keep the API on the same origin while the frontend remains a static site.
+    handle /api/* {
+        reverse_proxy backend:8000
+    }
+
+    # Resolve a published route to its generated /route/index.html without
+    # falling back to the homepage. Unknown paths reach the explicit 404.
+    @prerendered file {
+        try_files {path}/index.html
+    }
+    handle @prerendered {
+        rewrite * {http.matchers.file.relative}
+        file_server
+    }
+
+    # Serve files such as assets, robots.txt, sitemap.xml and PDFs as-is.
+    @assets file {
+        try_files {path}
+    }
+    handle @assets {
+        file_server
+    }
+
+    respond 404
+}

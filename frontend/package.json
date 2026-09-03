@@ -10,9 +10,8 @@
   "scripts": {
     "seo:generate": "node scripts/generate-seo.mjs",
     "prebuild": "npm run seo:generate",
-    "postbuild": "node scripts/prerender-seo.mjs",
     "dev": "vite",
-    "build": "tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.node.json --noEmit && vite build",
+    "build": "tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.node.json --noEmit && vite build && vite build --ssr src/entry-server.tsx --outDir dist-server && node scripts/prerender-seo.mjs",
     "preview": "vite preview"
   },
   "dependencies": {

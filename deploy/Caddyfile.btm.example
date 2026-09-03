@@ -1,20 +1,19 @@
 # In den bestehenden Caddyfile übernehmen.
 # Voraussetzung: Caddy läuft im selben Docker-Netzwerk wie der BTM-Stack.
-# Die Compose-Service-Namen bleiben dadurch stabil; keine Container-ID verwenden.
+# Der Frontend-Container ist im Produktionsmodus selbst ein statischer Caddy
+# und lauscht intern auf Port 80. Der Vite-Dev-Server wird nicht veröffentlicht.
 
 btm.shortaktien.de {
-\tencode zstd gzip
+    encode zstd gzip
 
-\theader {
-\t\tStrict-Transport-Security "max-age=31536000; includeSubDomains"
-\t\tX-Content-Type-Options "nosniff"
-\t\tReferrer-Policy "strict-origin-when-cross-origin"
-\t\tPermissions-Policy "camera=(), microphone=(), geolocation=()"
-\t\t-Server
-\t}
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        Permissions-Policy "camera=(), microphone=(), geolocation=()"
+        -Server
+    }
 
-\t@api path /api/*
-\treverse_proxy @api backend:8000
-
-\treverse_proxy frontend:5173
+    reverse_proxy frontend:80
 }
