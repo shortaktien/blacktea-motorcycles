@@ -3332,6 +3332,7 @@ function SourcesPage() {
 function CommunityMapPage() {
   const [regions, setRegions] = useState<CommunityMapRegion[]>([]);
   const [memberCount, setMemberCount] = useState(0);
+  const [totalKilometers, setTotalKilometers] = useState(0);
   const [activeKey, setActiveKey] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -3342,10 +3343,11 @@ function CommunityMapPage() {
     let active = true;
     const loadMap = async () => {
       try {
-        const response = await apiJson<{ regions: CommunityMapRegion[]; memberCount: number; regionCount: number }>('/api/community/map');
+        const response = await apiJson<{ regions: CommunityMapRegion[]; memberCount: number; totalKilometers: number }>('/api/community/map');
         if (!active) return;
         setRegions(response.regions ?? []);
         setMemberCount(response.memberCount ?? 0);
+        setTotalKilometers(response.totalKilometers ?? 0);
         setError('');
       } catch (reason) {
         if (active) setError(reason instanceof Error ? reason.message : 'Die Community-Karte konnte gerade nicht geladen werden.');
@@ -3385,9 +3387,10 @@ function CommunityMapPage() {
         <section className="community-map-section section-pad">
           <div className="community-map-stats" aria-label="Zusammenfassung der Community-Karte">
             <div><strong>{memberCount}</strong><span>Mitglieder gesamt</span></div>
-            <div><strong>{membersByCountry.D}</strong><span>Mitglieder in Deutschland</span></div>
-            <div><strong>{membersByCountry.A}</strong><span>Mitglieder in Österreich</span></div>
-            <div><strong>{membersByCountry.CH}</strong><span>Mitglieder in der Schweiz</span></div>
+            <div><strong>{membersByCountry.D}</strong><span>Deutschland</span></div>
+            <div><strong>{membersByCountry.A}</strong><span>Österreich</span></div>
+            <div><strong>{membersByCountry.CH}</strong><span>Schweiz</span></div>
+            <div className="community-map-stat-kilometers"><strong>ca. {new Intl.NumberFormat('de-DE').format(totalKilometers)} km</strong><span>Community-Kilometer gesamt</span></div>
           </div>
           <div className="community-map-card card-doodle" aria-busy={loading}>
             <div className="community-map-card-heading">

@@ -74,9 +74,15 @@ final class CommunityController
     public function communityMap(): JsonResponse
     {
         $regions = [];
+        $totalKilometers = 0;
         foreach ($this->userStorage->read()['users'] ?? [] as $user) {
             if (($user['status'] ?? null) !== 'active') {
                 continue;
+            }
+
+            $kilometers = filter_var($user['kilometers'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 0, 'max_range' => 999999]]);
+            if ($kilometers !== false) {
+                $totalKilometers += $kilometers;
             }
 
             $country = $user['country'] ?? null;
@@ -104,6 +110,7 @@ final class CommunityController
             'regions' => $regionList,
             'memberCount' => array_sum(array_column($regionList, 'memberCount')),
             'regionCount' => count($regionList),
+            'totalKilometers' => $totalKilometers,
         ]);
         $response->headers->set('Cache-Control', 'no-store');
         return $response;
