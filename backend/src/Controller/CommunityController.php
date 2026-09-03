@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Service\CommunityStorage;
+use App\Service\EmailConfirmationService;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,7 +22,10 @@ final class CommunityController
         'image/gif' => 'gif',
     ];
 
-    public function __construct(private readonly CommunityStorage $storage)
+    public function __construct(
+        private readonly CommunityStorage $storage,
+        private readonly EmailConfirmationService $emailConfirmation,
+    )
     {
     }
 
@@ -145,6 +149,13 @@ final class CommunityController
             return $this->error('Bitte eine gültige Webadresse als Quelle angeben.', Response::HTTP_BAD_REQUEST);
         }
 
+        $normalizedEmail = strtolower(trim($email));
+        if ($response = $this->confirmationRateLimited($request, $normalizedEmail)) {
+            return $response;
+        }
+
+        $confirmation = $this->emailConfirmation->createToken('/api/comments/confirm/');
+
         $image = $request->files->get('image');
         if ($image !== null && !$image instanceof UploadedFile) {
             return $this->error('Das Bild konnte nicht verarbeitet werden.', Response::HTTP_BAD_REQUEST);
@@ -180,7 +191,7 @@ final class CommunityController
             'guide' => $guide,
             'kind' => $kind,
             'name' => trim($name),
-            'email' => strtolower(trim($email)),
+            'email' => $normalizedEmail,
             'body' => trim($body),
             'topic' => in_array($kind, ['wiki_suggestion', 'repair_request'], true) ? trim((string) $topic) : null,
             'section' => is_string($section) && trim($section) !== '' ? trim($section) : null,
@@ -188,9 +199,12 @@ final class CommunityController
             'parentId' => $kind === 'repair_answer' ? trim((string) $parentId) : null,
             'imageFile' => $imageFilename,
             'imageMime' => $imageMime,
-            'status' => 'pending',
+            'status' => 'awaiting_confirmation',
             'createdAt' => (new \DateTimeImmutable())->format(DATE_ATOM),
             'approvedAt' => null,
+            'emailConfirmedAt' => null,
+            'emailConfirmationTokenHash' => $confirmation['tokenHash'],
+            'emailConfirmationExpiresAt' => $confirmation['expiresAt'],
         ];
 
         try {
@@ -202,14 +216,81 @@ final class CommunityController
             return $this->error('Der Kommentar konnte nicht gespeichert werden.', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
+        try {
+            $this->emailConfirmation->send(
+                $normalizedEmail,
+                trim($name),
+                $confirmation['url'],
+                $this->submissionLabel($kind, is_string($topic) ? trim($topic) : null),
+            );
+        } catch (\Throwable $exception) {
+            $this->removeComment($comment['id']);
+            $this->storage->deleteImage($imageFilename);
+            error_log('[email-confirmation] ' . $exception->getMessage());
+            return $this->error('Die Bestätigungs-E-Mail konnte gerade nicht versendet werden. Bitte später erneut versuchen.', Response::HTTP_SERVICE_UNAVAILABLE);
+        }
+
         return new JsonResponse([
             'message' => match ($kind) {
-                'wiki_suggestion' => 'Danke! Dein Wiki-Vorschlag wird vor der Veröffentlichung redaktionell geprüft.',
-                'repair_request' => 'Danke! Deine Reparaturanfrage wird vor der Veröffentlichung redaktionell geprüft.',
-                'repair_answer' => 'Danke! Deine Antwort wird vor der Veröffentlichung redaktionell geprüft.',
-                default => 'Danke! Dein Kommentar wird vor der Veröffentlichung redaktionell geprüft.',
+                'wiki_suggestion' => 'Fast geschafft! Bestätige jetzt deine E-Mail-Adresse. Erst danach landet dein Wiki-Vorschlag bei uns zur redaktionellen Prüfung.',
+                'repair_request' => 'Fast geschafft! Bestätige jetzt deine E-Mail-Adresse. Erst danach landet deine Reparaturanfrage bei uns zur redaktionellen Prüfung.',
+                'repair_answer' => 'Fast geschafft! Bestätige jetzt deine E-Mail-Adresse. Erst danach landet deine Antwort bei uns zur redaktionellen Prüfung.',
+                default => 'Fast geschafft! Bestätige jetzt deine E-Mail-Adresse. Erst danach landet dein Kommentar bei uns zur redaktionellen Prüfung.',
             },
         ], Response::HTTP_ACCEPTED);
+    }
+
+    #[Route('/api/comments/confirm/{token}', name: 'api_comment_confirm', methods: ['GET'])]
+    public function confirmCommentEmail(string $token, Request $request): Response
+    {
+        if (preg_match('/^[a-f0-9]{64}$/', $token) !== 1) {
+            return $this->confirmationPage('Bestätigungslink ungültig', 'Dieser Bestätigungslink ist nicht gültig.', '/hilfe/anfragen', Response::HTTP_BAD_REQUEST);
+        }
+        if (!$this->storage->allowRate('comment-confirmation-click', $request->getClientIp() ?? 'unknown', 30, 900)) {
+            $response = $this->confirmationPage('Zu viele Versuche', 'Bitte versuche es in einigen Minuten erneut.', '/hilfe/anfragen', Response::HTTP_TOO_MANY_REQUESTS);
+            $response->headers->set('Retry-After', '900');
+            return $response;
+        }
+
+        $tokenHash = hash('sha256', $token);
+        $match = null;
+        foreach ($this->storage->read()['comments'] as $comment) {
+            $storedHash = $comment['emailConfirmationTokenHash'] ?? null;
+            if (($comment['status'] ?? null) === 'awaiting_confirmation' && is_string($storedHash) && hash_equals($storedHash, $tokenHash)) {
+                $match = $comment;
+                break;
+            }
+        }
+
+        if ($match === null) {
+            return $this->confirmationPage('Link bereits verwendet', 'Dieser Bestätigungslink ist ungültig oder wurde bereits verwendet.', '/hilfe/anfragen', Response::HTTP_GONE);
+        }
+        if (!is_string($match['emailConfirmationExpiresAt'] ?? null) || $this->emailConfirmation->isExpired($match['emailConfirmationExpiresAt'])) {
+            return $this->confirmationPage('Link abgelaufen', 'Dieser Bestätigungslink ist abgelaufen. Bitte sende den Beitrag erneut ab.', '/hilfe/anfragen', Response::HTTP_GONE);
+        }
+
+        $updated = null;
+        $this->storage->update(static function (array &$data) use ($match, $tokenHash, &$updated): void {
+            foreach ($data['comments'] as &$comment) {
+                if (($comment['id'] ?? null) === ($match['id'] ?? null)
+                    && ($comment['status'] ?? null) === 'awaiting_confirmation'
+                    && ($comment['emailConfirmationTokenHash'] ?? null) === $tokenHash
+                ) {
+                    $comment['status'] = 'pending';
+                    $comment['emailConfirmedAt'] = (new \DateTimeImmutable())->format(DATE_ATOM);
+                    unset($comment['emailConfirmationTokenHash'], $comment['emailConfirmationExpiresAt']);
+                    $updated = $comment;
+                    break;
+                }
+            }
+            unset($comment);
+        });
+
+        if (!is_array($updated)) {
+            return $this->confirmationPage('Link bereits verwendet', 'Dieser Bestätigungslink wurde bereits verwendet.', '/hilfe/anfragen', Response::HTTP_GONE);
+        }
+
+        return $this->confirmationPage('E-Mail bestätigt', 'Danke! Deine E-Mail-Adresse ist bestätigt. Dein Beitrag wartet jetzt bei uns auf die redaktionelle Prüfung.', '/hilfe/anfragen', Response::HTTP_OK);
     }
 
     #[Route('/api/comments/{id}/image', name: 'api_comment_image', methods: ['GET'])]
@@ -288,7 +369,10 @@ final class CommunityController
             return $this->unauthorized();
         }
 
-        $comments = $this->storage->read()['comments'];
+        $comments = array_values(array_filter(
+            $this->storage->read()['comments'],
+            static fn (array $comment): bool => in_array(($comment['status'] ?? null), ['pending', 'approved'], true),
+        ));
         usort($comments, static fn (array $a, array $b): int => strcmp((string) ($b['createdAt'] ?? ''), (string) ($a['createdAt'] ?? '')));
         $response = new JsonResponse(['comments' => array_map(fn (array $comment): array => $this->adminComment($comment), $comments)]);
         $response->headers->set('Cache-Control', 'no-store');
@@ -312,9 +396,14 @@ final class CommunityController
         }
 
         $updated = null;
-        $this->storage->update(static function (array &$data) use ($id, $status, &$updated): void {
+        $awaitingConfirmation = false;
+        $this->storage->update(static function (array &$data) use ($id, $status, &$updated, &$awaitingConfirmation): void {
             foreach ($data['comments'] as &$comment) {
                 if (($comment['id'] ?? null) === $id) {
+                    if (($comment['status'] ?? null) === 'awaiting_confirmation') {
+                        $awaitingConfirmation = true;
+                        break;
+                    }
                     $comment['status'] = $status;
                     $comment['approvedAt'] = $status === 'approved' ? (new \DateTimeImmutable())->format(DATE_ATOM) : null;
                     $updated = $comment;
@@ -323,6 +412,10 @@ final class CommunityController
             }
             unset($comment);
         });
+
+        if ($awaitingConfirmation) {
+            return $this->error('Die E-Mail-Adresse wurde noch nicht bestätigt.', Response::HTTP_CONFLICT);
+        }
 
         if (!is_array($updated)) {
             return $this->error('Kommentar nicht gefunden.', Response::HTTP_NOT_FOUND);
@@ -454,6 +547,56 @@ final class CommunityController
         $response = $this->error('Zu viele Anfragen. Bitte später erneut versuchen.', Response::HTTP_TOO_MANY_REQUESTS);
         $response->headers->set('Retry-After', (string) $windowSeconds);
         return $response;
+    }
+
+    private function confirmationRateLimited(Request $request, string $email): ?JsonResponse
+    {
+        $ip = $request->getClientIp() ?? 'unknown';
+        $allowed = $this->storage->allowRate('confirmation-mail-email', $email, 5, 3600)
+            && $this->storage->allowRate('confirmation-mail-ip', $ip, 10, 3600)
+            && $this->storage->allowRate('confirmation-mail-global', 'all', 100, 3600);
+        if ($allowed) {
+            return null;
+        }
+
+        $response = $this->error('Zu viele Bestätigungs-E-Mails. Bitte später erneut versuchen.', Response::HTTP_TOO_MANY_REQUESTS);
+        $response->headers->set('Retry-After', '3600');
+        return $response;
+    }
+
+    private function removeComment(string $id): void
+    {
+        $this->storage->update(static function (array &$data) use ($id): void {
+            $data['comments'] = array_values(array_filter(
+                $data['comments'],
+                static fn (array $comment): bool => ($comment['id'] ?? null) !== $id,
+            ));
+        });
+    }
+
+    private function submissionLabel(string $kind, ?string $topic): string
+    {
+        $label = match ($kind) {
+            'wiki_suggestion' => 'Wiki-Vorschlag',
+            'repair_request' => 'Reparaturanfrage',
+            'repair_answer' => 'Antwort auf eine Reparaturanfrage',
+            default => 'Kommentar',
+        };
+
+        return $topic !== null && $topic !== '' ? $label . ': ' . $topic : $label;
+    }
+
+    private function confirmationPage(string $title, string $message, string $path, int $status): Response
+    {
+        $safeTitle = htmlspecialchars($title, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $safeMessage = htmlspecialchars($message, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $safePath = htmlspecialchars($path, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $html = '<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>' . $safeTitle . ' — BTM-Hilfe</title><style>body{margin:0;padding:32px;background:#f3f2ee;color:#27252d;font:16px/1.6 system-ui,sans-serif}.card{max-width:620px;margin:10vh auto;padding:32px;background:#fbfaf7;border:2px solid #2d27c7;border-radius:14px;box-shadow:5px 6px 0 rgba(45,39,199,.12)}h1{margin:0 0 16px;font-size:clamp(30px,6vw,48px);line-height:1.05}a{display:inline-block;margin-top:14px;padding:11px 16px;border-radius:8px;color:#fff;background:#2d27c7;text-decoration:none;font-weight:700}</style></head><body><main class="card"><h1>' . $safeTitle . '</h1><p>' . $safeMessage . '</p><a href="' . $safePath . '">Zurück zu BTM-Hilfe ↗</a></main></body></html>';
+
+        return new Response($html, $status, [
+            'Cache-Control' => 'no-store',
+            'Content-Type' => 'text/html; charset=UTF-8',
+        ]);
     }
 
     private function error(string $message, int $status): JsonResponse

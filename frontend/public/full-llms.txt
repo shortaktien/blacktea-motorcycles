@@ -694,7 +694,6 @@
 - [21-gabelabdichtung-community.pdf](https://btm.shortaktien.de/pdfs/21-gabelabdichtung-community.pdf): Lokale PDF-Kopie im Dokumentenarchiv.
 - [22-wildfire-fardriver-settings-community.pdf](https://btm.shortaktien.de/pdfs/22-wildfire-fardriver-settings-community.pdf): Lokale PDF-Kopie im Dokumentenarchiv.
 
-
 ## Bezugs- und Quellenlogik
 
 - Ersatzteilkandidaten werden zuerst über Amazon geprüft; wenn dort kein belastbarer Treffer existiert, werden deutsche oder EU-Fachhändler berücksichtigt.

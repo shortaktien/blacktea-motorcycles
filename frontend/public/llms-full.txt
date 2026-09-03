@@ -13,6 +13,7 @@
 
 - [Black Tea Motorbikes – Hilfe — Dokumente, Ersatzteile & Updates](https://btm.shortaktien.de/): Unabhängige Sammelstelle für Black Tea Motorbikes: lokale PDFs, Ersatzteile, Reparaturhilfen und nachvollziehbare Quellen.
 - [Reparaturhilfe — Black Tea Motorbikes – Hilfe](https://btm.shortaktien.de/hilfe): Redaktionell geordnete Reparaturhilfen für typische Bonfire- und Wildfire-Fehlerbilder — mit Kurzablauf, ausführlicher Prüfung, Sicherheit und Quelle.
+- [Reparatur anfragen — Black Tea Motorbikes – Hilfe](https://btm.shortaktien.de/hilfe/anfragen): Reparaturanfragen zu Black Tea Bonfire und Wildfire stellen, Erfahrungen teilen und gemeinsam nachvollziehbare Lösungen dokumentieren.
 - [Ersatzteile — Black Tea Motorbikes – Hilfe](https://btm.shortaktien.de/ersatzteile): Historischer BTM-Ersatzteilkatalog mit Modellbezug, Teilenamen und Quellen. Bestand und Preise vor dem Kauf prüfen.
 - [BTM Community-Wissen — Black Tea Motorbikes – Hilfe](https://btm.shortaktien.de/community): Technische Hinweise aus der Black Tea Community verständlich zusammengefasst, mit lokalen PDFs und Originalquellen.
 - [Quellen — Black Tea Motorbikes – Hilfe](https://btm.shortaktien.de/quellen): Nachvollziehbare Quellen zu Insolvenzstatus, Handbüchern, lokalen PDFs, Ersatzteilspuren und Community-Wissen.
@@ -692,7 +693,6 @@
 - [20-wildfire-wartung-community.pdf](https://btm.shortaktien.de/pdfs/20-wildfire-wartung-community.pdf): Lokale PDF-Kopie im Dokumentenarchiv.
 - [21-gabelabdichtung-community.pdf](https://btm.shortaktien.de/pdfs/21-gabelabdichtung-community.pdf): Lokale PDF-Kopie im Dokumentenarchiv.
 - [22-wildfire-fardriver-settings-community.pdf](https://btm.shortaktien.de/pdfs/22-wildfire-fardriver-settings-community.pdf): Lokale PDF-Kopie im Dokumentenarchiv.
-
 
 ## Bezugs- und Quellenlogik
 

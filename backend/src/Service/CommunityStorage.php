@@ -162,7 +162,7 @@ final class CommunityStorage
         }
     }
 
-    /** @return array{feedback: array<string, array{up: int, down: int}>, comments: list<array<string, mixed>>} */
+    /** @return array{feedback: array<string, array{up: int, down: int}>, comments: list<array<string, mixed>>, bugReports: list<array<string, mixed>>} */
     private function decode($handle): array
     {
         rewind($handle);
@@ -206,11 +206,18 @@ final class CommunityStorage
             }
         }
 
-        return ['feedback' => $feedback, 'comments' => $comments];
+        $bugReports = [];
+        foreach (($data['bugReports'] ?? []) as $bugReport) {
+            if (is_array($bugReport) && isset($bugReport['id'])) {
+                $bugReports[] = $bugReport;
+            }
+        }
+
+        return ['feedback' => $feedback, 'comments' => $comments, 'bugReports' => $bugReports];
     }
 
     private function emptyStore(): array
     {
-        return ['feedback' => [], 'comments' => []];
+        return ['feedback' => [], 'comments' => [], 'bugReports' => []];
     }
 }

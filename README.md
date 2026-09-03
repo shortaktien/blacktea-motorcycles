@@ -116,9 +116,15 @@ Für das öffentliche **„Bug melden“**-Popup werden Meldungen serverseitig a
 GITHUB_REPOSITORY=shortaktien/blacktea-motorcycles
 GITHUB_TOKEN=<nur-serverseitig-setzen>
 BUG_REPORT_ALLOWED_HOSTS=btm.shortaktien.de,127.0.0.1,localhost
+PUBLIC_SITE_URL=https://btm.shortaktien.de
+EMAIL_CONFIRMATION_TTL_SECONDS=86400
+MAILJET_API_KEY=<nur-serverseitig-setzen>
+MAILJET_API_SECRET=<nur-serverseitig-setzen>
+MAILJET_FROM_EMAIL=info@shortaktien.de
+MAILJET_FROM_NAME=BTM-Hilfe
 ```
 
-Der Token darf niemals in `frontend/`, im Browser-Bundle oder in GitHub-Issue-Inhalten landen. Name und Beschreibung werden ins Issue übernommen; die E-Mail dient der Spambegrenzung und wird nicht öffentlich veröffentlicht. Im Repository sind GitHub Issues bereits aktiviert und das Label `bug` vorhanden.
+Der GitHub-Token sowie die Mailjet-Zugangsdaten dürfen niemals in `frontend/`, im Browser-Bundle oder in GitHub-Issue-Inhalten landen. Öffentliche Beiträge und Bugmeldungen werden vor der Annahme per Einmal-Link in einer Bestätigungs-E-Mail verifiziert. Der Link läuft standardmäßig nach 24 Stunden ab. Bestätigte Beiträge landen anschließend in der redaktionellen Prüfung; erst bestätigte Bugmeldungen werden als GitHub-Issue angelegt. Name und Beschreibung werden bei Bugmeldungen ins Issue übernommen; die E-Mail dient der Bestätigung und Spambegrenzung und wird nicht öffentlich veröffentlicht. Im Repository sind GitHub Issues bereits aktiviert und das Label `bug` vorhanden.
 
 ### Anwendung starten
 

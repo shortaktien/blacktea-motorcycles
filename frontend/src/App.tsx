@@ -194,7 +194,7 @@ const sourceLinks = [
   {
     title: 'MOTORRAD Online · Bonfire und Wildfire',
     detail: 'Retro-E-Motorräder aus München · veröffentlicht am 02.09.2026',
-    href: 'https://www.motorradonline.de/elektro/retro-e-motorrader-black-tea-bonfire-und-wildfire-a1-und-b196/',
+    href: 'https://www.motorradonline.de/elektro/retro-e-motorraeder-black-tea-bonfire-und-wildfire-a1-und-b196/',
   },
   {
     title: 'Bonfire-Handbuch',
@@ -2352,7 +2352,8 @@ function LegalPage({ kind }: { kind: 'impressum' | 'datenschutz' }) {
                 <h3>Besuch der Website</h3>
                 <p>Diese Website stellt Dokumente und Hinweise bereit. Es gibt hier keine Nutzerkonten, Newsletter oder eingebauten Analyse- und Marketingdienste. Unter Reparaturhilfen und Wiki-Artikeln können moderierte Kommentare oder Ergänzungsvorschläge abgegeben werden.</p>
                 <h3>Kommentare und Bildanhänge</h3>
-                <p>Wenn du einen Kommentar oder Wiki-Vorschlag abgibst, werden dein Name, deine E-Mail-Adresse, der Beitragstext, bei Wiki-Vorschlägen optional eine Quellenangabe und optional ein Bild zur redaktionellen Prüfung gespeichert. Die E-Mail-Adresse bleibt intern und wird nicht veröffentlicht. Der Beitrag erscheint erst nach Freigabe; nicht freigegebene oder gelöschte Beiträge werden nicht öffentlich angezeigt.</p>
+                <p>Wenn du einen Kommentar, eine Reparaturanfrage oder einen Wiki-Vorschlag abgibst, werden dein Name, deine E-Mail-Adresse, der Beitragstext, bei Wiki-Vorschlägen optional eine Quellenangabe und optional ein Bild zunächst zur E-Mail-Bestätigung gespeichert. Die Bestätigungs-E-Mail wird über Mailjet versendet; die E-Mail-Adresse bleibt intern und wird nicht veröffentlicht. Erst nach Bestätigung landet der Beitrag bei uns in der redaktionellen Prüfung und erscheint danach nur nach Freigabe öffentlich. Nicht freigegebene oder gelöschte Beiträge werden nicht öffentlich angezeigt.</p>
+                <p>Bei einer Bugmeldung werden Name, E-Mail-Adresse, Fundstellen-URL und Fehlerbeschreibung zunächst ebenfalls nur zur E-Mail-Bestätigung gespeichert. Erst nach bestätigtem Link wird die Meldung automatisch als GitHub-Issue angelegt; die E-Mail-Adresse wird nicht in das öffentliche Issue übernommen.</p>
                 <p>Beim Aufruf können technisch notwendige Zugriffsdaten wie aufgerufene Seite, Datum und Uhrzeit, übertragene Datenmenge, Browser-/Betriebssysteminformationen, Referrer-URL und IP-Adresse in Server-Logs des Hostings verarbeitet werden. Das dient dem sicheren und stabilen Betrieb.</p>
                 <h3>Externe Links und Rechte</h3>
                 <p>Erst beim Anklicken eines externen Links, etwa zu Amazon, einem Fachhändler oder einem Forum, wird eine Verbindung zum jeweiligen Anbieter hergestellt. Es gelten dann dessen Datenschutzbestimmungen.</p>
@@ -2524,7 +2525,7 @@ function BugReportWidget() {
               </div>
               <button className="bug-report-close" type="button" aria-label="Bugmeldung schließen" onClick={() => setOpen(false)}>×</button>
             </div>
-            <p className="bug-report-intro">Hilf uns, Fehler schnell nachzuvollziehen. Die Meldung wird automatisch als GitHub-Issue angelegt und redaktionell weiterbearbeitet.</p>
+            <p className="bug-report-intro">Hilf uns, Fehler schnell nachzuvollziehen. Nach deiner E-Mail-Bestätigung wird die Meldung automatisch als GitHub-Issue angelegt und redaktionell weiterbearbeitet.</p>
             <form className="comment-form bug-report-form" onSubmit={handleSubmit}>
               <label>Überschrift<input name="title" required minLength={2} maxLength={160} placeholder="z. B. Link auf der Reparaturseite funktioniert nicht" /></label>
               <div className="comment-form-grid">
@@ -2805,7 +2806,7 @@ function WikiContributionForm({ guideSlug, heading, onSubmitted }: { guideSlug: 
       await apiJson<{ message: string }>('/api/comments', { method: 'POST', body: formData });
       form.reset();
       setSelectedFile(null);
-      setContributionNotice('Danke! Dein Vorschlag wartet jetzt auf die redaktionelle Prüfung.');
+      setContributionNotice('Fast geschafft! Bestätige jetzt deine E-Mail-Adresse. Erst danach landet dein Wiki-Vorschlag bei uns zur redaktionellen Prüfung.');
       await onSubmitted();
     } catch (error) {
       setContributionError(error instanceof Error ? error.message : 'Der Vorschlag konnte nicht gesendet werden.');
@@ -2820,7 +2821,7 @@ function WikiContributionForm({ guideSlug, heading, onSubmitted }: { guideSlug: 
       <label>Thema oder kurze Überschrift<input name="topic" defaultValue={heading} required minLength={2} maxLength={120} placeholder="z. B. Reifengröße der Bonfire X" /></label>
       <div className="comment-form-grid">
         <label>Name<input name="name" required minLength={2} maxLength={80} autoComplete="name" /></label>
-        <label>E-Mail<input name="email" type="email" required maxLength={180} autoComplete="email" /><small>wird nicht öffentlich angezeigt</small></label>
+        <label>E-Mail<input name="email" type="email" required maxLength={180} autoComplete="email" /><small>Bestätigungslink per Mail; danach beginnt die redaktionelle Prüfung.</small></label>
       </div>
       <label>Dein Vorschlag<textarea name="body" required minLength={10} maxLength={4000} rows={5} placeholder="Was sollte ergänzt, geändert oder belegt werden?" /></label>
       <label>Quelle (optional)<input name="source" maxLength={500} placeholder="z. B. Bonfire-Handbuch, S. 12 oder https://…" /><small>Eine Seitenzahl, PDF oder Webadresse hilft bei der Prüfung.</small></label>
@@ -2956,7 +2957,7 @@ function RepairRequestForm({ onSubmitted }: { onSubmitted: () => void }) {
       await apiJson<{ message: string }>('/api/comments', { method: 'POST', body: formData });
       form.reset();
       setSelectedFile(null);
-      setRequestNotice('Danke! Deine Anfrage wartet jetzt auf die redaktionelle Freigabe.');
+      setRequestNotice('Fast geschafft! Bestätige jetzt deine E-Mail-Adresse. Erst danach landet deine Reparaturanfrage bei uns zur redaktionellen Prüfung.');
       onSubmitted();
     } catch (error) {
       setRequestError(error instanceof Error ? error.message : 'Die Anfrage konnte nicht gesendet werden.');
@@ -2984,7 +2985,7 @@ function RepairRequestForm({ onSubmitted }: { onSubmitted: () => void }) {
         </label>
         <label>Name<input name="name" required minLength={2} maxLength={80} autoComplete="name" /></label>
       </div>
-      <label>E-Mail<input name="email" type="email" required maxLength={180} autoComplete="email" /><small>wird nicht öffentlich angezeigt</small></label>
+      <label>E-Mail<input name="email" type="email" required maxLength={180} autoComplete="email" /><small>Bestätigungslink per Mail; danach beginnt die redaktionelle Prüfung.</small></label>
       <label>Beschreibung<textarea name="body" required minLength={10} maxLength={4000} rows={7} placeholder="Modell, Baujahr, genaue Symptome, wann der Fehler auftritt und was bereits geprüft wurde …" /></label>
       <label>Quelle oder weitere Infos (optional)<input name="source" maxLength={500} placeholder="z. B. Handbuch Seite 12 oder https://…" /></label>
       <label>Bild (optional, max. 1 MB)<input name="image" type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={handleImageChange} /><small>JPG, PNG, WEBP oder GIF</small></label>
@@ -3189,7 +3190,7 @@ function RepairAnswerForm({ parentId, onSubmitted }: { parentId: string; onSubmi
       await apiJson<{ message: string }>('/api/comments', { method: 'POST', body: formData });
       form.reset();
       setSelectedFile(null);
-      setAnswerNotice('Danke! Deine Antwort wartet jetzt auf die redaktionelle Freigabe.');
+      setAnswerNotice('Fast geschafft! Bestätige jetzt deine E-Mail-Adresse. Erst danach landet deine Antwort bei uns zur redaktionellen Prüfung.');
       await onSubmitted();
     } catch (error) {
       setAnswerError(error instanceof Error ? error.message : 'Die Antwort konnte nicht gesendet werden.');
@@ -3202,7 +3203,7 @@ function RepairAnswerForm({ parentId, onSubmitted }: { parentId: string; onSubmi
     <form className="comment-form repair-answer-form" onSubmit={handleSubmit}>
       <div className="comment-form-grid">
         <label>Name<input name="name" required minLength={2} maxLength={80} autoComplete="name" /></label>
-        <label>E-Mail<input name="email" type="email" required maxLength={180} autoComplete="email" /><small>wird nicht öffentlich angezeigt</small></label>
+        <label>E-Mail<input name="email" type="email" required maxLength={180} autoComplete="email" /><small>Bestätigungslink per Mail; danach beginnt die redaktionelle Prüfung.</small></label>
       </div>
       <label>Dein Lösungsansatz<textarea name="body" required minLength={10} maxLength={4000} rows={5} placeholder="Was hast du geprüft, gemessen oder erfolgreich repariert?" /></label>
       <label>Quelle (optional)<input name="source" maxLength={500} placeholder="z. B. Handbuch, Teilenummer oder https://…" /></label>
@@ -3383,7 +3384,7 @@ function RepairComments({ guideSlug }: { guideSlug: string }) {
       await apiJson<{ message: string }>('/api/comments', { method: 'POST', body: formData });
       form.reset();
       setSelectedFile(null);
-      setCommentNotice('Danke! Dein Kommentar wartet jetzt auf die redaktionelle Freigabe.');
+      setCommentNotice('Fast geschafft! Bestätige jetzt deine E-Mail-Adresse. Erst danach landet dein Kommentar bei uns zur redaktionellen Prüfung.');
       await loadFeedback();
     } catch (error) {
       setCommentError(error instanceof Error ? error.message : 'Der Kommentar konnte nicht gesendet werden.');
@@ -3405,7 +3406,7 @@ function RepairComments({ guideSlug }: { guideSlug: string }) {
       <form className="comment-form" onSubmit={handleCommentSubmit}>
         <div className="comment-form-grid">
           <label>Name<input name="name" required minLength={2} maxLength={80} autoComplete="name" /></label>
-          <label>E-Mail<input name="email" type="email" required maxLength={180} autoComplete="email" /><small>wird nicht öffentlich angezeigt</small></label>
+          <label>E-Mail<input name="email" type="email" required maxLength={180} autoComplete="email" /><small>Bestätigungslink per Mail; danach beginnt die redaktionelle Prüfung.</small></label>
         </div>
         <label>Kommentar<textarea name="body" required minLength={10} maxLength={4000} rows={5} placeholder="Was hast du geprüft oder repariert?" /></label>
         <label>Bild (optional, max. 1 MB)<input name="image" type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={handleImageChange} /><small>JPG, PNG, WEBP oder GIF</small></label>
