@@ -94,6 +94,7 @@ jobs:
             --exclude='.DS_Store' \
             --exclude='frontend/node_modules/' \
             --exclude='frontend/dist/' \
+            --exclude='frontend/dist-server/' \
             --exclude='frontend/.env*' \
             --exclude='backend/vendor/' \
             --exclude='backend/var/' \
@@ -127,25 +128,21 @@ jobs:
             exit 1
           fi
 
-          docker compose version
-          docker compose config >/dev/null
-          # Das Named Volume kann ältere node_modules enthalten als das aktuelle Image.
-          # Vor dem Start mit dem Lockfile synchronisieren, damit neue Frontend-Pakete
-          # trotz des Bind-Mounts auf /app verfügbar sind.
-          docker compose run --rm --no-deps --build frontend npm ci
-          docker compose up -d --build --remove-orphans
+          docker compose -f docker-compose.prod.yml version
+          docker compose -f docker-compose.prod.yml config >/dev/null
+          docker compose -f docker-compose.prod.yml up -d --build --remove-orphans
 
           for attempt in $(seq 1 30); do
             if curl --fail --silent --show-error --max-time 5 http://127.0.0.1:5173/ >/dev/null \
               && curl --fail --silent --show-error --max-time 5 http://127.0.0.1:8000/api/health >/dev/null; then
               echo "BTM-Stack ist erreichbar."
-              docker compose ps
+              docker compose -f docker-compose.prod.yml ps
               exit 0
             fi
             sleep 2
           done
 
-          docker compose ps
+          docker compose -f docker-compose.prod.yml ps
           echo "Health-Check nach dem Deployment fehlgeschlagen." >&2
           exit 1
           REMOTE

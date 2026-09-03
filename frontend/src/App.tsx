@@ -1479,7 +1479,9 @@ const slugify = (value: string) => value
   .replace(/[\u0300-\u036f]/g, '')
   .replace(/[^a-z0-9]+/g, '-')
   .replace(/^-|-$/g, '');
-const getLocationKey = () => `${normalizePath(window.location.pathname)}${window.location.hash}`;
+const getLocationKey = () => typeof window === 'undefined'
+  ? '/'
+  : `${normalizePath(window.location.pathname)}${window.location.hash}`;
 const siteOrigin = (import.meta.env.VITE_SITE_URL || siteConfig.siteOrigin).replace(/\/+$/, '');
 
 type BikeProfile = {
@@ -1961,12 +1963,7 @@ function HomePage() {
   }, [filter, query]);
 
   const featuredSourcingCards = useMemo(() => {
-    const cards = [...sourcingCards];
-    for (let index = cards.length - 1; index > 0; index -= 1) {
-      const swapIndex = Math.floor(Math.random() * (index + 1));
-      [cards[index], cards[swapIndex]] = [cards[swapIndex], cards[index]];
-    }
-    return cards.slice(0, 4);
+    return sourcingCards.slice(0, 4);
   }, []);
 
   return (
@@ -2001,8 +1998,12 @@ function HomePage() {
 
           <div className="hero-doodle">
             <picture className="hero-concept-picture">
-              <source srcSet="/images/bonfire-konzept-skizze.webp" type="image/webp" />
-              <img className="hero-concept-image" src="/images/bonfire-konzept-skizze.png" width="1536" height="1024" alt="Designer-Konzeptskizze einer Black Tea Bonfire" />
+              <source
+                srcSet="/images/bonfire-konzept-skizze-480.webp 480w, /images/bonfire-konzept-skizze-768.webp 768w, /images/bonfire-konzept-skizze.webp 1536w"
+                sizes="(max-width: 620px) calc(100vw - 84px), (max-width: 900px) 90vw, 48vw"
+                type="image/webp"
+              />
+              <img className="hero-concept-image" src="/images/bonfire-konzept-skizze.png" width="1536" height="1024" alt="Designer-Konzeptskizze einer Black Tea Bonfire" loading="eager" decoding="async" {...({ fetchpriority: 'high' } as Record<string, string>)} />
             </picture>
           </div>
         </section>
@@ -2086,7 +2087,7 @@ function HomePage() {
           </div>
           <div className="sourcing-intro card-doodle">
             <span className="sourcing-badge">1. Amazon</span>
-            <p>Hier erscheinen nur Produkte mit einem konkreten Kauf-Link. Die Auswahl wechselt zufällig, wenn mehr als vier Treffer vorhanden sind. Den Passformstatus findest du direkt am jeweiligen Artikel.</p>
+            <p>Hier erscheinen nur Produkte mit einem konkreten Kauf-Link. Die vier belegten Treffer bleiben stabil, damit Suchmaschinen und Menschen dieselben Inhalte sehen. Den Passformstatus findest du direkt am jeweiligen Artikel.</p>
             <strong>Alibaba bleibt draußen.</strong>
           </div>
           <div className="sourcing-grid">
@@ -2125,7 +2126,7 @@ function HomePage() {
                       <div className="technical-item" key={item.label}>
                         <dt>{item.label}</dt>
                         <dd>{item.value}</dd>
-                        <small>{item.note}</small>
+                        <dd className="technical-item-note">{item.note}</dd>
                       </div>
                     ))}
                   </dl>
@@ -2391,7 +2392,9 @@ function WikiPage() {
 
 function BikePage({ bike, article }: { bike: BikeProfile; article?: WikiArticle }) {
   useEffect(() => {
-    document.title = `${article?.title ?? bike.name} — ${article?.model ?? 'Bikes'} — Black Tea Hilfe`;
+    document.title = article
+      ? `${article.title} — ${article.model} — Black Tea Motorbikes – Hilfe`
+      : `${bike.name} — Bikes — Black Tea Motorbikes – Hilfe`;
     window.scrollTo(0, 0);
   }, [article?.model, article?.title, bike.name]);
 
@@ -2413,90 +2416,6 @@ function BikePage({ bike, article }: { bike: BikeProfile; article?: WikiArticle 
             <h2>Diese Seite wird gerade aufgebaut.</h2>
             <p>Hier entsteht eine übersichtliche Wiki-Seite mit technischen Daten, Modellvarianten, Handbuchauszügen und verlinkten Quellen.</p>
           </article>
-        </section>
-      </main>
-      <GuideFooter />
-    </div>
-  );
-}
-
-function WikiArticlePage({ article }: { article: WikiArticle }) {
-  useEffect(() => {
-    document.title = `${article.title} — ${article.model} — Black Tea Hilfe`;
-    window.scrollTo(0, 0);
-  }, [article.model, article.title]);
-
-  const sourceIsExternal = article.sourceHref?.startsWith('http') ?? false;
-  const modelPath = `/bikes/${article.model.toLowerCase()}`;
-  const toc = getWikiToc(article.body);
-  const [editingHeading, setEditingHeading] = useState<string | null>(null);
-  const headingIds = new Map(toc.map((item) => [item.label, item.id]));
-  const markdownComponents: Components = {
-    h2: ({ children }) => {
-      const label = String(children);
-      return <h2 id={headingIds.get(label) ?? slugifyWikiHeading(label)}><span className="wiki-heading-text">{children}</span><button className="wiki-heading-edit" type="button" onClick={() => setEditingHeading(label)}>Bearbeiten</button></h2>;
-    },
-    h3: ({ children }) => {
-      const label = String(children);
-      return <h3 id={headingIds.get(label) ?? slugifyWikiHeading(label)}><span className="wiki-heading-text">{children}</span><button className="wiki-heading-edit" type="button" onClick={() => setEditingHeading(label)}>Bearbeiten</button></h3>;
-    },
-  };
-
-  useEffect(() => {
-    if (!editingHeading) return undefined;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setEditingHeading(null);
-    };
-    document.addEventListener('keydown', closeOnEscape);
-    return () => {
-      document.removeEventListener('keydown', closeOnEscape);
-      document.body.style.overflow = previousOverflow;
-    };
-  }, [editingHeading]);
-
-  return (
-    <div className="site-shell">
-      <GuideHeader />
-      <main className="wiki-article-page-main">
-        <section className="wiki-article-page-hero section-pad">
-          <div className="wiki-breadcrumb">
-            <a className="repair-back" href={article.path === modelPath ? '/' : modelPath}>← {article.path === modelPath ? 'Zur Sammelmappe' : `Zur ${article.model}-Übersicht`}</a>
-            <div className="eyebrow handwritten">wiki · {article.model}</div>
-          </div>
-          <h1>{article.title}</h1>
-          <p>{article.intro}</p>
-        </section>
-        <section className="wiki-article-section section-pad">
-          <div className="wiki-article-layout">
-            {toc.length > 0 && (
-              <nav className="wiki-toc card-doodle" aria-label="Inhaltsverzeichnis">
-                <div className="eyebrow handwritten">auf dieser seite</div>
-                <h2>Inhalt</h2>
-                <ol>
-                  {toc.map((item) => (
-                    <li key={item.id} className={item.level === 3 ? 'wiki-toc-subitem' : undefined}>
-                      <a href={`#${item.id}`}>{item.label}</a>
-                    </li>
-                  ))}
-                </ol>
-              </nav>
-            )}
-            <article className="wiki-article card-doodle">
-              <div className="wiki-article-topline"><span className="kind-chip doc">Wiki-Artikel</span><span>{article.status}</span></div>
-              <div className="wiki-markdown"><ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>{article.body}</ReactMarkdown></div>
-              <WikiContributions guideSlug={`wiki-${article.slug}`} editingHeading={editingHeading} onCloseEditor={() => setEditingHeading(null)} />
-              {article.sourceHref && (
-                <div className="wiki-source-box">
-                  <span className="repair-subhead">Quellenangabe</span>
-                  <a href={article.sourceHref} target={sourceIsExternal ? '_blank' : undefined} rel={sourceIsExternal ? 'nofollow noreferrer' : undefined}>
-                    {article.sourceLabel ?? 'Lokale Quelle öffnen'} ↗
-                  </a>
-                </div>
-              )}
-            </article>
-          </div>
         </section>
       </main>
       <GuideFooter />
