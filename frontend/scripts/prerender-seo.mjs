@@ -1,9 +1,10 @@
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
 
 const frontendRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const distRoot = join(frontendRoot, 'dist');
+const wikiRoot = join(frontendRoot, '..', 'content', 'wiki');
 const appSource = readFileSync(join(frontendRoot, 'src', 'App.tsx'), 'utf8');
 const siteConfig = JSON.parse(readFileSync(join(frontendRoot, 'src', 'site-config.json'), 'utf8'));
 const partsCatalog = JSON.parse(readFileSync(join(frontendRoot, '..', 'research', 'parts.json'), 'utf8'));
@@ -40,6 +41,30 @@ const parts = (partsCatalog.historical_product_slugs ?? []).map((slug) => ({
   path: `/ersatzteile/${slug}`,
 }));
 
+const collectMarkdownFiles = (directory) => readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+  const entryPath = join(directory, entry.name);
+  return entry.isDirectory() ? collectMarkdownFiles(entryPath) : entry.name.toLowerCase().endsWith('.md') ? [entryPath] : [];
+});
+const parseWikiArticle = (filePath) => {
+  const source = readFileSync(filePath, 'utf8');
+  const frontmatterMatch = source.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+  const fields = {};
+  for (const line of (frontmatterMatch?.[1] ?? '').split(/\r?\n/)) {
+    const separator = line.indexOf(':');
+    if (separator < 1) continue;
+    fields[line.slice(0, separator).trim()] = line.slice(separator + 1).trim().replace(/^("|')([\s\S]*)\1$/, '$2');
+  }
+  const relativePath = filePath.slice(wikiRoot.length + 1).replaceAll('\\', '/');
+  const articlePath = relativePath.replace(/\.md$/, '').replace(/\/index$/, '');
+  return {
+    path: `/bikes/${articlePath}`,
+    title: fields.title ?? articlePath,
+    model: fields.model ?? 'Bikes',
+    intro: fields.intro ?? 'Redaktionell aufbereiteter Wiki-Artikel aus lokal gesicherten Quellen.',
+  };
+};
+const wikiArticles = collectMarkdownFiles(wikiRoot).map(parseWikiArticle).sort((left, right) => left.title.localeCompare(right.title, 'de'));
+
 if (guides.length === 0 || !readFileSync(indexPath, 'utf8')) {
   throw new Error('Prerendering konnte keine App oder Reparaturhilfen finden.');
 }
@@ -53,11 +78,19 @@ const staticPages = [
   { path: '/impressum', title: 'Impressum — Black Tea Hilfe', description: 'Anbieterinformationen und rechtliche Hinweise zu Black Tea Hilfe.' },
   { path: '/datenschutz', title: 'Datenschutz — Black Tea Hilfe', description: 'Datenschutzhinweise zu Kommentaren, Bildanhängen und dem Betrieb von Black Tea Hilfe.' },
   { path: '/wiki', title: 'Wiki — Black Tea Hilfe', description: 'Das BTM-Wiki wird vorbereitet.' },
+  { path: '/bikes/bonfire', title: 'Bonfire — Bikes — Black Tea Hilfe', description: 'Technische Wiki-Seite zur Black Tea Bonfire mit Handbuchdaten, Modellvarianten und nachvollziehbaren Quellen.' },
+  { path: '/bikes/wildfire', title: 'Wildfire — Bikes — Black Tea Hilfe', description: 'Technische Wiki-Seite zur Black Tea Wildfire mit Handbuchdaten, Modellvarianten und nachvollziehbaren Quellen.' },
   { path: '/admin', title: 'Admin — Black Tea Hilfe', description: 'Interner Bereich zur redaktionellen Prüfung von Kommentaren.', robots: 'noindex,nofollow,noarchive' },
 ];
 
 const pages = [
-  ...staticPages,
+  ...staticPages.map((page) => {
+    const wikiArticle = wikiArticles.find((article) => article.path === page.path);
+    return wikiArticle ? { ...page, wikiArticle } : page;
+  }),
+  ...wikiArticles
+    .filter((article) => !staticPages.some((page) => page.path === article.path))
+    .map((article) => ({ ...article, title: `${article.title} — ${article.model} — Black Tea Hilfe`, description: article.intro, robots: 'index,follow,max-image-preview:large', wikiArticle: article })),
   ...guides.map((guide) => ({ ...guide, title: `${guide.title} — Black Tea Hilfe`, description: guide.intro, robots: 'index,follow,max-image-preview:large', guide })),
   ...parts.map((part) => ({
     ...part,
@@ -117,6 +150,15 @@ const schemaFor = (page) => {
     category: 'Ersatzteil',
     sku: `btm-${page.part.id}`,
     brand: { '@type': 'Brand', name: 'Black Tea Motorbikes' },
+  } : page.wikiArticle ? {
+    '@type': 'Article',
+    '@id': `${absoluteUrl(page.path)}#article`,
+    headline: page.wikiArticle.title,
+    description: page.description,
+    url: absoluteUrl(page.path),
+    inLanguage: 'de-DE',
+    isPartOf: { '@id': `${siteOrigin}/#website` },
+    about: { '@type': 'Vehicle', name: page.wikiArticle.model, brand: { '@type': 'Brand', name: 'Black Tea Motorbikes' } },
   } : {
     '@type': page.path === '/hilfe' || page.path === '/ersatzteile' || page.path === '/community' || page.path === '/quellen' ? 'CollectionPage' : 'WebPage',
     '@id': `${absoluteUrl(page.path)}#webpage`,

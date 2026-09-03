@@ -24,9 +24,13 @@ Das Wiki ist der gemeinschaftliche Bereich für technische Informationen zu den 
 - [Bonfire-Wiki](https://btm.shortaktien.de/bikes/bonfire)
 - [Wildfire-Wiki](https://btm.shortaktien.de/bikes/wildfire)
 
+Du brauchst für einen Hinweis keinen GitHub-Account: Am Ende jedes Bike-Artikels kannst du über **„Etwas ergänzen oder korrigieren?“** direkt eine Wiki-Ergänzung, eine Quelle und optional ein Bild einreichen. Die Redaktion prüft den Vorschlag im Admin-Bereich; erst freigegebene Beiträge werden auf der Website angezeigt. So können auch kurze Korrekturen und praktische Erfahrungen ohne GitHub eingebracht werden.
+
 Die Inhalte liegen direkt im Repository unter [`content/wiki/`](content/wiki/). Jede Markdown-Datei wird beim nächsten Build automatisch als Wiki-Artikel eingebunden. `content/wiki/bonfire/index.md` erzeugt zum Beispiel die Bonfire-Seite; weitere Dateien in diesem Ordner werden zu eigenen Unterseiten. Entsprechend gilt das für `content/wiki/wildfire/`.
 
 ### So kannst du einen Artikel ergänzen
+
+Für kurze Hinweise ist das Formular auf der Website der einfachste Weg. Für größere Ergänzungen oder einen vollständigen neuen Artikel kannst du weiterhin den folgenden GitHub-Weg nutzen:
 
 1. Repository auf GitHub forken und einen eigenen Branch anlegen.
 2. Einen bestehenden Artikel unter [`content/wiki/bonfire/`](content/wiki/bonfire/) oder [`content/wiki/wildfire/`](content/wiki/wildfire/) öffnen – oder eine neue Datei mit einem kurzen Dateinamen wie `akku-bms.md` anlegen.
@@ -126,16 +130,9 @@ docker compose down
 
 Die Docker-Volumes für `node_modules` und Composer-Abhängigkeiten bleiben dabei erhalten. Für einen vollständigen Neuaufbau der Abhängigkeiten kann der Build erneut mit `docker compose up --build` gestartet werden.
 
-### PDFs separat auf dem VPS ablegen
+### PDF-Dateien
 
-Nach dem ersten Deployment müssen freigegebene PDF-Dateien separat auf dem VPS unter `/opt/btm/frontend/public/pdfs/` abgelegt werden. Beispiel aus dem Projektverzeichnis:
-
-```bash
-ssh <deploy-user>@<vps-host> 'mkdir -p /opt/btm/frontend/public/pdfs'
-rsync -av --progress frontend/public/pdfs/*.pdf <deploy-user>@<vps-host>:/opt/btm/frontend/public/pdfs/
-```
-
-Die Dateien werden durch `.gitignore` nicht nach GitHub übernommen. Der Deploy-Workflow schließt sie ebenfalls vom `rsync --delete` aus, damit ein späteres Deployment die separat verwalteten VPS-PDFs nicht entfernt. Nur Dokumente mit geklärter Weitergabeberechtigung sollten dort öffentlich erreichbar sein.
+Die eigentlichen PDF-Dateien werden aus Rechte- und Speichergründen nicht über den öffentlichen GitHub-Stand verteilt. Freigegebene Dokumente werden von Maintainer:innen separat bereitgestellt und vor der Veröffentlichung rechtlich geprüft. Herkunft, Abrufdatum und Rechte-Status gehören weiterhin in [research/pdfs.json](research/pdfs.json).
 
 ## Entwicklung ohne Docker
 
@@ -202,11 +199,13 @@ Die `.gitignore` schützt lokale und generierte Daten. Nicht versioniert werden 
 
 Die PDF-Dateien unter `frontend/public/pdfs/` sind ausdrücklich erfasst und werden nicht versioniert. Der HTML-Index bleibt als öffentliche Übersicht erhalten; die eigentlichen PDFs werden separat auf dem VPS verwaltet und müssen vor der öffentlichen Bereitstellung rechtlich geprüft werden.
 
-## VPS-Deployment nach Review
+## Produktionsauslieferung
 
-Der Workflow in [.github/workflows/deploy-vps.yml](.github/workflows/deploy-vps.yml) ist bis zu einem separaten Review **manuell** und reagiert nicht automatisch auf jeden Push. Für einen Deploy sollte GitHub zusätzlich eine geschützte `production`-Umgebung mit mindestens einem Required Reviewer erhalten. Benötigt werden außerdem die dort hinterlegten Secrets `VPS_HOST`, `VPS_USER`, `VPS_PORT`, `VPS_APP_PATH`, `VPS_SSH_PRIVATE_KEY` und `VPS_SSH_KNOWN_HOSTS`. Der Deploy-Benutzer darf nicht `root` sein; er benötigt auf dem VPS die erforderlichen Docker-Rechte. Deployments werden nur vom `main`-Branch akzeptiert.
+Das Repository ist öffentlich, der Produktionszugriff aber nicht. Beiträge werden offen per Formular oder Pull Request gesammelt; Produktionsdeployments führen ausschließlich Maintainer:innen aus. Die öffentliche Dokumentation enthält deshalb keine echte VPS-Adresse, Zugangsdaten, SSH-Schlüssel oder Secret-Werte.
 
-Für den öffentlichen Host muss der Site-Block aus [deploy/Caddyfile.btm.example](deploy/Caddyfile.btm.example) in die bestehende Caddy-Konfiguration übernommen werden. Caddy muss dafür im selben Docker-Netzwerk wie der BTM-Stack laufen; dann sind die Compose-Dienste unter `backend:8000` und `frontend:5173` erreichbar. Läuft Caddy direkt auf dem VPS-Host, müssen diese beiden Ziele stattdessen auf `127.0.0.1:8000` und `127.0.0.1:5173` zeigen. Nach dem Einfügen mit `caddy validate` prüfen und Caddy kontrolliert neu laden.
+Der interne Deploy-Workflow ist manuell und durch eine geschützte GitHub-Umgebung mit Required Reviewer abgesichert. Er akzeptiert ausschließlich den geprüften `main`-Stand. Forks und externe Pull Requests erhalten keinen Zugriff auf die Produktions-Secrets und können keinen Deploy auf den VPS auslösen.
+
+Die öffentliche Website kann unabhängig davon lokal mit Docker gestartet werden. Für den öffentlichen Host muss der Site-Block aus [deploy/Caddyfile.btm.example](deploy/Caddyfile.btm.example) in die bestehende Caddy-Konfiguration übernommen werden; diese Infrastrukturkonfiguration gehört in die private Maintainer-Dokumentation.
 
 ## Quellen und Status
 

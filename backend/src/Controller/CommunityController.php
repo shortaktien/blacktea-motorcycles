@@ -28,14 +28,17 @@ final class CommunityController
     public function readFeedback(string $guide): JsonResponse
     {
         if (!$this->validGuide($guide)) {
-            return $this->error('Ungültige Reparaturhilfe.', Response::HTTP_BAD_REQUEST);
+            return $this->error('Ungültiger Beitrag.', Response::HTTP_BAD_REQUEST);
         }
 
         $data = $this->storage->read();
         $counts = $data['feedback'][$guide] ?? ['up' => 0, 'down' => 0];
+        $expectedKind = $this->isWikiGuide($guide) ? 'wiki_suggestion' : 'comment';
         $comments = array_values(array_filter(
             $data['comments'],
-            static fn (array $comment): bool => ($comment['guide'] ?? null) === $guide && ($comment['status'] ?? null) === 'approved'
+            static fn (array $comment): bool => ($comment['guide'] ?? null) === $guide
+                && ($comment['kind'] ?? 'comment') === $expectedKind
+                && ($comment['status'] ?? null) === 'approved'
         ));
         usort($comments, static fn (array $a, array $b): int => strcmp((string) ($b['createdAt'] ?? ''), (string) ($a['createdAt'] ?? '')));
 
@@ -86,10 +89,20 @@ final class CommunityController
         $name = $request->request->get('name');
         $email = $request->request->get('email');
         $body = $request->request->get('body');
+        $kind = $request->request->get('kind', 'comment');
+        $topic = $request->request->get('topic');
+        $section = $request->request->get('section');
+        $source = $request->request->get('source');
         $honeypot = $request->request->get('website');
 
         if (!is_string($guide) || !$this->validGuide($guide)) {
-            return $this->error('Ungültige Reparaturhilfe.', Response::HTTP_BAD_REQUEST);
+            return $this->error('Ungültiger Beitrag.', Response::HTTP_BAD_REQUEST);
+        }
+        if (!is_string($kind) || !in_array($kind, ['comment', 'wiki_suggestion'], true)) {
+            return $this->error('Ungültiger Beitragstyp.', Response::HTTP_BAD_REQUEST);
+        }
+        if (($this->isWikiGuide($guide) && $kind !== 'wiki_suggestion') || (!$this->isWikiGuide($guide) && $kind !== 'comment')) {
+            return $this->error('Beitragstyp und Ziel passen nicht zusammen.', Response::HTTP_BAD_REQUEST);
         }
         if (is_string($honeypot) && trim($honeypot) !== '') {
             return $this->error('Kommentar konnte nicht angenommen werden.', Response::HTTP_BAD_REQUEST);
@@ -102,6 +115,18 @@ final class CommunityController
         }
         if (!is_string($body) || $this->length($body) < 10 || $this->length($body) > 4000) {
             return $this->error('Bitte einen Kommentar mit 10 bis 4.000 Zeichen angeben.', Response::HTTP_BAD_REQUEST);
+        }
+        if ($kind === 'wiki_suggestion' && (!is_string($topic) || $this->length(trim($topic)) < 2 || $this->length(trim($topic)) > 120)) {
+            return $this->error('Bitte einen kurzen Titel mit 2 bis 120 Zeichen angeben.', Response::HTTP_BAD_REQUEST);
+        }
+        if ($section !== null && (!is_string($section) || $this->length(trim($section)) > 200)) {
+            return $this->error('Der betroffene Abschnitt darf höchstens 200 Zeichen enthalten.', Response::HTTP_BAD_REQUEST);
+        }
+        if ($source !== null && (!is_string($source) || $this->length(trim($source)) > 500)) {
+            return $this->error('Die Quellenangabe darf höchstens 500 Zeichen enthalten.', Response::HTTP_BAD_REQUEST);
+        }
+        if (is_string($source) && preg_match('/^https?:\/\//i', trim($source)) === 1 && filter_var(trim($source), FILTER_VALIDATE_URL) === false) {
+            return $this->error('Bitte eine gültige Webadresse als Quelle angeben.', Response::HTTP_BAD_REQUEST);
         }
 
         $image = $request->files->get('image');
@@ -137,9 +162,13 @@ final class CommunityController
         $comment = [
             'id' => bin2hex(random_bytes(16)),
             'guide' => $guide,
+            'kind' => $kind,
             'name' => trim($name),
             'email' => strtolower(trim($email)),
             'body' => trim($body),
+            'topic' => $kind === 'wiki_suggestion' ? trim((string) $topic) : null,
+            'section' => is_string($section) && trim($section) !== '' ? trim($section) : null,
+            'source' => is_string($source) && trim($source) !== '' ? trim($source) : null,
             'imageFile' => $imageFilename,
             'imageMime' => $imageMime,
             'status' => 'pending',
@@ -157,7 +186,9 @@ final class CommunityController
         }
 
         return new JsonResponse([
-            'message' => 'Danke! Dein Kommentar wird vor der Veröffentlichung redaktionell geprüft.',
+            'message' => $kind === 'wiki_suggestion'
+                ? 'Danke! Dein Wiki-Vorschlag wird vor der Veröffentlichung redaktionell geprüft.'
+                : 'Danke! Dein Kommentar wird vor der Veröffentlichung redaktionell geprüft.',
         ], Response::HTTP_ACCEPTED);
     }
 
@@ -328,7 +359,12 @@ final class CommunityController
 
     private function validGuide(string $guide): bool
     {
-        return preg_match('/^(hilfe|ersatzteil)-[a-z0-9-]{1,90}$/', $guide) === 1;
+        return preg_match('/^(hilfe|ersatzteil|wiki)-[a-z0-9-]{1,90}$/', $guide) === 1;
+    }
+
+    private function isWikiGuide(string $guide): bool
+    {
+        return str_starts_with($guide, 'wiki-');
     }
 
     private function jsonPayload(Request $request): array
@@ -351,8 +387,12 @@ final class CommunityController
     {
         return [
             'id' => (string) $comment['id'],
+            'kind' => (string) ($comment['kind'] ?? 'comment'),
             'name' => (string) $comment['name'],
             'body' => (string) $comment['body'],
+            'topic' => isset($comment['topic']) && is_string($comment['topic']) ? $comment['topic'] : null,
+            'section' => isset($comment['section']) && is_string($comment['section']) ? $comment['section'] : null,
+            'source' => isset($comment['source']) && is_string($comment['source']) ? $comment['source'] : null,
             'createdAt' => (string) $comment['createdAt'],
             'imageUrl' => !empty($comment['imageFile']) ? '/api/comments/' . rawurlencode((string) $comment['id']) . '/image' : null,
         ];

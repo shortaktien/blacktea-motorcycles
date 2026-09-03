@@ -4,6 +4,7 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
 const researchRoot = fileURLToPath(new URL('../research', import.meta.url));
+const contentRoot = fileURLToPath(new URL('../content', import.meta.url));
 const frontendRoot = fileURLToPath(new URL('.', import.meta.url));
 const siteConfig = JSON.parse(readFileSync(new URL('./src/site-config.json', import.meta.url), 'utf8'));
 const siteOrigin = (process.env.VITE_SITE_URL ?? siteConfig.siteOrigin).replace(/\/+$/, '');
@@ -30,6 +31,8 @@ const routeMetadata: Record<string, { title: string; description: string; robots
   '/community': { title: 'BTM Community-Wissen — Black Tea Hilfe', description: 'Technische Hinweise aus der Black Tea Community verständlich zusammengefasst, mit lokalen PDFs und Originalquellen.' },
   '/quellen': { title: 'Quellen — Black Tea Hilfe', description: 'Nachvollziehbare Quellen zu Insolvenzstatus, Handbüchern, lokalen PDFs, Ersatzteilspuren und Community-Wissen.' },
   '/admin': { title: 'Admin — Black Tea Hilfe', description: 'Interner Bereich zur redaktionellen Prüfung von Kommentaren.', robots: 'noindex,nofollow,noarchive' },
+  '/bikes/bonfire': { title: 'Bonfire — Bikes — Black Tea Hilfe', description: 'Technische Wiki-Seite zur Black Tea Bonfire mit Handbuchdaten, Modellvarianten und nachvollziehbaren Quellen.' },
+  '/bikes/wildfire': { title: 'Wildfire — Bikes — Black Tea Hilfe', description: 'Technische Wiki-Seite zur Black Tea Wildfire mit Handbuchdaten, Modellvarianten und nachvollziehbaren Quellen.' },
 };
 const securityHeaders = {
   'X-Content-Type-Options': 'nosniff',
@@ -90,7 +93,7 @@ export default defineConfig({
     },
     headers: securityHeaders,
     fs: {
-      allow: [frontendRoot, researchRoot],
+      allow: [frontendRoot, researchRoot, contentRoot],
     },
   },
   preview: {
