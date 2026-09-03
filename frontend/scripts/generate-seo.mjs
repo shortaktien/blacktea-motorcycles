@@ -51,7 +51,9 @@ const staticPages = [
   { path: '/quellen', title: 'Quellen — Black Tea Hilfe', description: 'Nachvollziehbare Quellen zu Insolvenzstatus, Handbüchern, lokalen PDFs, Ersatzteilspuren und Community-Wissen.' },
   { path: '/impressum', title: 'Impressum — Black Tea Hilfe', description: 'Anbieterinformationen und rechtliche Hinweise zu Black Tea Hilfe.' },
   { path: '/datenschutz', title: 'Datenschutz — Black Tea Hilfe', description: 'Datenschutzhinweise zu Kommentaren, Bildanhängen und dem Betrieb von Black Tea Hilfe.' },
-  { path: '/wiki', title: 'Wiki — Black Tea Hilfe', description: 'Das BTM-Wiki wird vorbereitet.' },
+  { path: '/wiki', title: 'Wiki — Black Tea Hilfe', description: 'Technische Modellseiten für Black Tea Bonfire und Wildfire — mit Daten, Quellen und klar markierten Unsicherheiten.' },
+  { path: '/wiki/bonfire', title: 'Bonfire: Daten für Abgleich & Wartung — Black Tea Hilfe', description: 'Die wichtigsten Bonfire-Handbuchwerte für Ersatzteilsuche, Wartung und den Abgleich am konkreten Bike.' },
+  { path: '/wiki/wildfire', title: 'Wildfire: Reichweite, Modi & Pflege — Black Tea Hilfe', description: 'Reichweite, Fahrmodi, Bremsen und Pflegehinweise aus der gesicherten Wildfire-Community-Dokumentation — mit markierten Unsicherheiten.' },
 ];
 
 const pdfFiles = readdirSync(join(publicRoot, 'pdfs')).filter((file) => file.toLowerCase().endsWith('.pdf')).sort();

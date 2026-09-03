@@ -29,6 +29,9 @@ const routeMetadata: Record<string, { title: string; description: string; robots
   '/ersatzteile': { title: 'Ersatzteile — Black Tea Hilfe', description: 'Historischer BTM-Ersatzteilkatalog mit Modellbezug, Teilenamen und Quellen. Bestand und Preise vor dem Kauf prüfen.' },
   '/community': { title: 'BTM Community-Wissen — Black Tea Hilfe', description: 'Technische Hinweise aus der Black Tea Community verständlich zusammengefasst, mit lokalen PDFs und Originalquellen.' },
   '/quellen': { title: 'Quellen — Black Tea Hilfe', description: 'Nachvollziehbare Quellen zu Insolvenzstatus, Handbüchern, lokalen PDFs, Ersatzteilspuren und Community-Wissen.' },
+  '/wiki': { title: 'Wiki — Black Tea Hilfe', description: 'Technische Modellseiten für Black Tea Bonfire und Wildfire — mit Daten, Quellen und klar markierten Unsicherheiten.' },
+  '/wiki/bonfire': { title: 'Bonfire: Daten für Abgleich & Wartung — Black Tea Hilfe', description: 'Die wichtigsten Bonfire-Handbuchwerte für Ersatzteilsuche, Wartung und den Abgleich am konkreten Bike.' },
+  '/wiki/wildfire': { title: 'Wildfire: Reichweite, Modi & Pflege — Black Tea Hilfe', description: 'Reichweite, Fahrmodi, Bremsen und Pflegehinweise aus der gesicherten Wildfire-Community-Dokumentation — mit markierten Unsicherheiten.' },
   '/admin': { title: 'Admin — Black Tea Hilfe', description: 'Interner Bereich zur redaktionellen Prüfung von Kommentaren.', robots: 'noindex,nofollow,noarchive' },
 };
 const securityHeaders = {
