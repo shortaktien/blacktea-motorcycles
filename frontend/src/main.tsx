@@ -11,7 +11,13 @@ const app = (
 );
 
 if (root.hasChildNodes()) {
-  hydrateRoot(root, app);
+  const isDynamicRepairRequest = /^\/hilfe\/anfragen\/[a-f0-9]{32}\/?$/.test(window.location.pathname);
+  if (isDynamicRepairRequest) {
+    root.replaceChildren();
+    createRoot(root).render(app);
+  } else {
+    hydrateRoot(root, app);
+  }
 } else {
   createRoot(root).render(app);
 }

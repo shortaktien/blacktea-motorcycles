@@ -12,6 +12,7 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class CommunityController
 {
+    private const REPAIR_REQUEST_GUIDE = 'hilfe-anfragen';
     private const MAX_IMAGE_BYTES = 1048576;
     private const ALLOWED_IMAGES = [
         'image/jpeg' => 'jpg',
@@ -33,11 +34,11 @@ final class CommunityController
 
         $data = $this->storage->read();
         $counts = $data['feedback'][$guide] ?? ['up' => 0, 'down' => 0];
-        $expectedKind = $this->isWikiGuide($guide) ? 'wiki_suggestion' : 'comment';
+        $expectedKinds = $this->expectedKinds($guide);
         $comments = array_values(array_filter(
             $data['comments'],
-            static fn (array $comment): bool => ($comment['guide'] ?? null) === $guide
-                && ($comment['kind'] ?? 'comment') === $expectedKind
+            fn (array $comment): bool => ($comment['guide'] ?? null) === $guide
+                && in_array(($comment['kind'] ?? 'comment'), $expectedKinds, true)
                 && ($comment['status'] ?? null) === 'approved'
         ));
         usort($comments, static fn (array $a, array $b): int => strcmp((string) ($b['createdAt'] ?? ''), (string) ($a['createdAt'] ?? '')));
@@ -93,15 +94,16 @@ final class CommunityController
         $topic = $request->request->get('topic');
         $section = $request->request->get('section');
         $source = $request->request->get('source');
+        $parentId = $request->request->get('parentId');
         $honeypot = $request->request->get('website');
 
         if (!is_string($guide) || !$this->validGuide($guide)) {
             return $this->error('Ungültiger Beitrag.', Response::HTTP_BAD_REQUEST);
         }
-        if (!is_string($kind) || !in_array($kind, ['comment', 'wiki_suggestion'], true)) {
+        if (!is_string($kind) || !in_array($kind, ['comment', 'wiki_suggestion', 'repair_request', 'repair_answer'], true)) {
             return $this->error('Ungültiger Beitragstyp.', Response::HTTP_BAD_REQUEST);
         }
-        if (($this->isWikiGuide($guide) && $kind !== 'wiki_suggestion') || (!$this->isWikiGuide($guide) && $kind !== 'comment')) {
+        if (!in_array($kind, $this->expectedKinds($guide), true)) {
             return $this->error('Beitragstyp und Ziel passen nicht zusammen.', Response::HTTP_BAD_REQUEST);
         }
         if (is_string($honeypot) && trim($honeypot) !== '') {
@@ -116,8 +118,22 @@ final class CommunityController
         if (!is_string($body) || $this->length($body) < 10 || $this->length($body) > 4000) {
             return $this->error('Bitte einen Kommentar mit 10 bis 4.000 Zeichen angeben.', Response::HTTP_BAD_REQUEST);
         }
-        if ($kind === 'wiki_suggestion' && (!is_string($topic) || $this->length(trim($topic)) < 2 || $this->length(trim($topic)) > 120)) {
+        if (in_array($kind, ['wiki_suggestion', 'repair_request'], true) && (!is_string($topic) || $this->length(trim($topic)) < 2 || $this->length(trim($topic)) > 120)) {
             return $this->error('Bitte einen kurzen Titel mit 2 bis 120 Zeichen angeben.', Response::HTTP_BAD_REQUEST);
+        }
+        if ($kind === 'repair_request' && $parentId !== null && $parentId !== '') {
+            return $this->error('Eine neue Reparaturanfrage darf keine Antwort als übergeordneten Beitrag haben.', Response::HTTP_BAD_REQUEST);
+        }
+        if ($kind === 'repair_answer') {
+            if (!is_string($parentId) || preg_match('/^[a-f0-9]{32}$/', trim($parentId)) !== 1) {
+                return $this->error('Die zugehörige Anfrage wurde nicht erkannt.', Response::HTTP_BAD_REQUEST);
+            }
+            $parent = $this->findComment(trim($parentId));
+            if ($parent === null || ($parent['guide'] ?? null) !== self::REPAIR_REQUEST_GUIDE || ($parent['kind'] ?? null) !== 'repair_request' || ($parent['status'] ?? null) !== 'approved') {
+                return $this->error('Auf diese Anfrage kann derzeit nicht geantwortet werden.', Response::HTTP_BAD_REQUEST);
+            }
+        } elseif ($parentId !== null && $parentId !== '') {
+            return $this->error('Übergeordneter Beitrag ist nicht erlaubt.', Response::HTTP_BAD_REQUEST);
         }
         if ($section !== null && (!is_string($section) || $this->length(trim($section)) > 200)) {
             return $this->error('Der betroffene Abschnitt darf höchstens 200 Zeichen enthalten.', Response::HTTP_BAD_REQUEST);
@@ -166,9 +182,10 @@ final class CommunityController
             'name' => trim($name),
             'email' => strtolower(trim($email)),
             'body' => trim($body),
-            'topic' => $kind === 'wiki_suggestion' ? trim((string) $topic) : null,
+            'topic' => in_array($kind, ['wiki_suggestion', 'repair_request'], true) ? trim((string) $topic) : null,
             'section' => is_string($section) && trim($section) !== '' ? trim($section) : null,
             'source' => is_string($source) && trim($source) !== '' ? trim($source) : null,
+            'parentId' => $kind === 'repair_answer' ? trim((string) $parentId) : null,
             'imageFile' => $imageFilename,
             'imageMime' => $imageMime,
             'status' => 'pending',
@@ -186,9 +203,12 @@ final class CommunityController
         }
 
         return new JsonResponse([
-            'message' => $kind === 'wiki_suggestion'
-                ? 'Danke! Dein Wiki-Vorschlag wird vor der Veröffentlichung redaktionell geprüft.'
-                : 'Danke! Dein Kommentar wird vor der Veröffentlichung redaktionell geprüft.',
+            'message' => match ($kind) {
+                'wiki_suggestion' => 'Danke! Dein Wiki-Vorschlag wird vor der Veröffentlichung redaktionell geprüft.',
+                'repair_request' => 'Danke! Deine Reparaturanfrage wird vor der Veröffentlichung redaktionell geprüft.',
+                'repair_answer' => 'Danke! Deine Antwort wird vor der Veröffentlichung redaktionell geprüft.',
+                default => 'Danke! Dein Kommentar wird vor der Veröffentlichung redaktionell geprüft.',
+            },
         ], Response::HTTP_ACCEPTED);
     }
 
@@ -362,6 +382,16 @@ final class CommunityController
         return preg_match('/^(hilfe|ersatzteil|wiki)-[a-z0-9-]{1,90}$/', $guide) === 1;
     }
 
+    /** @return list<string> */
+    private function expectedKinds(string $guide): array
+    {
+        if ($guide === self::REPAIR_REQUEST_GUIDE) {
+            return ['repair_request', 'repair_answer'];
+        }
+
+        return [$this->isWikiGuide($guide) ? 'wiki_suggestion' : 'comment'];
+    }
+
     private function isWikiGuide(string $guide): bool
     {
         return str_starts_with($guide, 'wiki-');
@@ -393,6 +423,7 @@ final class CommunityController
             'topic' => isset($comment['topic']) && is_string($comment['topic']) ? $comment['topic'] : null,
             'section' => isset($comment['section']) && is_string($comment['section']) ? $comment['section'] : null,
             'source' => isset($comment['source']) && is_string($comment['source']) ? $comment['source'] : null,
+            'parentId' => isset($comment['parentId']) && is_string($comment['parentId']) ? $comment['parentId'] : null,
             'createdAt' => (string) $comment['createdAt'],
             'imageUrl' => !empty($comment['imageFile']) ? '/api/comments/' . rawurlencode((string) $comment['id']) . '/image' : null,
         ];

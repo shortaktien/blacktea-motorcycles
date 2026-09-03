@@ -27,6 +27,7 @@ const parts = (partsCatalog.historical_product_slugs ?? []).map((slug) => ({ pat
 const routeMetadata: Record<string, { title: string; description: string; robots?: string }> = {
   '/': { title: 'Black Tea Hilfe — Dokumente, Ersatzteile & Updates', description: 'Unabhängige Sammelstelle für Black Tea Motorbikes: lokale PDFs, Ersatzteile, Reparaturhilfen und nachvollziehbare Quellen.' },
   '/hilfe': { title: 'Reparaturhilfe — Black Tea Hilfe', description: 'Redaktionell geordnete Reparaturhilfen für typische Bonfire- und Wildfire-Fehlerbilder — mit Kurzablauf, ausführlicher Prüfung, Sicherheit und Quelle.' },
+  '/hilfe/anfragen': { title: 'Reparatur anfragen — Black Tea Hilfe', description: 'Reparaturanfragen zu Black Tea Bonfire und Wildfire stellen, Erfahrungen teilen und gemeinsam nachvollziehbare Lösungen dokumentieren.' },
   '/ersatzteile': { title: 'Ersatzteile — Black Tea Hilfe', description: 'Historischer BTM-Ersatzteilkatalog mit Modellbezug, Teilenamen und Quellen. Bestand und Preise vor dem Kauf prüfen.' },
   '/community': { title: 'BTM Community-Wissen — Black Tea Hilfe', description: 'Technische Hinweise aus der Black Tea Community verständlich zusammengefasst, mit lokalen PDFs und Originalquellen.' },
   '/quellen': { title: 'Quellen — Black Tea Hilfe', description: 'Nachvollziehbare Quellen zu Insolvenzstatus, Handbüchern, lokalen PDFs, Ersatzteilspuren und Community-Wissen.' },
@@ -55,11 +56,14 @@ export default defineConfig({
         const requestedPath = new URL(context.originalUrl ?? context.path, 'http://localhost').pathname.replace(/\/index\.html$/, '') || '/';
         const guide = guides.find((item) => item.path === requestedPath);
         const part = parts.find((item) => item.path === requestedPath);
+        const repairRequestDetail = /^\/hilfe\/anfragen\/[a-f0-9]{32}\/?$/.test(requestedPath);
         const page: PageMetadata = guide
           ? { ...guide, title: `${guide.title} — Black Tea Hilfe` }
           : part
             ? { title: `${part.title} — Ersatzteil — Black Tea Hilfe`, description: `${part.title} für Black Tea Motorbikes: historischer BTM-Shop-Eintrag, Archivquelle und aktuelle Kaufoptionen zur Gegenprüfung.` }
-            : (routeMetadata[requestedPath] ?? routeMetadata['/']);
+            : repairRequestDetail
+              ? { title: 'Reparaturanfrage — Black Tea Hilfe', description: 'Freigegebene Reparaturanfrage zu einem Black Tea Bike mit Platz für nachvollziehbare Antworten und Lösungsansätze.', robots: 'noindex,follow,noarchive' }
+              : (routeMetadata[requestedPath] ?? routeMetadata['/']);
         const canonical = `${siteOrigin}${requestedPath === '/' ? '/' : requestedPath}`;
         const robots = page.robots ?? 'index,follow,max-image-preview:large';
         let transformed = html

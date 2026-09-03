@@ -110,6 +110,16 @@ ADMIN_PASSWORD_HASH=<passwort-hash>
 
 Einen zufälligen Secret-Wert kannst du zum Beispiel mit `openssl rand -hex 32` erzeugen. Für das Admin-Passwort sollte ein Passwort-Hash verwendet werden, niemals das Klartextpasswort. Die Admin-Funktion ist nur für die Moderation der Kommentare gedacht.
 
+Für das öffentliche **„Bug melden“**-Popup werden Meldungen serverseitig als GitHub-Issue angelegt. Dafür zusätzlich einen Fine-grained Personal Access Token ausschließlich für dieses Repository mit der Berechtigung **Issues: Read and write** hinterlegen:
+
+```dotenv
+GITHUB_REPOSITORY=shortaktien/blacktea-motorcycles
+GITHUB_TOKEN=<nur-serverseitig-setzen>
+BUG_REPORT_ALLOWED_HOSTS=btm.shortaktien.de,127.0.0.1,localhost
+```
+
+Der Token darf niemals in `frontend/`, im Browser-Bundle oder in GitHub-Issue-Inhalten landen. Name und Beschreibung werden ins Issue übernommen; die E-Mail dient der Spambegrenzung und wird nicht öffentlich veröffentlicht. Im Repository sind GitHub Issues bereits aktiviert und das Label `bug` vorhanden.
+
 ### Anwendung starten
 
 ```bash

@@ -1,6 +1,4 @@
-import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent } from 'react';
-import ReactMarkdown, { type Components } from 'react-markdown';
-import remarkGfm from 'remark-gfm';
+import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent, type MouseEvent, type ReactNode } from 'react';
 import partsCatalog from '../../research/parts.json';
 import partDetailsCatalog from '../../research/parts-details.json';
 import siteConfig from './site-config.json';
@@ -67,12 +65,13 @@ type FeedbackSummary = {
 
 type PublicComment = {
   id: string;
-  kind?: 'comment' | 'wiki_suggestion';
+  kind?: 'comment' | 'wiki_suggestion' | 'repair_request' | 'repair_answer';
   name: string;
   body: string;
   topic?: string | null;
   section?: string | null;
   source?: string | null;
+  parentId?: string | null;
   createdAt: string;
   imageUrl: string | null;
 };
@@ -176,6 +175,15 @@ type CommunityKnowledge = {
 };
 
 const localPartArchiveHref = '/quellen#ersatzteil-archiv';
+const repairRequestGuideSlug = 'hilfe-anfragen';
+const repairRequestPath = '/hilfe/anfragen';
+const repairRequestDetailPrefix = `${repairRequestPath}/`;
+const repairRequestDetailPath = (id: string) => `${repairRequestPath}/${id}`;
+const getRepairRequestId = (path: string) => {
+  if (!path.startsWith(repairRequestDetailPrefix)) return null;
+  const id = path.slice(repairRequestDetailPrefix.length);
+  return /^[a-f0-9]{32}$/.test(id) ? id : null;
+};
 
 const sourceLinks = [
   {
@@ -1543,6 +1551,132 @@ function getWikiToc(body: string): WikiTocItem[] {
   return items;
 }
 
+function renderWikiInlineMarkdown(value: string, keyPrefix: string): ReactNode[] {
+  const nodes: ReactNode[] = [];
+  const pattern = /\[([^\]]+)\]\(([^)\s]+)\)|\*\*([^*]+)\*\*|`([^`]+)`|\*([^*]+)\*/g;
+  let cursor = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = pattern.exec(value)) !== null) {
+    if (match.index > cursor) nodes.push(value.slice(cursor, match.index));
+    const key = `${keyPrefix}-${nodes.length}`;
+    if (match[1] && match[2] && (match[2].startsWith('/') || /^https?:\/\//i.test(match[2]))) {
+      const external = /^https?:\/\//i.test(match[2]);
+      nodes.push(<a key={key} href={match[2]} target={external ? '_blank' : undefined} rel={external ? 'nofollow noreferrer' : undefined}>{match[1]}</a>);
+    } else if (match[3]) {
+      nodes.push(<strong key={key}>{match[3]}</strong>);
+    } else if (match[4]) {
+      nodes.push(<code key={key}>{match[4]}</code>);
+    } else if (match[5]) {
+      nodes.push(<em key={key}>{match[5]}</em>);
+    } else {
+      nodes.push(match[0]);
+    }
+    cursor = match.index + match[0].length;
+  }
+
+  if (cursor < value.length) nodes.push(value.slice(cursor));
+  return nodes;
+}
+
+function parseWikiTableRow(line: string): string[] {
+  return line.trim().replace(/^\|/, '').replace(/\|$/, '').split('|').map((cell) => cell.trim());
+}
+
+function isWikiTableSeparator(line: string): boolean {
+  return parseWikiTableRow(line).every((cell) => /^:?-{3,}:?$/.test(cell));
+}
+
+function renderWikiMarkdown(body: string, onEditHeading: (heading: string) => void): ReactNode[] {
+  const lines = body.split(/\r?\n/);
+  const blocks: ReactNode[] = [];
+  let index = 0;
+
+  while (index < lines.length) {
+    const line = lines[index];
+    if (!line.trim()) {
+      index += 1;
+      continue;
+    }
+
+    const headingMatch = line.match(/^(#{2,3})\s+(.+?)\s*#*\s*$/);
+    if (headingMatch) {
+      const level = headingMatch[1].length === 2 ? 'h2' : 'h3';
+      const Heading = level;
+      const heading = headingMatch[2].trim();
+      blocks.push(<Heading key={`wiki-block-${index}`} id={slugifyWikiHeading(heading)}><span className="wiki-heading-text">{heading}</span><button className="wiki-heading-edit" type="button" onClick={() => onEditHeading(heading)}>Bearbeiten</button></Heading>);
+      index += 1;
+      continue;
+    }
+
+    if (line.trim().startsWith('|') && index + 1 < lines.length && lines[index + 1].trim().startsWith('|') && isWikiTableSeparator(lines[index + 1])) {
+      const header = parseWikiTableRow(line);
+      const rows: string[][] = [];
+      index += 2;
+      while (index < lines.length && lines[index].trim().startsWith('|')) {
+        rows.push(parseWikiTableRow(lines[index]));
+        index += 1;
+      }
+      blocks.push(
+        <div className="wiki-table-wrap" key={`wiki-block-${index}`}>
+          <table>
+            <thead><tr>{header.map((cell, cellIndex) => <th key={`wiki-table-head-${cellIndex}`}>{renderWikiInlineMarkdown(cell, `wiki-table-head-${cellIndex}`)}</th>)}</tr></thead>
+            <tbody>{rows.map((row, rowIndex) => <tr key={`wiki-table-row-${rowIndex}`}>{row.map((cell, cellIndex) => <td key={`wiki-table-cell-${rowIndex}-${cellIndex}`}>{renderWikiInlineMarkdown(cell, `wiki-table-cell-${rowIndex}-${cellIndex}`)}</td>)}</tr>)}</tbody>
+          </table>
+        </div>,
+      );
+      continue;
+    }
+
+    const unorderedMatch = line.match(/^\s*[-*]\s+(.+)$/);
+    if (unorderedMatch) {
+      const items: string[] = [];
+      while (index < lines.length) {
+        const itemMatch = lines[index].match(/^\s*[-*]\s+(.+)$/);
+        if (!itemMatch) break;
+        items.push(itemMatch[1]);
+        index += 1;
+      }
+      blocks.push(<ul key={`wiki-block-${index}`}>{items.map((item, itemIndex) => <li key={`wiki-list-item-${itemIndex}`}>{renderWikiInlineMarkdown(item, `wiki-list-item-${itemIndex}`)}</li>)}</ul>);
+      continue;
+    }
+
+    const orderedMatch = line.match(/^\s*\d+[.)]\s+(.+)$/);
+    if (orderedMatch) {
+      const items: string[] = [];
+      while (index < lines.length) {
+        const itemMatch = lines[index].match(/^\s*\d+[.)]\s+(.+)$/);
+        if (!itemMatch) break;
+        items.push(itemMatch[1]);
+        index += 1;
+      }
+      blocks.push(<ol key={`wiki-block-${index}`}>{items.map((item, itemIndex) => <li key={`wiki-ordered-item-${itemIndex}`}>{renderWikiInlineMarkdown(item, `wiki-ordered-item-${itemIndex}`)}</li>)}</ol>);
+      continue;
+    }
+
+    if (line.trim().startsWith('>')) {
+      const quoteLines: string[] = [];
+      while (index < lines.length && lines[index].trim().startsWith('>')) {
+        quoteLines.push(lines[index].trim().replace(/^>\s?/, ''));
+        index += 1;
+      }
+      blocks.push(<blockquote key={`wiki-block-${index}`}>{quoteLines.map((quote, quoteIndex) => <span key={`wiki-quote-${quoteIndex}`}>{quoteIndex > 0 ? ' ' : ''}{renderWikiInlineMarkdown(quote, `wiki-quote-${quoteIndex}`)}</span>)}</blockquote>);
+      continue;
+    }
+
+    const paragraphLines: string[] = [];
+    while (index < lines.length && lines[index].trim()) {
+      const current = lines[index];
+      if (paragraphLines.length > 0 && (/^(#{2,3})\s+/.test(current) || /^\s*[-*]\s+/.test(current) || /^\s*\d+[.)]\s+/.test(current) || current.trim().startsWith('>') || (current.trim().startsWith('|') && index + 1 < lines.length && lines[index + 1].trim().startsWith('|') && isWikiTableSeparator(lines[index + 1])))) break;
+      paragraphLines.push(current);
+      index += 1;
+    }
+    blocks.push(<p key={`wiki-block-${index}`}>{paragraphLines.flatMap((paragraphLine, lineIndex) => [...(lineIndex > 0 ? [' '] : []), ...renderWikiInlineMarkdown(paragraphLine, `wiki-paragraph-${index}-${lineIndex}`)])}</p>);
+  }
+
+  return blocks;
+}
+
 function getWikiSearchMatches(query: string): Array<{ article: WikiArticle; sections: WikiTocItem[] }> {
   const normalizedQuery = query.trim().toLocaleLowerCase('de');
   if (!normalizedQuery) return wikiArticles.map((article) => ({ article, sections: getWikiToc(article.body) }));
@@ -1597,6 +1731,16 @@ function getSeoMetadata(path: string, guide?: RepairGuide, part?: HistoricalShop
       description: 'Interner Bereich zur redaktionellen Prüfung von Kommentaren.',
       canonicalPath: '/admin',
       robots: 'noindex,nofollow,noarchive',
+      jsonLd: {},
+    };
+  }
+
+  if (getRepairRequestId(path)) {
+    return {
+      title: 'Reparaturanfrage — Black Tea Motorbikes – Hilfe',
+      description: 'Freigegebene Reparaturanfrage zu einem Black Tea Bike mit Platz für nachvollziehbare Antworten und Lösungsansätze.',
+      canonicalPath: path,
+      robots: 'noindex,follow,noarchive',
       jsonLd: {},
     };
   }
@@ -1736,6 +1880,10 @@ function getSeoMetadata(path: string, guide?: RepairGuide, part?: HistoricalShop
       title: 'Reparaturhilfe — Black Tea Motorbikes – Hilfe',
       description: 'Redaktionell geordnete Reparaturhilfen für typische Bonfire- und Wildfire-Fehlerbilder — mit Kurzablauf, ausführlicher Prüfung, Sicherheit und Quelle.',
     },
+    [repairRequestPath]: {
+      title: 'Reparatur anfragen — Black Tea Motorbikes – Hilfe',
+      description: 'Reparaturanfragen zu Black Tea Bonfire und Wildfire stellen, Erfahrungen teilen und gemeinsam nachvollziehbare Lösungen dokumentieren.',
+    },
     '/ersatzteile': {
       title: 'Ersatzteile — Black Tea Motorbikes – Hilfe',
       description: 'Historischer BTM-Ersatzteilkatalog mit Modellbezug, Teilenamen und Quellen. Bestand und Preise vor dem Kauf prüfen.',
@@ -1864,10 +2012,13 @@ function App({ initialPath }: { initialPath?: string } = {}) {
   const part = historicalShopParts.find((candidate) => candidate.path === path);
   const bike = bikeProfiles.find((candidate) => candidate.path === path);
   const wikiArticle = wikiArticles.find((candidate) => candidate.path === path);
+  const repairRequestId = getRepairRequestId(path);
   const seoMetadata = getSeoMetadata(path, guide, part, bike, wikiArticle);
   const isKnownPath = path === '/'
     || path === '/admin'
     || path === '/hilfe'
+    || path === repairRequestPath
+    || Boolean(repairRequestId)
     || path === '/ersatzteile'
     || path === '/community'
     || path === '/quellen'
@@ -1885,6 +2036,8 @@ function App({ initialPath }: { initialPath?: string } = {}) {
 
   if (guide) return <RepairGuidePage guide={guide} />;
   if (path === '/admin') return <AdminPage />;
+  if (repairRequestId) return <RepairRequestDetailPage requestId={repairRequestId} />;
+  if (path === repairRequestPath) return <RepairRequestPage />;
   if (path === '/hilfe') return <RepairGuideIndexPage />;
   if (part) return <PartDetailPage part={part} />;
   if (path === '/ersatzteile' || (path === '/' && hash === 'teile')) return <PartsPage />;
@@ -1948,7 +2101,7 @@ function HomePage() {
         <nav className="main-nav" aria-label="Hauptnavigation">
           <a href="#status">Status</a>
           <a href="#wissen">PDFs</a>
-          <a href="/hilfe">Reparatur</a>
+          <RepairMenu />
           <a href="/ersatzteile">Ersatzteile</a>
           <BikeMenu />
           <a href="/quellen">Quellen</a>
@@ -1975,7 +2128,7 @@ function HomePage() {
                 sizes="(max-width: 620px) calc(100vw - 84px), (max-width: 900px) 90vw, 48vw"
                 type="image/webp"
               />
-              <img className="hero-concept-image" src="/images/bonfire-konzept-skizze.png" width="1536" height="1024" alt="Designer-Konzeptskizze einer Black Tea Bonfire" loading="eager" decoding="async" {...({ fetchpriority: 'high' } as Record<string, string>)} />
+              <img className="hero-concept-image" src="/images/bonfire-konzept-skizze.webp" width="1536" height="1024" alt="Designer-Konzeptskizze einer Black Tea Bonfire" loading="eager" decoding="async" {...({ fetchpriority: 'high' } as Record<string, string>)} />
             </picture>
           </div>
         </section>
@@ -2098,6 +2251,7 @@ function HomePage() {
 
       </main>
 
+      <BugReportWidget />
       <footer className="site-footer">
         <span className="wordmark"><span className="wordmark-mark" aria-hidden="true">BTM</span>black tea motorbikes – <strong>hilfe</strong></span>
         <span className="handwritten">gebaut für die leute, die weiterfahren wollen.</span>
@@ -2237,20 +2391,43 @@ function ResourceCard({ resource, index }: { resource: Resource; index: number }
 
 function GuideHeader() {
   return (
-    <header className="site-header">
-      <a className="wordmark" href="/" aria-label="Black Tea Motorbikes – Hilfe Startseite">
-        <span className="wordmark-mark" aria-hidden="true">BTM</span>
-        <span>black tea motorbikes – <strong>hilfe</strong></span>
-      </a>
-      <nav className="main-nav" aria-label="Hauptnavigation">
-        <a href="/#status">Status</a>
-        <a href="/#wissen">PDFs</a>
-        <a href="/hilfe">Reparatur</a>
-        <a href="/ersatzteile">Ersatzteile</a>
-        <BikeMenu />
-        <a href="/quellen">Quellen</a>
-      </nav>
-    </header>
+    <>
+      <header className="site-header">
+        <a className="wordmark" href="/" aria-label="Black Tea Motorbikes – Hilfe Startseite">
+          <span className="wordmark-mark" aria-hidden="true">BTM</span>
+          <span>black tea motorbikes – <strong>hilfe</strong></span>
+        </a>
+        <nav className="main-nav" aria-label="Hauptnavigation">
+          <a href="/#status">Status</a>
+          <a href="/#wissen">PDFs</a>
+          <RepairMenu />
+          <a href="/ersatzteile">Ersatzteile</a>
+          <BikeMenu />
+          <a href="/quellen">Quellen</a>
+        </nav>
+      </header>
+      <BugReportWidget />
+    </>
+  );
+}
+
+function RepairMenu() {
+  return (
+    <div className="nav-dropdown">
+      <button className="nav-dropdown-trigger" type="button" aria-haspopup="menu">
+        Reparatur <span className="nav-dropdown-caret" aria-hidden="true" />
+      </button>
+      <div className="nav-dropdown-menu" role="menu">
+        <a className="nav-dropdown-item" href="/hilfe" role="menuitem">
+          <strong>Reparaturhilfen</strong>
+          <span>Alle Anleitungen öffnen</span>
+        </a>
+        <a className="nav-dropdown-item" href={repairRequestPath} role="menuitem">
+          <strong>Reparatur anfragen</strong>
+          <span>Frage stellen und Lösung teilen</span>
+        </a>
+      </div>
+    </div>
   );
 }
 
@@ -2269,6 +2446,96 @@ function BikeMenu() {
         ))}
       </div>
     </div>
+  );
+}
+
+function BugReportWidget() {
+  const [open, setOpen] = useState(false);
+  const [pageUrl, setPageUrl] = useState('');
+  const [reportError, setReportError] = useState('');
+  const [reportNotice, setReportNotice] = useState('');
+  const [issueUrl, setIssueUrl] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (!open) return undefined;
+    setPageUrl(window.location.href);
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setOpen(false);
+    };
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [open]);
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSubmitting(true);
+    setReportError('');
+    setReportNotice('');
+    setIssueUrl('');
+    const form = event.currentTarget;
+    const payload = Object.fromEntries(new FormData(form).entries());
+    payload.pageUrl = pageUrl || window.location.href;
+
+    try {
+      const response = await apiJson<{ message: string; issueUrl?: string }>('/api/bug-reports', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      form.reset();
+      setPageUrl(window.location.href);
+      setReportNotice(response.message);
+      setIssueUrl(response.issueUrl ?? '');
+    } catch (error) {
+      setReportError(error instanceof Error ? error.message : 'Die Bugmeldung konnte nicht gesendet werden.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleBackdropMouseDown = (event: MouseEvent<HTMLDivElement>) => {
+    if (event.target === event.currentTarget) setOpen(false);
+  };
+
+  return (
+    <>
+      <button className="bug-report-trigger" type="button" aria-label="Fehler oder Bug melden" aria-expanded={open} aria-controls="bug-report-dialog" onClick={() => setOpen(true)}>
+        <span aria-hidden="true">🐞</span>
+      </button>
+      {open && (
+        <div className="bug-report-overlay" onMouseDown={handleBackdropMouseDown}>
+          <section className="bug-report-dialog card-doodle" id="bug-report-dialog" role="dialog" aria-modal="true" aria-labelledby="bug-report-title">
+            <div className="bug-report-dialog-header">
+              <div>
+                <div className="eyebrow handwritten">fehler gefunden?</div>
+                <h2 id="bug-report-title">Bug melden</h2>
+              </div>
+              <button className="bug-report-close" type="button" aria-label="Bugmeldung schließen" onClick={() => setOpen(false)}>×</button>
+            </div>
+            <p className="bug-report-intro">Hilf uns, Fehler schnell nachzuvollziehen. Die Meldung wird automatisch als GitHub-Issue angelegt und redaktionell weiterbearbeitet.</p>
+            <form className="comment-form bug-report-form" onSubmit={handleSubmit}>
+              <label>Überschrift<input name="title" required minLength={2} maxLength={160} placeholder="z. B. Link auf der Reparaturseite funktioniert nicht" /></label>
+              <div className="comment-form-grid">
+                <label>Name<input name="name" required minLength={2} maxLength={80} autoComplete="name" /></label>
+                <label>E-Mail<input name="email" type="email" required maxLength={180} autoComplete="email" /><small>wird nicht öffentlich ins Issue geschrieben</small></label>
+              </div>
+              <label>Fundstelle<input name="pageUrl" value={pageUrl} readOnly aria-readonly="true" /><small>Diese URL wird automatisch aus der aktuellen Seite übernommen.</small></label>
+              <label>Beschreibung<textarea name="description" required minLength={10} maxLength={8000} rows={6} placeholder="Was ist passiert? Welche Schritte führen zum Fehler?" /></label>
+              <label className="comment-honeypot" aria-hidden="true">Website<input name="website" tabIndex={-1} autoComplete="off" /></label>
+              {reportError && <p className="form-message form-message-error" role="alert">{reportError}</p>}
+              {reportNotice && <div className="form-message form-message-success" role="status"><p>{reportNotice}</p>{issueUrl && <a href={issueUrl} target="_blank" rel="noreferrer">GitHub-Issue öffnen ↗</a>}</div>}
+              <button className="button button-ink" type="submit" disabled={submitting}>{submitting ? 'Wird an GitHub übergeben …' : 'Bugmeldung senden'} <span aria-hidden="true">↗</span></button>
+            </form>
+          </section>
+        </div>
+      )}
+    </>
   );
 }
 
@@ -2377,18 +2644,6 @@ function WikiArticlePage({ article }: { article: WikiArticle }) {
   const modelPath = `/bikes/${article.model.toLowerCase()}`;
   const toc = getWikiToc(article.body);
   const [editingHeading, setEditingHeading] = useState<string | null>(null);
-  const headingIds = new Map(toc.map((item) => [item.label, item.id]));
-  const markdownComponents: Components = {
-    h2: ({ children }) => {
-      const label = String(children);
-      return <h2 id={headingIds.get(label) ?? slugifyWikiHeading(label)}><span className="wiki-heading-text">{children}</span><button className="wiki-heading-edit" type="button" onClick={() => setEditingHeading(label)}>Bearbeiten</button></h2>;
-    },
-    h3: ({ children }) => {
-      const label = String(children);
-      return <h3 id={headingIds.get(label) ?? slugifyWikiHeading(label)}><span className="wiki-heading-text">{children}</span><button className="wiki-heading-edit" type="button" onClick={() => setEditingHeading(label)}>Bearbeiten</button></h3>;
-    },
-  };
-
   useEffect(() => {
     if (!editingHeading) return undefined;
     const previousOverflow = document.body.style.overflow;
@@ -2432,7 +2687,7 @@ function WikiArticlePage({ article }: { article: WikiArticle }) {
             )}
             <article className="wiki-article card-doodle">
               <div className="wiki-article-topline"><span className="kind-chip doc">Wiki-Artikel</span><span>{article.status}</span></div>
-              <div className="wiki-markdown"><ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>{article.body}</ReactMarkdown></div>
+              <div className="wiki-markdown">{renderWikiMarkdown(article.body, setEditingHeading)}</div>
               <WikiContributions guideSlug={`wiki-${article.slug}`} editingHeading={editingHeading} onCloseEditor={() => setEditingHeading(null)} />
               {article.sourceHref && (
                 <div className="wiki-source-box">
@@ -2572,6 +2827,15 @@ function WikiContributionForm({ guideSlug, heading, onSubmitted }: { guideSlug: 
   );
 }
 
+function RepairTabs({ active }: { active: 'guides' | 'requests' }) {
+  return (
+    <nav className="repair-tabs" aria-label="Reparaturbereich">
+      <a className={active === 'guides' ? 'active' : undefined} href="/hilfe" aria-current={active === 'guides' ? 'page' : undefined}>Reparaturhilfen</a>
+      <a className={active === 'requests' ? 'active' : undefined} href={repairRequestPath} aria-current={active === 'requests' ? 'page' : undefined}>Reparatur anfragen</a>
+    </nav>
+  );
+}
+
 function RepairGuideIndexPage() {
   useEffect(() => {
     document.title = 'Reparaturhilfe — Black Tea Motorbikes – Hilfe';
@@ -2587,6 +2851,7 @@ function RepairGuideIndexPage() {
           <div className="eyebrow handwritten">kurz erklärt, sauber belegt</div>
           <h1>Reparaturhilfe</h1>
           <p>Konkrete, redaktionell geprüfte Reparaturhilfen für typische BTM-Fehlerbilder. Keine Forendiskussionen — nur Ablauf, Prüfung, Sicherheit und Quelle.</p>
+          <RepairTabs active="guides" />
         </section>
         <section className="repair-index-section section-pad">
           <div className="repair-index-grid">
@@ -2602,6 +2867,345 @@ function RepairGuideIndexPage() {
       </main>
       <GuideFooter />
     </div>
+  );
+}
+
+function RepairRequestPage() {
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  useEffect(() => {
+    document.title = 'Reparatur anfragen — Black Tea Motorbikes – Hilfe';
+    window.scrollTo(0, 0);
+  }, []);
+
+  return (
+    <div className="site-shell">
+      <GuideHeader />
+      <main className="repair-page-main repair-request-page">
+        <section className="repair-page-hero section-pad">
+          <a className="repair-back" href="/">← Zur Sammelmappe</a>
+          <div className="eyebrow handwritten">gemeinsam eingrenzen, sauber dokumentieren</div>
+          <h1>Reparatur anfragen</h1>
+          <p>Beschreibe dein Fehlerbild, stelle Fragen und teile Lösungsansätze. Beiträge werden vor der Veröffentlichung geprüft und können später als redaktionelle Reparaturhilfe aufbereitet werden.</p>
+          <RepairTabs active="requests" />
+        </section>
+        <section className="repair-request-submit-section section-pad">
+          <details className="repair-request-submit card-doodle">
+            <summary className="repair-request-summary">
+              <div>
+                <div className="eyebrow handwritten">neue frage</div>
+                <h2>Was ist an deinem Bike los?</h2>
+              </div>
+              <div className="repair-request-summary-action">
+                <span className="kind-chip community">moderiert</span>
+                <span className="repair-request-toggle repair-request-toggle-closed">Formular öffnen ↓</span>
+                <span className="repair-request-toggle repair-request-toggle-open">Formular schließen ↑</span>
+              </div>
+            </summary>
+            <div className="repair-request-submit-content">
+              <p className="repair-request-intro">Je genauer Modell, Baujahr, Akkuvariante, Fehlerbild und bereits geprüfte Punkte sind, desto leichter kann die Community sinnvoll antworten.</p>
+              <RepairRequestForm onSubmitted={() => setRefreshKey((value) => value + 1)} />
+            </div>
+          </details>
+        </section>
+        <RepairRequestBoard refreshKey={refreshKey} />
+      </main>
+      <GuideFooter />
+    </div>
+  );
+}
+
+function RepairRequestForm({ onSubmitted }: { onSubmitted: () => void }) {
+  const [requestError, setRequestError] = useState('');
+  const [requestNotice, setRequestNotice] = useState('');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] ?? null;
+    setRequestError('');
+    setRequestNotice('');
+    if (file && file.size > 1048576) {
+      setSelectedFile(null);
+      event.target.value = '';
+      setRequestError('Das Bild darf höchstens 1 MB groß sein.');
+      return;
+    }
+    setSelectedFile(file);
+  };
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSubmitting(true);
+    setRequestError('');
+    setRequestNotice('');
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    formData.set('guide', repairRequestGuideSlug);
+    formData.set('kind', 'repair_request');
+    formData.delete('image');
+    if (selectedFile) formData.append('image', selectedFile);
+
+    try {
+      await apiJson<{ message: string }>('/api/comments', { method: 'POST', body: formData });
+      form.reset();
+      setSelectedFile(null);
+      setRequestNotice('Danke! Deine Anfrage wartet jetzt auf die redaktionelle Freigabe.');
+      onSubmitted();
+    } catch (error) {
+      setRequestError(error instanceof Error ? error.message : 'Die Anfrage konnte nicht gesendet werden.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <form className="comment-form repair-request-form" onSubmit={handleSubmit}>
+      <label>Thema oder Fehlerbild<input name="topic" required minLength={2} maxLength={120} placeholder="z. B. Wildfire startet nach dem Laden nicht" /></label>
+      <div className="comment-form-grid">
+        <label>Modell / Bereich
+          <select name="section" defaultValue="">
+            <option value="">Bitte auswählen</option>
+            <option>Bonfire</option>
+            <option>Bonfire X</option>
+            <option>Wildfire</option>
+            <option>Akku / BMS</option>
+            <option>Laden / 12-V-Elektrik</option>
+            <option>Controller / Motor</option>
+            <option>Fahrwerk / Bremse</option>
+            <option>Sonstiges</option>
+          </select>
+        </label>
+        <label>Name<input name="name" required minLength={2} maxLength={80} autoComplete="name" /></label>
+      </div>
+      <label>E-Mail<input name="email" type="email" required maxLength={180} autoComplete="email" /><small>wird nicht öffentlich angezeigt</small></label>
+      <label>Beschreibung<textarea name="body" required minLength={10} maxLength={4000} rows={7} placeholder="Modell, Baujahr, genaue Symptome, wann der Fehler auftritt und was bereits geprüft wurde …" /></label>
+      <label>Quelle oder weitere Infos (optional)<input name="source" maxLength={500} placeholder="z. B. Handbuch Seite 12 oder https://…" /></label>
+      <label>Bild (optional, max. 1 MB)<input name="image" type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={handleImageChange} /><small>JPG, PNG, WEBP oder GIF</small></label>
+      <label className="comment-honeypot" aria-hidden="true">Website<input name="website" tabIndex={-1} autoComplete="off" /></label>
+      {requestError && <p className="form-message form-message-error" role="alert">{requestError}</p>}
+      {requestNotice && <p className="form-message form-message-success" role="status">{requestNotice}</p>}
+      <button className="button button-ink" type="submit" disabled={submitting}>{submitting ? 'Wird geprüft …' : 'Reparaturanfrage senden'} <span aria-hidden="true">↗</span></button>
+    </form>
+  );
+}
+
+function RepairRequestBoard({ refreshKey }: { refreshKey: number }) {
+  const [summary, setSummary] = useState<FeedbackSummary | null>(null);
+  const [boardError, setBoardError] = useState('');
+
+  const loadRequests = async () => {
+    try {
+      const payload = await apiJson<FeedbackSummary>(`/api/feedback/${repairRequestGuideSlug}`);
+      setSummary(payload);
+      setBoardError('');
+    } catch (error) {
+      setSummary({ guide: repairRequestGuideSlug, up: 0, down: 0, comments: [] });
+      setBoardError(error instanceof Error ? error.message : 'Anfragen konnten nicht geladen werden.');
+    }
+  };
+
+  useEffect(() => {
+    void loadRequests();
+  }, [refreshKey]);
+
+  const comments = summary?.comments ?? [];
+  const requests = comments.filter((comment) => comment.kind === 'repair_request');
+  const answerCountsByRequest = new Map<string, number>();
+  comments.filter((comment) => comment.kind === 'repair_answer').forEach((answer) => {
+    if (!answer.parentId) return;
+    answerCountsByRequest.set(answer.parentId, (answerCountsByRequest.get(answer.parentId) ?? 0) + 1);
+  });
+
+  return (
+    <section className="repair-request-board-section section-pad">
+      <div className="section-heading compact">
+        <div>
+          <div className="eyebrow handwritten">offene fragen und lösungen</div>
+          <h2>Was die Community gerade klärt.</h2>
+        </div>
+        <span className="comment-count">{requests.length} freigegeben</span>
+      </div>
+      {boardError && <p className="form-message form-message-error" role="alert">{boardError}</p>}
+      {requests.length ? (
+        <div className="repair-request-grid">
+          {requests.map((request, index) => <RepairRequestCard key={request.id} request={request} answerCount={answerCountsByRequest.get(request.id) ?? 0} index={index} />)}
+        </div>
+      ) : (
+        <div className="empty-state card-doodle repair-request-empty"><h3>Noch keine freigegebene Anfrage.</h3><p>Starte oben die erste Frage. Nach der Prüfung kann die Community darauf antworten und die Lösung dokumentieren.</p></div>
+      )}
+    </section>
+  );
+}
+
+function RepairRequestDetailPage({ requestId }: { requestId: string }) {
+  const [summary, setSummary] = useState<FeedbackSummary | null>(null);
+  const [detailError, setDetailError] = useState('');
+  const detailPath = repairRequestDetailPath(requestId);
+
+  const loadRequest = async () => {
+    try {
+      const payload = await apiJson<FeedbackSummary>(`/api/feedback/${repairRequestGuideSlug}`);
+      setSummary(payload);
+      setDetailError('');
+    } catch (error) {
+      setSummary({ guide: repairRequestGuideSlug, up: 0, down: 0, comments: [] });
+      setDetailError(error instanceof Error ? error.message : 'Die Reparaturanfrage konnte nicht geladen werden.');
+    }
+  };
+
+  useEffect(() => {
+    document.title = 'Reparaturanfrage — Black Tea Motorbikes – Hilfe';
+    window.scrollTo(0, 0);
+    void loadRequest();
+  }, [requestId]);
+
+  const comments = summary?.comments ?? [];
+  const request = comments.find((comment) => comment.id === requestId && comment.kind === 'repair_request');
+  const answers = comments.filter((comment) => comment.kind === 'repair_answer' && comment.parentId === requestId);
+
+  useEffect(() => {
+    if (!request) return;
+    const title = `${request.topic ?? 'Reparaturanfrage'} — Reparaturhilfe — Black Tea Motorbikes – Hilfe`;
+    const description = `${request.topic ?? 'Reparaturanfrage'}: ${request.body}`.slice(0, 155);
+    applySeoMetadata({
+      title,
+      description,
+      canonicalPath: detailPath,
+      robots: 'noindex,follow,noarchive',
+      jsonLd: {},
+    });
+  }, [detailPath, request]);
+
+  if (summary && !request && !detailError) return <NotFoundPage path={detailPath} />;
+
+  return (
+    <div className="site-shell">
+      <GuideHeader />
+      <main className="repair-page-main repair-request-detail-page">
+        <section className="repair-page-hero section-pad">
+          <a className="repair-back" href={repairRequestPath}>← Alle offenen Fragen</a>
+          <div className="eyebrow handwritten">{request?.section ?? 'reparaturanfrage'}</div>
+          <h1>{request?.topic ?? 'Reparaturanfrage wird geladen …'}</h1>
+          <p>{request ? 'Hier kannst du das Fehlerbild in Ruhe nachvollziehen und eine eigene Antwort oder Lösung teilen.' : 'Die freigegebene Anfrage und ihre Antworten werden geladen.'}</p>
+          <RepairTabs active="requests" />
+        </section>
+        <section className="repair-request-detail-section section-pad">
+          {detailError && <p className="form-message form-message-error" role="alert">{detailError}</p>}
+          {!summary && !detailError && <div className="empty-state card-doodle repair-request-empty"><h2>Anfrage wird geladen …</h2><p>Einen Moment bitte.</p></div>}
+          {request && (
+            <div className="repair-request-detail-layout">
+              <article className="repair-request-detail-card card-doodle">
+                <div className="repair-request-card-topline"><span className="kind-chip community">Frage</span><time dateTime={request.createdAt}>{new Date(request.createdAt).toLocaleDateString('de-DE')}</time></div>
+                <div className="approved-comment-topline"><strong>{request.name}</strong><span>{request.section ?? 'Modell noch offen'}</span></div>
+                <h2>Fehlerbild und bisherige Angaben</h2>
+                <p className="repair-request-detail-body">{request.body}</p>
+                {request.source && <p className="repair-request-source"><strong>Weitere Info:</strong> {request.source}</p>}
+                <div className="repair-answers repair-request-detail-answers">
+                  <div className="repair-answers-heading"><span className="eyebrow handwritten">antworten und lösungen</span><span className="comment-count">{answers.length}</span></div>
+                  {answers.length ? answers.map((answer) => (
+                    <article className="repair-answer" key={answer.id}>
+                      <div className="approved-comment-topline"><strong>{answer.name}</strong><time dateTime={answer.createdAt}>{new Date(answer.createdAt).toLocaleDateString('de-DE')}</time></div>
+                      <p>{answer.body}</p>
+                      {answer.source && <small>Quelle: {answer.source}</small>}
+                      {answer.imageUrl && <img src={answer.imageUrl} alt={`Bild von ${answer.name}`} loading="lazy" />}
+                    </article>
+                  )) : <p className="no-comments">Noch keine Antwort. Vielleicht kennst du den ersten Lösungsansatz?</p>}
+                </div>
+              </article>
+              <aside className="repair-request-answer-panel card-doodle">
+                <div className="eyebrow handwritten">dein lösungsansatz</div>
+                <h2>Antwort oder Lösung teilen</h2>
+                <p>Beschreibe, was du geprüft, gemessen oder erfolgreich repariert hast. Auch Antworten werden vor der Veröffentlichung moderiert.</p>
+                <RepairAnswerForm parentId={request.id} onSubmitted={loadRequest} />
+              </aside>
+            </div>
+          )}
+        </section>
+      </main>
+      <GuideFooter />
+    </div>
+  );
+}
+
+function RepairRequestCard({ request, answerCount, index }: { request: PublicComment; answerCount: number; index: number }) {
+  const detailPath = repairRequestDetailPath(request.id);
+
+  return (
+    <article className={`repair-request-card card-doodle ${index % 2 ? 'repair-request-card-tilt-right' : 'repair-request-card-tilt-left'}`}>
+      <div className="repair-request-card-topline"><span className="kind-chip community">Frage</span><span>{request.section ?? 'Modell noch offen'}</span></div>
+      <h3><a className="repair-request-title-link" href={detailPath}>{request.topic ?? 'Reparaturanfrage'} ↗</a></h3>
+      <div className="approved-comment-topline"><strong>{request.name}</strong><time dateTime={request.createdAt}>{new Date(request.createdAt).toLocaleDateString('de-DE')}</time></div>
+      <p className="repair-request-body">{request.body}</p>
+      {request.source && <p className="repair-request-source"><strong>Weitere Info:</strong> {request.source}</p>}
+      <div className="repair-answers">
+        <div className="repair-answers-heading"><span className="eyebrow handwritten">antworten und lösungen</span><span className="comment-count">{answerCount}</span></div>
+        <p className="no-comments">{answerCount ? `${answerCount} geprüfte Antwort${answerCount === 1 ? '' : 'en'} auf der Anfrageseite.` : 'Noch keine Antwort. Teile den ersten Lösungsansatz auf der Anfrageseite.'}</p>
+      </div>
+      <a className="repair-request-open-link" href={detailPath}>Anfrage öffnen und kommentieren ↗</a>
+    </article>
+  );
+}
+
+function RepairAnswerForm({ parentId, onSubmitted }: { parentId: string; onSubmitted: () => Promise<void> | void }) {
+  const [answerError, setAnswerError] = useState('');
+  const [answerNotice, setAnswerNotice] = useState('');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] ?? null;
+    setAnswerError('');
+    setAnswerNotice('');
+    if (file && file.size > 1048576) {
+      setSelectedFile(null);
+      event.target.value = '';
+      setAnswerError('Das Bild darf höchstens 1 MB groß sein.');
+      return;
+    }
+    setSelectedFile(file);
+  };
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSubmitting(true);
+    setAnswerError('');
+    setAnswerNotice('');
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    formData.set('guide', repairRequestGuideSlug);
+    formData.set('kind', 'repair_answer');
+    formData.set('parentId', parentId);
+    formData.delete('image');
+    if (selectedFile) formData.append('image', selectedFile);
+
+    try {
+      await apiJson<{ message: string }>('/api/comments', { method: 'POST', body: formData });
+      form.reset();
+      setSelectedFile(null);
+      setAnswerNotice('Danke! Deine Antwort wartet jetzt auf die redaktionelle Freigabe.');
+      await onSubmitted();
+    } catch (error) {
+      setAnswerError(error instanceof Error ? error.message : 'Die Antwort konnte nicht gesendet werden.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <form className="comment-form repair-answer-form" onSubmit={handleSubmit}>
+      <div className="comment-form-grid">
+        <label>Name<input name="name" required minLength={2} maxLength={80} autoComplete="name" /></label>
+        <label>E-Mail<input name="email" type="email" required maxLength={180} autoComplete="email" /><small>wird nicht öffentlich angezeigt</small></label>
+      </div>
+      <label>Dein Lösungsansatz<textarea name="body" required minLength={10} maxLength={4000} rows={5} placeholder="Was hast du geprüft, gemessen oder erfolgreich repariert?" /></label>
+      <label>Quelle (optional)<input name="source" maxLength={500} placeholder="z. B. Handbuch, Teilenummer oder https://…" /></label>
+      <label>Bild (optional, max. 1 MB)<input name="image" type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={handleImageChange} /></label>
+      <label className="comment-honeypot" aria-hidden="true">Website<input name="website" tabIndex={-1} autoComplete="off" /></label>
+      {answerError && <p className="form-message form-message-error" role="alert">{answerError}</p>}
+      {answerNotice && <p className="form-message form-message-success" role="status">{answerNotice}</p>}
+      <button className="button button-ink" type="submit" disabled={submitting}>{submitting ? 'Wird geprüft …' : 'Antwort zur Prüfung senden'} <span aria-hidden="true">↗</span></button>
+    </form>
   );
 }
 
@@ -2825,7 +3429,7 @@ function AdminPage() {
   const [loginEmail, setLoginEmail] = useState('hallo@shortaktien.de');
   const [password, setPassword] = useState('');
   const [comments, setComments] = useState<AdminComment[]>([]);
-  const [adminFilter, setAdminFilter] = useState<'all' | 'wiki' | 'comments'>('all');
+  const [adminFilter, setAdminFilter] = useState<'all' | 'wiki' | 'comments' | 'requests'>('all');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
@@ -2919,6 +3523,41 @@ function AdminPage() {
     }
   };
 
+  const handleRepairDraftDownload = (request: AdminComment) => {
+    const answers = comments.filter((comment) => comment.kind === 'repair_answer' && comment.parentId === request.id);
+    const answerSection = answers.length
+      ? answers.flatMap((answer) => [`### Antwort von ${answer.name}`, '', answer.body, ...(answer.source ? ['', `Quelle: ${answer.source}`] : []), ''])
+      : ['Noch keine freigegebene Antwort.', ''];
+    const markdown = [
+      '---',
+      `title: "${(request.topic ?? 'Neue Reparaturhilfe').replace(/"/g, '\\"')}"`,
+      `model: "${(request.section ?? 'Bonfire oder Wildfire').replace(/"/g, '\\"')}"`,
+      'status: Entwurf',
+      '---',
+      '',
+      '## Fehlerbild',
+      '',
+      request.body,
+      '',
+      '## Lösungsansätze aus der Community',
+      '',
+      ...answerSection,
+      '## Sicherheit',
+      '',
+      'Sicherheitskritische Arbeiten an Akku, BMS, Hochvolt, Controller, Bremsen und Fahrwerk gehören in qualifizierte Hände. Die Hinweise müssen vor Veröffentlichung fachlich und quellenbasiert geprüft werden.',
+      '',
+      ...(request.source ? ['## Ausgangsquelle', '', request.source, ''] : []),
+    ].join('\n');
+    const filename = `${slugify(request.topic ?? 'neue-reparaturhilfe') || 'neue-reparaturhilfe'}.md`;
+    const url = URL.createObjectURL(new Blob([markdown], { type: 'text/markdown;charset=utf-8' }));
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    link.click();
+    URL.revokeObjectURL(url);
+    setNotice('Markdown-Entwurf für die neue Reparaturhilfe wurde heruntergeladen.');
+  };
+
   const handleLogout = async () => {
     await apiJson<{ authenticated: boolean }>('/api/admin/logout', { method: 'POST', headers: { 'X-CSRF-Token': csrfToken } });
     setAuthenticated(false);
@@ -2928,8 +3567,9 @@ function AdminPage() {
   };
 
   const wikiSuggestions = comments.filter((comment) => comment.kind === 'wiki_suggestion');
-  const experienceComments = comments.filter((comment) => comment.kind !== 'wiki_suggestion');
-  const visibleComments = adminFilter === 'wiki' ? wikiSuggestions : adminFilter === 'comments' ? experienceComments : comments;
+  const repairRequests = comments.filter((comment) => comment.kind === 'repair_request' || comment.kind === 'repair_answer');
+  const experienceComments = comments.filter((comment) => comment.kind === 'comment');
+  const visibleComments = adminFilter === 'wiki' ? wikiSuggestions : adminFilter === 'comments' ? experienceComments : adminFilter === 'requests' ? repairRequests : comments;
 
   return (
     <div className="site-shell">
@@ -2939,7 +3579,7 @@ function AdminPage() {
           <a className="repair-back" href="/hilfe">← Zur Reparaturhilfe</a>
           <div className="eyebrow handwritten">redaktion · intern</div>
           <h1>Beiträge prüfen</h1>
-          <p>Hier werden Erfahrungsberichte und Wiki-Vorschläge geprüft, bevor sie öffentlich erscheinen.</p>
+          <p>Hier werden Erfahrungsberichte, Reparaturanfragen, Antworten und Wiki-Vorschläge geprüft, bevor sie öffentlich erscheinen.</p>
         </section>
         {!checked ? <p className="admin-loading section-pad">Sitzung wird geprüft …</p> : !authenticated ? (
           <section className="admin-login-section section-pad">
@@ -2964,14 +3604,16 @@ function AdminPage() {
               <button className={adminFilter === 'all' ? 'active' : ''} type="button" role="tab" aria-selected={adminFilter === 'all'} onClick={() => setAdminFilter('all')}>Alle <strong>{comments.length}</strong></button>
               <button className={adminFilter === 'wiki' ? 'active' : ''} type="button" role="tab" aria-selected={adminFilter === 'wiki'} onClick={() => setAdminFilter('wiki')}>Wiki <strong>{wikiSuggestions.length}</strong></button>
               <button className={adminFilter === 'comments' ? 'active' : ''} type="button" role="tab" aria-selected={adminFilter === 'comments'} onClick={() => setAdminFilter('comments')}>Kommentare <strong>{experienceComments.length}</strong></button>
+              <button className={adminFilter === 'requests' ? 'active' : ''} type="button" role="tab" aria-selected={adminFilter === 'requests'} onClick={() => setAdminFilter('requests')}>Reparatur <strong>{repairRequests.length}</strong></button>
             </div>
             <div className="admin-comment-list">
               {visibleComments.length ? visibleComments.map((comment) => (
                 <article className={`admin-comment card-doodle ${comment.status === 'pending' ? 'admin-comment-pending' : ''}`} key={comment.id}>
                   <div className="admin-comment-header">
-                    <div><span className={`admin-status ${comment.status}`}>{comment.status === 'pending' ? 'wartet auf Prüfung' : 'freigegeben'}</span><span className="admin-kind">{comment.kind === 'wiki_suggestion' ? 'Wiki-Vorschlag' : 'Erfahrungsbericht'}</span><h2>{comment.topic ?? comment.name}</h2><p>{comment.topic ? `${comment.name} · ` : ''}{comment.email} · {comment.guide} · {new Date(comment.createdAt).toLocaleString('de-DE')}</p>{comment.section && <p className="admin-comment-target"><strong>Betroffener Abschnitt:</strong> „{comment.section}“</p>}</div>
+                    <div><span className={`admin-status ${comment.status}`}>{comment.status === 'pending' ? 'wartet auf Prüfung' : 'freigegeben'}</span><span className="admin-kind">{comment.kind === 'wiki_suggestion' ? 'Wiki-Vorschlag' : comment.kind === 'repair_request' ? 'Reparaturanfrage' : comment.kind === 'repair_answer' ? 'Antwort auf Reparaturanfrage' : 'Erfahrungsbericht'}</span><h2>{comment.topic ?? comment.name}</h2><p>{comment.topic ? `${comment.name} · ` : ''}{comment.email} · {comment.guide} · {new Date(comment.createdAt).toLocaleString('de-DE')}</p>{comment.section && <p className="admin-comment-target"><strong>Modell / Bereich:</strong> „{comment.section}“</p>}{comment.kind === 'repair_answer' && comment.parentId && <p className="admin-comment-target"><strong>Antwort auf Anfrage:</strong> {comment.parentId}</p>}</div>
                     <div className="admin-comment-actions">
                       {comment.status === 'pending' ? <button className="button button-ink" type="button" disabled={busy} onClick={() => void handleStatus(comment, 'approved')}>Freigeben</button> : <button className="button button-ghost" type="button" disabled={busy} onClick={() => void handleStatus(comment, 'pending')}>Zurückstellen</button>}
+                      {comment.kind === 'repair_request' && <button className="button button-ghost" type="button" onClick={() => handleRepairDraftDownload(comment)}>Als neue Hilfe vorbereiten</button>}
                       <button className="button button-danger" type="button" disabled={busy} onClick={() => void handleDelete(comment)}>Löschen</button>
                     </div>
                   </div>
@@ -2979,7 +3621,7 @@ function AdminPage() {
                   {comment.source && <p className="admin-comment-source"><strong>Quelle:</strong> {comment.source}</p>}
                   {comment.imageUrl && <a href={comment.imageUrl} target="_blank" rel="noreferrer"><img className="admin-comment-image" src={comment.imageUrl} alt={`Anhang von ${comment.name}`} /></a>}
                 </article>
-              )) : <div className="admin-empty card-doodle"><h2>Alles ruhig.</h2><p>{adminFilter === 'wiki' ? 'Aktuell liegen keine Wiki-Vorschläge zur Prüfung vor.' : adminFilter === 'comments' ? 'Aktuell liegen keine Erfahrungsberichte zur Prüfung vor.' : 'Aktuell liegen keine Beiträge zur Prüfung vor.'}</p></div>}
+              )) : <div className="admin-empty card-doodle"><h2>Alles ruhig.</h2><p>{adminFilter === 'wiki' ? 'Aktuell liegen keine Wiki-Vorschläge zur Prüfung vor.' : adminFilter === 'comments' ? 'Aktuell liegen keine Erfahrungsberichte zur Prüfung vor.' : adminFilter === 'requests' ? 'Aktuell liegen keine Reparaturanfragen oder Antworten zur Prüfung vor.' : 'Aktuell liegen keine Beiträge zur Prüfung vor.'}</p></div>}
             </div>
           </section>
         )}
