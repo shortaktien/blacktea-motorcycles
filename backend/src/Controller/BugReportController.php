@@ -5,6 +5,9 @@ namespace App\Controller;
 use App\Service\CommunityStorage;
 use App\Service\EmailConfirmationService;
 use App\Service\GitHubIssueService;
+use App\Service\MailjetService;
+use App\Service\UserAuthService;
+use App\Service\UserStorage;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,12 +19,19 @@ final class BugReportController
         private readonly CommunityStorage $storage,
         private readonly EmailConfirmationService $emailConfirmation,
         private readonly GitHubIssueService $github,
+        private readonly MailjetService $mailjet,
+        private readonly UserAuthService $users,
+        private readonly UserStorage $userStorage,
     ) {
     }
 
     #[Route('/api/bug-reports', name: 'api_bug_report_create', methods: ['POST'])]
     public function create(Request $request): JsonResponse
     {
+        $authenticatedUser = $this->users->currentUser();
+        if (($authenticatedUser['communicationBlocked'] ?? false) === true) {
+            return $this->error('Dein Konto ist für neue Community-Kommunikation gesperrt.', Response::HTTP_FORBIDDEN);
+        }
         $payload = $this->jsonPayload($request);
         $honeypot = $payload['website'] ?? '';
         if (is_string($honeypot) && trim($honeypot) !== '') {
@@ -33,6 +43,11 @@ final class BugReportController
         $email = $payload['email'] ?? null;
         $description = $payload['description'] ?? null;
         $pageUrl = $payload['pageUrl'] ?? null;
+
+        if ($authenticatedUser !== null) {
+            $name = $authenticatedUser['name'];
+            $email = $authenticatedUser['email'];
+        }
 
         if (!is_string($title) || $this->length($title) < 2 || $this->length($title) > 160) {
             return $this->error('Bitte eine Überschrift mit 2 bis 160 Zeichen angeben.', Response::HTTP_BAD_REQUEST);
@@ -58,11 +73,17 @@ final class BugReportController
         }
 
         $normalizedEmail = strtolower(trim($email));
-        if ($response = $this->confirmationRateLimited($request, $normalizedEmail)) {
+        if ($authenticatedUser === null) {
+            $registeredUser = $this->userStorage->findByEmail($normalizedEmail);
+            if (($registeredUser['communicationBlocked'] ?? false) === true) {
+                return $this->error('Dieses Konto ist für neue Community-Kommunikation gesperrt.', Response::HTTP_FORBIDDEN);
+            }
+        }
+        if ($authenticatedUser === null && ($response = $this->confirmationRateLimited($request, $normalizedEmail))) {
             return $response;
         }
 
-        $confirmation = $this->emailConfirmation->createToken('/api/bug-reports/confirm/');
+        $confirmation = $authenticatedUser === null ? $this->emailConfirmation->createToken('/api/bug-reports/confirm/') : null;
         $bugReport = [
             'id' => bin2hex(random_bytes(16)),
             'title' => trim($title),
@@ -70,28 +91,55 @@ final class BugReportController
             'email' => $normalizedEmail,
             'description' => trim($description),
             'pageUrl' => trim($pageUrl),
-            'status' => 'awaiting_confirmation',
+            'userId' => $authenticatedUser['id'] ?? null,
+            'status' => $authenticatedUser === null ? 'awaiting_confirmation' : 'confirmed',
             'createdAt' => (new \DateTimeImmutable())->format(DATE_ATOM),
-            'emailConfirmedAt' => null,
-            'emailConfirmationTokenHash' => $confirmation['tokenHash'],
-            'emailConfirmationExpiresAt' => $confirmation['expiresAt'],
+            'emailConfirmedAt' => $authenticatedUser !== null ? (new \DateTimeImmutable())->format(DATE_ATOM) : null,
             'issueUrl' => null,
         ];
+        if (is_array($confirmation)) {
+            $bugReport['emailConfirmationTokenHash'] = $confirmation['tokenHash'];
+            $bugReport['emailConfirmationExpiresAt'] = $confirmation['expiresAt'];
+        }
 
         try {
             $this->storage->update(static function (array &$data) use ($bugReport): void {
                 $data['bugReports'][] = $bugReport;
             });
-            $this->emailConfirmation->send($normalizedEmail, trim($name), $confirmation['url'], 'Bugmeldung: ' . trim($title));
+            if (is_array($confirmation)) {
+                $this->emailConfirmation->send($normalizedEmail, trim($name), $confirmation['url'], 'Bugmeldung: ' . trim($title));
+            } else {
+                $issue = $this->github->createBugIssue(trim($title), trim($description), trim($pageUrl), trim($name));
+                $this->storage->update(static function (array &$data) use ($bugReport, $issue): void {
+                    foreach ($data['bugReports'] as &$candidate) {
+                        if (($candidate['id'] ?? null) === $bugReport['id']) {
+                            $candidate['status'] = 'reported';
+                            $candidate['issueUrl'] = $issue['url'];
+                            break;
+                        }
+                    }
+                    unset($candidate);
+                });
+                try {
+                    $this->notifyStaffAboutBugReport($bugReport, (string) $issue['url']);
+                } catch (\Throwable $notificationException) {
+                    error_log('[admin-bug-notification] ' . $notificationException->getMessage());
+                }
+            }
         } catch (\Throwable $exception) {
             $this->removeBugReport($bugReport['id']);
             error_log('[bug-report] ' . $exception->getMessage());
+            if ($authenticatedUser !== null) {
+                return $this->error('Die Bugmeldung konnte gerade nicht als GitHub-Issue angelegt werden. Bitte später erneut versuchen.', Response::HTTP_SERVICE_UNAVAILABLE);
+            }
             return $this->error('Die Bestätigungs-E-Mail konnte gerade nicht versendet werden. Bitte später erneut versuchen.', Response::HTTP_SERVICE_UNAVAILABLE);
         }
 
         return new JsonResponse([
-            'message' => 'Fast geschafft! Bestätige jetzt deine E-Mail-Adresse. Erst danach wird die Bugmeldung als GitHub-Issue angelegt.',
-        ], Response::HTTP_ACCEPTED);
+            'message' => $authenticatedUser !== null
+                ? 'Danke! Deine Bugmeldung ist bestätigt und wird jetzt als GitHub-Issue angelegt.'
+                : 'Fast geschafft! Bestätige jetzt deine E-Mail-Adresse. Erst danach wird die Bugmeldung als GitHub-Issue angelegt.',
+        ], $authenticatedUser !== null ? Response::HTTP_CREATED : Response::HTTP_ACCEPTED);
     }
 
     #[Route('/api/bug-reports/confirm/{token}', name: 'api_bug_report_confirm', methods: ['GET'])]
@@ -162,6 +210,11 @@ final class BugReportController
                 }
                 unset($bugReport);
             });
+            try {
+                $this->notifyStaffAboutBugReport($match, (string) $issue['url']);
+            } catch (\Throwable $notificationException) {
+                error_log('[admin-bug-notification] ' . $notificationException->getMessage());
+            }
         } catch (\Throwable $exception) {
             $this->storage->update(static function (array &$data) use ($match, $tokenHash): void {
                 foreach ($data['bugReports'] as &$bugReport) {
@@ -245,6 +298,71 @@ final class BugReportController
                 static fn (array $bugReport): bool => ($bugReport['id'] ?? null) !== $id,
             ));
         });
+    }
+
+    /** @param array<string, mixed> $bugReport */
+    private function notifyStaffAboutBugReport(array $bugReport, string $issueUrl): void
+    {
+        $bugReportId = (string) ($bugReport['id'] ?? '');
+        if ($bugReportId === '') {
+            return;
+        }
+
+        $recipients = [];
+        $adminEmail = strtolower(trim($this->env('ADMIN_EMAIL')));
+        if (filter_var($adminEmail, FILTER_VALIDATE_EMAIL) !== false
+            && ($this->storage->notificationSettingsForAdmin()['bugs'] ?? true) === true
+        ) {
+            $recipients[] = $adminEmail;
+        }
+        foreach ($this->userStorage->read()['users'] as $user) {
+            $email = strtolower(trim((string) ($user['email'] ?? '')));
+            $userId = (string) ($user['id'] ?? '');
+            if (($user['status'] ?? null) !== 'active'
+                || ($user['role'] ?? 'member') !== 'moderator'
+                || $userId === ''
+                || filter_var($email, FILTER_VALIDATE_EMAIL) === false
+                || ($this->storage->notificationSettingsForModerator($userId)['bugs'] ?? true) !== true
+                || in_array($email, $recipients, true)
+            ) {
+                continue;
+            }
+            $recipients[] = $email;
+        }
+        if ($recipients === []) {
+            return;
+        }
+        if (!$this->storage->allowRate('admin-bug-notification', $bugReportId, 1, 86400)
+            || !$this->storage->allowRate('admin-bug-notification-global', 'all', 30, 3600)
+        ) {
+            error_log('[admin-bug-notification] Rate-Limit erreicht.');
+            return;
+        }
+
+        $title = (string) ($bugReport['title'] ?? 'Bugmeldung');
+        $description = (string) ($bugReport['description'] ?? '');
+        $pageUrl = (string) ($bugReport['pageUrl'] ?? '');
+        $body = $description . "\n\nFundstelle: " . $pageUrl . "\nGitHub-Issue: " . $issueUrl;
+        foreach ($recipients as $recipient) {
+            try {
+                $this->mailjet->sendModerationNotification(
+                    $recipient,
+                    'Bugmeldung: ' . $title,
+                    (string) ($bugReport['name'] ?? ''),
+                    (string) ($bugReport['email'] ?? ''),
+                    $body,
+                    'Bugmeldung',
+                );
+            } catch (\Throwable $exception) {
+                error_log('[admin-bug-notification] ' . $exception->getMessage());
+            }
+        }
+    }
+
+    private function env(string $key): string
+    {
+        $value = $_ENV[$key] ?? $_SERVER[$key] ?? getenv($key);
+        return is_string($value) ? $value : '';
     }
 
     private function confirmationPage(string $title, string $message, string $path, int $status): Response

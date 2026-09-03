@@ -162,7 +162,37 @@ final class CommunityStorage
         }
     }
 
-    /** @return array{feedback: array<string, array{up: int, down: int}>, comments: list<array<string, mixed>>, bugReports: list<array<string, mixed>>} */
+    public function notificationSettingsForAdmin(): array
+    {
+        return $this->read()['notificationSettings']['admin'];
+    }
+
+    public function notificationSettingsForModerator(string $userId): array
+    {
+        $settings = $this->read()['notificationSettings']['moderators'][$userId] ?? null;
+        return is_array($settings) ? $settings : $this->normaliseNotificationSettings(null, false);
+    }
+
+    public function saveNotificationSettings(string $audience, string $identity, array $settings): array
+    {
+        $isAdmin = $audience === 'admin';
+        $normalized = $this->normaliseNotificationSettings($settings, $isAdmin);
+        $updated = $this->update(static function (array &$data) use ($isAdmin, $identity, $normalized): void {
+            $data['notificationSettings'] ??= ['admin' => [], 'moderators' => []];
+            if ($isAdmin) {
+                $data['notificationSettings']['admin'] = $normalized;
+                return;
+            }
+            $data['notificationSettings']['moderators'] ??= [];
+            $data['notificationSettings']['moderators'][$identity] = $normalized;
+        });
+
+        return $isAdmin
+            ? $updated['notificationSettings']['admin']
+            : $updated['notificationSettings']['moderators'][$identity];
+    }
+
+    /** @return array{feedback: array<string, array{up: int, down: int}>, comments: list<array<string, mixed>>, bugReports: list<array<string, mixed>>, staffChat: list<array<string, mixed>>, notificationSettings: array{admin: array<string, bool>, moderators: array<string, array<string, bool>>}} */
     private function decode($handle): array
     {
         rewind($handle);
@@ -213,11 +243,57 @@ final class CommunityStorage
             }
         }
 
-        return ['feedback' => $feedback, 'comments' => $comments, 'bugReports' => $bugReports];
+        $staffChat = [];
+        foreach (($data['staffChat'] ?? []) as $message) {
+            if (is_array($message) && isset($message['id'], $message['authorId'], $message['authorName'], $message['authorRole'], $message['body'], $message['createdAt'])) {
+                $staffChat[] = $message;
+            }
+        }
+
+        $rawNotificationSettings = is_array($data['notificationSettings'] ?? null) ? $data['notificationSettings'] : [];
+        $moderatorSettings = [];
+        foreach (($rawNotificationSettings['moderators'] ?? []) as $userId => $settings) {
+            if (is_string($userId) && $userId !== '') {
+                $moderatorSettings[$userId] = $this->normaliseNotificationSettings($settings, false);
+            }
+        }
+
+        return [
+            'feedback' => $feedback,
+            'comments' => $comments,
+            'bugReports' => $bugReports,
+            'staffChat' => $staffChat,
+            'notificationSettings' => [
+                'admin' => $this->normaliseNotificationSettings($rawNotificationSettings['admin'] ?? null, true),
+                'moderators' => $moderatorSettings,
+            ],
+        ];
     }
 
     private function emptyStore(): array
     {
-        return ['feedback' => [], 'comments' => [], 'bugReports' => []];
+        return [
+            'feedback' => [],
+            'comments' => [],
+            'bugReports' => [],
+            'staffChat' => [],
+            'notificationSettings' => [
+                'admin' => $this->normaliseNotificationSettings(null, true),
+                'moderators' => [],
+            ],
+        ];
+    }
+
+    private function normaliseNotificationSettings(mixed $settings, bool $isAdmin): array
+    {
+        $settings = is_array($settings) ? $settings : [];
+
+        return [
+            'comments' => ($settings['comments'] ?? true) === true,
+            'wiki' => ($settings['wiki'] ?? true) === true,
+            'repair' => ($settings['repair'] ?? true) === true,
+            'bugs' => ($settings['bugs'] ?? true) === true,
+            'registration' => $isAdmin && (($settings['registration'] ?? true) === true),
+        ];
     }
 }

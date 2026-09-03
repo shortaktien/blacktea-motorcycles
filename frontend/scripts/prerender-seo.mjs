@@ -83,6 +83,9 @@ const staticPages = [
   { path: '/bikes/bonfire', title: 'Bonfire — Bikes — Black Tea Motorbikes – Hilfe', description: 'Technische Wiki-Seite zur Black Tea Bonfire mit Handbuchdaten, Modellvarianten und nachvollziehbaren Quellen.' },
   { path: '/bikes/wildfire', title: 'Wildfire — Bikes — Black Tea Motorbikes – Hilfe', description: 'Technische Wiki-Seite zur Black Tea Wildfire mit Handbuchdaten, Modellvarianten und nachvollziehbaren Quellen.' },
   { path: '/admin', title: 'Admin — Black Tea Motorbikes – Hilfe', description: 'Interner Bereich zur redaktionellen Prüfung von Kommentaren.', robots: 'noindex,nofollow,noarchive' },
+  { path: '/login', title: 'Einloggen — Black Tea Motorbikes – Hilfe', description: 'In den persönlichen BTM-Hilfe-Bereich einloggen.', robots: 'noindex,nofollow,noarchive' },
+  { path: '/registrieren', title: 'Registrieren — Black Tea Motorbikes – Hilfe', description: 'Ein persönliches BTM-Hilfe-Konto mit Mailjet-Bestätigung anlegen.', robots: 'noindex,nofollow,noarchive' },
+  { path: '/konto', title: 'Mein Bereich — Black Tea Motorbikes – Hilfe', description: 'Persönliche Bike-Einstellungen und Benachrichtigungen bei BTM-Hilfe.', robots: 'noindex,nofollow,noarchive' },
 ];
 
 const pages = [

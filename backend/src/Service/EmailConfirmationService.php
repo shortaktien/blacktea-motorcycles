@@ -30,6 +30,11 @@ final class EmailConfirmationService
         $this->mailjet->sendConfirmation($email, $name, $url, $submissionLabel);
     }
 
+    public function sendAccountConfirmation(string $email, string $name, string $url): void
+    {
+        $this->mailjet->sendAccountConfirmation($email, $name, $url);
+    }
+
     public function isExpired(string $expiresAt): bool
     {
         try {

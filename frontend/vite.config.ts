@@ -32,6 +32,10 @@ const routeMetadata: Record<string, { title: string; description: string; robots
   '/community': { title: 'BTM Community-Wissen — Black Tea Hilfe', description: 'Technische Hinweise aus der Black Tea Community verständlich zusammengefasst, mit lokalen PDFs und Originalquellen.' },
   '/quellen': { title: 'Quellen — Black Tea Hilfe', description: 'Nachvollziehbare Quellen zu Insolvenzstatus, Handbüchern, lokalen PDFs, Ersatzteilspuren und Community-Wissen.' },
   '/admin': { title: 'Admin — Black Tea Hilfe', description: 'Interner Bereich zur redaktionellen Prüfung von Kommentaren.', robots: 'noindex,nofollow,noarchive' },
+  '/login': { title: 'Einloggen — Black Tea Hilfe', description: 'In den persönlichen BTM-Hilfe-Bereich einloggen.', robots: 'noindex,nofollow,noarchive' },
+  '/registrieren': { title: 'Registrieren — Black Tea Hilfe', description: 'Ein persönliches BTM-Hilfe-Konto mit Mailjet-Bestätigung anlegen.', robots: 'noindex,nofollow,noarchive' },
+  '/konto': { title: 'Mein Bereich — Black Tea Hilfe', description: 'Persönliche Bike-Einstellungen und Benachrichtigungen bei BTM-Hilfe.', robots: 'noindex,nofollow,noarchive' },
+  '/passwort-zuruecksetzen': { title: 'Passwort zurücksetzen — Black Tea Hilfe', description: 'Passwort für ein BTM-Hilfe-Konto zurücksetzen.', robots: 'noindex,nofollow,noarchive' },
   '/bikes/bonfire': { title: 'Bonfire — Bikes — Black Tea Hilfe', description: 'Technische Wiki-Seite zur Black Tea Bonfire mit Handbuchdaten, Modellvarianten und nachvollziehbaren Quellen.' },
   '/bikes/wildfire': { title: 'Wildfire — Bikes — Black Tea Hilfe', description: 'Technische Wiki-Seite zur Black Tea Wildfire mit Handbuchdaten, Modellvarianten und nachvollziehbaren Quellen.' },
 };

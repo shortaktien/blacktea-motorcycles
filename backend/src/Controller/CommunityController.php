@@ -4,27 +4,40 @@ namespace App\Controller;
 
 use App\Service\CommunityStorage;
 use App\Service\EmailConfirmationService;
+use App\Service\MailjetService;
+use App\Service\UserAuthService;
+use App\Service\UserStorage;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\UploadedFile;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Routing\Attribute\Route;
 
 final class CommunityController
 {
     private const REPAIR_REQUEST_GUIDE = 'hilfe-anfragen';
     private const MAX_IMAGE_BYTES = 1048576;
+    private const STAFF_CHAT_RETENTION_SECONDS = 20 * 86400;
+    private const STAFF_CHAT_MAX_MESSAGES = 500;
     private const ALLOWED_IMAGES = [
         'image/jpeg' => 'jpg',
         'image/png' => 'png',
         'image/webp' => 'webp',
         'image/gif' => 'gif',
     ];
+    private const ALLOWED_AVATARS = [
+        'image/jpeg' => 'jpg',
+        'image/png' => 'png',
+        'image/webp' => 'webp',
+    ];
 
     public function __construct(
         private readonly CommunityStorage $storage,
         private readonly EmailConfirmationService $emailConfirmation,
+        private readonly UserAuthService $users,
+        private readonly UserStorage $userStorage,
+        private readonly MailjetService $mailjet,
     )
     {
     }
@@ -64,6 +77,11 @@ final class CommunityController
             return $response;
         }
 
+        $authenticatedUser = $this->users->currentUser();
+        if (($authenticatedUser['communicationBlocked'] ?? false) === true) {
+            return $this->error('Dein Konto ist für neue Community-Kommunikation gesperrt.', Response::HTTP_FORBIDDEN);
+        }
+
         $payload = $this->jsonPayload($request);
         $guide = $payload['guide'] ?? null;
         $value = $payload['value'] ?? null;
@@ -90,6 +108,10 @@ final class CommunityController
             return $response;
         }
 
+        $authenticatedUser = $this->users->currentUser();
+        if (($authenticatedUser['communicationBlocked'] ?? false) === true) {
+            return $this->error('Dein Konto ist für neue Community-Kommunikation gesperrt.', Response::HTTP_FORBIDDEN);
+        }
         $guide = $request->request->get('guide');
         $name = $request->request->get('name');
         $email = $request->request->get('email');
@@ -100,6 +122,11 @@ final class CommunityController
         $source = $request->request->get('source');
         $parentId = $request->request->get('parentId');
         $honeypot = $request->request->get('website');
+
+        if ($authenticatedUser !== null) {
+            $name = $authenticatedUser['name'];
+            $email = $authenticatedUser['email'];
+        }
 
         if (!is_string($guide) || !$this->validGuide($guide)) {
             return $this->error('Ungültiger Beitrag.', Response::HTTP_BAD_REQUEST);
@@ -150,11 +177,17 @@ final class CommunityController
         }
 
         $normalizedEmail = strtolower(trim($email));
-        if ($response = $this->confirmationRateLimited($request, $normalizedEmail)) {
+        if ($authenticatedUser === null) {
+            $registeredUser = $this->userStorage->findByEmail($normalizedEmail);
+            if (($registeredUser['communicationBlocked'] ?? false) === true) {
+                return $this->error('Dieses Konto ist für neue Community-Kommunikation gesperrt.', Response::HTTP_FORBIDDEN);
+            }
+        }
+        if ($authenticatedUser === null && ($response = $this->confirmationRateLimited($request, $normalizedEmail))) {
             return $response;
         }
-
-        $confirmation = $this->emailConfirmation->createToken('/api/comments/confirm/');
+        $confirmation = $authenticatedUser === null ? $this->emailConfirmation->createToken('/api/comments/confirm/') : null;
+        $submissionStatus = $authenticatedUser === null ? 'awaiting_confirmation' : 'pending';
 
         $image = $request->files->get('image');
         if ($image !== null && !$image instanceof UploadedFile) {
@@ -168,7 +201,7 @@ final class CommunityController
                 return $this->error('Das Bild darf höchstens 1 MB groß sein.', Response::HTTP_BAD_REQUEST);
             }
 
-            $imageMime = $image->getMimeType();
+            $imageMime = function_exists('mime_content_type') ? @mime_content_type($image->getPathname()) : null;
             if (!is_string($imageMime) || !isset(self::ALLOWED_IMAGES[$imageMime])) {
                 return $this->error('Erlaubt sind JPG, PNG, WEBP oder GIF.', Response::HTTP_BAD_REQUEST);
             }
@@ -197,15 +230,18 @@ final class CommunityController
             'section' => is_string($section) && trim($section) !== '' ? trim($section) : null,
             'source' => is_string($source) && trim($source) !== '' ? trim($source) : null,
             'parentId' => $kind === 'repair_answer' ? trim((string) $parentId) : null,
+            'userId' => $authenticatedUser['id'] ?? null,
             'imageFile' => $imageFilename,
             'imageMime' => $imageMime,
-            'status' => 'awaiting_confirmation',
+            'status' => $submissionStatus,
             'createdAt' => (new \DateTimeImmutable())->format(DATE_ATOM),
             'approvedAt' => null,
-            'emailConfirmedAt' => null,
-            'emailConfirmationTokenHash' => $confirmation['tokenHash'],
-            'emailConfirmationExpiresAt' => $confirmation['expiresAt'],
+            'emailConfirmedAt' => $authenticatedUser !== null ? (new \DateTimeImmutable())->format(DATE_ATOM) : null,
         ];
+        if (is_array($confirmation)) {
+            $comment['emailConfirmationTokenHash'] = $confirmation['tokenHash'];
+            $comment['emailConfirmationExpiresAt'] = $confirmation['expiresAt'];
+        }
 
         try {
             $this->storage->update(static function (array &$data) use ($comment): void {
@@ -216,27 +252,38 @@ final class CommunityController
             return $this->error('Der Kommentar konnte nicht gespeichert werden.', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        try {
-            $this->emailConfirmation->send(
-                $normalizedEmail,
-                trim($name),
-                $confirmation['url'],
-                $this->submissionLabel($kind, is_string($topic) ? trim($topic) : null),
-            );
-        } catch (\Throwable $exception) {
-            $this->removeComment($comment['id']);
-            $this->storage->deleteImage($imageFilename);
-            error_log('[email-confirmation] ' . $exception->getMessage());
-            return $this->error('Die Bestätigungs-E-Mail konnte gerade nicht versendet werden. Bitte später erneut versuchen.', Response::HTTP_SERVICE_UNAVAILABLE);
+        if (is_array($confirmation)) {
+            try {
+                $this->emailConfirmation->send(
+                    $normalizedEmail,
+                    trim($name),
+                    $confirmation['url'],
+                    $this->submissionLabel($kind, is_string($topic) ? trim($topic) : null),
+                );
+            } catch (\Throwable $exception) {
+                $this->removeComment($comment['id']);
+                $this->storage->deleteImage($imageFilename);
+                error_log('[email-confirmation] ' . $exception->getMessage());
+                return $this->error('Die Bestätigungs-E-Mail konnte gerade nicht versendet werden. Bitte später erneut versuchen.', Response::HTTP_SERVICE_UNAVAILABLE);
+            }
+        } else {
+            $this->notifyAdminAboutComment($comment);
         }
 
         return new JsonResponse([
-            'message' => match ($kind) {
-                'wiki_suggestion' => 'Fast geschafft! Bestätige jetzt deine E-Mail-Adresse. Erst danach landet dein Wiki-Vorschlag bei uns zur redaktionellen Prüfung.',
-                'repair_request' => 'Fast geschafft! Bestätige jetzt deine E-Mail-Adresse. Erst danach landet deine Reparaturanfrage bei uns zur redaktionellen Prüfung.',
-                'repair_answer' => 'Fast geschafft! Bestätige jetzt deine E-Mail-Adresse. Erst danach landet deine Antwort bei uns zur redaktionellen Prüfung.',
-                default => 'Fast geschafft! Bestätige jetzt deine E-Mail-Adresse. Erst danach landet dein Kommentar bei uns zur redaktionellen Prüfung.',
-            },
+            'message' => $authenticatedUser !== null
+                ? match ($kind) {
+                    'wiki_suggestion' => 'Danke! Dein Wiki-Vorschlag ist bei uns zur redaktionellen Prüfung vorgemerkt.',
+                    'repair_request' => 'Danke! Deine Reparaturanfrage ist bei uns zur redaktionellen Prüfung vorgemerkt.',
+                    'repair_answer' => 'Danke! Deine Antwort ist bei uns zur redaktionellen Prüfung vorgemerkt.',
+                    default => 'Danke! Dein Kommentar ist bei uns zur redaktionellen Prüfung vorgemerkt.',
+                }
+                : match ($kind) {
+                    'wiki_suggestion' => 'Fast geschafft! Bestätige jetzt deine E-Mail-Adresse. Erst danach landet dein Wiki-Vorschlag bei uns zur redaktionellen Prüfung.',
+                    'repair_request' => 'Fast geschafft! Bestätige jetzt deine E-Mail-Adresse. Erst danach landet deine Reparaturanfrage bei uns zur redaktionellen Prüfung.',
+                    'repair_answer' => 'Fast geschafft! Bestätige jetzt deine E-Mail-Adresse. Erst danach landet deine Antwort bei uns zur redaktionellen Prüfung.',
+                    default => 'Fast geschafft! Bestätige jetzt deine E-Mail-Adresse. Erst danach landet dein Kommentar bei uns zur redaktionellen Prüfung.',
+                },
         ], Response::HTTP_ACCEPTED);
     }
 
@@ -290,6 +337,8 @@ final class CommunityController
             return $this->confirmationPage('Link bereits verwendet', 'Dieser Bestätigungslink wurde bereits verwendet.', '/hilfe/anfragen', Response::HTTP_GONE);
         }
 
+        $this->notifyAdminAboutComment($updated);
+
         return $this->confirmationPage('E-Mail bestätigt', 'Danke! Deine E-Mail-Adresse ist bestätigt. Dein Beitrag wartet jetzt bei uns auf die redaktionelle Prüfung.', '/hilfe/anfragen', Response::HTTP_OK);
     }
 
@@ -300,7 +349,7 @@ final class CommunityController
         if ($comment === null) {
             return $this->error('Bild nicht gefunden.', Response::HTTP_NOT_FOUND);
         }
-        if (($comment['status'] ?? null) !== 'approved' && !$this->isAdminAuthenticated()) {
+        if (($comment['status'] ?? null) !== 'approved' && !$this->isModeratorAuthenticated()) {
             return $this->error('Bild noch nicht freigegeben.', Response::HTTP_NOT_FOUND);
         }
 
@@ -318,6 +367,40 @@ final class CommunityController
         $response->headers->set('Content-Type', $mime);
         $response->headers->set('Content-Disposition', 'inline; filename="' . basename($filename) . '"');
         $response->headers->set('Cache-Control', 'no-store');
+        return $response;
+    }
+
+    #[Route('/api/comments/{id}/avatar', name: 'api_comment_avatar', methods: ['GET'])]
+    public function commentAvatar(string $id): Response
+    {
+        $comment = $this->findComment($id);
+        if ($comment === null || ($comment['status'] ?? null) !== 'approved') {
+            return $this->error('Bild nicht gefunden.', Response::HTTP_NOT_FOUND);
+        }
+
+        $userId = $comment['userId'] ?? null;
+        if (!is_string($userId) || $userId === '') {
+            return $this->error('Bild nicht gefunden.', Response::HTTP_NOT_FOUND);
+        }
+        $user = $this->userStorage->findById($userId);
+        if ($user === null || ($user['status'] ?? null) !== 'active') {
+            return $this->error('Bild nicht gefunden.', Response::HTTP_NOT_FOUND);
+        }
+
+        $filename = $user['avatarFile'] ?? null;
+        $mime = $user['avatarMime'] ?? null;
+        if (!is_string($filename) || !is_string($mime) || !isset(self::ALLOWED_AVATARS[$mime])) {
+            return $this->error('Bild nicht gefunden.', Response::HTTP_NOT_FOUND);
+        }
+        $path = $this->userStorage->uploadsDir() . '/' . basename($filename);
+        if (!is_file($path)) {
+            return $this->error('Bild nicht gefunden.', Response::HTTP_NOT_FOUND);
+        }
+
+        $response = new BinaryFileResponse($path);
+        $response->headers->set('Content-Type', $mime);
+        $response->headers->set('Content-Disposition', 'inline; filename="' . basename($filename) . '"');
+        $response->headers->set('Cache-Control', 'public, max-age=300, stale-while-revalidate=60');
         return $response;
     }
 
@@ -346,32 +429,183 @@ final class CommunityController
         $_SESSION['admin_email'] = strtolower(trim($email));
         $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 
-        return new JsonResponse(['authenticated' => true, 'email' => $_SESSION['admin_email'], 'csrfToken' => $_SESSION['csrf_token']]);
+        return new JsonResponse([
+            'authenticated' => true,
+            'email' => $_SESSION['admin_email'],
+            'role' => 'admin',
+            'canManageMembers' => true,
+            'csrfToken' => $_SESSION['csrf_token'],
+        ]);
     }
 
     #[Route('/api/admin/session', name: 'api_admin_session', methods: ['GET'])]
     public function session(): JsonResponse
     {
-        $authenticated = $this->isAdminAuthenticated();
+        $adminAuthenticated = $this->isAdminAuthenticated();
+        $moderator = $adminAuthenticated ? null : $this->moderatorUser();
+        $authenticated = $adminAuthenticated || $moderator !== null;
         $response = new JsonResponse([
             'authenticated' => $authenticated,
-            'email' => $authenticated ? ($_SESSION['admin_email'] ?? null) : null,
-            'csrfToken' => $authenticated ? $this->csrfToken() : null,
+            'email' => $adminAuthenticated ? ($_SESSION['admin_email'] ?? null) : ($moderator['email'] ?? null),
+            'role' => $adminAuthenticated ? 'admin' : ($moderator !== null ? 'moderator' : null),
+            'canManageMembers' => $adminAuthenticated,
+            'csrfToken' => $adminAuthenticated ? $this->csrfToken() : ($moderator !== null ? $this->users->csrfToken() : null),
         ]);
         $response->headers->set('Cache-Control', 'no-store');
         return $response;
     }
 
+    #[Route('/api/admin/notification-settings', name: 'api_admin_notification_settings_read', methods: ['GET'])]
+    public function notificationSettings(): JsonResponse
+    {
+        $adminAuthenticated = $this->isAdminAuthenticated();
+        $moderator = $adminAuthenticated ? null : $this->moderatorUser();
+        if (!$adminAuthenticated && $moderator === null) {
+            return $this->unauthorized();
+        }
+
+        $settings = $adminAuthenticated
+            ? $this->storage->notificationSettingsForAdmin()
+            : $this->storage->notificationSettingsForModerator((string) $moderator['id']);
+        $response = new JsonResponse([
+            'settings' => $settings,
+            'role' => $adminAuthenticated ? 'admin' : 'moderator',
+            'canManageRegistration' => $adminAuthenticated,
+        ]);
+        $response->headers->set('Cache-Control', 'no-store');
+        return $response;
+    }
+
+    #[Route('/api/admin/notification-settings', name: 'api_admin_notification_settings_update', methods: ['PATCH'])]
+    public function updateNotificationSettings(Request $request): JsonResponse
+    {
+        $adminAuthenticated = $this->isAdminAuthenticated();
+        $moderator = $adminAuthenticated ? null : $this->moderatorUser();
+        if (!$adminAuthenticated && $moderator === null) {
+            return $this->unauthorized();
+        }
+        if (!$this->validModeratorCsrfToken($request)) {
+            return $this->error('Ungültige Sitzung.', Response::HTTP_FORBIDDEN);
+        }
+
+        $payload = $this->jsonPayload($request);
+        $settings = $payload['settings'] ?? null;
+        if (!is_array($settings)) {
+            return $this->error('Die E-Mail-Einstellungen sind nicht gültig.', Response::HTTP_BAD_REQUEST);
+        }
+        foreach (['comments', 'wiki', 'repair', 'bugs'] as $key) {
+            if (isset($settings[$key]) && !is_bool($settings[$key])) {
+                return $this->error('Die E-Mail-Einstellungen sind nicht gültig.', Response::HTTP_BAD_REQUEST);
+            }
+        }
+        if ($adminAuthenticated && isset($settings['registration']) && !is_bool($settings['registration'])) {
+            return $this->error('Die E-Mail-Einstellungen sind nicht gültig.', Response::HTTP_BAD_REQUEST);
+        }
+
+        $current = $adminAuthenticated
+            ? $this->storage->notificationSettingsForAdmin()
+            : $this->storage->notificationSettingsForModerator((string) $moderator['id']);
+        $merged = array_merge($current, $settings);
+        if (!$adminAuthenticated) {
+            $merged['registration'] = false;
+        }
+        $identity = $adminAuthenticated ? 'admin' : (string) $moderator['id'];
+        $saved = $this->storage->saveNotificationSettings($adminAuthenticated ? 'admin' : 'moderator', $identity, $merged);
+
+        return new JsonResponse([
+            'settings' => $saved,
+            'role' => $adminAuthenticated ? 'admin' : 'moderator',
+            'canManageRegistration' => $adminAuthenticated,
+            'message' => 'E-Mail-Einstellungen gespeichert.',
+        ]);
+    }
+
+    #[Route('/api/admin/chat', name: 'api_admin_chat_read', methods: ['GET'])]
+    public function readStaffChat(Request $request): JsonResponse
+    {
+        $staff = $this->currentStaff($request);
+        if ($staff === null) {
+            return $this->unauthorized();
+        }
+
+        $cutoff = time() - self::STAFF_CHAT_RETENTION_SECONDS;
+        $messages = [];
+        $this->storage->update(static function (array &$data) use ($cutoff, &$messages): void {
+            $messages = array_values(array_filter(
+                $data['staffChat'],
+                static fn (array $message): bool => strtotime((string) ($message['createdAt'] ?? '')) > $cutoff,
+            ));
+            $data['staffChat'] = $messages;
+        });
+        usort($messages, static fn (array $a, array $b): int => strcmp((string) ($a['createdAt'] ?? ''), (string) ($b['createdAt'] ?? '')));
+
+        $response = new JsonResponse(['messages' => array_map(fn (array $message): array => $this->staffChatMessage($message), $messages)]);
+        $response->headers->set('Cache-Control', 'no-store');
+        return $response;
+    }
+
+    #[Route('/api/admin/chat', name: 'api_admin_chat_create', methods: ['POST'])]
+    public function createStaffChatMessage(Request $request): JsonResponse
+    {
+        $staff = $this->currentStaff($request);
+        if ($staff === null) {
+            return $this->unauthorized();
+        }
+        if (!$this->validModeratorCsrfToken($request)) {
+            return $this->error('Ungültige Sitzung.', Response::HTTP_FORBIDDEN);
+        }
+
+        $identity = $staff['role'] . ':' . $staff['id'];
+        if (!$this->storage->allowRate('staff-chat-user', $identity, 60, 3600)
+            || !$this->storage->allowRate('staff-chat-global', 'all', 300, 3600)
+        ) {
+            $response = $this->error('Zu viele Chat-Nachrichten. Bitte später erneut versuchen.', Response::HTTP_TOO_MANY_REQUESTS);
+            $response->headers->set('Retry-After', '3600');
+            return $response;
+        }
+
+        $body = $this->jsonPayload($request)['body'] ?? null;
+        if (!is_string($body)) {
+            return $this->error('Bitte eine Nachricht eingeben.', Response::HTTP_BAD_REQUEST);
+        }
+        $body = trim($body);
+        if ($body === '' || $this->length($body) > 2000) {
+            return $this->error('Die Nachricht muss zwischen 1 und 2000 Zeichen enthalten.', Response::HTTP_BAD_REQUEST);
+        }
+
+        $message = [
+            'id' => bin2hex(random_bytes(16)),
+            'authorId' => $staff['id'],
+            'authorName' => $staff['name'],
+            'authorRole' => $staff['role'],
+            'body' => $body,
+            'createdAt' => (new \DateTimeImmutable())->format(DATE_ATOM),
+        ];
+        $cutoff = time() - self::STAFF_CHAT_RETENTION_SECONDS;
+        $this->storage->update(static function (array &$data) use ($cutoff, $message): void {
+            $messages = array_values(array_filter(
+                $data['staffChat'],
+                static fn (array $candidate): bool => strtotime((string) ($candidate['createdAt'] ?? '')) > $cutoff,
+            ));
+            $messages[] = $message;
+            $data['staffChat'] = array_slice($messages, -self::STAFF_CHAT_MAX_MESSAGES);
+        });
+
+        return new JsonResponse(['message' => $this->staffChatMessage($message)], Response::HTTP_CREATED);
+    }
+
     #[Route('/api/admin/comments', name: 'api_admin_comments', methods: ['GET'])]
     public function adminComments(): JsonResponse
     {
-        if (!$this->isAdminAuthenticated()) {
+        $adminAuthenticated = $this->isAdminAuthenticated();
+        if (!$adminAuthenticated && $this->moderatorUser() === null) {
             return $this->unauthorized();
         }
 
         $comments = array_values(array_filter(
             $this->storage->read()['comments'],
-            static fn (array $comment): bool => in_array(($comment['status'] ?? null), ['pending', 'approved'], true),
+            static fn (array $comment) => ($comment['status'] ?? null) === 'pending'
+                || ($adminAuthenticated && ($comment['status'] ?? null) === 'approved'),
         ));
         usort($comments, static fn (array $a, array $b): int => strcmp((string) ($b['createdAt'] ?? ''), (string) ($a['createdAt'] ?? '')));
         $response = new JsonResponse(['comments' => array_map(fn (array $comment): array => $this->adminComment($comment), $comments)]);
@@ -379,13 +613,340 @@ final class CommunityController
         return $response;
     }
 
-    #[Route('/api/admin/comments/{id}', name: 'api_admin_comment_update', methods: ['PATCH'])]
-    public function updateComment(string $id, Request $request): JsonResponse
+    #[Route('/api/admin/users', name: 'api_admin_users', methods: ['GET'])]
+    public function adminUsers(): JsonResponse
+    {
+        if (!$this->isAdminAuthenticated()) {
+            return $this->unauthorized();
+        }
+
+        $users = $this->userStorage->read()['users'];
+        usort($users, static fn (array $a, array $b): int => strcmp((string) ($b['createdAt'] ?? ''), (string) ($a['createdAt'] ?? '')));
+        $response = new JsonResponse(['users' => array_map(fn (array $user): array => $this->adminUser($user), $users)]);
+        $response->headers->set('Cache-Control', 'no-store');
+        return $response;
+    }
+
+    #[Route('/api/admin/users/{id}/role', name: 'api_admin_user_role', methods: ['PATCH'])]
+    public function updateUserRole(string $id, Request $request): JsonResponse
     {
         if (!$this->isAdminAuthenticated()) {
             return $this->unauthorized();
         }
         if (!$this->validCsrfToken($request)) {
+            return $this->error('Ungültige Admin-Sitzung.', Response::HTTP_FORBIDDEN);
+        }
+
+        $user = $this->userStorage->findById($id);
+        if ($user === null) {
+            return $this->error('Mitglied nicht gefunden.', Response::HTTP_NOT_FOUND);
+        }
+        $role = $this->jsonPayload($request)['role'] ?? null;
+        if (!is_string($role) || !in_array($role, ['member', 'moderator'], true)) {
+            return $this->error('Ungültige Rolle.', Response::HTTP_BAD_REQUEST);
+        }
+
+        $updated = null;
+        $this->userStorage->update(static function (array &$data) use ($id, $role, &$updated): void {
+            foreach ($data['users'] as &$candidate) {
+                if (($candidate['id'] ?? null) !== $id) {
+                    continue;
+                }
+                $candidate['role'] = $role;
+                $updated = $candidate;
+                break;
+            }
+            unset($candidate);
+        });
+
+        return is_array($updated)
+            ? new JsonResponse([
+                'member' => $this->adminUser($updated),
+                'message' => $role === 'moderator' ? 'Mitglied ist jetzt Moderator.' : 'Moderatorrolle wurde entzogen.',
+            ])
+            : $this->error('Mitglied nicht gefunden.', Response::HTTP_NOT_FOUND);
+    }
+
+    #[Route('/api/admin/newsletter', name: 'api_admin_newsletter_send', methods: ['POST'])]
+    public function sendNewsletter(Request $request): JsonResponse
+    {
+        if (!$this->isAdminAuthenticated()) {
+            return $this->unauthorized();
+        }
+        if (!$this->validCsrfToken($request)) {
+            return $this->error('Ungültige Admin-Sitzung.', Response::HTTP_FORBIDDEN);
+        }
+
+        $payload = $this->jsonPayload($request);
+        $subject = $payload['subject'] ?? null;
+        $title = $payload['title'] ?? null;
+        $intro = $payload['intro'] ?? null;
+        $body = $payload['body'] ?? null;
+        if (!is_string($subject) || $this->length(trim($subject)) < 2 || $this->length(trim($subject)) > 160) {
+            return $this->error('Bitte einen Betreff mit 2 bis 160 Zeichen angeben.', Response::HTTP_BAD_REQUEST);
+        }
+        if (!is_string($title) || $this->length(trim($title)) < 2 || $this->length(trim($title)) > 120) {
+            return $this->error('Bitte eine Überschrift mit 2 bis 120 Zeichen angeben.', Response::HTTP_BAD_REQUEST);
+        }
+        if (!is_string($intro) || $this->length(trim($intro)) < 10 || $this->length(trim($intro)) > 500) {
+            return $this->error('Bitte einen Vorspann mit 10 bis 500 Zeichen angeben.', Response::HTTP_BAD_REQUEST);
+        }
+        if (!is_string($body) || $this->length(trim($body)) < 10 || $this->length(trim($body)) > 8000) {
+            return $this->error('Bitte einen Newslettertext mit 10 bis 8.000 Zeichen angeben.', Response::HTTP_BAD_REQUEST);
+        }
+
+        $recipients = [];
+        foreach ($this->userStorage->read()['users'] as $user) {
+            $email = trim((string) ($user['email'] ?? ''));
+            if (($user['status'] ?? null) !== 'active'
+                || ($user['newsletterSubscribed'] ?? false) !== true
+                || ($user['communicationBlocked'] ?? false) === true
+                || !is_string($user['emailConfirmedAt'] ?? null)
+                || $user['emailConfirmedAt'] === ''
+                || filter_var($email, FILTER_VALIDATE_EMAIL) === false
+            ) {
+                continue;
+            }
+            $recipients[] = ['email' => $email, 'name' => trim((string) ($user['name'] ?? 'BTM-Community'))];
+        }
+
+        if ($recipients === []) {
+            return $this->error('Es gibt aktuell keine bestätigten Newsletter-Abonnenten.', Response::HTTP_CONFLICT);
+        }
+        if (!$this->storage->allowRate('admin-newsletter', 'global', 1, 900)) {
+            $response = $this->error('Ein Newsletter wurde gerade erst versendet. Bitte mindestens 15 Minuten warten.', Response::HTTP_TOO_MANY_REQUESTS);
+            $response->headers->set('Retry-After', '900');
+            return $response;
+        }
+
+        try {
+            $sent = $this->mailjet->sendNewsletter($recipients, trim($subject), trim($title), trim($intro), trim($body));
+        } catch (\Throwable $exception) {
+            error_log('[admin-newsletter] ' . $exception->getMessage());
+            return $this->error('Der Newsletter konnte gerade nicht vollständig versendet werden.', Response::HTTP_SERVICE_UNAVAILABLE);
+        }
+
+        return new JsonResponse([
+            'sent' => $sent,
+            'recipients' => count($recipients),
+            'message' => $sent . ' Newsletter-E-Mail' . ($sent === 1 ? '' : 's') . ' wurde' . ($sent === 1 ? '' : 'n') . ' versendet.',
+        ]);
+    }
+
+    #[Route('/api/admin/users/{id}/message', name: 'api_admin_user_message', methods: ['POST'])]
+    public function sendUserMessage(string $id, Request $request): JsonResponse
+    {
+        if (!$this->isAdminAuthenticated()) {
+            return $this->unauthorized();
+        }
+        if (!$this->validCsrfToken($request)) {
+            return $this->error('Ungültige Admin-Sitzung.', Response::HTTP_FORBIDDEN);
+        }
+
+        $user = $this->userStorage->findById($id);
+        if ($user === null) {
+            return $this->error('Mitglied nicht gefunden.', Response::HTTP_NOT_FOUND);
+        }
+        $payload = $this->jsonPayload($request);
+        $subject = $payload['subject'] ?? null;
+        $body = $payload['body'] ?? null;
+        if (!is_string($subject) || $this->length(trim($subject)) < 2 || $this->length(trim($subject)) > 160) {
+            return $this->error('Bitte einen Betreff mit 2 bis 160 Zeichen angeben.', Response::HTTP_BAD_REQUEST);
+        }
+        if (!is_string($body) || $this->length(trim($body)) < 2 || $this->length(trim($body)) > 5000) {
+            return $this->error('Bitte eine Nachricht mit 2 bis 5.000 Zeichen angeben.', Response::HTTP_BAD_REQUEST);
+        }
+        if ($response = $this->adminMailRateLimited('admin-user-message', $id, 3, 3600)) {
+            return $response;
+        }
+
+        try {
+            $this->mailjet->sendAdminMessage((string) $user['email'], (string) $user['name'], trim($subject), trim($body));
+        } catch (\Throwable $exception) {
+            error_log('[admin-user-message] ' . $exception->getMessage());
+            return $this->error('Die Nachricht konnte gerade nicht versendet werden.', Response::HTTP_SERVICE_UNAVAILABLE);
+        }
+
+        return new JsonResponse(['message' => 'Nachricht wurde versendet.']);
+    }
+
+    #[Route('/api/admin/users/{id}/password-reset', name: 'api_admin_user_password_reset', methods: ['POST'])]
+    public function sendUserPasswordReset(string $id, Request $request): JsonResponse
+    {
+        if (!$this->isAdminAuthenticated()) {
+            return $this->unauthorized();
+        }
+        if (!$this->validCsrfToken($request)) {
+            return $this->error('Ungültige Admin-Sitzung.', Response::HTTP_FORBIDDEN);
+        }
+
+        $user = $this->userStorage->findById($id);
+        if ($user === null) {
+            return $this->error('Mitglied nicht gefunden.', Response::HTTP_NOT_FOUND);
+        }
+        if ($response = $this->adminMailRateLimited('admin-user-password-reset', $id, 2, 3600)) {
+            return $response;
+        }
+
+        $reset = $this->emailConfirmation->createToken('/passwort-zuruecksetzen?token=');
+        $this->userStorage->update(static function (array &$data) use ($id, $reset): void {
+            foreach ($data['users'] as &$candidate) {
+                if (($candidate['id'] ?? null) !== $id) {
+                    continue;
+                }
+                $candidate['passwordResetTokenHash'] = $reset['tokenHash'];
+                $candidate['passwordResetExpiresAt'] = $reset['expiresAt'];
+                break;
+            }
+            unset($candidate);
+        });
+
+        try {
+            $this->mailjet->sendPasswordReset((string) $user['email'], (string) $user['name'], $reset['token']);
+        } catch (\Throwable $exception) {
+            $this->clearPasswordResetToken($id, $reset['tokenHash']);
+            error_log('[admin-user-password-reset] ' . $exception->getMessage());
+            return $this->error('Die Passwort-Zurücksetzungs-Mail konnte gerade nicht versendet werden.', Response::HTTP_SERVICE_UNAVAILABLE);
+        }
+
+        return new JsonResponse(['message' => 'Passwort-Zurücksetzungs-Mail wurde versendet.']);
+    }
+
+    #[Route('/api/admin/users/{id}/warning', name: 'api_admin_user_warning', methods: ['POST'])]
+    public function warnUser(string $id, Request $request): JsonResponse
+    {
+        if (!$this->isAdminAuthenticated()) {
+            return $this->unauthorized();
+        }
+        if (!$this->validCsrfToken($request)) {
+            return $this->error('Ungültige Admin-Sitzung.', Response::HTTP_FORBIDDEN);
+        }
+
+        $user = $this->userStorage->findById($id);
+        if ($user === null) {
+            return $this->error('Mitglied nicht gefunden.', Response::HTTP_NOT_FOUND);
+        }
+        $payload = $this->jsonPayload($request);
+        $reason = $payload['reason'] ?? null;
+        if (!is_string($reason) || $this->length(trim($reason)) < 5 || $this->length(trim($reason)) > 1000) {
+            return $this->error('Bitte einen Verwarnungsgrund mit 5 bis 1.000 Zeichen angeben.', Response::HTTP_BAD_REQUEST);
+        }
+        if (($user['communicationBlocked'] ?? false) === true) {
+            return $this->error('Dieses Mitglied ist bereits für Kommunikation gesperrt.', Response::HTTP_CONFLICT);
+        }
+        if ($response = $this->adminMailRateLimited('admin-user-warning', $id, 3, 86400)) {
+            return $response;
+        }
+
+        $warning = [
+            'id' => bin2hex(random_bytes(16)),
+            'reason' => trim($reason),
+            'createdAt' => (new \DateTimeImmutable())->format(DATE_ATOM),
+        ];
+        $updated = null;
+        $blocked = false;
+        $this->userStorage->update(static function (array &$data) use ($id, $warning, &$updated, &$blocked): void {
+            foreach ($data['users'] as &$candidate) {
+                if (($candidate['id'] ?? null) !== $id) {
+                    continue;
+                }
+                $warnings = is_array($candidate['warnings'] ?? null) ? $candidate['warnings'] : [];
+                $warnings[] = $warning;
+                $candidate['warnings'] = array_slice($warnings, -20);
+                $blocked = count($candidate['warnings']) >= 3;
+                if ($blocked) {
+                    $candidate['communicationBlocked'] = true;
+                    $candidate['communicationBlockedAt'] ??= (new \DateTimeImmutable())->format(DATE_ATOM);
+                }
+                $updated = $candidate;
+                break;
+            }
+            unset($candidate);
+        });
+
+        if (!is_array($updated)) {
+            return $this->error('Mitglied nicht gefunden.', Response::HTTP_NOT_FOUND);
+        }
+
+        $mailSent = true;
+        try {
+            $this->mailjet->sendWarning((string) $updated['email'], (string) $updated['name'], (string) $warning['reason'], count($updated['warnings']), $blocked);
+        } catch (\Throwable $exception) {
+            $mailSent = false;
+            error_log('[admin-user-warning] ' . $exception->getMessage());
+        }
+
+        return new JsonResponse([
+            'member' => $this->adminUser($updated),
+            'mailSent' => $mailSent,
+            'message' => $mailSent
+                ? ($blocked ? 'Dritte Verwarnung gespeichert. Das Mitglied ist jetzt für Kommunikation gesperrt.' : 'Verwarnung gespeichert und per E-Mail mitgeteilt.')
+                : 'Verwarnung gespeichert, aber die E-Mail konnte gerade nicht versendet werden.',
+        ]);
+    }
+
+    #[Route('/api/admin/users/{id}', name: 'api_admin_user_delete', methods: ['DELETE'])]
+    public function deleteUser(string $id, Request $request): JsonResponse
+    {
+        if (!$this->isAdminAuthenticated()) {
+            return $this->unauthorized();
+        }
+        if (!$this->validCsrfToken($request)) {
+            return $this->error('Ungültige Admin-Sitzung.', Response::HTTP_FORBIDDEN);
+        }
+
+        $deleted = null;
+        $this->userStorage->update(static function (array &$data) use ($id, &$deleted): void {
+            $remaining = [];
+            foreach ($data['users'] as $candidate) {
+                if (($candidate['id'] ?? null) === $id) {
+                    $deleted = $candidate;
+                    continue;
+                }
+                $remaining[] = $candidate;
+            }
+            $data['users'] = $remaining;
+        });
+        if (!is_array($deleted)) {
+            return $this->error('Mitglied nicht gefunden.', Response::HTTP_NOT_FOUND);
+        }
+
+        $this->userStorage->deleteAvatar($deleted['avatarFile'] ?? null);
+        $deletedImages = [];
+        $deletedEmail = strtolower((string) ($deleted['email'] ?? ''));
+        $this->storage->update(static function (array &$data) use ($id, $deletedEmail, &$deletedImages): void {
+            $data['comments'] = array_values(array_filter($data['comments'], static function (array $comment) use ($id, $deletedEmail, &$deletedImages): bool {
+                $matchesUser = ($comment['userId'] ?? null) === $id;
+                $matchesLegacyEmail = ($deletedEmail !== '' && ($comment['userId'] ?? null) === null && strtolower((string) ($comment['email'] ?? '')) === $deletedEmail);
+                if ($matchesUser || $matchesLegacyEmail) {
+                    if (isset($comment['imageFile']) && is_string($comment['imageFile'])) {
+                        $deletedImages[] = $comment['imageFile'];
+                    }
+                    return false;
+                }
+                return true;
+            }));
+            $data['bugReports'] = array_values(array_filter($data['bugReports'], static function (array $bugReport) use ($id, $deletedEmail): bool {
+                $matchesUser = ($bugReport['userId'] ?? null) === $id;
+                $matchesLegacyEmail = ($deletedEmail !== '' && ($bugReport['userId'] ?? null) === null && strtolower((string) ($bugReport['email'] ?? '')) === $deletedEmail);
+                return !$matchesUser && !$matchesLegacyEmail;
+            }));
+        });
+        foreach ($deletedImages as $filename) {
+            $this->storage->deleteImage($filename);
+        }
+
+        return new JsonResponse(['deleted' => true]);
+    }
+
+    #[Route('/api/admin/comments/{id}', name: 'api_admin_comment_update', methods: ['PATCH'])]
+    public function updateComment(string $id, Request $request): JsonResponse
+    {
+        $adminAuthenticated = $this->isAdminAuthenticated();
+        if (!$adminAuthenticated && $this->moderatorUser() === null) {
+            return $this->unauthorized();
+        }
+        if (!$this->validModeratorCsrfToken($request)) {
             return $this->error('Ungültige Admin-Sitzung.', Response::HTTP_FORBIDDEN);
         }
 
@@ -397,21 +958,33 @@ final class CommunityController
 
         $updated = null;
         $awaitingConfirmation = false;
-        $this->storage->update(static function (array &$data) use ($id, $status, &$updated, &$awaitingConfirmation): void {
+        $newlyApproved = false;
+        $moderatorScopeViolation = false;
+        $this->storage->update(static function (array &$data) use ($id, $status, $adminAuthenticated, &$updated, &$awaitingConfirmation, &$newlyApproved, &$moderatorScopeViolation): void {
             foreach ($data['comments'] as &$comment) {
                 if (($comment['id'] ?? null) === $id) {
+                    if (!$adminAuthenticated && ($comment['status'] ?? null) !== 'pending') {
+                        $moderatorScopeViolation = true;
+                        break;
+                    }
                     if (($comment['status'] ?? null) === 'awaiting_confirmation') {
                         $awaitingConfirmation = true;
                         break;
                     }
+                    $wasApproved = ($comment['status'] ?? null) === 'approved';
                     $comment['status'] = $status;
                     $comment['approvedAt'] = $status === 'approved' ? (new \DateTimeImmutable())->format(DATE_ATOM) : null;
+                    $newlyApproved = $status === 'approved' && !$wasApproved;
                     $updated = $comment;
                     break;
                 }
             }
             unset($comment);
         });
+
+        if ($moderatorScopeViolation) {
+            return $this->error('Moderatoren können nur offene Beiträge bearbeiten.', Response::HTTP_FORBIDDEN);
+        }
 
         if ($awaitingConfirmation) {
             return $this->error('Die E-Mail-Adresse wurde noch nicht bestätigt.', Response::HTTP_CONFLICT);
@@ -421,24 +994,42 @@ final class CommunityController
             return $this->error('Kommentar nicht gefunden.', Response::HTTP_NOT_FOUND);
         }
 
+        if ($newlyApproved && ($updated['kind'] ?? null) === 'repair_answer' && is_string($updated['parentId'] ?? null)) {
+            $parent = $this->findComment($updated['parentId']);
+            if ($parent !== null) {
+                try {
+                    $this->users->notifyReply((string) ($parent['userId'] ?? ''), $updated, $parent);
+                } catch (\Throwable $exception) {
+                    error_log('[reply-notification] ' . $exception->getMessage());
+                }
+            }
+        }
+
         return new JsonResponse(['comment' => $this->adminComment($updated)]);
     }
 
     #[Route('/api/admin/comments/{id}', name: 'api_admin_comment_delete', methods: ['DELETE'])]
     public function deleteComment(string $id, Request $request): JsonResponse
     {
-        if (!$this->isAdminAuthenticated()) {
+        $adminAuthenticated = $this->isAdminAuthenticated();
+        if (!$adminAuthenticated && $this->moderatorUser() === null) {
             return $this->unauthorized();
         }
-        if (!$this->validCsrfToken($request)) {
+        if (!$this->validModeratorCsrfToken($request)) {
             return $this->error('Ungültige Admin-Sitzung.', Response::HTTP_FORBIDDEN);
         }
 
         $deleted = null;
-        $this->storage->update(static function (array &$data) use ($id, &$deleted): void {
+        $moderatorScopeViolation = false;
+        $this->storage->update(static function (array &$data) use ($id, $adminAuthenticated, &$deleted, &$moderatorScopeViolation): void {
             $remaining = [];
             foreach ($data['comments'] as $comment) {
                 if (($comment['id'] ?? null) === $id) {
+                    if (!$adminAuthenticated && ($comment['status'] ?? null) !== 'pending') {
+                        $moderatorScopeViolation = true;
+                        $remaining[] = $comment;
+                        continue;
+                    }
                     $deleted = $comment;
                     continue;
                 }
@@ -446,6 +1037,10 @@ final class CommunityController
             }
             $data['comments'] = $remaining;
         });
+
+        if ($moderatorScopeViolation) {
+            return $this->error('Moderatoren können nur offene Beiträge löschen.', Response::HTTP_FORBIDDEN);
+        }
 
         if (!is_array($deleted)) {
             return $this->error('Kommentar nicht gefunden.', Response::HTTP_NOT_FOUND);
@@ -458,15 +1053,25 @@ final class CommunityController
     #[Route('/api/admin/logout', name: 'api_admin_logout', methods: ['POST'])]
     public function logout(Request $request): JsonResponse
     {
-        if (!$this->isAdminAuthenticated()) {
-            return $this->unauthorized();
-        }
-        if (!$this->validCsrfToken($request)) {
-            return $this->error('Ungültige Admin-Sitzung.', Response::HTTP_FORBIDDEN);
+        if ($this->isAdminAuthenticated()) {
+            if (!$this->validCsrfToken($request)) {
+                return $this->error('Ungültige Admin-Sitzung.', Response::HTTP_FORBIDDEN);
+            }
+
+            $_SESSION = [];
+            session_destroy();
+            $this->clearAdminSessionCookie();
+            return new JsonResponse(['authenticated' => false]);
         }
 
-        $_SESSION = [];
-        session_destroy();
+        if ($this->moderatorUser() === null) {
+            return $this->unauthorized();
+        }
+        if (!$this->users->validCsrfToken($request->headers->get('X-CSRF-Token', ''))) {
+            return $this->error('Ungültige Sitzung.', Response::HTTP_FORBIDDEN);
+        }
+
+        $this->users->logout();
         return new JsonResponse(['authenticated' => false]);
     }
 
@@ -508,6 +1113,19 @@ final class CommunityController
 
     private function publicComment(array $comment): array
     {
+        $avatarStyle = null;
+        $avatarUrl = null;
+        $userId = $comment['userId'] ?? null;
+        if (is_string($userId) && $userId !== '') {
+            $user = $this->userStorage->findById($userId);
+            if ($user !== null && ($user['status'] ?? null) === 'active') {
+                $avatarStyle = max(0, min(19, (int) ($user['avatarStyle'] ?? 0)));
+                $avatarUrl = !empty($user['avatarFile'])
+                    ? '/api/comments/' . rawurlencode((string) $comment['id']) . '/avatar?v=' . substr(hash('sha256', (string) $user['avatarFile']), 0, 16)
+                    : '/images/avatars/avatar-' . str_pad((string) ($avatarStyle + 1), 2, '0', STR_PAD_LEFT) . '.webp';
+            }
+        }
+
         return [
             'id' => (string) $comment['id'],
             'kind' => (string) ($comment['kind'] ?? 'comment'),
@@ -519,6 +1137,8 @@ final class CommunityController
             'parentId' => isset($comment['parentId']) && is_string($comment['parentId']) ? $comment['parentId'] : null,
             'createdAt' => (string) $comment['createdAt'],
             'imageUrl' => !empty($comment['imageFile']) ? '/api/comments/' . rawurlencode((string) $comment['id']) . '/image' : null,
+            'avatarStyle' => $avatarStyle,
+            'avatarUrl' => $avatarUrl,
         ];
     }
 
@@ -530,6 +1150,65 @@ final class CommunityController
             'status' => (string) $comment['status'],
             'approvedAt' => $comment['approvedAt'] ?? null,
         ];
+    }
+
+    private function adminUser(array $user): array
+    {
+        $warnings = [];
+        foreach (($user['warnings'] ?? []) as $warning) {
+            if (!is_array($warning) || !is_string($warning['id'] ?? null) || !is_string($warning['reason'] ?? null) || !is_string($warning['createdAt'] ?? null)) {
+                continue;
+            }
+            $warnings[] = [
+                'id' => $warning['id'],
+                'reason' => $warning['reason'],
+                'createdAt' => $warning['createdAt'],
+            ];
+        }
+
+        return [
+            'id' => (string) $user['id'],
+            'name' => (string) $user['name'],
+            'email' => (string) $user['email'],
+            'role' => ($user['role'] ?? 'member') === 'moderator' ? 'moderator' : 'member',
+            'status' => (string) ($user['status'] ?? 'active'),
+            'model' => $user['model'] ?? null,
+            'kilometers' => (int) ($user['kilometers'] ?? 0),
+            'createdAt' => (string) ($user['createdAt'] ?? ''),
+            'emailConfirmedAt' => isset($user['emailConfirmedAt']) && is_string($user['emailConfirmedAt']) ? $user['emailConfirmedAt'] : null,
+            'newsletterSubscribed' => ($user['newsletterSubscribed'] ?? false) === true,
+            'warningCount' => count($warnings),
+            'warnings' => $warnings,
+            'communicationBlocked' => ($user['communicationBlocked'] ?? false) === true || count($warnings) >= 3,
+            'communicationBlockedAt' => isset($user['communicationBlockedAt']) && is_string($user['communicationBlockedAt']) ? $user['communicationBlockedAt'] : null,
+        ];
+    }
+
+    private function adminMailRateLimited(string $scope, string $userId, int $perUserLimit, int $windowSeconds): ?JsonResponse
+    {
+        $allowed = $this->storage->allowRate($scope . '-user', $userId, $perUserLimit, $windowSeconds)
+            && $this->storage->allowRate($scope . '-global', 'all', 30, $windowSeconds);
+        if ($allowed) {
+            return null;
+        }
+
+        $response = $this->error('Zu viele Nachrichten für dieses Mitglied. Bitte später erneut versuchen.', Response::HTTP_TOO_MANY_REQUESTS);
+        $response->headers->set('Retry-After', (string) $windowSeconds);
+        return $response;
+    }
+
+    private function clearPasswordResetToken(string $id, string $tokenHash): void
+    {
+        $this->userStorage->update(static function (array &$data) use ($id, $tokenHash): void {
+            foreach ($data['users'] as &$candidate) {
+                if (($candidate['id'] ?? null) !== $id || ($candidate['passwordResetTokenHash'] ?? null) !== $tokenHash) {
+                    continue;
+                }
+                unset($candidate['passwordResetTokenHash'], $candidate['passwordResetExpiresAt']);
+                break;
+            }
+            unset($candidate);
+        });
     }
 
     private function unauthorized(): JsonResponse
@@ -584,6 +1263,90 @@ final class CommunityController
         };
 
         return $topic !== null && $topic !== '' ? $label . ': ' . $topic : $label;
+    }
+
+    /** @param array<string, mixed> $comment */
+    private function notifyAdminAboutComment(array $comment): void
+    {
+        $commentId = (string) ($comment['id'] ?? '');
+        if ($commentId === '' || ($comment['status'] ?? null) !== 'pending') {
+            return;
+        }
+        try {
+            $category = $this->notificationCategoryForComment($comment);
+            $recipients = $this->moderationNotificationRecipients($category);
+        } catch (\Throwable $exception) {
+            error_log('[admin-moderation-notification] ' . $exception->getMessage());
+            return;
+        }
+        if ($recipients === []) {
+            return;
+        }
+        if (!$this->storage->allowRate('admin-moderation-notification', $commentId, 1, 86400)
+            || !$this->storage->allowRate('admin-moderation-notification-global', 'all', 30, 3600)
+        ) {
+            error_log('[admin-moderation-notification] Rate-Limit erreicht.');
+            return;
+        }
+
+        try {
+            $kind = (string) ($comment['kind'] ?? 'comment');
+            $topic = isset($comment['topic']) && is_string($comment['topic']) ? trim($comment['topic']) : null;
+            foreach ($recipients as $recipient) {
+                try {
+                    $this->mailjet->sendModerationNotification(
+                        $recipient,
+                        $this->submissionLabel($kind, $topic),
+                        (string) ($comment['name'] ?? ''),
+                        (string) ($comment['email'] ?? ''),
+                        (string) ($comment['body'] ?? ''),
+                        (string) ($comment['guide'] ?? ''),
+                    );
+                } catch (\Throwable $exception) {
+                    error_log('[admin-moderation-notification] ' . $exception->getMessage());
+                }
+            }
+        } catch (\Throwable $exception) {
+            error_log('[admin-moderation-notification] ' . $exception->getMessage());
+        }
+    }
+
+    private function notificationCategoryForComment(array $comment): string
+    {
+        return match ((string) ($comment['kind'] ?? 'comment')) {
+            'wiki_suggestion' => 'wiki',
+            'repair_request', 'repair_answer' => 'repair',
+            default => 'comments',
+        };
+    }
+
+    /** @return list<string> */
+    private function moderationNotificationRecipients(string $category): array
+    {
+        $recipients = [];
+        $adminEmail = strtolower(trim($this->env('ADMIN_EMAIL')));
+        if (filter_var($adminEmail, FILTER_VALIDATE_EMAIL) !== false
+            && ($this->storage->notificationSettingsForAdmin()[$category] ?? true) === true
+        ) {
+            $recipients[] = $adminEmail;
+        }
+
+        foreach ($this->userStorage->read()['users'] as $user) {
+            $email = strtolower(trim((string) ($user['email'] ?? '')));
+            $userId = (string) ($user['id'] ?? '');
+            if (($user['status'] ?? null) !== 'active'
+                || ($user['role'] ?? 'member') !== 'moderator'
+                || $userId === ''
+                || filter_var($email, FILTER_VALIDATE_EMAIL) === false
+                || ($this->storage->notificationSettingsForModerator($userId)[$category] ?? true) !== true
+                || in_array($email, $recipients, true)
+            ) {
+                continue;
+            }
+            $recipients[] = $email;
+        }
+
+        return $recipients;
     }
 
     private function confirmationPage(string $title, string $message, string $path, int $status): Response
@@ -647,8 +1410,110 @@ final class CommunityController
 
     private function isAdminAuthenticated(): bool
     {
+        if (session_status() !== PHP_SESSION_ACTIVE && !$this->hasAdminSessionCookie()) {
+            return false;
+        }
         $this->startAdminSession();
         return isset($_SESSION['admin_email']) && is_string($_SESSION['admin_email']) && $_SESSION['admin_email'] !== '';
+    }
+
+    private function isModeratorAuthenticated(): bool
+    {
+        if ($this->isAdminAuthenticated()) {
+            return true;
+        }
+
+        return $this->moderatorUser() !== null;
+    }
+
+    private function validModeratorCsrfToken(Request $request): bool
+    {
+        $context = $this->requestedStaffContext($request);
+        if ($context === 'moderator') {
+            return $this->moderatorUser() !== null
+                && $this->users->validCsrfToken($request->headers->get('X-CSRF-Token', ''));
+        }
+
+        if ($context === 'admin' || $this->isAdminAuthenticated()) {
+            return $this->validCsrfToken($request);
+        }
+
+        return $this->moderatorUser() !== null
+            && $this->users->validCsrfToken($request->headers->get('X-CSRF-Token', ''));
+    }
+
+    private function requestedStaffContext(Request $request): ?string
+    {
+        $context = strtolower(trim($request->headers->get('X-Staff-Context', '')));
+        return in_array($context, ['admin', 'moderator'], true) ? $context : null;
+    }
+
+    /** @return array{id: string, name: string, role: 'admin'|'moderator'}|null */
+    private function currentStaff(?Request $request = null): ?array
+    {
+        $context = $request ? $this->requestedStaffContext($request) : null;
+        if ($context !== 'moderator' && $this->isAdminAuthenticated()) {
+            return [
+                'id' => (string) ($_SESSION['admin_email'] ?? 'admin'),
+                'name' => 'Admin',
+                'role' => 'admin',
+            ];
+        }
+
+        $moderator = $this->moderatorUser();
+        if ($moderator === null) {
+            return null;
+        }
+
+        return [
+            'id' => (string) $moderator['id'],
+            'name' => (string) $moderator['name'],
+            'role' => 'moderator',
+        ];
+    }
+
+    /** @return array{id: string, authorName: string, authorRole: string, body: string, createdAt: string} */
+    private function staffChatMessage(array $message): array
+    {
+        return [
+            'id' => (string) $message['id'],
+            'authorName' => (string) $message['authorName'],
+            'authorRole' => (string) $message['authorRole'],
+            'body' => (string) $message['body'],
+            'createdAt' => (string) $message['createdAt'],
+        ];
+    }
+
+    private function moderatorUser(): ?array
+    {
+        if (session_status() === PHP_SESSION_ACTIVE && session_name() === 'blacktea_admin' && !isset($_SESSION['admin_email'])) {
+            session_write_close();
+        }
+        $user = $this->users->currentUser();
+        return is_array($user) && ($user['role'] ?? 'member') === 'moderator' ? $user : null;
+    }
+
+    private function hasAdminSessionCookie(): bool
+    {
+        $sessionId = $_COOKIE['blacktea_admin'] ?? null;
+        return is_string($sessionId) && $sessionId !== '';
+    }
+
+    private function clearAdminSessionCookie(): void
+    {
+        if (!ini_get('session.use_cookies')) {
+            return;
+        }
+
+        $params = session_get_cookie_params();
+        setcookie('blacktea_admin', '', [
+            'expires' => time() - 42000,
+            'path' => (string) ($params['path'] ?? '/'),
+            'domain' => (string) ($params['domain'] ?? ''),
+            'secure' => (bool) ($params['secure'] ?? false),
+            'httponly' => (bool) ($params['httponly'] ?? true),
+            'samesite' => (string) ($params['samesite'] ?? 'Lax'),
+        ]);
     }
 
     private function length(string $value): int

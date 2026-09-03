@@ -89,11 +89,14 @@ const staticPages = [
   { path: '/wiki', title: 'Wiki — Black Tea Motorbikes – Hilfe', description: 'Das BTM-Wiki enthält redaktionell geprüfte Artikel zu Bonfire und Wildfire und wird gemeinsam erweitert.' },
   { path: '/bikes/bonfire', title: 'Bonfire — Bikes — Black Tea Motorbikes – Hilfe', description: 'Technische Wiki-Seite zur Black Tea Bonfire mit Handbuchdaten, Modellvarianten und nachvollziehbaren Quellen.' },
   { path: '/bikes/wildfire', title: 'Wildfire — Bikes — Black Tea Motorbikes – Hilfe', description: 'Technische Wiki-Seite zur Black Tea Wildfire mit Handbuchdaten, Modellvarianten und nachvollziehbaren Quellen.' },
+  { path: '/login', title: 'Einloggen — Black Tea Motorbikes – Hilfe', description: 'In den persönlichen BTM-Hilfe-Bereich einloggen.', robots: 'noindex,nofollow,noarchive' },
+  { path: '/registrieren', title: 'Registrieren — Black Tea Motorbikes – Hilfe', description: 'Ein persönliches BTM-Hilfe-Konto mit Mailjet-Bestätigung anlegen.', robots: 'noindex,nofollow,noarchive' },
+  { path: '/konto', title: 'Mein Bereich — Black Tea Motorbikes – Hilfe', description: 'Persönliche Bike-Einstellungen und Benachrichtigungen bei BTM-Hilfe.', robots: 'noindex,nofollow,noarchive' },
 ];
 
 const pdfFiles = readdirSync(join(publicRoot, 'pdfs')).filter((file) => file.toLowerCase().endsWith('.pdf')).sort();
 const ownPaths = [...new Set([
-  ...staticPages.map((page) => page.path),
+  ...staticPages.filter((page) => !page.robots?.startsWith('noindex')).map((page) => page.path),
   ...guides.map((guide) => guide.path),
   ...parts.map((part) => part.path),
   ...wikiArticles.map((article) => article.path),
@@ -129,7 +132,7 @@ const llms = [
   '',
   '## Kernseiten',
   '',
-  ...staticPages.map((page) => `- [${page.title}](${absoluteUrl(page.path)}): ${page.description}`),
+  ...staticPages.filter((page) => !page.robots?.startsWith('noindex')).map((page) => `- [${page.title}](${absoluteUrl(page.path)}): ${page.description}`),
   '',
   '## Reparaturhilfen',
   '',
@@ -168,7 +171,7 @@ const fullLlms = [
   '',
   '## Übersichtsseiten',
   '',
-  ...staticPages.map((page) => `- [${page.title}](${absoluteUrl(page.path)}): ${page.description}`),
+  ...staticPages.filter((page) => !page.robots?.startsWith('noindex')).map((page) => `- [${page.title}](${absoluteUrl(page.path)}): ${page.description}`),
   '',
   '## Reparaturhilfen',
   '',

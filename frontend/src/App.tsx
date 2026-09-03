@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent, type MouseEvent, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState, type ChangeEvent, type FormEvent, type MouseEvent, type ReactNode } from 'react';
 import partsCatalog from '../../research/parts.json';
 import partDetailsCatalog from '../../research/parts-details.json';
 import siteConfig from './site-config.json';
@@ -74,6 +74,8 @@ type PublicComment = {
   parentId?: string | null;
   createdAt: string;
   imageUrl: string | null;
+  avatarStyle?: number | null;
+  avatarUrl?: string | null;
 };
 
 type AdminComment = PublicComment & {
@@ -81,6 +83,37 @@ type AdminComment = PublicComment & {
   email: string;
   status: 'pending' | 'approved';
   approvedAt: string | null;
+};
+
+type AdminWarning = {
+  id: string;
+  reason: string;
+  createdAt: string;
+};
+
+type AdminMember = {
+  id: string;
+  name: string;
+  email: string;
+  role: 'member' | 'moderator' | string;
+  status: 'active' | 'awaiting_confirmation' | string;
+  model: 'Bonfire' | 'Wildfire' | null;
+  kilometers: number;
+  createdAt: string;
+  emailConfirmedAt: string | null;
+  newsletterSubscribed: boolean;
+  warningCount: number;
+  warnings: AdminWarning[];
+  communicationBlocked: boolean;
+  communicationBlockedAt: string | null;
+};
+
+type AdminNotificationSettings = {
+  comments: boolean;
+  wiki: boolean;
+  repair: boolean;
+  bugs: boolean;
+  registration: boolean;
 };
 
 type SourcingCard = {
@@ -173,6 +206,52 @@ type CommunityKnowledge = {
   sourceLabel: string;
   sourceHref: string;
 };
+
+type AuthNotification = {
+  id: string;
+  type: string;
+  title: string;
+  body: string;
+  href: string;
+  createdAt: string;
+  readAt: string | null;
+};
+
+type StaffChatMessage = {
+  id: string;
+  authorName: string;
+  authorRole: 'admin' | 'moderator' | string;
+  body: string;
+  createdAt: string;
+};
+
+type AuthUser = {
+  id: string;
+  name: string;
+  email: string;
+  role: 'member' | 'moderator' | string;
+  model: 'Bonfire' | 'Wildfire' | null;
+  kilometers: number;
+  avatarStyle: number;
+  avatarUrl: string | null;
+  notifyReplies: boolean;
+  newsletterSubscribed: boolean;
+  notifications: AuthNotification[];
+};
+
+type AuthContextValue = {
+  user: AuthUser | null;
+  csrfToken: string;
+  loading: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  register: (name: string, email: string, password: string, passwordConfirm: string) => Promise<string>;
+  logout: () => Promise<void>;
+  updateProfile: (profile: Pick<AuthUser, 'name' | 'model' | 'kilometers' | 'notifyReplies' | 'newsletterSubscribed'>) => Promise<void>;
+  uploadAvatar: (file: File) => Promise<void>;
+  markNotificationRead: (id: string) => Promise<void>;
+};
+
+const AuthContext = createContext<AuthContextValue | null>(null);
 
 const localPartArchiveHref = '/quellen#ersatzteil-archiv';
 const repairRequestGuideSlug = 'hilfe-anfragen';
@@ -1556,31 +1635,50 @@ function getWikiToc(body: string): WikiTocItem[] {
   return items;
 }
 
-function renderWikiInlineMarkdown(value: string, keyPrefix: string): ReactNode[] {
+function highlightWikiText(value: string, query: string, keyPrefix: string): ReactNode[] {
+  const searchTerm = query.trim();
+  const normalizedValue = value.toLocaleLowerCase('de');
+  const normalizedQuery = searchTerm.toLocaleLowerCase('de');
+  if (!normalizedQuery) return [value];
+
+  const nodes: ReactNode[] = [];
+  let cursor = 0;
+  let matchIndex = normalizedValue.indexOf(normalizedQuery, cursor);
+  while (matchIndex >= 0) {
+    if (matchIndex > cursor) nodes.push(value.slice(cursor, matchIndex));
+    nodes.push(<mark className="wiki-search-highlight" key={`${keyPrefix}-match-${nodes.length}`}>{value.slice(matchIndex, matchIndex + searchTerm.length)}</mark>);
+    cursor = matchIndex + searchTerm.length;
+    matchIndex = normalizedValue.indexOf(normalizedQuery, cursor);
+  }
+  if (cursor < value.length) nodes.push(value.slice(cursor));
+  return nodes.length ? nodes : [value];
+}
+
+function renderWikiInlineMarkdown(value: string, keyPrefix: string, query = ''): ReactNode[] {
   const nodes: ReactNode[] = [];
   const pattern = /\[([^\]]+)\]\(([^)\s]+)\)|\*\*([^*]+)\*\*|`([^`]+)`|\*([^*]+)\*/g;
   let cursor = 0;
   let match: RegExpExecArray | null;
 
   while ((match = pattern.exec(value)) !== null) {
-    if (match.index > cursor) nodes.push(value.slice(cursor, match.index));
+    if (match.index > cursor) nodes.push(...highlightWikiText(value.slice(cursor, match.index), query, `${keyPrefix}-plain-${nodes.length}`));
     const key = `${keyPrefix}-${nodes.length}`;
     if (match[1] && match[2] && (match[2].startsWith('/') || /^https?:\/\//i.test(match[2]))) {
       const external = /^https?:\/\//i.test(match[2]);
-      nodes.push(<a key={key} href={match[2]} target={external ? '_blank' : undefined} rel={external ? 'nofollow noreferrer' : undefined}>{match[1]}</a>);
+      nodes.push(<a key={key} href={match[2]} target={external ? '_blank' : undefined} rel={external ? 'nofollow noreferrer' : undefined}>{highlightWikiText(match[1], query, `${key}-link`)}</a>);
     } else if (match[3]) {
-      nodes.push(<strong key={key}>{match[3]}</strong>);
+      nodes.push(<strong key={key}>{highlightWikiText(match[3], query, `${key}-strong`)}</strong>);
     } else if (match[4]) {
-      nodes.push(<code key={key}>{match[4]}</code>);
+      nodes.push(<code key={key}>{highlightWikiText(match[4], query, `${key}-code`)}</code>);
     } else if (match[5]) {
-      nodes.push(<em key={key}>{match[5]}</em>);
+      nodes.push(<em key={key}>{highlightWikiText(match[5], query, `${key}-emphasis`)}</em>);
     } else {
-      nodes.push(match[0]);
+      nodes.push(...highlightWikiText(match[0], query, `${key}-fallback`));
     }
     cursor = match.index + match[0].length;
   }
 
-  if (cursor < value.length) nodes.push(value.slice(cursor));
+  if (cursor < value.length) nodes.push(...highlightWikiText(value.slice(cursor), query, `${keyPrefix}-plain-end`));
   return nodes;
 }
 
@@ -1592,7 +1690,7 @@ function isWikiTableSeparator(line: string): boolean {
   return parseWikiTableRow(line).every((cell) => /^:?-{3,}:?$/.test(cell));
 }
 
-function renderWikiMarkdown(body: string, onEditHeading: (heading: string) => void): ReactNode[] {
+function renderWikiMarkdown(body: string, onEditHeading: (heading: string) => void, query = ''): ReactNode[] {
   const lines = body.split(/\r?\n/);
   const blocks: ReactNode[] = [];
   let index = 0;
@@ -1609,7 +1707,7 @@ function renderWikiMarkdown(body: string, onEditHeading: (heading: string) => vo
       const level = headingMatch[1].length === 2 ? 'h2' : 'h3';
       const Heading = level;
       const heading = headingMatch[2].trim();
-      blocks.push(<Heading key={`wiki-block-${index}`} id={slugifyWikiHeading(heading)}><span className="wiki-heading-text">{heading}</span><button className="wiki-heading-edit" type="button" onClick={() => onEditHeading(heading)}>Bearbeiten</button></Heading>);
+      blocks.push(<Heading key={`wiki-block-${index}`} id={slugifyWikiHeading(heading)}><span className="wiki-heading-text">{highlightWikiText(heading, query, `wiki-heading-${index}`)}</span><button className="wiki-heading-edit" type="button" onClick={() => onEditHeading(heading)}>Bearbeiten</button></Heading>);
       index += 1;
       continue;
     }
@@ -1625,8 +1723,8 @@ function renderWikiMarkdown(body: string, onEditHeading: (heading: string) => vo
       blocks.push(
         <div className="wiki-table-wrap" key={`wiki-block-${index}`}>
           <table>
-            <thead><tr>{header.map((cell, cellIndex) => <th key={`wiki-table-head-${cellIndex}`}>{renderWikiInlineMarkdown(cell, `wiki-table-head-${cellIndex}`)}</th>)}</tr></thead>
-            <tbody>{rows.map((row, rowIndex) => <tr key={`wiki-table-row-${rowIndex}`}>{row.map((cell, cellIndex) => <td key={`wiki-table-cell-${rowIndex}-${cellIndex}`}>{renderWikiInlineMarkdown(cell, `wiki-table-cell-${rowIndex}-${cellIndex}`)}</td>)}</tr>)}</tbody>
+            <thead><tr>{header.map((cell, cellIndex) => <th key={`wiki-table-head-${cellIndex}`}>{renderWikiInlineMarkdown(cell, `wiki-table-head-${cellIndex}`, query)}</th>)}</tr></thead>
+            <tbody>{rows.map((row, rowIndex) => <tr key={`wiki-table-row-${rowIndex}`}>{row.map((cell, cellIndex) => <td key={`wiki-table-cell-${rowIndex}-${cellIndex}`}>{renderWikiInlineMarkdown(cell, `wiki-table-cell-${rowIndex}-${cellIndex}`, query)}</td>)}</tr>)}</tbody>
           </table>
         </div>,
       );
@@ -1642,7 +1740,7 @@ function renderWikiMarkdown(body: string, onEditHeading: (heading: string) => vo
         items.push(itemMatch[1]);
         index += 1;
       }
-      blocks.push(<ul key={`wiki-block-${index}`}>{items.map((item, itemIndex) => <li key={`wiki-list-item-${itemIndex}`}>{renderWikiInlineMarkdown(item, `wiki-list-item-${itemIndex}`)}</li>)}</ul>);
+      blocks.push(<ul key={`wiki-block-${index}`}>{items.map((item, itemIndex) => <li key={`wiki-list-item-${itemIndex}`}>{renderWikiInlineMarkdown(item, `wiki-list-item-${itemIndex}`, query)}</li>)}</ul>);
       continue;
     }
 
@@ -1655,7 +1753,7 @@ function renderWikiMarkdown(body: string, onEditHeading: (heading: string) => vo
         items.push(itemMatch[1]);
         index += 1;
       }
-      blocks.push(<ol key={`wiki-block-${index}`}>{items.map((item, itemIndex) => <li key={`wiki-ordered-item-${itemIndex}`}>{renderWikiInlineMarkdown(item, `wiki-ordered-item-${itemIndex}`)}</li>)}</ol>);
+      blocks.push(<ol key={`wiki-block-${index}`}>{items.map((item, itemIndex) => <li key={`wiki-ordered-item-${itemIndex}`}>{renderWikiInlineMarkdown(item, `wiki-ordered-item-${itemIndex}`, query)}</li>)}</ol>);
       continue;
     }
 
@@ -1665,7 +1763,7 @@ function renderWikiMarkdown(body: string, onEditHeading: (heading: string) => vo
         quoteLines.push(lines[index].trim().replace(/^>\s?/, ''));
         index += 1;
       }
-      blocks.push(<blockquote key={`wiki-block-${index}`}>{quoteLines.map((quote, quoteIndex) => <span key={`wiki-quote-${quoteIndex}`}>{quoteIndex > 0 ? ' ' : ''}{renderWikiInlineMarkdown(quote, `wiki-quote-${quoteIndex}`)}</span>)}</blockquote>);
+      blocks.push(<blockquote key={`wiki-block-${index}`}>{quoteLines.map((quote, quoteIndex) => <span key={`wiki-quote-${quoteIndex}`}>{quoteIndex > 0 ? ' ' : ''}{renderWikiInlineMarkdown(quote, `wiki-quote-${quoteIndex}`, query)}</span>)}</blockquote>);
       continue;
     }
 
@@ -1676,7 +1774,7 @@ function renderWikiMarkdown(body: string, onEditHeading: (heading: string) => vo
       paragraphLines.push(current);
       index += 1;
     }
-    blocks.push(<p key={`wiki-block-${index}`}>{paragraphLines.flatMap((paragraphLine, lineIndex) => [...(lineIndex > 0 ? [' '] : []), ...renderWikiInlineMarkdown(paragraphLine, `wiki-paragraph-${index}-${lineIndex}`)])}</p>);
+    blocks.push(<p key={`wiki-block-${index}`}>{paragraphLines.flatMap((paragraphLine, lineIndex) => [...(lineIndex > 0 ? [' '] : []), ...renderWikiInlineMarkdown(paragraphLine, `wiki-paragraph-${index}-${lineIndex}`, query)])}</p>);
   }
 
   return blocks;
@@ -1694,13 +1792,156 @@ function getWikiSearchMatches(query: string): Array<{ article: WikiArticle; sect
   });
 }
 
+function getWikiArticleSearchResults(body: string, query: string): WikiTocItem[] {
+  const normalizedQuery = query.trim().toLocaleLowerCase('de');
+  if (!normalizedQuery) return [];
+
+  const usedIds = new Map<string, number>();
+  const sections: Array<WikiTocItem & { text: string }> = [];
+  let current: (WikiTocItem & { text: string }) | null = null;
+
+  const finishSection = () => {
+    if (current) sections.push(current);
+  };
+
+  for (const line of body.split(/\r?\n/)) {
+    const headingMatch = line.match(/^(#{2,3})\s+(.+?)\s*#*\s*$/);
+    if (headingMatch) {
+      finishSection();
+      const label = headingMatch[2].trim();
+      const baseId = slugifyWikiHeading(label);
+      const occurrence = usedIds.get(baseId) ?? 0;
+      usedIds.set(baseId, occurrence + 1);
+      current = { id: occurrence === 0 ? baseId : `${baseId}-${occurrence + 1}`, label, level: headingMatch[1].length as 2 | 3, text: '' };
+      continue;
+    }
+    if (current) current.text += ` ${line}`;
+  }
+  finishSection();
+
+  return sections
+    .filter((section) => `${section.label} ${section.text}`.toLocaleLowerCase('de').includes(normalizedQuery))
+    .map(({ id, label, level }) => ({ id, label, level }));
+}
+
 async function apiJson<T>(input: RequestInfo | URL, init?: RequestInit): Promise<T> {
-  const response = await fetch(input, init);
+  const response = await fetch(input, { credentials: 'same-origin', ...init });
   const payload = await response.json().catch(() => ({}));
   if (!response.ok) {
     throw new Error(typeof payload === 'object' && payload !== null && 'error' in payload ? String(payload.error) : 'Die Anfrage konnte nicht verarbeitet werden.');
   }
   return payload as T;
+}
+
+const COOKIE_CONSENT_KEY = 'btm-cookie-consent';
+
+function setOptionalServiceConsent(choice: 'accepted' | 'rejected'): void {
+  if (typeof window === 'undefined') return;
+
+  try {
+    window.localStorage.setItem(COOKIE_CONSENT_KEY, choice);
+  } catch {
+    // A blocked local storage must never break the website or the login flow.
+  }
+
+  document.documentElement.dataset.optionalServices = choice === 'accepted' ? 'allowed' : 'blocked';
+  window.dispatchEvent(new CustomEvent('btm-cookie-consent-changed', { detail: choice }));
+}
+
+const normaliseDisplayName = (value: string): string => value
+  .toLowerCase()
+  .replace(/[^a-z0-9äöüß]/g, '')
+  .slice(0, 80);
+
+function AuthProvider({ children }: { children: ReactNode }) {
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [csrfToken, setCsrfToken] = useState('');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+    const refreshSession = async () => {
+      try {
+        const session = await apiJson<{ authenticated: boolean; user: AuthUser | null; csrfToken: string | null }>('/api/auth/session');
+        if (!active) return;
+        setUser(session.authenticated ? session.user : null);
+        setCsrfToken(session.csrfToken ?? '');
+      } catch {
+        if (!active) return;
+        setUser(null);
+        setCsrfToken('');
+      } finally {
+        if (active) setLoading(false);
+      }
+    };
+    void refreshSession();
+    const refreshTimer = window.setInterval(() => { void refreshSession(); }, 60000);
+    return () => {
+      active = false;
+      window.clearInterval(refreshTimer);
+    };
+  }, []);
+
+  const login = async (email: string, password: string) => {
+    const session = await apiJson<{ user: AuthUser; csrfToken: string }>('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+    setUser(session.user);
+    setCsrfToken(session.csrfToken);
+  };
+
+  const register = async (name: string, email: string, password: string, passwordConfirm: string) => {
+    const response = await apiJson<{ message: string }>('/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, password, passwordConfirm }),
+    });
+    return response.message;
+  };
+
+  const logout = async () => {
+    await apiJson('/api/auth/logout', { method: 'POST', headers: { 'X-CSRF-Token': csrfToken } });
+    setUser(null);
+    setCsrfToken('');
+  };
+
+  const updateProfile = async (profile: Pick<AuthUser, 'name' | 'model' | 'kilometers' | 'notifyReplies' | 'newsletterSubscribed'>) => {
+    const response = await apiJson<{ user: AuthUser }>('/api/auth/profile', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
+      body: JSON.stringify(profile),
+    });
+    setUser(response.user);
+  };
+
+  const uploadAvatar = async (file: File) => {
+    const formData = new FormData();
+    formData.append('avatar', file);
+    const response = await apiJson<{ user: AuthUser }>('/api/auth/avatar', {
+      method: 'POST',
+      headers: { 'X-CSRF-Token': csrfToken },
+      body: formData,
+    });
+    setUser(response.user);
+  };
+
+  const markNotificationRead = async (id: string) => {
+    const response = await apiJson<{ notifications: AuthNotification[] }>(`/api/auth/notifications/${encodeURIComponent(id)}/read`, {
+      method: 'POST',
+      headers: { 'X-CSRF-Token': csrfToken },
+    });
+    setUser((current) => current ? { ...current, notifications: response.notifications } : current);
+  };
+
+  return <AuthContext.Provider value={{ user, csrfToken, loading, login, register, logout, updateProfile, uploadAvatar, markNotificationRead }}>{children}</AuthContext.Provider>;
+}
+
+function useAuth(): AuthContextValue {
+  const context = useContext(AuthContext);
+  if (!context) throw new Error('useAuth muss innerhalb von AuthProvider verwendet werden.');
+  return context;
 }
 
 type SeoMetadata = {
@@ -1730,11 +1971,11 @@ const breadcrumbSchema = (items: Array<{ name: string; url: string }>) => ({
 });
 
 function getSeoMetadata(path: string, guide?: RepairGuide, part?: HistoricalShopPart, bike?: BikeProfile, wikiArticle?: WikiArticle): SeoMetadata {
-  if (path === '/admin') {
+  if (path === '/admin' || path === '/login' || path === '/registrieren' || path === '/konto' || path === '/passwort-zuruecksetzen') {
     return {
-      title: 'Admin — Black Tea Motorbikes – Hilfe',
-      description: 'Interner Bereich zur redaktionellen Prüfung von Kommentaren.',
-      canonicalPath: '/admin',
+      title: path === '/konto' ? 'Mein Bereich — Black Tea Motorbikes – Hilfe' : path === '/registrieren' ? 'Registrieren — Black Tea Motorbikes – Hilfe' : path === '/login' ? 'Einloggen — Black Tea Motorbikes – Hilfe' : path === '/passwort-zuruecksetzen' ? 'Passwort zurücksetzen — Black Tea Motorbikes – Hilfe' : 'Admin — Black Tea Motorbikes – Hilfe',
+      description: 'Persönlicher Bereich von Black Tea Motorbikes – Hilfe.',
+      canonicalPath: path,
       robots: 'noindex,nofollow,noarchive',
       jsonLd: {},
     };
@@ -1999,7 +2240,7 @@ function applySeoMetadata(metadata: SeoMetadata): void {
   structuredData.textContent = JSON.stringify(metadata.jsonLd);
 }
 
-function App({ initialPath }: { initialPath?: string } = {}) {
+function AppContent({ initialPath }: { initialPath?: string } = {}) {
   const [locationKey, setLocationKey] = useState(() => initialPath ?? getLocationKey());
 
   useEffect(() => {
@@ -2021,6 +2262,10 @@ function App({ initialPath }: { initialPath?: string } = {}) {
   const seoMetadata = getSeoMetadata(path, guide, part, bike, wikiArticle);
   const isKnownPath = path === '/'
     || path === '/admin'
+    || path === '/login'
+    || path === '/registrieren'
+    || path === '/konto'
+    || path === '/passwort-zuruecksetzen'
     || path === '/hilfe'
     || path === repairRequestPath
     || Boolean(repairRequestId)
@@ -2041,6 +2286,10 @@ function App({ initialPath }: { initialPath?: string } = {}) {
 
   if (guide) return <RepairGuidePage guide={guide} />;
   if (path === '/admin') return <AdminPage />;
+  if (path === '/login') return <LoginPage />;
+  if (path === '/registrieren') return <RegisterPage />;
+  if (path === '/passwort-zuruecksetzen') return <PasswordResetPage />;
+  if (path === '/konto') return <AccountPage />;
   if (repairRequestId) return <RepairRequestDetailPage requestId={repairRequestId} />;
   if (path === repairRequestPath) return <RepairRequestPage />;
   if (path === '/hilfe') return <RepairGuideIndexPage />;
@@ -2057,6 +2306,47 @@ function App({ initialPath }: { initialPath?: string } = {}) {
   return <HomePage />;
 }
 
+function CookieConsentBanner() {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    try {
+      const choice = window.localStorage.getItem(COOKIE_CONSENT_KEY);
+      document.documentElement.dataset.optionalServices = choice === 'accepted' ? 'allowed' : 'blocked';
+      setVisible(!choice);
+    } catch {
+      // Do not interrupt the page when local storage is unavailable.
+      document.documentElement.dataset.optionalServices = 'blocked';
+    }
+  }, []);
+
+  if (!visible) return null;
+
+  const choose = (choice: 'accepted' | 'rejected') => {
+    setOptionalServiceConsent(choice);
+    setVisible(false);
+  };
+
+  return (
+    <section className="cookie-consent-banner card-doodle" role="dialog" aria-live="polite" aria-label="Cookie-Einstellungen">
+      <div>
+        <div className="eyebrow handwritten">kurz und transparent</div>
+        <h2>Deine Cookie-Wahl.</h2>
+        <p>Aktuell laden wir keine Analyse-, Werbe- oder eingebetteten Drittanbieter-Dienste. Technisch notwendige Sitzungsfunktionen bleiben aktiv. Wenn später optionale Inhalte dazukommen, laden wir sie nur nach deiner Zustimmung.</p>
+        <a href="/datenschutz">Mehr zum Datenschutz ↗</a>
+      </div>
+      <div className="cookie-consent-actions">
+        <button className="button button-ghost" type="button" onClick={() => choose('rejected')}>Ablehnen</button>
+        <button className="button button-ink" type="button" onClick={() => choose('accepted')}>Optionale Inhalte erlauben</button>
+      </div>
+    </section>
+  );
+}
+
+export function App(props: { initialPath?: string } = {}) {
+  return <AuthProvider><AppContent {...props} /><CookieConsentBanner /></AuthProvider>;
+}
+
 function NotFoundPage({ path }: { path: string }) {
   return (
     <div className="site-shell">
@@ -2069,6 +2359,476 @@ function NotFoundPage({ path }: { path: string }) {
       </main>
       <GuideFooter />
     </div>
+  );
+}
+
+function AvatarBadge({ user, compact = false }: { user: Pick<AuthUser, 'name' | 'avatarStyle' | 'avatarUrl'>; compact?: boolean }) {
+  const style = Math.max(0, Math.min(19, user.avatarStyle));
+  return (
+    <span className={`avatar-badge avatar-style-${style} ${compact ? 'avatar-badge-compact' : ''}`} aria-label={`Avatar von ${user.name}`}>
+      {user.avatarUrl ? <img src={user.avatarUrl} alt="" /> : <span className="avatar-fallback" aria-hidden="true">BTM</span>}
+    </span>
+  );
+}
+
+function PublicCommentAvatar({ comment }: { comment: Pick<PublicComment, 'name' | 'avatarStyle' | 'avatarUrl'> }) {
+  if (!comment.avatarUrl) return null;
+  const style = Math.max(0, Math.min(19, comment.avatarStyle ?? 0));
+  return (
+    <span className={`public-comment-avatar avatar-style-${style}`} aria-label={`Avatar von ${comment.name}`}>
+      <img src={comment.avatarUrl} alt="" loading="lazy" />
+    </span>
+  );
+}
+
+function PublicCommentAuthor({ comment }: { comment: Pick<PublicComment, 'name' | 'avatarStyle' | 'avatarUrl'> }) {
+  return (
+    <span className="approved-comment-author">
+      <PublicCommentAvatar comment={comment} />
+      <strong>{comment.name}</strong>
+    </span>
+  );
+}
+
+function LoginPage() {
+  const { user, login } = useAuth();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [showPasswordReset, setShowPasswordReset] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const [resetError, setResetError] = useState('');
+  const [resetNotice, setResetNotice] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [resetSubmitting, setResetSubmitting] = useState(false);
+
+  useEffect(() => {
+    document.title = 'Einloggen — Black Tea Motorbikes – Hilfe';
+    window.scrollTo(0, 0);
+  }, []);
+
+  if (user) {
+    return (
+      <div className="site-shell"><GuideHeader /><main className="auth-page section-pad"><div className="auth-card card-doodle"><div className="eyebrow handwritten">schön, dass du da bist</div><h1>Du bist schon drin.</h1><p>Dein persönlicher BTM-Hilfe-Bereich wartet auf dich.</p><a className="button button-ink" href="/konto">Zum Mein-Bereich ↗</a></div></main><GuideFooter /></div>
+    );
+  }
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSubmitting(true);
+    setError('');
+    try {
+      await login(email, password);
+      window.location.href = '/konto';
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : 'Der Login konnte nicht durchgeführt werden.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handlePasswordResetRequest = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setResetSubmitting(true);
+    setResetError('');
+    setResetNotice('');
+    try {
+      const response = await apiJson<{ message: string }>('/api/auth/password-reset/request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: resetEmail }),
+      });
+      setResetNotice(response.message);
+    } catch (reason) {
+      setResetError(reason instanceof Error ? reason.message : 'Die Passwort-Mail konnte gerade nicht angefordert werden.');
+    } finally {
+      setResetSubmitting(false);
+    }
+  };
+
+  const openPasswordReset = () => {
+    setResetEmail(email);
+    setResetError('');
+    setResetNotice('');
+    setShowPasswordReset(true);
+  };
+
+  return (
+    <div className="site-shell"><GuideHeader /><main className="auth-page section-pad"><section className="auth-card card-doodle"><div className="eyebrow handwritten">dein btm-bereich</div><h1>Einloggen.</h1><p>Mit deinem Konto kannst du kommentieren, Bugs melden und später sehen, wenn jemand auf deine Reparaturanfrage antwortet.</p><form className="auth-form" onSubmit={handleSubmit}><label>E-Mail<input value={email} onChange={(event) => setEmail(event.target.value)} type="email" autoComplete="email" required /></label><label>Passwort<input value={password} onChange={(event) => setPassword(event.target.value)} type="password" autoComplete="current-password" required /></label>{error && <p className="form-message form-message-error" role="alert">{error}</p>}<button className="button button-ink" type="submit" disabled={submitting}>{submitting ? 'Einen Moment …' : 'Einloggen'} <span aria-hidden="true">↗</span></button></form><p className="auth-switch"><button className="auth-text-button" type="button" onClick={openPasswordReset} aria-expanded={showPasswordReset}>Passwort vergessen?</button></p>{showPasswordReset && <section className="auth-reset-request"><div className="eyebrow handwritten">wieder reinkommen</div><h2>Passwort zurücksetzen.</h2><p>Gib deine E-Mail-Adresse ein. Wenn sie zu einem aktiven Konto gehört, schicken wir dir einen sicheren Link.</p><form className="auth-form" onSubmit={handlePasswordResetRequest}><label>E-Mail<input value={resetEmail} onChange={(event) => setResetEmail(event.target.value)} type="email" autoComplete="email" required /></label>{resetError && <p className="form-message form-message-error" role="alert">{resetError}</p>}{resetNotice && <p className="form-message form-message-success" role="status">{resetNotice}</p>}<button className="button button-ghost" type="submit" disabled={resetSubmitting}>{resetSubmitting ? 'Mail wird angefordert …' : 'Reset-Mail anfordern'} <span aria-hidden="true">↗</span></button></form></section>}<p className="auth-switch">Noch kein Konto? <a href="/registrieren">Jetzt registrieren ↗</a></p></section></main><GuideFooter /></div>
+  );
+}
+
+function PasswordResetPage() {
+  const [password, setPassword] = useState('');
+  const [passwordConfirm, setPasswordConfirm] = useState('');
+  const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const token = useMemo(() => typeof window === 'undefined' ? '' : new URLSearchParams(window.location.search).get('token') ?? '', []);
+
+  useEffect(() => {
+    document.title = 'Passwort zurücksetzen — Black Tea Motorbikes – Hilfe';
+    window.scrollTo(0, 0);
+  }, []);
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSubmitting(true);
+    setError('');
+    setNotice('');
+    try {
+      const response = await apiJson<{ message: string }>('/api/auth/password-reset', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token, password, passwordConfirm }),
+      });
+      setNotice(response.message);
+      setPassword('');
+      setPasswordConfirm('');
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : 'Das Passwort konnte nicht geändert werden.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="site-shell"><GuideHeader /><main className="auth-page section-pad"><section className="auth-card card-doodle"><div className="eyebrow handwritten">neuer zugang</div><h1>Passwort zurücksetzen.</h1>{token ? <><p>Lege ein neues Passwort für dein BTM-Hilfe-Konto fest.</p><form className="auth-form" onSubmit={handleSubmit}><label>Neues Passwort<input value={password} onChange={(event) => setPassword(event.target.value)} type="password" minLength={10} maxLength={128} autoComplete="new-password" required /><small>Mindestens 10 Zeichen.</small></label><label>Passwort wiederholen<input value={passwordConfirm} onChange={(event) => setPasswordConfirm(event.target.value)} type="password" minLength={10} maxLength={128} autoComplete="new-password" required /></label>{error && <p className="form-message form-message-error" role="alert">{error}</p>}{notice && <p className="form-message form-message-success" role="status">{notice}</p>}<button className="button button-ink" type="submit" disabled={submitting}>{submitting ? 'Wird gespeichert …' : 'Neues Passwort speichern'} <span aria-hidden="true">↗</span></button></form>{notice && <p className="auth-switch"><a href="/login">Zum Login ↗</a></p>}</> : <><p>Dieser Link enthält keinen gültigen Passwort-Token. Bitte fordere im Admin-Bereich eine neue Reset-Mail an.</p><a className="button button-ink" href="/login">Zum Login ↗</a></>}</section></main><GuideFooter /></div>
+  );
+}
+
+function RegisterPage() {
+  const { user, register } = useAuth();
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [passwordConfirm, setPasswordConfirm] = useState('');
+  const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    document.title = 'Registrieren — Black Tea Motorbikes – Hilfe';
+    window.scrollTo(0, 0);
+  }, []);
+
+  if (user) {
+    return <div className="site-shell"><GuideHeader /><main className="auth-page section-pad"><div className="auth-card card-doodle"><div className="eyebrow handwritten">konto vorhanden</div><h1>Du bist bereits registriert.</h1><p>Verwalte deine Bike-Einstellungen direkt in deinem persönlichen Bereich.</p><a className="button button-ink" href="/konto">Zum Mein-Bereich ↗</a></div></main><GuideFooter /></div>;
+  }
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSubmitting(true);
+    setError('');
+    setNotice('');
+    try {
+      const message = await register(name, email, password, passwordConfirm);
+      setNotice(message);
+      setPassword('');
+      setPasswordConfirm('');
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : 'Die Registrierung konnte nicht durchgeführt werden.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="site-shell"><GuideHeader /><main className="auth-page section-pad"><section className="auth-card card-doodle"><div className="eyebrow handwritten">dabei sein, mithelfen</div><h1>Registrieren.</h1><p>Ein kleines Konto reicht. Wir bestätigen deine E-Mail zuerst über Mailjet – erst danach ist dein Zugang aktiv.</p><form className="auth-form" onSubmit={handleSubmit}><label>Name<input value={name} onChange={(event) => setName(normaliseDisplayName(event.target.value))} minLength={2} maxLength={80} autoComplete="name" autoCapitalize="none" autoCorrect="off" spellCheck={false} pattern="[a-z0-9äöüß]+" title="Nur Kleinbuchstaben und Zahlen, ohne Leerzeichen, Sonderzeichen oder Emojis." required /><small>Nur Kleinbuchstaben und Zahlen, ohne Leerzeichen oder Emojis.</small></label><label>E-Mail<input value={email} onChange={(event) => setEmail(event.target.value)} type="email" maxLength={180} autoComplete="email" required /></label><label>Passwort<input value={password} onChange={(event) => setPassword(event.target.value)} type="password" minLength={10} maxLength={128} autoComplete="new-password" required /><small>Mindestens 10 Zeichen.</small></label><label>Passwort wiederholen<input value={passwordConfirm} onChange={(event) => setPasswordConfirm(event.target.value)} type="password" minLength={10} maxLength={128} autoComplete="new-password" required /></label>{error && <p className="form-message form-message-error" role="alert">{error}</p>}{notice && <p className="form-message form-message-success" role="status">{notice}</p>}<button className="button button-ink" type="submit" disabled={submitting}>{submitting ? 'Konto wird angelegt …' : 'Registrieren'} <span aria-hidden="true">↗</span></button></form><p className="auth-switch">Schon dabei? <a href="/login">Zum Login ↗</a></p></section></main><GuideFooter /></div>
+  );
+}
+
+function AccountPage() {
+  const { user, loading, csrfToken, updateProfile, uploadAvatar, markNotificationRead, logout } = useAuth();
+  const [name, setName] = useState('');
+  const [model, setModel] = useState<'Bonfire' | 'Wildfire' | ''>('');
+  const [kilometers, setKilometers] = useState(0);
+  const [notifyReplies, setNotifyReplies] = useState(true);
+  const [newsletterSubscribed, setNewsletterSubscribed] = useState(false);
+  const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
+  const [uploading, setUploading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [accountSection, setAccountSection] = useState<'overview' | 'moderation' | 'chat'>('overview');
+
+  useEffect(() => {
+    document.title = 'Mein Bereich — Black Tea Motorbikes – Hilfe';
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
+    if (!user) return;
+    setName(normaliseDisplayName(user.name));
+    setModel(user.model ?? '');
+    setKilometers(user.kilometers);
+    setNotifyReplies(user.notifyReplies);
+    setNewsletterSubscribed(user.newsletterSubscribed);
+  }, [user]);
+
+  if (loading) return <div className="site-shell"><GuideHeader /><main className="auth-page section-pad"><div className="auth-card card-doodle"><div className="eyebrow handwritten">dein btm-bereich</div><h1>Konto wird geladen …</h1><p>Einen Moment bitte.</p></div></main><GuideFooter /></div>;
+  if (!user) return <div className="site-shell"><GuideHeader /><main className="auth-page section-pad"><div className="auth-card card-doodle"><div className="eyebrow handwritten">zugang nötig</div><h1>Dein Bereich wartet.</h1><p>Logge dich ein, um deine Einstellungen, Benachrichtigungen und Avatar-Spielerei zu sehen.</p><a className="button button-ink" href="/login">Einloggen ↗</a><a className="auth-secondary-link" href="/registrieren">Noch kein Konto? Registrieren</a></div></main><GuideFooter /></div>;
+
+  const saveProfile = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSaving(true);
+    setError('');
+    setNotice('');
+    try {
+      await updateProfile({ name, model: model || null, kilometers: Number(kilometers), notifyReplies, newsletterSubscribed });
+      setNotice('Gespeichert. Dein BTM-Bereich ist auf dem aktuellen Stand.');
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : 'Die Einstellungen konnten nicht gespeichert werden.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleAvatarUpload = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      setError('Bitte ein Bild bis höchstens 2 MB auswählen.');
+      return;
+    }
+    setUploading(true);
+    setError('');
+    setNotice('');
+    try {
+      await uploadAvatar(file);
+      setNotice('Dein Bild ist jetzt als Avatar gespeichert.');
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : 'Das Bild konnte nicht gespeichert werden.');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const unread = user.notifications.filter((notification) => !notification.readAt);
+  const previewUser = user;
+  return (
+    <div className="site-shell">
+      <GuideHeader />
+      <main className="account-page section-pad">
+        <section className="account-hero">
+          <div>
+            <div className="eyebrow handwritten">dein persönlicher bereich</div>
+            <h1>Hallo, {user.name}.</h1>
+            <p>Ein bisschen Bike-Profil, ein bisschen Community. Name und E-Mail werden bei deinen Beiträgen automatisch aus deinem bestätigten Konto übernommen.</p>
+          </div>
+          <div className="account-hero-avatar"><AvatarBadge user={previewUser} /></div>
+        </section>
+        {user.role === 'moderator' && (
+            <div className="account-section-tabs" role="tablist" aria-label="Bereiche im Mein-Bereich">
+            <button className={accountSection === 'overview' ? 'active' : ''} type="button" role="tab" aria-selected={accountSection === 'overview'} onClick={() => setAccountSection('overview')}>Mein Bereich</button>
+            <button className={accountSection === 'moderation' ? 'active' : ''} type="button" role="tab" aria-selected={accountSection === 'moderation'} onClick={() => setAccountSection('moderation')}>Moderation</button>
+            <button className={accountSection === 'chat' ? 'active' : ''} type="button" role="tab" aria-selected={accountSection === 'chat'} onClick={() => setAccountSection('chat')}>Team-Chat</button>
+          </div>
+        )}
+        {accountSection === 'moderation' && user.role === 'moderator' ? <ModeratorDashboardPanel csrfToken={csrfToken} /> : accountSection === 'chat' && user.role === 'moderator' ? <StaffChatPanel csrfToken={csrfToken} context="moderator" /> : <div className="account-grid">
+          <section className="account-card card-doodle">
+            <div className="eyebrow handwritten">bike &amp; spielerei</div>
+            <h2>Deine Einstellungen</h2>
+            <form className="auth-form" onSubmit={saveProfile}>
+              <label>Anzeigename<input value={name} onChange={(event) => setName(normaliseDisplayName(event.target.value))} minLength={2} maxLength={80} autoCapitalize="none" autoCorrect="off" spellCheck={false} pattern="[a-z0-9äöüß]+" title="Nur Kleinbuchstaben und Zahlen, ohne Leerzeichen, Sonderzeichen oder Emojis." required /><small>Nur Kleinbuchstaben und Zahlen, ohne Leerzeichen oder Emojis.</small></label>
+              <label>Dein Modell<select value={model} onChange={(event) => setModel(event.target.value as 'Bonfire' | 'Wildfire' | '')}><option value="">Noch nicht festgelegt</option><option value="Bonfire">Bonfire</option><option value="Wildfire">Wildfire</option></select></label>
+              <label>Kilometerstand<input value={kilometers} onChange={(event) => setKilometers(Number(event.target.value))} type="number" min="0" max="999999" step="1" /><small>Nur für deinen persönlichen Bereich – keine öffentliche Statistik.</small></label>
+              <label className="account-check"><input checked={notifyReplies} onChange={(event) => setNotifyReplies(event.target.checked)} type="checkbox" /> Benachrichtigungen bei Antworten aktivieren</label>
+              <div className="account-consent-setting"><label className="account-check"><input checked={newsletterSubscribed} onChange={(event) => setNewsletterSubscribed(event.target.checked)} type="checkbox" /> Newsletter erhalten</label><small>Neuigkeiten und wichtige Updates per E-Mail. Du kannst ihn hier jederzeit abbestellen.</small></div>
+              <div className="avatar-upload"><label>Eigenes Bild (optional)<input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleAvatarUpload} disabled={uploading} /><small>{uploading ? 'Bild wird gespeichert …' : 'JPG, PNG oder WEBP · maximal 2 MB. Dein eigenes Bild ersetzt den zugewiesenen Avatar.'}</small></label></div>
+              {error && <p className="form-message form-message-error" role="alert">{error}</p>}
+              {notice && <p className="form-message form-message-success" role="status">{notice}</p>}
+              <button className="button button-ink" type="submit" disabled={saving}>{saving ? 'Wird gespeichert …' : 'Einstellungen speichern'} <span aria-hidden="true">↗</span></button>
+            </form>
+          </section>
+          <section className="account-card card-doodle">
+            <div className="eyebrow handwritten">postfach</div>
+            <h2>Antworten für dich{unread.length ? ` · ${unread.length} neu` : ''}</h2>
+            <p className="account-notification-intro">Wenn jemand auf deine freigegebene Reparaturanfrage antwortet, findest du hier den Hinweis – und optional zusätzlich in deinem E-Mail-Postfach.</p>
+            <div className="account-notifications">{user.notifications.length ? user.notifications.map((notification) => <article className={`account-notification ${notification.readAt ? 'is-read' : 'is-unread'}`} key={notification.id}><div><strong>{notification.title}</strong><p>{notification.body}</p><time dateTime={notification.createdAt}>{new Date(notification.createdAt).toLocaleDateString('de-DE')}</time></div><div className="account-notification-actions"><a href={notification.href}>Öffnen ↗</a>{!notification.readAt && <button type="button" onClick={() => { void markNotificationRead(notification.id); }}>Als gelesen markieren</button>}</div></article>) : <p className="no-comments">Noch keine Antworten. Wir sagen dir Bescheid, sobald es etwas Neues gibt.</p>}</div>
+            <button className="account-logout-button" type="button" onClick={() => { void logout().then(() => { window.location.href = '/'; }); }}>Ausloggen</button>
+          </section>
+        </div>}
+      </main>
+      <GuideFooter />
+    </div>
+  );
+}
+
+function ModeratorDashboardPanel({ csrfToken }: { csrfToken: string }) {
+  const [comments, setComments] = useState<AdminComment[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [busyId, setBusyId] = useState<string | null>(null);
+  const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
+
+  const loadOpenComments = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const payload = await apiJson<{ comments: AdminComment[] }>('/api/admin/comments');
+      setComments(payload.comments.filter((comment) => comment.status === 'pending'));
+    } catch (loadError) {
+      setError(loadError instanceof Error ? loadError.message : 'Offene Beiträge konnten nicht geladen werden.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    void loadOpenComments();
+  }, []);
+
+  const updateComment = async (comment: AdminComment, status: 'approved' | 'pending') => {
+    setBusyId(comment.id);
+    setError('');
+    setNotice('');
+    try {
+      await apiJson<{ comment: AdminComment }>(`/api/admin/comments/${comment.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
+        body: JSON.stringify({ status }),
+      });
+      setComments((current) => current.filter((item) => item.id !== comment.id));
+      setNotice(status === 'approved' ? 'Beitrag freigegeben.' : 'Beitrag zurückgestellt.');
+    } catch (actionError) {
+      setError(actionError instanceof Error ? actionError.message : 'Der Beitrag konnte nicht aktualisiert werden.');
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  const deleteComment = async (comment: AdminComment) => {
+    if (!window.confirm(`Beitrag von ${comment.name} wirklich löschen?`)) return;
+    setBusyId(comment.id);
+    setError('');
+    setNotice('');
+    try {
+      await apiJson<{ deleted: boolean }>(`/api/admin/comments/${comment.id}`, {
+        method: 'DELETE',
+        headers: { 'X-CSRF-Token': csrfToken },
+      });
+      setComments((current) => current.filter((item) => item.id !== comment.id));
+      setNotice('Beitrag gelöscht.');
+    } catch (actionError) {
+      setError(actionError instanceof Error ? actionError.message : 'Der Beitrag konnte nicht gelöscht werden.');
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  return (
+    <section className="account-moderation-panel account-card card-doodle">
+      <div className="account-moderation-heading">
+        <div>
+          <div className="eyebrow handwritten">moderation · intern</div>
+          <h2>Offene Beiträge.</h2>
+          <p>Hier siehst du nur Inhalte, die noch auf eine redaktionelle Prüfung warten.</p>
+        </div>
+        <button className="button button-ghost" type="button" onClick={() => { void loadOpenComments(); }} disabled={loading}>Aktualisieren ↻</button>
+      </div>
+      {error && <p className="form-message form-message-error" role="alert">{error}</p>}
+      {notice && <p className="form-message form-message-success" role="status">{notice}</p>}
+      <div className="account-moderation-count">{loading ? 'Offene Beiträge werden geladen …' : `${comments.length} offen`}</div>
+      <div className="account-moderation-list">
+        {loading ? <p className="no-comments">Einen Moment bitte.</p> : comments.length ? comments.map((comment) => (
+          <article className="account-moderation-item card-doodle" key={comment.id}>
+            <div className="account-moderation-item-topline">
+              <span className="admin-status pending">wartet auf Prüfung</span>
+              <span className="admin-kind">{comment.kind === 'wiki_suggestion' ? 'Wiki-Vorschlag' : comment.kind === 'repair_request' ? 'Reparaturanfrage' : comment.kind === 'repair_answer' ? 'Antwort auf Reparaturanfrage' : 'Erfahrungsbericht'}</span>
+            </div>
+            <h3>{comment.topic ?? comment.name}</h3>
+            <p className="account-moderation-meta">{comment.topic ? `${comment.name} · ` : ''}{comment.guide} · {new Date(comment.createdAt).toLocaleString('de-DE')}</p>
+            {comment.section && <p className="admin-comment-target"><strong>Modell / Bereich:</strong> „{comment.section}“</p>}
+            <p className="account-moderation-body">{comment.body}</p>
+            {comment.source && <p className="admin-comment-source"><strong>Quelle:</strong> {comment.source}</p>}
+            {comment.imageUrl && <a href={comment.imageUrl} target="_blank" rel="noreferrer"><img className="admin-comment-image" src={comment.imageUrl} alt={`Anhang von ${comment.name}`} /></a>}
+            <div className="account-moderation-actions">
+              <button className="button button-ink" type="button" disabled={busyId !== null} onClick={() => void updateComment(comment, 'approved')}>Freigeben</button>
+              <button className="button button-danger" type="button" disabled={busyId !== null} onClick={() => void deleteComment(comment)}>Löschen</button>
+            </div>
+          </article>
+        )) : <div className="admin-empty card-doodle"><h3>Alles ruhig.</h3><p>Aktuell liegt nichts zur Prüfung vor.</p></div>}
+      </div>
+    </section>
+  );
+}
+
+function StaffChatPanel({ csrfToken, context }: { csrfToken: string; context: 'admin' | 'moderator' }) {
+  const [messages, setMessages] = useState<StaffChatMessage[]>([]);
+  const [body, setBody] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
+
+  const loadMessages = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const payload = await apiJson<{ messages: StaffChatMessage[] }>('/api/admin/chat', {
+        headers: { 'X-Staff-Context': context },
+      });
+      setMessages(payload.messages);
+    } catch (loadError) {
+      setError(loadError instanceof Error ? loadError.message : 'Der Team-Chat konnte nicht geladen werden.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    void loadMessages();
+  }, []);
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const trimmedBody = body.trim();
+    if (!trimmedBody) return;
+    setSubmitting(true);
+    setError('');
+    setNotice('');
+    try {
+      const payload = await apiJson<{ message: StaffChatMessage }>('/api/admin/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken, 'X-Staff-Context': context },
+        body: JSON.stringify({ body: trimmedBody }),
+      });
+      setMessages((current) => [...current, payload.message]);
+      setBody('');
+      setNotice('Nachricht gesendet.');
+    } catch (submitError) {
+      setError(submitError instanceof Error ? submitError.message : 'Die Nachricht konnte nicht gesendet werden.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <section className="staff-chat-panel account-card card-doodle">
+      <div className="staff-chat-heading">
+        <div>
+          <div className="eyebrow handwritten">intern · nur team</div>
+          <h2>Team-Chat.</h2>
+          <p>Gemeinsamer Austausch für Admins und Moderatoren. Nachrichten werden automatisch nach 20 Tagen gelöscht.</p>
+        </div>
+        <button className="button button-ghost" type="button" onClick={() => { void loadMessages(); }} disabled={loading}>Aktualisieren ↻</button>
+      </div>
+      {error && <p className="form-message form-message-error" role="alert">{error}</p>}
+      {notice && <p className="form-message form-message-success" role="status">{notice}</p>}
+      <div className="staff-chat-messages" aria-live="polite">
+        {loading ? <p className="no-comments">Chat wird geladen …</p> : messages.length ? messages.map((message) => (
+          <article className="staff-chat-message" key={message.id}>
+            <div className="staff-chat-message-topline"><strong>{message.authorName}</strong><span>{message.authorRole === 'admin' ? 'Admin' : 'Moderator'}</span><time dateTime={message.createdAt}>{new Date(message.createdAt).toLocaleString('de-DE')}</time></div>
+            <p>{message.body}</p>
+          </article>
+        )) : <p className="no-comments">Noch keine Nachrichten im Team-Chat.</p>}
+      </div>
+      <form className="staff-chat-form comment-form" onSubmit={handleSubmit}>
+        <label>Nachricht<textarea value={body} onChange={(event) => setBody(event.target.value)} maxLength={2000} rows={4} placeholder="Was sollten Admins und Moderatoren wissen?" required /></label>
+        <button className="button button-ink" type="submit" disabled={submitting}>{submitting ? 'Wird gesendet …' : 'Nachricht senden'} <span aria-hidden="true">↗</span></button>
+      </form>
+    </section>
   );
 }
 
@@ -2111,7 +2871,9 @@ function HomePage() {
           <BikeMenu />
           <a href="/quellen">Quellen</a>
         </nav>
+        <AccountMenu />
       </header>
+      <BugReportWidget />
 
       <main id="top">
         <section className="hero section-pad">
@@ -2162,6 +2924,25 @@ function HomePage() {
               <a href="#chronik">Zeitliche Einordnung ↓</a>
               <a href={sourceLinks[0].href} target="_blank" rel="nofollow noreferrer">Verfahrensquelle öffnen ↗</a>
             </div>
+          </div>
+        </section>
+
+        <section id="chronik" className="timeline-section timeline-section-featured section-pad">
+          <div className="section-heading compact">
+            <div>
+              <div className="eyebrow handwritten">chronik · aktuell eingeordnet</div>
+              <h2>Was bisher bekannt ist</h2>
+            </div>
+            <div className="timeline-highlight">
+              <strong>4 Stationen</strong>
+              <span>Die wichtigsten öffentlich dokumentierten Schritte zum Verfahren.</span>
+            </div>
+          </div>
+          <div className="timeline">
+            <TimelineItem date="14.07.2026" title="Sicherungsmaßnahmen angeordnet" text="Das Amtsgericht München ordnet vorläufige Insolvenzverwaltung an. Aktenzeichen: 1513 IN 2588/26." sourceHref={sourceLinks[0].href} sourceLabel="Verfahrensquelle" />
+            <TimelineItem date="16.07.2026" title="Erste öffentliche Berichte" text="Die ersten Berichte ordnen die Situation ein. Welche Folgen das für Bestellungen, Reparaturen und Ersatzteile hat, war zu diesem Zeitpunkt noch offen." sourceHref={sourceLinks[0].href} sourceLabel="Verfahrensquelle" />
+            <TimelineItem date="01.09.2026" title="Verfahrensstand erneut veröffentlicht" text="Der laufende Verfahrensstand ist erneut öffentlich dokumentiert. Für verbindliche rechtliche Fragen ist die zuständige Stelle maßgeblich." sourceHref={sourceLinks[0].href} sourceLabel="Verfahrensquelle" />
+            <TimelineItem date="02.09.2026" title="MOTORRAD Online ordnet Folgen ein" text="MOTORRAD Online beschreibt die 2026er Bonfire und Wildfire und weist auf das vorläufige Insolvenzverfahren hin. Liefertermine, Verfügbarkeit, Gewährleistung/Service und Ersatzteilversorgung sind dadurch schwerer verlässlich einzuschätzen." sourceHref={sourceLinks[1].href} sourceLabel="MOTORRAD Online" />
           </div>
         </section>
 
@@ -2238,22 +3019,6 @@ function HomePage() {
             <span>□ Quelle öffnen</span>
           </div>
         </div>
-
-        <section id="chronik" className="timeline-section section-pad">
-          <div className="section-heading compact">
-            <div>
-              <div className="eyebrow handwritten">kurze chronik</div>
-              <h2>Was bisher bekannt ist</h2>
-            </div>
-            <p className="timeline-intro">Die wichtigsten öffentlich dokumentierten Schritte zum Verfahren — kompakt zusammengefasst.</p>
-          </div>
-          <div className="timeline">
-            <TimelineItem date="14.07.2026" title="Sicherungsmaßnahmen angeordnet" text="Das Amtsgericht München ordnet vorläufige Insolvenzverwaltung an. Aktenzeichen: 1513 IN 2588/26." sourceHref={sourceLinks[0].href} sourceLabel="Verfahrensquelle" />
-            <TimelineItem date="16.07.2026" title="Erste öffentliche Berichte" text="Die ersten Berichte ordnen die Situation ein. Welche Folgen das für Bestellungen, Reparaturen und Ersatzteile hat, war zu diesem Zeitpunkt noch offen." sourceHref={sourceLinks[0].href} sourceLabel="Verfahrensquelle" />
-            <TimelineItem date="01.09.2026" title="Verfahrensstand erneut veröffentlicht" text="Der laufende Verfahrensstand ist erneut öffentlich dokumentiert. Für verbindliche rechtliche Fragen ist die zuständige Stelle maßgeblich." sourceHref={sourceLinks[0].href} sourceLabel="Verfahrensquelle" />
-            <TimelineItem date="02.09.2026" title="MOTORRAD Online ordnet Folgen ein" text="MOTORRAD Online beschreibt die 2026er Bonfire und Wildfire und weist auf das vorläufige Insolvenzverfahren hin. Liefertermine, Verfügbarkeit, Gewährleistung/Service und Ersatzteilversorgung sind dadurch schwerer verlässlich einzuschätzen." sourceHref={sourceLinks[1].href} sourceLabel="MOTORRAD Online" />
-          </div>
-        </section>
 
       </main>
 
@@ -2350,10 +3115,13 @@ function LegalPage({ kind }: { kind: 'impressum' | 'datenschutz' }) {
                 <h3>Verantwortlicher</h3>
                 <p>Alexander Komissarov<br />Teplitzer Str. 104<br />01219 Dresden<br />Deutschland<br /><a href="mailto:hallo@shortaktien.de">hallo@shortaktien.de</a></p>
                 <h3>Besuch der Website</h3>
-                <p>Diese Website stellt Dokumente und Hinweise bereit. Es gibt hier keine Nutzerkonten, Newsletter oder eingebauten Analyse- und Marketingdienste. Unter Reparaturhilfen und Wiki-Artikeln können moderierte Kommentare oder Ergänzungsvorschläge abgegeben werden.</p>
-                <h3>Kommentare und Bildanhänge</h3>
-                <p>Wenn du einen Kommentar, eine Reparaturanfrage oder einen Wiki-Vorschlag abgibst, werden dein Name, deine E-Mail-Adresse, der Beitragstext, bei Wiki-Vorschlägen optional eine Quellenangabe und optional ein Bild zunächst zur E-Mail-Bestätigung gespeichert. Die Bestätigungs-E-Mail wird über Mailjet versendet; die E-Mail-Adresse bleibt intern und wird nicht veröffentlicht. Erst nach Bestätigung landet der Beitrag bei uns in der redaktionellen Prüfung und erscheint danach nur nach Freigabe öffentlich. Nicht freigegebene oder gelöschte Beiträge werden nicht öffentlich angezeigt.</p>
-                <p>Bei einer Bugmeldung werden Name, E-Mail-Adresse, Fundstellen-URL und Fehlerbeschreibung zunächst ebenfalls nur zur E-Mail-Bestätigung gespeichert. Erst nach bestätigtem Link wird die Meldung automatisch als GitHub-Issue angelegt; die E-Mail-Adresse wird nicht in das öffentliche Issue übernommen.</p>
+                <p>Diese Website stellt Dokumente und Hinweise bereit. Es gibt keine eingebauten Analyse- und Marketingdienste. Für moderierte Kommentare, Reparaturanfragen, Wiki-Ergänzungen, Benachrichtigungen und den optionalen Newsletter können Nutzer freiwillig ein Konto anlegen.</p>
+                <h3>Optionale Dienste und Cookie-Wahl</h3>
+                <p>Aktuell werden keine Analyse-, Werbe- oder Marketing-Cookies und keine eingebetteten Drittanbieter-Dienste geladen. Die Auswahl im Hinweisbanner wird nur lokal im Browser gespeichert. Technisch notwendige Sitzungsfunktionen für Anmeldung und Community bleiben davon unberührt. Bei „Ablehnen“ werden optionale Inhalte nicht nachgeladen; externe Seiten öffnen sich erst nach einem bewussten Klick auf einen externen Link.</p>
+                <h3>Nutzerkonto, Kommentare und Bildanhänge</h3>
+                <p>Bei der Registrierung werden Name, E-Mail-Adresse und ein Passwort-Hash gespeichert. Die E-Mail-Adresse wird über Mailjet bestätigt; erst danach wird das Konto aktiviert. Im persönlichen Bereich können freiwillig Modell, Kilometerstand, Avatarbild, Avatar-Stil, die Benachrichtigung bei Antworten und der Newsletter-Empfang gespeichert werden. Das Avatarbild bleibt zugriffsgeschützt und wird nicht öffentlich ausgestellt. Der Newsletter wird ausschließlich an bestätigte Nutzer mit aktivierter Einstellung über Mailjet versendet und kann im persönlichen Bereich jederzeit abbestellt werden.</p>
+                <p>Wenn du eingeloggt einen Kommentar, eine Reparaturanfrage oder einen Wiki-Vorschlag abgibst, übernimmt die Website Name und E-Mail-Adresse aus deinem bestätigten Konto. Beitragstext, optional eine Quellenangabe und optional ein Bild werden intern zur redaktionellen Prüfung gespeichert. Erst nach Freigabe erscheint der Beitrag öffentlich; die E-Mail-Adresse bleibt intern. Anonyme Einsendungen erhalten weiterhin eine einzelne Bestätigungs-E-Mail über Mailjet, bevor sie bei uns zur Prüfung landen.</p>
+                <p>Bei einer Bugmeldung werden Titel, Fundstellen-URL und Fehlerbeschreibung gespeichert. Eingeloggte Nutzer werden über ihr bestätigtes Konto zugeordnet; anonyme Meldungen werden zunächst per Mailjet bestätigt. Erst danach wird die Meldung als GitHub-Issue angelegt. Die E-Mail-Adresse wird nicht in das öffentliche Issue übernommen.</p>
                 <p>Beim Aufruf können technisch notwendige Zugriffsdaten wie aufgerufene Seite, Datum und Uhrzeit, übertragene Datenmenge, Browser-/Betriebssysteminformationen, Referrer-URL und IP-Adresse in Server-Logs des Hostings verarbeitet werden. Das dient dem sicheren und stabilen Betrieb.</p>
                 <h3>Externe Links und Rechte</h3>
                 <p>Erst beim Anklicken eines externen Links, etwa zu Amazon, einem Fachhändler oder einem Forum, wird eine Verbindung zum jeweiligen Anbieter hergestellt. Es gelten dann dessen Datenschutzbestimmungen.</p>
@@ -2406,15 +3174,39 @@ function GuideHeader() {
         </a>
         <nav className="main-nav" aria-label="Hauptnavigation">
           <a href="/#status">Status</a>
-          <a href="/#wissen">PDFs</a>
           <RepairMenu />
           <a href="/ersatzteile">Ersatzteile</a>
           <BikeMenu />
+          <a href="/#wissen">PDFs</a>
           <a href="/quellen">Quellen</a>
         </nav>
+        <AccountMenu />
       </header>
       <BugReportWidget />
     </>
+  );
+}
+
+function AccountMenu() {
+  const { user, loading, logout } = useAuth();
+  const unreadCount = user?.notifications.filter((notification) => !notification.readAt).length ?? 0;
+
+  if (loading) return <span className="header-link account-link account-loading">Konto</span>;
+  if (!user) return <a className="header-link account-link" href="/login">Einloggen ↗</a>;
+
+  return (
+    <div className="nav-dropdown account-menu">
+      <button className="nav-dropdown-trigger account-menu-trigger" type="button" aria-haspopup="menu">
+        <AvatarBadge user={user} compact />
+        <span className="account-menu-name">{user.name}</span>
+        {unreadCount > 0 && <span className="account-unread-count" aria-label={`${unreadCount} ungelesene Benachrichtigungen`}>{unreadCount}</span>}
+        <span className="nav-dropdown-caret" aria-hidden="true" />
+      </button>
+      <div className="nav-dropdown-menu account-menu-dropdown" role="menu">
+        <a className="nav-dropdown-item" href="/konto" role="menuitem"><strong>Mein Bereich{unreadCount > 0 ? ` · ${unreadCount} neu` : ''}</strong><span>Bike, Kilometer &amp; Benachrichtigungen</span></a>
+        <button className="account-logout" type="button" onClick={() => { void logout(); }}>Ausloggen</button>
+      </div>
+    </div>
   );
 }
 
@@ -2457,6 +3249,7 @@ function BikeMenu() {
 }
 
 function BugReportWidget() {
+  const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [pageUrl, setPageUrl] = useState('');
   const [reportError, setReportError] = useState('');
@@ -2488,6 +3281,10 @@ function BugReportWidget() {
     const form = event.currentTarget;
     const payload = Object.fromEntries(new FormData(form).entries());
     payload.pageUrl = pageUrl || window.location.href;
+    if (user) {
+      payload.name = user.name;
+      payload.email = user.email;
+    }
 
     try {
       const response = await apiJson<{ message: string; issueUrl?: string }>('/api/bug-reports', {
@@ -2528,10 +3325,10 @@ function BugReportWidget() {
             <p className="bug-report-intro">Hilf uns, Fehler schnell nachzuvollziehen. Nach deiner E-Mail-Bestätigung wird die Meldung automatisch als GitHub-Issue angelegt und redaktionell weiterbearbeitet.</p>
             <form className="comment-form bug-report-form" onSubmit={handleSubmit}>
               <label>Überschrift<input name="title" required minLength={2} maxLength={160} placeholder="z. B. Link auf der Reparaturseite funktioniert nicht" /></label>
-              <div className="comment-form-grid">
+              {!user && <div className="comment-form-grid">
                 <label>Name<input name="name" required minLength={2} maxLength={80} autoComplete="name" /></label>
                 <label>E-Mail<input name="email" type="email" required maxLength={180} autoComplete="email" /><small>wird nicht öffentlich ins Issue geschrieben</small></label>
-              </div>
+              </div>}
               <label>Fundstelle<input name="pageUrl" value={pageUrl} readOnly aria-readonly="true" /><small>Diese URL wird automatisch aus der aktuellen Seite übernommen.</small></label>
               <label>Beschreibung<textarea name="description" required minLength={10} maxLength={8000} rows={6} placeholder="Was ist passiert? Welche Schritte führen zum Fehler?" /></label>
               <label className="comment-honeypot" aria-hidden="true">Website<input name="website" tabIndex={-1} autoComplete="off" /></label>
@@ -2590,10 +3387,10 @@ function WikiPage() {
             {matches.map(({ article, sections }, index) => (
               <article className={`wiki-index-card card-doodle ${index % 2 ? 'wiki-index-card-tilt-right' : 'wiki-index-card-tilt-left'}`} key={article.path}>
                 <div className="wiki-index-card-topline"><span className="kind-chip doc">{article.model}</span><span>{article.status}</span></div>
-                <h2><a href={article.path}>{article.title}</a></h2>
-                <p>{article.intro}</p>
+                <h2><a href={article.path}>{highlightWikiText(article.title, query, `wiki-card-title-${article.slug}`)}</a></h2>
+                <p>{highlightWikiText(article.intro, query, `wiki-card-intro-${article.slug}`)}</p>
                 <div className="wiki-index-topics">
-                  {sections.slice(0, 4).map((section) => <a href={`${article.path}#${section.id}`} key={`${article.path}-${section.id}`}>{section.label}</a>)}
+                  {sections.slice(0, 4).map((section) => <a href={`${article.path}#${section.id}`} key={`${article.path}-${section.id}`}>{highlightWikiText(section.label, query, `wiki-card-section-${article.slug}-${section.id}`)}</a>)}
                 </div>
                 <a className="resource-link" href={article.path}>Wiki-Artikel öffnen ↗</a>
               </article>
@@ -2642,6 +3439,8 @@ function BikePage({ bike, article }: { bike: BikeProfile; article?: WikiArticle 
 }
 
 function WikiArticlePage({ article }: { article: WikiArticle }) {
+  const [query, setQuery] = useState('');
+
   useEffect(() => {
     document.title = `${article.title} — ${article.model} — Black Tea Motorbikes – Hilfe`;
     window.scrollTo(0, 0);
@@ -2650,6 +3449,7 @@ function WikiArticlePage({ article }: { article: WikiArticle }) {
   const sourceIsExternal = article.sourceHref?.startsWith('http') ?? false;
   const modelPath = `/bikes/${article.model.toLowerCase()}`;
   const toc = getWikiToc(article.body);
+  const searchResults = useMemo(() => getWikiArticleSearchResults(article.body, query), [article.body, query]);
   const [editingHeading, setEditingHeading] = useState<string | null>(null);
   useEffect(() => {
     if (!editingHeading) return undefined;
@@ -2674,10 +3474,23 @@ function WikiArticlePage({ article }: { article: WikiArticle }) {
             <a className="repair-back" href={article.path === modelPath ? '/' : modelPath}>← {article.path === modelPath ? 'Zur Sammelmappe' : `Zur ${article.model}-Übersicht`}</a>
             <div className="eyebrow handwritten">wiki · {article.model}</div>
           </div>
-          <h1>{article.title}</h1>
-          <p>{article.intro}</p>
+          <h1>{highlightWikiText(article.title, query, 'wiki-article-hero-title')}</h1>
+          <p>{highlightWikiText(article.intro, query, 'wiki-article-hero-intro')}</p>
         </section>
         <section className="wiki-article-section section-pad">
+          <div className="wiki-search wiki-article-search card-doodle">
+            <label className="search-box">
+              <span aria-hidden="true">⌕</span>
+              <span className="sr-only">In diesem Wiki suchen</span>
+              <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={`z. B. Akku, Reifen, ${article.model}, Ladegerät …`} />
+            </label>
+            <span className="wiki-search-count">{query.trim() ? `${searchResults.length} Treffer` : `${toc.length} Abschnitte`}</span>
+          </div>
+          {query.trim() && (
+            <div className="wiki-article-search-results" aria-live="polite">
+              {searchResults.length ? <><span className="wiki-article-search-results-label">Treffer im Artikel</span>{searchResults.map((result) => <a href={`#${result.id}`} key={result.id}>{highlightWikiText(result.label, query, `wiki-search-result-${result.id}`)} ↗</a>)}</> : <span>Keine passende Stelle gefunden. Versuch es mit „Akku“, „Reifen“ oder „Ladegerät“.</span>}
+            </div>
+          )}
           <div className="wiki-article-layout">
             {toc.length > 0 && (
               <nav className="wiki-toc card-doodle" aria-label="Inhaltsverzeichnis">
@@ -2686,7 +3499,7 @@ function WikiArticlePage({ article }: { article: WikiArticle }) {
                 <ol>
                   {toc.map((item) => (
                     <li key={item.id} className={item.level === 3 ? 'wiki-toc-subitem' : undefined}>
-                      <a href={`#${item.id}`}>{item.label}</a>
+                      <a href={`#${item.id}`}>{highlightWikiText(item.label, query, `wiki-toc-${item.id}`)}</a>
                     </li>
                   ))}
                 </ol>
@@ -2694,7 +3507,7 @@ function WikiArticlePage({ article }: { article: WikiArticle }) {
             )}
             <article className="wiki-article card-doodle">
               <div className="wiki-article-topline"><span className="kind-chip doc">Wiki-Artikel</span><span>{article.status}</span></div>
-              <div className="wiki-markdown">{renderWikiMarkdown(article.body, setEditingHeading)}</div>
+              <div className="wiki-markdown">{renderWikiMarkdown(article.body, setEditingHeading, query)}</div>
               <WikiContributions guideSlug={`wiki-${article.slug}`} editingHeading={editingHeading} onCloseEditor={() => setEditingHeading(null)} />
               {article.sourceHref && (
                 <div className="wiki-source-box">
@@ -2747,7 +3560,7 @@ function WikiContributions({ guideSlug, editingHeading, onCloseEditor }: { guide
           const sourceIsExternal = /^https?:\/\//i.test(comment.source ?? '');
           return (
             <article className="approved-comment wiki-approved-contribution" key={comment.id}>
-              <div className="approved-comment-topline"><strong>{comment.name}</strong><time dateTime={comment.createdAt}>{new Date(comment.createdAt).toLocaleDateString('de-DE')}</time></div>
+              <div className="approved-comment-topline"><PublicCommentAuthor comment={comment} /><time dateTime={comment.createdAt}>{new Date(comment.createdAt).toLocaleDateString('de-DE')}</time></div>
               {comment.topic && <h4>{comment.topic}</h4>}
               {comment.section && <small className="wiki-contribution-section">Bezug: {comment.section}</small>}
               <p>{comment.body}</p>
@@ -2772,6 +3585,7 @@ function WikiContributions({ guideSlug, editingHeading, onCloseEditor }: { guide
 }
 
 function WikiContributionForm({ guideSlug, heading, onSubmitted }: { guideSlug: string; heading?: string; onSubmitted: () => Promise<void> | void }) {
+  const { user } = useAuth();
   const [contributionError, setContributionError] = useState('');
   const [contributionNotice, setContributionNotice] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -2806,7 +3620,7 @@ function WikiContributionForm({ guideSlug, heading, onSubmitted }: { guideSlug: 
       await apiJson<{ message: string }>('/api/comments', { method: 'POST', body: formData });
       form.reset();
       setSelectedFile(null);
-      setContributionNotice('Fast geschafft! Bestätige jetzt deine E-Mail-Adresse. Erst danach landet dein Wiki-Vorschlag bei uns zur redaktionellen Prüfung.');
+      setContributionNotice(user ? 'Danke! Dein Wiki-Vorschlag ist bei uns zur redaktionellen Prüfung vorgemerkt.' : 'Fast geschafft! Bestätige jetzt deine E-Mail-Adresse. Erst danach landet dein Wiki-Vorschlag bei uns zur redaktionellen Prüfung.');
       await onSubmitted();
     } catch (error) {
       setContributionError(error instanceof Error ? error.message : 'Der Vorschlag konnte nicht gesendet werden.');
@@ -2819,10 +3633,10 @@ function WikiContributionForm({ guideSlug, heading, onSubmitted }: { guideSlug: 
     <form className="comment-form wiki-contribution-form" onSubmit={handleSubmit}>
       <input type="hidden" name="section" value={heading ?? ''} />
       <label>Thema oder kurze Überschrift<input name="topic" defaultValue={heading} required minLength={2} maxLength={120} placeholder="z. B. Reifengröße der Bonfire X" /></label>
-      <div className="comment-form-grid">
+      {user ? <><input type="hidden" name="name" value={user.name} /><input type="hidden" name="email" value={user.email} /></> : <div className="comment-form-grid">
         <label>Name<input name="name" required minLength={2} maxLength={80} autoComplete="name" /></label>
         <label>E-Mail<input name="email" type="email" required maxLength={180} autoComplete="email" /><small>Bestätigungslink per Mail; danach beginnt die redaktionelle Prüfung.</small></label>
-      </div>
+      </div>}
       <label>Dein Vorschlag<textarea name="body" required minLength={10} maxLength={4000} rows={5} placeholder="Was sollte ergänzt, geändert oder belegt werden?" /></label>
       <label>Quelle (optional)<input name="source" maxLength={500} placeholder="z. B. Bonfire-Handbuch, S. 12 oder https://…" /><small>Eine Seitenzahl, PDF oder Webadresse hilft bei der Prüfung.</small></label>
       <label>Bild (optional, max. 1 MB)<input name="image" type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={handleImageChange} /><small>JPG, PNG, WEBP oder GIF</small></label>
@@ -2844,10 +3658,30 @@ function RepairTabs({ active }: { active: 'guides' | 'requests' }) {
 }
 
 function RepairGuideIndexPage() {
+  const [query, setQuery] = useState('');
+
   useEffect(() => {
     document.title = 'Reparaturhilfe — Black Tea Motorbikes – Hilfe';
     window.scrollTo(0, 0);
   }, []);
+
+  const filteredGuides = useMemo(() => {
+    const normalizedQuery = query.trim().toLocaleLowerCase('de');
+    if (!normalizedQuery) return repairGuides;
+
+    return repairGuides.filter((guide) => {
+      const searchable = [
+        guide.title,
+        guide.model,
+        guide.intro,
+        guide.safety,
+        guide.sourceLabel,
+        ...guide.steps,
+        ...guide.detailSections.flatMap((section) => [section.title, ...section.paragraphs, ...(section.bullets ?? [])]),
+      ].join(' ').toLocaleLowerCase('de');
+      return searchable.includes(normalizedQuery);
+    });
+  }, [query]);
 
   return (
     <div className="site-shell">
@@ -2861,8 +3695,16 @@ function RepairGuideIndexPage() {
           <RepairTabs active="guides" />
         </section>
         <section className="repair-index-section section-pad">
+          <div className="repair-search card-doodle">
+            <label className="search-box">
+              <span aria-hidden="true">⌕</span>
+              <span className="sr-only">Reparaturhilfen durchsuchen</span>
+              <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="z. B. Akku, Ladegerät, Controller, Bremse …" />
+            </label>
+            <span className="repair-search-count">{query.trim() ? `${filteredGuides.length} Treffer` : `${repairGuides.length} Reparaturhilfen`}</span>
+          </div>
           <div className="repair-index-grid">
-            {repairGuides.map((guide, index) => (
+            {filteredGuides.map((guide, index) => (
               <article className={`repair-index-card card-doodle ${index % 2 === 1 ? 'repair-index-card-tilt-right' : 'repair-index-card-tilt-left'}`} key={guide.id}>
                 <div className="repair-guide-topline"><span className="kind-chip community">Anleitung</span><span>{guide.model}</span></div>
                 <h2><a href={guide.path}>{guide.title}</a></h2>
@@ -2870,6 +3712,7 @@ function RepairGuideIndexPage() {
               </article>
             ))}
           </div>
+          {filteredGuides.length === 0 && <div className="empty-state card-doodle">Nichts gefunden. Versuch es mit „Akku“, „Wildfire“, „Controller“ oder „Ladegerät“.</div>}
         </section>
       </main>
       <GuideFooter />
@@ -2923,6 +3766,7 @@ function RepairRequestPage() {
 }
 
 function RepairRequestForm({ onSubmitted }: { onSubmitted: () => void }) {
+  const { user } = useAuth();
   const [requestError, setRequestError] = useState('');
   const [requestNotice, setRequestNotice] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -2957,7 +3801,7 @@ function RepairRequestForm({ onSubmitted }: { onSubmitted: () => void }) {
       await apiJson<{ message: string }>('/api/comments', { method: 'POST', body: formData });
       form.reset();
       setSelectedFile(null);
-      setRequestNotice('Fast geschafft! Bestätige jetzt deine E-Mail-Adresse. Erst danach landet deine Reparaturanfrage bei uns zur redaktionellen Prüfung.');
+      setRequestNotice(user ? 'Danke! Deine Reparaturanfrage ist bei uns zur redaktionellen Prüfung vorgemerkt.' : 'Fast geschafft! Bestätige jetzt deine E-Mail-Adresse. Erst danach landet deine Reparaturanfrage bei uns zur redaktionellen Prüfung.');
       onSubmitted();
     } catch (error) {
       setRequestError(error instanceof Error ? error.message : 'Die Anfrage konnte nicht gesendet werden.');
@@ -2983,9 +3827,9 @@ function RepairRequestForm({ onSubmitted }: { onSubmitted: () => void }) {
             <option>Sonstiges</option>
           </select>
         </label>
-        <label>Name<input name="name" required minLength={2} maxLength={80} autoComplete="name" /></label>
+        {user ? <><input type="hidden" name="name" value={user.name} /><input type="hidden" name="email" value={user.email} /></> : <label>Name<input name="name" required minLength={2} maxLength={80} autoComplete="name" /></label>}
       </div>
-      <label>E-Mail<input name="email" type="email" required maxLength={180} autoComplete="email" /><small>Bestätigungslink per Mail; danach beginnt die redaktionelle Prüfung.</small></label>
+      {!user && <label>E-Mail<input name="email" type="email" required maxLength={180} autoComplete="email" /><small>Bestätigungslink per Mail; danach beginnt die redaktionelle Prüfung.</small></label>}
       <label>Beschreibung<textarea name="body" required minLength={10} maxLength={4000} rows={7} placeholder="Modell, Baujahr, genaue Symptome, wann der Fehler auftritt und was bereits geprüft wurde …" /></label>
       <label>Quelle oder weitere Infos (optional)<input name="source" maxLength={500} placeholder="z. B. Handbuch Seite 12 oder https://…" /></label>
       <label>Bild (optional, max. 1 MB)<input name="image" type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={handleImageChange} /><small>JPG, PNG, WEBP oder GIF</small></label>
@@ -3104,7 +3948,7 @@ function RepairRequestDetailPage({ requestId }: { requestId: string }) {
             <div className="repair-request-detail-layout">
               <article className="repair-request-detail-card card-doodle">
                 <div className="repair-request-card-topline"><span className="kind-chip community">Frage</span><time dateTime={request.createdAt}>{new Date(request.createdAt).toLocaleDateString('de-DE')}</time></div>
-                <div className="approved-comment-topline"><strong>{request.name}</strong><span>{request.section ?? 'Modell noch offen'}</span></div>
+                <div className="approved-comment-topline"><PublicCommentAuthor comment={request} /><span>{request.section ?? 'Modell noch offen'}</span></div>
                 <h2>Fehlerbild und bisherige Angaben</h2>
                 <p className="repair-request-detail-body">{request.body}</p>
                 {request.source && <p className="repair-request-source"><strong>Weitere Info:</strong> {request.source}</p>}
@@ -3112,7 +3956,7 @@ function RepairRequestDetailPage({ requestId }: { requestId: string }) {
                   <div className="repair-answers-heading"><span className="eyebrow handwritten">antworten und lösungen</span><span className="comment-count">{answers.length}</span></div>
                   {answers.length ? answers.map((answer) => (
                     <article className="repair-answer" key={answer.id}>
-                      <div className="approved-comment-topline"><strong>{answer.name}</strong><time dateTime={answer.createdAt}>{new Date(answer.createdAt).toLocaleDateString('de-DE')}</time></div>
+                      <div className="approved-comment-topline"><PublicCommentAuthor comment={answer} /><time dateTime={answer.createdAt}>{new Date(answer.createdAt).toLocaleDateString('de-DE')}</time></div>
                       <p>{answer.body}</p>
                       {answer.source && <small>Quelle: {answer.source}</small>}
                       {answer.imageUrl && <img src={answer.imageUrl} alt={`Bild von ${answer.name}`} loading="lazy" />}
@@ -3142,7 +3986,7 @@ function RepairRequestCard({ request, answerCount, index }: { request: PublicCom
     <article className={`repair-request-card card-doodle ${index % 2 ? 'repair-request-card-tilt-right' : 'repair-request-card-tilt-left'}`}>
       <div className="repair-request-card-topline"><span className="kind-chip community">Frage</span><span>{request.section ?? 'Modell noch offen'}</span></div>
       <h3><a className="repair-request-title-link" href={detailPath}>{request.topic ?? 'Reparaturanfrage'} ↗</a></h3>
-      <div className="approved-comment-topline"><strong>{request.name}</strong><time dateTime={request.createdAt}>{new Date(request.createdAt).toLocaleDateString('de-DE')}</time></div>
+      <div className="approved-comment-topline"><PublicCommentAuthor comment={request} /><time dateTime={request.createdAt}>{new Date(request.createdAt).toLocaleDateString('de-DE')}</time></div>
       <p className="repair-request-body">{request.body}</p>
       {request.source && <p className="repair-request-source"><strong>Weitere Info:</strong> {request.source}</p>}
       <div className="repair-answers">
@@ -3155,6 +3999,7 @@ function RepairRequestCard({ request, answerCount, index }: { request: PublicCom
 }
 
 function RepairAnswerForm({ parentId, onSubmitted }: { parentId: string; onSubmitted: () => Promise<void> | void }) {
+  const { user } = useAuth();
   const [answerError, setAnswerError] = useState('');
   const [answerNotice, setAnswerNotice] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -3190,7 +4035,7 @@ function RepairAnswerForm({ parentId, onSubmitted }: { parentId: string; onSubmi
       await apiJson<{ message: string }>('/api/comments', { method: 'POST', body: formData });
       form.reset();
       setSelectedFile(null);
-      setAnswerNotice('Fast geschafft! Bestätige jetzt deine E-Mail-Adresse. Erst danach landet deine Antwort bei uns zur redaktionellen Prüfung.');
+      setAnswerNotice(user ? 'Danke! Deine Antwort ist bei uns zur redaktionellen Prüfung vorgemerkt.' : 'Fast geschafft! Bestätige jetzt deine E-Mail-Adresse. Erst danach landet deine Antwort bei uns zur redaktionellen Prüfung.');
       await onSubmitted();
     } catch (error) {
       setAnswerError(error instanceof Error ? error.message : 'Die Antwort konnte nicht gesendet werden.');
@@ -3201,10 +4046,10 @@ function RepairAnswerForm({ parentId, onSubmitted }: { parentId: string; onSubmi
 
   return (
     <form className="comment-form repair-answer-form" onSubmit={handleSubmit}>
-      <div className="comment-form-grid">
+      {user ? <><input type="hidden" name="name" value={user.name} /><input type="hidden" name="email" value={user.email} /></> : <div className="comment-form-grid">
         <label>Name<input name="name" required minLength={2} maxLength={80} autoComplete="name" /></label>
         <label>E-Mail<input name="email" type="email" required maxLength={180} autoComplete="email" /><small>Bestätigungslink per Mail; danach beginnt die redaktionelle Prüfung.</small></label>
-      </div>
+      </div>}
       <label>Dein Lösungsansatz<textarea name="body" required minLength={10} maxLength={4000} rows={5} placeholder="Was hast du geprüft, gemessen oder erfolgreich repariert?" /></label>
       <label>Quelle (optional)<input name="source" maxLength={500} placeholder="z. B. Handbuch, Teilenummer oder https://…" /></label>
       <label>Bild (optional, max. 1 MB)<input name="image" type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={handleImageChange} /></label>
@@ -3337,6 +4182,7 @@ function RepairFeedback({ guideSlug }: { guideSlug: string }) {
 }
 
 function RepairComments({ guideSlug }: { guideSlug: string }) {
+  const { user } = useAuth();
   const [summary, setSummary] = useState<FeedbackSummary | null>(null);
   const [commentError, setCommentError] = useState('');
   const [commentNotice, setCommentNotice] = useState('');
@@ -3384,7 +4230,7 @@ function RepairComments({ guideSlug }: { guideSlug: string }) {
       await apiJson<{ message: string }>('/api/comments', { method: 'POST', body: formData });
       form.reset();
       setSelectedFile(null);
-      setCommentNotice('Fast geschafft! Bestätige jetzt deine E-Mail-Adresse. Erst danach landet dein Kommentar bei uns zur redaktionellen Prüfung.');
+      setCommentNotice(user ? 'Danke! Dein Kommentar ist bei uns zur redaktionellen Prüfung vorgemerkt.' : 'Fast geschafft! Bestätige jetzt deine E-Mail-Adresse. Erst danach landet dein Kommentar bei uns zur redaktionellen Prüfung.');
       await loadFeedback();
     } catch (error) {
       setCommentError(error instanceof Error ? error.message : 'Der Kommentar konnte nicht gesendet werden.');
@@ -3404,10 +4250,10 @@ function RepairComments({ guideSlug }: { guideSlug: string }) {
       </div>
       <p className="repair-comments-intro">Schreib kurz, was bei dir funktioniert hat oder wo ein Schritt anders war. Kommentare werden vor der Veröffentlichung geprüft; deine E-Mail bleibt intern.</p>
       <form className="comment-form" onSubmit={handleCommentSubmit}>
-        <div className="comment-form-grid">
+        {user ? <><input type="hidden" name="name" value={user.name} /><input type="hidden" name="email" value={user.email} /></> : <div className="comment-form-grid">
           <label>Name<input name="name" required minLength={2} maxLength={80} autoComplete="name" /></label>
           <label>E-Mail<input name="email" type="email" required maxLength={180} autoComplete="email" /><small>Bestätigungslink per Mail; danach beginnt die redaktionelle Prüfung.</small></label>
-        </div>
+        </div>}
         <label>Kommentar<textarea name="body" required minLength={10} maxLength={4000} rows={5} placeholder="Was hast du geprüft oder repariert?" /></label>
         <label>Bild (optional, max. 1 MB)<input name="image" type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={handleImageChange} /><small>JPG, PNG, WEBP oder GIF</small></label>
         <label className="comment-honeypot" aria-hidden="true">Website<input name="website" tabIndex={-1} autoComplete="off" /></label>
@@ -3418,7 +4264,7 @@ function RepairComments({ guideSlug }: { guideSlug: string }) {
       <div className="approved-comments">
         {summary?.comments.length ? summary.comments.map((comment) => (
           <article className="approved-comment" key={comment.id}>
-            <div className="approved-comment-topline"><strong>{comment.name}</strong><time dateTime={comment.createdAt}>{new Date(comment.createdAt).toLocaleDateString('de-DE')}</time></div>
+            <div className="approved-comment-topline"><PublicCommentAuthor comment={comment} /><time dateTime={comment.createdAt}>{new Date(comment.createdAt).toLocaleDateString('de-DE')}</time></div>
             <p>{comment.body}</p>
             {comment.imageUrl && <img src={comment.imageUrl} alt={`Bild von ${comment.name}`} loading="lazy" />}
           </article>
@@ -3429,14 +4275,20 @@ function RepairComments({ guideSlug }: { guideSlug: string }) {
 }
 
 function AdminPage() {
+  const { logout: logoutUser } = useAuth();
   const [checked, setChecked] = useState(false);
   const [authenticated, setAuthenticated] = useState(false);
   const [csrfToken, setCsrfToken] = useState('');
   const [adminEmail, setAdminEmail] = useState('');
+  const [adminRole, setAdminRole] = useState<'admin' | 'moderator' | null>(null);
+  const [canManageMembers, setCanManageMembers] = useState(false);
   const [loginEmail, setLoginEmail] = useState('hallo@shortaktien.de');
   const [password, setPassword] = useState('');
   const [comments, setComments] = useState<AdminComment[]>([]);
+  const [members, setMembers] = useState<AdminMember[]>([]);
+  const [adminSection, setAdminSection] = useState<'comments' | 'members' | 'newsletter' | 'notifications' | 'chat'>('comments');
   const [adminFilter, setAdminFilter] = useState<'all' | 'wiki' | 'comments' | 'requests'>('all');
+  const [adminSearch, setAdminSearch] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
@@ -3460,13 +4312,31 @@ function AdminPage() {
     }
   };
 
+  const loadMembers = async () => {
+    try {
+      const payload = await apiJson<{ users: AdminMember[] }>('/api/admin/users');
+      setMembers(payload.users);
+    } catch (loadError) {
+      if (loadError instanceof Error && loadError.message === 'Nicht autorisiert.') {
+        setAuthenticated(false);
+      } else {
+        setError(loadError instanceof Error ? loadError.message : 'Mitglieder konnten nicht geladen werden.');
+      }
+    }
+  };
+
   const checkSession = async () => {
     try {
-      const payload = await apiJson<{ authenticated: boolean; email: string | null; csrfToken: string | null }>('/api/admin/session');
+      const payload = await apiJson<{ authenticated: boolean; email: string | null; role: 'admin' | 'moderator' | null; canManageMembers: boolean; csrfToken: string | null }>('/api/admin/session');
       setAuthenticated(payload.authenticated);
       setAdminEmail(payload.email ?? '');
+      setAdminRole(payload.role);
+      setCanManageMembers(payload.canManageMembers);
       setCsrfToken(payload.csrfToken ?? '');
-      if (payload.authenticated) await loadComments();
+      if (payload.authenticated) {
+        await loadComments();
+        if (payload.canManageMembers) await loadMembers();
+      }
     } catch (sessionError) {
       setError(sessionError instanceof Error ? sessionError.message : 'Admin-Sitzung konnte nicht geprüft werden.');
     } finally {
@@ -3480,16 +4350,19 @@ function AdminPage() {
     setError('');
     setNotice('');
     try {
-      const payload = await apiJson<{ authenticated: boolean; email: string; csrfToken: string }>('/api/admin/login', {
+      const payload = await apiJson<{ authenticated: boolean; email: string; role: 'admin'; canManageMembers: true; csrfToken: string }>('/api/admin/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: loginEmail, password }),
       });
       setAuthenticated(payload.authenticated);
       setAdminEmail(payload.email);
+      setAdminRole(payload.role);
+      setCanManageMembers(payload.canManageMembers);
       setCsrfToken(payload.csrfToken);
       setPassword('');
       await loadComments();
+      await loadMembers();
     } catch (loginError) {
       setError(loginError instanceof Error ? loginError.message : 'Anmeldung fehlgeschlagen.');
     } finally {
@@ -3566,25 +4439,40 @@ function AdminPage() {
   };
 
   const handleLogout = async () => {
-    await apiJson<{ authenticated: boolean }>('/api/admin/logout', { method: 'POST', headers: { 'X-CSRF-Token': csrfToken } });
+    if (adminRole === 'moderator') {
+      await logoutUser();
+    } else {
+      await apiJson<{ authenticated: boolean }>('/api/admin/logout', { method: 'POST', headers: { 'X-CSRF-Token': csrfToken } });
+    }
     setAuthenticated(false);
     setCsrfToken('');
     setComments([]);
+    setMembers([]);
     setAdminEmail('');
+    setAdminRole(null);
+    setCanManageMembers(false);
   };
 
   const wikiSuggestions = comments.filter((comment) => comment.kind === 'wiki_suggestion');
   const repairRequests = comments.filter((comment) => comment.kind === 'repair_request' || comment.kind === 'repair_answer');
   const experienceComments = comments.filter((comment) => comment.kind === 'comment');
-  const visibleComments = adminFilter === 'wiki' ? wikiSuggestions : adminFilter === 'comments' ? experienceComments : adminFilter === 'requests' ? repairRequests : comments;
+  const openComments = comments.filter((comment) => comment.status === 'pending');
+  const visibleComments = adminFilter === 'wiki' ? wikiSuggestions : adminFilter === 'comments' ? experienceComments : adminFilter === 'requests' ? repairRequests : openComments;
+  const filteredComments = useMemo(() => {
+    const normalizedQuery = adminSearch.trim().toLocaleLowerCase('de');
+    if (!normalizedQuery) return visibleComments;
+    return visibleComments.filter((comment) => `${comment.topic ?? ''} ${comment.name} ${comment.email} ${comment.guide} ${comment.section ?? ''} ${comment.body} ${comment.kind ?? ''} ${comment.status}`.toLocaleLowerCase('de').includes(normalizedQuery));
+  }, [adminSearch, visibleComments]);
 
   return (
     <div className="site-shell">
       <GuideHeader />
       <main className="admin-page-main">
         <section className="admin-page-hero section-pad">
-          <a className="repair-back" href="/hilfe">← Zur Reparaturhilfe</a>
-          <div className="eyebrow handwritten">redaktion · intern</div>
+          <div className="wiki-breadcrumb">
+            <a className="repair-back" href="/hilfe">← Zur Reparaturhilfe</a>
+            <div className="eyebrow handwritten">redaktion · intern</div>
+          </div>
           <h1>Beiträge prüfen</h1>
           <p>Hier werden Erfahrungsberichte, Reparaturanfragen, Antworten und Wiki-Vorschläge geprüft, bevor sie öffentlich erscheinen.</p>
         </section>
@@ -3602,19 +4490,35 @@ function AdminPage() {
         ) : (
           <section className="admin-comments-section section-pad">
             <div className="admin-toolbar card-doodle">
-              <div><span className="eyebrow handwritten">eingeloggt als</span><strong>{adminEmail}</strong></div>
+              <div><span className="eyebrow handwritten">eingeloggt als</span><strong>{adminEmail} · {adminRole === 'moderator' ? 'Moderator' : 'Admin'}</strong></div>
               <button className="button button-ghost" type="button" onClick={() => void handleLogout()}>Abmelden</button>
             </div>
             {error && <p className="form-message form-message-error" role="alert">{error}</p>}
             {notice && <p className="form-message form-message-success" role="status">{notice}</p>}
+            <div className="admin-section-tabs" role="tablist" aria-label="Adminbereiche">
+              <button className={adminSection === 'comments' ? 'active' : ''} type="button" role="tab" aria-selected={adminSection === 'comments'} onClick={() => setAdminSection('comments')}>Beiträge prüfen <strong>{openComments.length}</strong></button>
+              {canManageMembers && <button className={adminSection === 'members' ? 'active' : ''} type="button" role="tab" aria-selected={adminSection === 'members'} onClick={() => { setAdminSection('members'); if (members.length === 0) void loadMembers(); }}>Mitgliederverwaltung <strong>{members.length}</strong></button>}
+              {canManageMembers && <button className={adminSection === 'newsletter' ? 'active' : ''} type="button" role="tab" aria-selected={adminSection === 'newsletter'} onClick={() => setAdminSection('newsletter')}>Newsletter <strong>{members.filter((member) => member.newsletterSubscribed).length}</strong></button>}
+              <button className={adminSection === 'notifications' ? 'active' : ''} type="button" role="tab" aria-selected={adminSection === 'notifications'} onClick={() => setAdminSection('notifications')}>E-Mail-Einstellungen</button>
+              <button className={adminSection === 'chat' ? 'active' : ''} type="button" role="tab" aria-selected={adminSection === 'chat'} onClick={() => setAdminSection('chat')}>Team-Chat</button>
+            </div>
+            {adminSection === 'chat' ? <StaffChatPanel csrfToken={csrfToken} context="admin" /> : adminSection === 'notifications' ? <AdminNotificationPanel csrfToken={csrfToken} canManageRegistration={adminRole === 'admin'} onNotice={setNotice} onError={setError} /> : adminSection === 'members' && canManageMembers ? <AdminMembersPanel members={members} csrfToken={csrfToken} onMembersChange={(updater) => setMembers(updater)} onNotice={setNotice} onError={setError} /> : adminSection === 'newsletter' && canManageMembers ? <AdminNewsletterPanel members={members} csrfToken={csrfToken} onNotice={setNotice} onError={setError} /> : <>
             <div className="admin-filter-tabs" role="tablist" aria-label="Beiträge filtern">
-              <button className={adminFilter === 'all' ? 'active' : ''} type="button" role="tab" aria-selected={adminFilter === 'all'} onClick={() => setAdminFilter('all')}>Alle <strong>{comments.length}</strong></button>
+              <button className={adminFilter === 'all' ? 'active' : ''} type="button" role="tab" aria-selected={adminFilter === 'all'} onClick={() => setAdminFilter('all')}>Alle <strong>{openComments.length}</strong></button>
               <button className={adminFilter === 'wiki' ? 'active' : ''} type="button" role="tab" aria-selected={adminFilter === 'wiki'} onClick={() => setAdminFilter('wiki')}>Wiki <strong>{wikiSuggestions.length}</strong></button>
               <button className={adminFilter === 'comments' ? 'active' : ''} type="button" role="tab" aria-selected={adminFilter === 'comments'} onClick={() => setAdminFilter('comments')}>Kommentare <strong>{experienceComments.length}</strong></button>
               <button className={adminFilter === 'requests' ? 'active' : ''} type="button" role="tab" aria-selected={adminFilter === 'requests'} onClick={() => setAdminFilter('requests')}>Reparatur <strong>{repairRequests.length}</strong></button>
             </div>
+            <div className="admin-search card-doodle">
+              <label className="search-box">
+                <span aria-hidden="true">⌕</span>
+                <span className="sr-only">Beiträge durchsuchen</span>
+                <input value={adminSearch} onChange={(event) => setAdminSearch(event.target.value)} placeholder="z. B. Akku, Bonfire, alex, Fehlerbild …" />
+              </label>
+              <span className="admin-search-count">{adminSearch.trim() ? `${filteredComments.length} Treffer` : `${visibleComments.length} angezeigt`}</span>
+            </div>
             <div className="admin-comment-list">
-              {visibleComments.length ? visibleComments.map((comment) => (
+              {filteredComments.length ? filteredComments.map((comment) => (
                 <article className={`admin-comment card-doodle ${comment.status === 'pending' ? 'admin-comment-pending' : ''}`} key={comment.id}>
                   <div className="admin-comment-header">
                     <div><span className={`admin-status ${comment.status}`}>{comment.status === 'pending' ? 'wartet auf Prüfung' : 'freigegeben'}</span><span className="admin-kind">{comment.kind === 'wiki_suggestion' ? 'Wiki-Vorschlag' : comment.kind === 'repair_request' ? 'Reparaturanfrage' : comment.kind === 'repair_answer' ? 'Antwort auf Reparaturanfrage' : 'Erfahrungsbericht'}</span><h2>{comment.topic ?? comment.name}</h2><p>{comment.topic ? `${comment.name} · ` : ''}{comment.email} · {comment.guide} · {new Date(comment.createdAt).toLocaleString('de-DE')}</p>{comment.section && <p className="admin-comment-target"><strong>Modell / Bereich:</strong> „{comment.section}“</p>}{comment.kind === 'repair_answer' && comment.parentId && <p className="admin-comment-target"><strong>Antwort auf Anfrage:</strong> {comment.parentId}</p>}</div>
@@ -3628,13 +4532,289 @@ function AdminPage() {
                   {comment.source && <p className="admin-comment-source"><strong>Quelle:</strong> {comment.source}</p>}
                   {comment.imageUrl && <a href={comment.imageUrl} target="_blank" rel="noreferrer"><img className="admin-comment-image" src={comment.imageUrl} alt={`Anhang von ${comment.name}`} /></a>}
                 </article>
-              )) : <div className="admin-empty card-doodle"><h2>Alles ruhig.</h2><p>{adminFilter === 'wiki' ? 'Aktuell liegen keine Wiki-Vorschläge zur Prüfung vor.' : adminFilter === 'comments' ? 'Aktuell liegen keine Erfahrungsberichte zur Prüfung vor.' : adminFilter === 'requests' ? 'Aktuell liegen keine Reparaturanfragen oder Antworten zur Prüfung vor.' : 'Aktuell liegen keine Beiträge zur Prüfung vor.'}</p></div>}
+              )) : <div className="admin-empty card-doodle"><h2>{adminSearch.trim() ? 'Nichts gefunden.' : 'Alles ruhig.'}</h2><p>{adminSearch.trim() ? 'Versuch es mit einem anderen Suchbegriff.' : adminFilter === 'wiki' ? 'Aktuell liegen keine Wiki-Vorschläge zur Prüfung vor.' : adminFilter === 'comments' ? 'Aktuell liegen keine Erfahrungsberichte zur Prüfung vor.' : adminFilter === 'requests' ? 'Aktuell liegen keine Reparaturanfragen oder Antworten zur Prüfung vor.' : 'Aktuell liegen keine offenen Beiträge zur Prüfung vor.'}</p></div>}
             </div>
+            </>}
           </section>
         )}
       </main>
       <GuideFooter />
     </div>
+  );
+}
+
+function AdminNotificationPanel({ csrfToken, canManageRegistration, onNotice, onError }: {
+  csrfToken: string;
+  canManageRegistration: boolean;
+  onNotice: (message: string) => void;
+  onError: (message: string) => void;
+}) {
+  const [settings, setSettings] = useState<AdminNotificationSettings | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    setLoading(true);
+    void apiJson<{ settings: AdminNotificationSettings }>('/api/admin/notification-settings')
+      .then((payload) => {
+        if (active) setSettings(payload.settings);
+      })
+      .catch((loadError) => {
+        if (active) onError(loadError instanceof Error ? loadError.message : 'E-Mail-Einstellungen konnten nicht geladen werden.');
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => { active = false; };
+  }, [onError]);
+
+  const updateSetting = (key: keyof AdminNotificationSettings, value: boolean) => {
+    setSettings((current) => current ? { ...current, [key]: value } : current);
+  };
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!settings) return;
+    setBusy(true);
+    try {
+      const response = await apiJson<{ settings: AdminNotificationSettings; message: string }>('/api/admin/notification-settings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
+        body: JSON.stringify({ settings }),
+      });
+      setSettings(response.settings);
+      onNotice(response.message);
+    } catch (saveError) {
+      onError(saveError instanceof Error ? saveError.message : 'E-Mail-Einstellungen konnten nicht gespeichert werden.');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const options: Array<{ key: keyof AdminNotificationSettings; title: string; description: string }> = [
+    { key: 'comments', title: 'Neue Kommentare', description: 'Erfahrungsberichte, Hinweise und Ergänzungen zur Prüfung.' },
+    { key: 'wiki', title: 'Neue Wiki-Vorschläge', description: 'Vorschläge für technische Wiki-Seiten und bestehende Abschnitte.' },
+    { key: 'repair', title: 'Neue Reparaturbeiträge', description: 'Reparaturanfragen und Antworten aus der Community.' },
+    { key: 'bugs', title: 'Neue Bugmeldungen', description: 'Bestätigte Fehlerberichte, die als GitHub-Issue angelegt wurden.' },
+  ];
+
+  return (
+    <section className="admin-notification-section">
+      <div className="admin-members-heading">
+        <div><div className="eyebrow handwritten">dein redaktions-postfach</div><h2>E-Mail-Einstellungen</h2><p>Wähle selbst, bei welchen neuen Vorgängen Mailjet dich informieren soll. Die Einstellungen gelten nur für dein Konto.</p></div>
+        <span className="admin-member-count">{canManageRegistration ? 'Admin' : 'Moderator'}</span>
+      </div>
+      {loading ? <p className="admin-loading">Einstellungen werden geladen …</p> : settings && <form className="admin-notification-form card-doodle" onSubmit={handleSubmit}>
+        <div className="admin-notification-list">
+          {options.map((option) => <label className="admin-notification-option" key={option.key}>
+            <input type="checkbox" checked={settings[option.key]} onChange={(event) => updateSetting(option.key, event.target.checked)} />
+            <span><strong>{option.title}</strong><small>{option.description}</small></span>
+          </label>)}
+        </div>
+        {canManageRegistration ? <label className="admin-notification-option admin-notification-registration">
+          <input type="checkbox" checked={settings.registration} onChange={(event) => updateSetting('registration', event.target.checked)} />
+          <span><strong>Neue Registrierungen</strong><small>Neue Konten, die auf ihre E-Mail-Bestätigung warten.</small></span>
+        </label> : <p className="admin-notification-locked"><strong>Neue Registrierungen bleiben beim Admin.</strong><br />Moderatoren erhalten aus Datenschutz- und Zuständigkeitsgründen keine Registrierungs-Mails.</p>}
+        <p className="admin-newsletter-note">Ausgeschaltete Kategorien werden serverseitig nicht versendet. Die bestehende Sicherheitsbremse gegen zu viele Mails bleibt aktiv.</p>
+        <button className="button button-ink" type="submit" disabled={busy}>{busy ? 'Wird gespeichert …' : 'Einstellungen speichern ↗'}</button>
+      </form>}
+    </section>
+  );
+}
+
+function AdminMembersPanel({ members, csrfToken, onMembersChange, onNotice, onError }: {
+  members: AdminMember[];
+  csrfToken: string;
+  onMembersChange: (updater: (current: AdminMember[]) => AdminMember[]) => void;
+  onNotice: (message: string) => void;
+  onError: (message: string) => void;
+}) {
+  const [busy, setBusy] = useState(false);
+  const [dialog, setDialog] = useState<{ type: 'message' | 'warning'; member: AdminMember } | null>(null);
+  const [subject, setSubject] = useState('');
+  const [body, setBody] = useState('');
+  const [reason, setReason] = useState('');
+  const [memberSearch, setMemberSearch] = useState('');
+
+  const filteredMembers = useMemo(() => {
+    const normalizedQuery = memberSearch.trim().toLocaleLowerCase('de');
+    if (!normalizedQuery) return members;
+    return members.filter((member) => `${member.name} ${member.email} ${member.role} ${member.status} ${member.model ?? ''} ${member.newsletterSubscribed ? 'newsletter abonniert' : ''}`.toLocaleLowerCase('de').includes(normalizedQuery));
+  }, [memberSearch, members]);
+
+  const openMessageDialog = (member: AdminMember) => {
+    setSubject('');
+    setBody('');
+    setDialog({ type: 'message', member });
+  };
+
+  const openWarningDialog = (member: AdminMember) => {
+    setReason('');
+    setDialog({ type: 'warning', member });
+  };
+
+  const handleDialogSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!dialog) return;
+    setBusy(true);
+    try {
+      const payload = dialog.type === 'message' ? { subject, body } : { reason };
+      const response = await apiJson<{ message: string; member?: AdminMember }>(`/api/admin/users/${dialog.member.id}/${dialog.type === 'message' ? 'message' : 'warning'}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
+        body: JSON.stringify(payload),
+      });
+      const updatedMember = response.member;
+      if (updatedMember) {
+        onMembersChange((current) => current.map((member) => member.id === updatedMember.id ? updatedMember : member));
+      }
+      setDialog(null);
+      onNotice(response.message);
+    } catch (actionError) {
+      onError(actionError instanceof Error ? actionError.message : 'Die Aktion konnte nicht durchgeführt werden.');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handlePasswordReset = async (member: AdminMember) => {
+    if (!window.confirm(`Eine Passwort-Zurücksetzungs-Mail an ${member.email} senden?`)) return;
+    setBusy(true);
+    try {
+      const response = await apiJson<{ message: string }>(`/api/admin/users/${member.id}/password-reset`, {
+        method: 'POST',
+        headers: { 'X-CSRF-Token': csrfToken },
+      });
+      onNotice(response.message);
+    } catch (actionError) {
+      onError(actionError instanceof Error ? actionError.message : 'Die Passwort-Mail konnte nicht versendet werden.');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleDelete = async (member: AdminMember) => {
+    if (!window.confirm(`Konto von ${member.name} samt persönlichen Beiträgen wirklich löschen?`)) return;
+    setBusy(true);
+    try {
+      await apiJson<{ deleted: boolean }>(`/api/admin/users/${member.id}`, {
+        method: 'DELETE',
+        headers: { 'X-CSRF-Token': csrfToken },
+      });
+      onMembersChange((current) => current.filter((item) => item.id !== member.id));
+      onNotice(`Konto von ${member.name} wurde gelöscht.`);
+    } catch (actionError) {
+      onError(actionError instanceof Error ? actionError.message : 'Das Mitglied konnte nicht gelöscht werden.');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleRoleChange = async (member: AdminMember) => {
+    const nextRole = member.role === 'moderator' ? 'member' : 'moderator';
+    const action = nextRole === 'moderator' ? 'zum Moderator machen' : 'die Moderatorrolle entziehen';
+    if (!window.confirm(member.name + ' wirklich ' + action + '?')) return;
+    setBusy(true);
+    try {
+      const response = await apiJson<{ message: string; member: AdminMember }>('/api/admin/users/' + member.id + '/role', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
+        body: JSON.stringify({ role: nextRole }),
+      });
+      onMembersChange((current) => current.map((item) => item.id === response.member.id ? response.member : item));
+      onNotice(response.message);
+    } catch (actionError) {
+      onError(actionError instanceof Error ? actionError.message : 'Die Moderatorrolle konnte nicht geändert werden.');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <section className="admin-members-section">
+      <div className="admin-members-heading">
+        <div><div className="eyebrow handwritten">community im blick</div><h2>Mitgliederverwaltung</h2><p>Konten verwalten, persönlich schreiben und Moderationsmaßnahmen nachvollziehbar auslösen.</p></div>
+        <span className="admin-member-count">{members.length} Konten</span>
+      </div>
+      <div className="admin-search card-doodle">
+        <label className="search-box">
+          <span aria-hidden="true">⌕</span>
+          <span className="sr-only">Mitglieder durchsuchen</span>
+          <input value={memberSearch} onChange={(event) => setMemberSearch(event.target.value)} placeholder="z. B. Name, E-Mail, Moderator, Bonfire …" />
+        </label>
+        <span className="admin-search-count">{memberSearch.trim() ? `${filteredMembers.length} Treffer` : `${members.length} Mitglieder`}</span>
+      </div>
+      <div className="admin-member-list">
+        {filteredMembers.length ? filteredMembers.map((member) => (
+          <article className={`admin-member card-doodle ${member.communicationBlocked ? 'admin-member-blocked' : ''}`} key={member.id}>
+            <div className="admin-member-topline">
+              <div><span className={`admin-status ${member.communicationBlocked ? 'blocked' : member.status === 'active' ? 'approved' : 'pending'}`}>{member.communicationBlocked ? 'Kommunikation gesperrt' : member.status === 'active' ? 'aktiv' : 'E-Mail offen'}</span>{member.role === 'moderator' && <span className="admin-role">Moderator</span>}<h3>{member.name}</h3><p>{member.email}</p></div>
+              <span className="admin-warning-count">{member.warningCount}/3 Verwarnungen</span>
+            </div>
+            <dl className="admin-member-facts"><div><dt>Modell</dt><dd>{member.model ?? 'nicht festgelegt'}</dd></div><div><dt>Registriert</dt><dd>{member.createdAt ? new Date(member.createdAt).toLocaleDateString('de-DE') : '—'}</dd></div><div><dt>Newsletter</dt><dd>{member.newsletterSubscribed ? 'abonniert' : 'nein'}</dd></div></dl>
+            {member.warnings.length > 0 && <details className="admin-member-warnings"><summary>Verwarnungen ansehen</summary><ol>{member.warnings.map((warning) => <li key={warning.id}><strong>{new Date(warning.createdAt).toLocaleDateString('de-DE')}</strong> · {warning.reason}</li>)}</ol></details>}
+            <div className="admin-member-actions"><button className="button button-ink" type="button" disabled={busy} onClick={() => openMessageDialog(member)}>Mail schreiben</button><button className="button button-ghost" type="button" disabled={busy} onClick={() => void handlePasswordReset(member)}>Reset-Mail senden</button><button className="button button-ghost" type="button" disabled={busy} onClick={() => void handleRoleChange(member)}>{member.role === 'moderator' ? 'Moderator entziehen' : 'Zum Moderator machen'}</button>{!member.communicationBlocked && <button className="button button-ghost" type="button" disabled={busy} onClick={() => openWarningDialog(member)}>Verwarnen</button>}<button className="button button-danger" type="button" disabled={busy} onClick={() => void handleDelete(member)}>Löschen</button></div>
+          </article>
+        )) : <div className="admin-empty card-doodle"><h2>{memberSearch.trim() ? 'Nichts gefunden.' : 'Noch keine Mitglieder.'}</h2><p>{memberSearch.trim() ? 'Versuch es mit einem anderen Suchbegriff.' : 'Sobald ein Konto bestätigt wurde, erscheint es hier.'}</p></div>}
+      </div>
+      {dialog && <div className="admin-user-overlay" onMouseDown={(event) => { if (event.target === event.currentTarget) setDialog(null); }}><section className="admin-user-dialog card-doodle" role="dialog" aria-modal="true" aria-labelledby="admin-user-dialog-title"><div className="admin-user-dialog-header"><div><div className="eyebrow handwritten">{dialog.type === 'message' ? 'direkter draht' : 'moderation'}</div><h3 id="admin-user-dialog-title">{dialog.type === 'message' ? `Mail an ${dialog.member.name}` : `Verwarnung für ${dialog.member.name}`}</h3></div><button className="bug-report-close" type="button" aria-label="Dialog schließen" onClick={() => setDialog(null)}>×</button></div>{dialog.type === 'message' ? <form className="comment-form" onSubmit={handleDialogSubmit}><label>Betreff<input value={subject} onChange={(event) => setSubject(event.target.value)} minLength={2} maxLength={160} required /></label><label>Nachricht<textarea value={body} onChange={(event) => setBody(event.target.value)} minLength={2} maxLength={5000} rows={8} required /></label><button className="button button-ink" type="submit" disabled={busy}>{busy ? 'Wird versendet …' : 'Mail senden'} <span aria-hidden="true">↗</span></button></form> : <form className="comment-form" onSubmit={handleDialogSubmit}><p className="admin-user-dialog-warning">Aktueller Stand: {dialog.member.warningCount}/3. Mit der dritten Verwarnung wird die Kommunikation automatisch gesperrt.</p><label>Grund der Verwarnung<textarea value={reason} onChange={(event) => setReason(event.target.value)} minLength={5} maxLength={1000} rows={7} placeholder="Was wurde moderiert?" required /></label><button className="button button-ink" type="submit" disabled={busy}>{busy ? 'Wird gespeichert …' : 'Verwarnung speichern'} <span aria-hidden="true">↗</span></button></form>}</section></div>}
+    </section>
+  );
+}
+
+function AdminNewsletterPanel({ members, csrfToken, onNotice, onError }: {
+  members: AdminMember[];
+  csrfToken: string;
+  onNotice: (message: string) => void;
+  onError: (message: string) => void;
+}) {
+  const [subject, setSubject] = useState('Neu bei BTM-Hilfe');
+  const [title, setTitle] = useState('Neuigkeiten aus der BTM-Community');
+  const [intro, setIntro] = useState('Was sich bei BTM-Hilfe getan hat und was jetzt wichtig ist.');
+  const [body, setBody] = useState('');
+  const [busy, setBusy] = useState(false);
+  const subscriberCount = members.filter((member) => member.newsletterSubscribed && member.status === 'active' && !member.communicationBlocked).length;
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (subscriberCount === 0) {
+      onError('Aktuell gibt es keine bestätigten Newsletter-Abonnenten.');
+      return;
+    }
+    if (!window.confirm(`Newsletter wirklich an ${subscriberCount} Abonnent${subscriberCount === 1 ? '' : 'en'} senden?`)) return;
+    setBusy(true);
+    try {
+      const response = await apiJson<{ message: string }>('/api/admin/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
+        body: JSON.stringify({ subject, title, intro, body }),
+      });
+      setBody('');
+      onNotice(response.message);
+    } catch (sendError) {
+      onError(sendError instanceof Error ? sendError.message : 'Der Newsletter konnte nicht versendet werden.');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <section className="admin-newsletter-section">
+      <div className="admin-members-heading">
+        <div><div className="eyebrow handwritten">direkt aus der redaktion</div><h2>Newsletter</h2><p>Schreibe eine hübsche Nachricht an bestätigte Nutzer, die den Newsletter aktiviert haben. Jede Kampagne wird einzeln und mit Abmeldelink verschickt.</p></div>
+        <span className="admin-member-count">{subscriberCount} Abonnenten</span>
+      </div>
+      <div className="admin-newsletter-recipient card-doodle"><strong>{subscriberCount}</strong><span>bestätigte Abonnenten erhalten diese Ausgabe.<br />Gesperrte Konten werden automatisch ausgelassen.</span></div>
+      <form className="admin-newsletter-form card-doodle" onSubmit={handleSubmit}>
+        <label>Betreff<input value={subject} onChange={(event) => setSubject(event.target.value)} minLength={2} maxLength={160} required /></label>
+        <label>Überschrift<input value={title} onChange={(event) => setTitle(event.target.value)} minLength={2} maxLength={120} required /></label>
+        <label>Vorspann<input value={intro} onChange={(event) => setIntro(event.target.value)} minLength={10} maxLength={500} required /></label>
+        <label>Newslettertext<textarea value={body} onChange={(event) => setBody(event.target.value)} minLength={10} maxLength={8000} rows={10} placeholder="Was möchtest du der Community mitteilen? Zeilenumbrüche bleiben erhalten." required /></label>
+        <p className="admin-newsletter-note">Sicherheitsbremse: maximal ein Newsletter alle 15 Minuten. Der Abmeldelink führt direkt in den persönlichen Bereich.</p>
+        <button className="button button-ink" type="submit" disabled={busy || subscriberCount === 0}>{busy ? 'Wird versendet …' : subscriberCount === 0 ? 'Keine Abonnenten vorhanden' : 'Newsletter versenden ↗'}</button>
+      </form>
+    </section>
   );
 }
 
@@ -3907,5 +5087,3 @@ function SourcingCard({ card, index }: { card: SourcingCard; index: number }) {
 function TimelineItem({ date, title, text, sourceHref, sourceLabel }: { date: string; title: string; text: string; sourceHref?: string; sourceLabel?: string }) {
   return <article className="timeline-item"><div className="timeline-date handwritten">{date}</div><div className="timeline-dot" /><div><h3>{title}</h3><p>{text}</p>{sourceHref && <a className="timeline-source" href={sourceHref} target="_blank" rel="nofollow noreferrer">Quelle: {sourceLabel ?? 'Quelle'} ↗</a>}</div></article>;
 }
-
-export { App };
