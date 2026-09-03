@@ -1442,36 +1442,6 @@ const sourcingCards: SourcingCard[] = [
   },
 ];
 
-const technicalGroups = [
-  {
-    title: 'Akku & Laden',
-    items: [
-      { label: 'Akku', value: '52 V Li-Ion', note: 'herausnehmbar' },
-      { label: 'Kapazität', value: '1,8 kWh', note: 'pro Akku' },
-      { label: 'Ladegerät', value: '58,8 V · 10 A', note: '80 % in ca. 3 Stunden' },
-      { label: 'Akkugewicht', value: '11,5 kg', note: 'pro Akku' },
-    ],
-  },
-  {
-    title: 'Maße & Gewicht',
-    items: [
-      { label: 'Abmessungen', value: '1.900 × 700 × 1.250 mm', note: 'L × B × H' },
-      { label: 'Radstand', value: '1.300 mm', note: 'Handbuchangabe' },
-      { label: 'Gewicht', value: '87 / 110 kg', note: 'trocken / mit 2 Akkus' },
-      { label: 'Zul. Gesamtgewicht', value: '260 kg', note: 'Handbuchangabe' },
-    ],
-  },
-  {
-    title: 'Reifen & Bremsen',
-    items: [
-      { label: 'Reifen Straße', value: '90/90-18 · 110/80-18', note: 'vorn · hinten' },
-      { label: 'Reifen Offroad', value: '3.50-18 · 110/80-18', note: 'vorn · hinten' },
-      { label: 'Reifendruck', value: '230 kPa · 2,3 bar', note: 'Handbuchangabe' },
-      { label: 'Bremse', value: 'CBS · hydraulisch', note: '265 mm vorn · 180 mm hinten' },
-    ],
-  },
-];
-
 const normalizePath = (value: string) => value.replace(/\/+$/, '') || '/';
 const slugify = (value: string) => value
   .toLowerCase()
@@ -1963,7 +1933,9 @@ function HomePage() {
   }, [filter, query]);
 
   const featuredSourcingCards = useMemo(() => {
-    return sourcingCards.slice(0, 4);
+    return sourcingCards
+      .filter((card) => Boolean(card.amazon?.href || card.fallback?.href))
+      .slice(0, 4);
   }, []);
 
   return (
@@ -2108,34 +2080,6 @@ function HomePage() {
             <span>□ Quelle öffnen</span>
           </div>
         </div>
-
-        <section className="technical-section section-pad">
-          <div className="technical-inner">
-            <div className="technical-copy">
-              <div className="eyebrow handwritten">für werkstatt & ersatzteilsuche</div>
-              <h2>Bonfire: die Daten, die beim Abgleich helfen.</h2>
-              <p>Maße, Akku, Reifen und Bremsen auf einen Blick — genau die Angaben, die du vor einer Bestellung, Wartung oder Reparatur am eigenen Fahrzeug gegenprüfen kannst.</p>
-              <a href={sourceLinks[1].href} target="_blank" rel="nofollow noreferrer" className="text-link">Bonfire-Handbuch öffnen ↗</a>
-            </div>
-            <div className="technical-groups">
-              {technicalGroups.map((group) => (
-                <section className="technical-group" key={group.title}>
-                  <h3>{group.title}</h3>
-                  <dl className="technical-list">
-                    {group.items.map((item) => (
-                      <div className="technical-item" key={item.label}>
-                        <dt>{item.label}</dt>
-                        <dd>{item.value}</dd>
-                        <dd className="technical-item-note">{item.note}</dd>
-                      </div>
-                    ))}
-                  </dl>
-                </section>
-              ))}
-            </div>
-            <p className="technical-note">Handbuchstand, keine pauschale Freigabe: Varianten und Baujahre können abweichen. Reifen, Bremsen, Akku und Zulassung am konkreten Bike prüfen.</p>
-          </div>
-        </section>
 
         <section id="chronik" className="timeline-section section-pad">
           <div className="section-heading compact">
@@ -3306,7 +3250,6 @@ function SourcingCard({ card, index }: { card: SourcingCard; index: number }) {
       <div className="sourcing-links">
         {card.amazon && <a className="source-action amazon-action" href={card.amazon.href} target="_blank" rel="nofollow noreferrer">{card.amazon.label} ↗</a>}
         {card.fallback && <a className="source-action fallback-action" href={card.fallback.href} target="_blank" rel="nofollow noreferrer">{card.fallback.label} ↗</a>}
-        {!card.amazon && !card.fallback && <span className="sourcing-no-link">Kein unbestätigter Kauf-Link</span>}
       </div>
     </article>
   );
