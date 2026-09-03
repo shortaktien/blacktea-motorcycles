@@ -100,6 +100,8 @@ Die Dateien werden durch `.gitignore` nicht nach GitHub übernommen. Der Deploy-
 
 ### Frontend
 
+Für die Entwicklung ohne Docker werden Node.js 24 und npm 10 oder neuer verwendet.
+
 ```bash
 cd frontend
 npm ci
