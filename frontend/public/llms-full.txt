@@ -124,6 +124,13 @@
 - Kurzbeschreibung: Regelmäßige Sicht- und Funktionskontrollen verhindern, dass aus Reifen-, Brems- oder Lagerspiel ein Sicherheitsproblem wird.
 - Aufbau: Kurzablauf, Sicherheitswarnung, ausführliche Reparaturhilfe, moderierte Erfahrungsberichte und Quellenangabe.
 
+### Wildfire-Fehlercodes richtig einordnen
+
+- [Reparaturhilfe öffnen](https://btm.shortaktien.de/hilfe/fehlercodes)
+- Modell-/Themenbezug: Wildfire · FarDriver / Antrieb
+- Kurzbeschreibung: Pieptöne und Kontrollleuchte helfen bei der Eingrenzung. Sie ersetzen keine Prüfung von Akku, Motor, Controller und Verkabelung.
+- Aufbau: Kurzablauf, Sicherheitswarnung, ausführliche Reparaturhilfe, moderierte Erfahrungsberichte und Quellenangabe.
+
 ## Ersatzteile
 
 ### Alu-Topcase

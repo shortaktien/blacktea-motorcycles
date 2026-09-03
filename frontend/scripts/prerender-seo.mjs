@@ -11,6 +11,7 @@ const partsCatalog = JSON.parse(readFileSync(join(frontendRoot, '..', 'research'
 const partDetailsCatalog = JSON.parse(readFileSync(join(frontendRoot, '..', 'research', 'parts-details.json'), 'utf8'));
 const faqContent = JSON.parse(readFileSync(join(frontendRoot, '..', 'content', 'faq.json'), 'utf8'));
 const faqItems = faqContent.items ?? [];
+const faqLastUpdated = faqContent.lastUpdated;
 const siteOrigin = (process.env.VITE_SITE_URL || siteConfig.siteOrigin).replace(/\/+$/, '');
 const indexPath = join(distRoot, 'index.html');
 const serverEntryPath = join(frontendRoot, 'dist-server', 'entry-server.js');
@@ -146,6 +147,7 @@ const schemaFor = (page) => {
     description: page.description,
     url: absoluteUrl(page.path),
     inLanguage: 'de-DE',
+    dateModified: faqLastUpdated,
     mainEntity: faqItems.map((item) => ({
       '@type': 'Question',
       name: item.question,

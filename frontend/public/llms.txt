@@ -35,6 +35,7 @@ Die Website richtet sich an Besitzerinnen und Besitzer von Bonfire- und Wildfire
 - [NFC / Keyless nachrüsten und prüfen](https://btm.shortaktien.de/hilfe/nfc): Wildfire · Startsystem. Beim NFC-Umbau zählen Modul, Stecker, Einbauort und Funktionsprüfung — nicht das Verbinden von Kabeln nach Farben.
 - [QS8-Akkuanschluss sicher prüfen](https://btm.shortaktien.de/hilfe/qs8): Bonfire · Akkuanschluss / Hochstrom. Ein QS8-Ersatz oder eine externe Lademöglichkeit darf nicht nach Optik ausgewählt werden. Stecker, Polung und BMS müssen zusammenpassen.
 - [Reifen, Bremsen und Lager warten](https://btm.shortaktien.de/hilfe/wartung): Bonfire & Wildfire · Wartung. Regelmäßige Sicht- und Funktionskontrollen verhindern, dass aus Reifen-, Brems- oder Lagerspiel ein Sicherheitsproblem wird.
+- [Wildfire-Fehlercodes richtig einordnen](https://btm.shortaktien.de/hilfe/fehlercodes): Wildfire · FarDriver / Antrieb. Pieptöne und Kontrollleuchte helfen bei der Eingrenzung. Sie ersetzen keine Prüfung von Akku, Motor, Controller und Verkabelung.
 
 ## Ersatzteile
 

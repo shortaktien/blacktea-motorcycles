@@ -34,7 +34,45 @@ Die folgenden Werte helfen beim ersten Abgleich von Reichweite, Fahrmodus, Akku 
 - **Druckprüfung:** Im Willkommenshinweis wird eine Prüfung alle zwei Wochen empfohlen, weil Speichenräder etwa 0,1–0,3 bar pro Woche verlieren können.
 - **Inspektion:** Der Community-Wartungshinweis nennt eine erste Inspektion nach 12.000 km oder innerhalb der ersten zwei Jahre, danach alle 12.000 km. Das ist eine historische Community-Spur und ersetzt keinen fahrzeugspezifischen Wartungsplan.
 
+### Wartungswerte aus den Wildfire-Unterlagen
+
+Die ausführlichere Handbuchfassung und die Zusammenfassung aus dem Forum nennen für die Wildfire zusätzlich eine wöchentliche beziehungsweise alle zehn Betriebsstunden empfohlene Reifendruckkontrolle. Als Orientierung werden mindestens 2,4 bar vorn und 2,6 bar hinten, höchstens 3,0 bar, genannt. Maßgeblich bleiben Reifen, Beladung, Modellstand und die Vorgabe am eigenen Fahrzeug.
+
+Für einzelne Verschraubungen werden 150 Nm an der Hinterachse, 120 Nm an der Vorderachse, 30–40 Nm an der Schwingenachse sowie 5–20 Nm für bestimmte Klemm- und M6-Schrauben genannt. Diese Werte sind nicht pauschal auf jede Wildfire übertragbar: Vor dem Anziehen muss die konkrete Schraube, Baugruppe und Revision identifiziert werden.
+
 Diese Angaben sind für die Vorauswahl und das Gespräch mit einer Werkstatt nützlich. Sie ersetzen weder die Prüfung von Modelljahr, Softwarestand und Akkuanzahl noch eine Freigabe für Reifen, Bremsen, Controller oder Ersatzteile.
+
+## Laden, Batterie und Zelltechnik
+
+### Ladeleistung und Rekuperation
+
+Die bereitgestellten Wildfire-Unterlagen beschreiben die Einstellung „Maximaler Ladestrom“ als Stromwert auf der Akku-Seite. Die dort genannten 8, 16, 32 und 64 A sind deshalb nicht einfach mit dem Strom einer 230-V-Haushaltssteckdose gleichzusetzen. Für einen dokumentierten 110-V-Akku und das dort verwendete Ladegerät werden ungefähr 0,9 kW, 1,8 kW, 3,6 kW und 6,6 kW Ladeleistung als Beispiele genannt.
+
+- Haushaltssteckdosen sollten in den Unterlagen möglichst mit etwa 2 kW belastet werden; Ladegerät, Leitung und Absicherung müssen trotzdem zusammenpassen.
+- An einer 11-kW-Ladesäule ist häufig nur ein begrenzter Anteil je Phase nutzbar. Eine 22-kW-Säule kann je nach Fahrzeug- und Ladegerätkonfiguration mehr Leistung bereitstellen, macht aber kein ungeeignetes Ladegerät passend.
+- Eine Begrenzung des Ladestroms kann auch die zulässige Rekuperation begrenzen. Als Dokumentationshilfe werden 10 A bei 8 A Ladestrom, 20 A bei 16 A und 40 A bei 32 A genannt. Das sind keine universellen Einstellwerte.
+
+Nach einer Fahrt soll der Akku zunächst abkühlen; die Community-Unterlagen nennen ungefähr eine Stunde. Unter 0 °C darf der Akku nicht geladen werden. Bei kalter Lagerung sollte ein vollständig entladener Akku vermieden werden. Die Hinweise gelten für den Batteriepack und die konkrete Ladeelektronik, nicht automatisch für jede Wildfire-Generation.
+
+### Einzelzelle ist nicht Akkupack
+
+Das zusätzlich bereitgestellte BAK-Datenblatt beschreibt eine einzelne N21700CG-50-Zelle: 5.000 mAh Nennkapazität, 3,60 V Nennspannung, 4,20 V Ladeschlussspannung und 2,50 V Entladegrenze unter den dort beschriebenen Laborbedingungen. Es nennt außerdem 0–45 °C als Ladebereich, −20–60 °C als Entladebereich, höchstens 30 mΩ Wechselstrom-Innenwiderstand und eine Lagerung von 3,50–3,80 V pro Zelle.
+
+Diese Werte belegen weder den Aufbau noch die Freigabe eines Wildfire-Akkupacks. Anzahl und Verschaltung der Zellen, BMS, Sicherungen, Stecker, Gehäuse, Ladegerät und Fahrzeugsoftware müssen separat geprüft werden. Einzelzellen dürfen nicht selbst aus einem Pack ausgebaut, gemischt oder ersetzt werden.
+
+## FarDriver, Leistung und Einstellungen
+
+### Line Current, Phase Current und Wärme
+
+Die Community-Dokumente unterscheiden zwei Strombegriffe. Der **Line Current** beschreibt den Batteriestrom und wirkt sich vor allem auf Beschleunigung bei höherem Tempo und die mögliche Dauerleistung aus. Der **Phase Current** beeinflusst vor allem Anfahrmoment und Beschleunigung bei niedriger Geschwindigkeit. Höhere Werte erhöhen die thermische Belastung von Akku, Motor und Controller.
+
+In den Unterlagen stehen je nach Controllerstand unterschiedliche Bereiche: ältere Controller werden beispielsweise mit etwa 70–130 A bei einem Akku und 140–260 A bei zwei Akkus beim Line Current beschrieben; für neuere Stände werden niedrigere Bereiche genannt. Beim Phase Current reichen die dokumentierten Bereiche ebenfalls von etwa 300–450 A bis 400–650 A. Das sind historische Community-Einstellungen, keine Empfehlung für jedes Fahrzeug.
+
+Für die grobe elektrische Plausibilitätsprüfung gilt: Eingangsleistung ist näherungsweise Batteriespannung × Batteriestrom. Phasenstrom darf nicht einfach als zusätzlicher Batteriestrom zur Leistung addiert werden. Die maximal mögliche Leistung hängt außerdem von Akkuabsicherung, Spannungseinbruch, Temperatur, BMS und Controllerbegrenzung ab.
+
+### Controller-Einstellungen sicher einordnen
+
+Die FarDriver-App und die Bluetooth-Verbindung gehören immer zu einem konkreten Controller- und Softwarestand. Werte aus einem Spickzettel oder aus dem Forum dürfen nicht blind übernommen werden. Vor jeder Änderung müssen Akkuzahl, Controllerrevision, Firmware, Sicherung, Motordaten und die Folgen für Temperatur und Rekuperation dokumentiert werden. Änderungen an Hochstrom- und Antriebsparametern gehören in qualifizierte Hände.
 
 ## Die wichtigsten Dokumentenspuren
 
@@ -62,9 +100,39 @@ In einem Community-Fall wird Fehler-/Piepton-Code 13 mit der High-Side der MOSFE
 
 Arbeiten an Hochstromleitungen, Akku, BMS, Controller und Motor gehören in qualifizierte Hände. Bei Hitze, Geruch, sichtbaren Schäden oder ungewöhnlichen Geräuschen das Fahrzeug nicht weiter betreiben.
 
+### Fehlercodes und Abschaltungen
+
+Das Wildfire-Handbuch ordnet die Pieptöne des Antriebsstrangs als erste Fehlerklasse ein. Die Zuordnung ist ein Diagnosehinweis, kein Beweis für ein einzelnes defektes Bauteil:
+
+| Pieptöne | Dokumentierte Fehlerklasse |
+| --- | --- |
+| 1 | Hall-Sensoren am Motor beschädigt oder nicht verbunden |
+| 2 | Gasgriff beschädigt, nicht verbunden oder Signal unplausibel |
+| 3 | Schutzfehler des Antriebsstrangs |
+| 4 | Phasenstrom zu hoch |
+| 5 | Über- oder Unterspannung |
+| 6 | Fahrzeug falsch eingeschaltet |
+| 7 | Motor überhitzt |
+| 8 | Controller überhitzt |
+| 9 | Batteriestrom zu hoch |
+| 10 | Interner Controllerfehler |
+| 11 | Kurzschluss der Motorphasen |
+| 12 | Interner Controlleralarm |
+| 13 | High-Side der MOSFETs beschädigt |
+| 14 | Low-Side der MOSFETs beschädigt |
+| 15 | Hardware-Überstrom |
+
+Bei Unterspannung, Übertemperatur, Hall- oder MOSFET-Hinweisen nicht weiterfahren und nicht durch wiederholte Neustarts „testen“. Das Fahrzeug sicher abstellen, Ladegerät trennen und Pieptöne, Displaymeldung, Akkuanzahl sowie die Situation beim Auftreten notieren. Die Unterlagen unterscheiden Warnungen und Eingriffe des BMS; die Fehlerleuchte kann nach der Behebung noch mehrere Fahrten sichtbar bleiben.
+
 ### Anzeige und Software
 
 Anzeige, Controller, Bluetooth-Modul und Softwarestand müssen als zusammengehörige Konfiguration betrachtet werden. Ein Ersatzteil mit gleichem Namen kann wegen Stecker, Protokoll, Firmware oder Halterung trotzdem nicht passen. Vor einer Nachrüstung deshalb Typenschild, Steckverbindung, Einbaumaß und vorhandene Software dokumentieren.
+
+### Frühes CT-22-Display
+
+Für frühe Wildfire mit CT-22-Anzeige beschreibt das bereitgestellte Dashboard-Handbuch einige Bedienfunktionen: Die Taste **ADJ** setzt den Tageskilometerzähler nach längerem Drücken zurück; **SET** schaltet bei langem Drücken zwischen km/h und mph um. Die Uhr wird bei ausgeschaltetem Fahrzeug über die Einstelltaste aufgerufen und anschließend mit ADJ und SET verändert.
+
+Das CT-22 besitzt außerdem ein passwortgeschütztes Service- und Kalibriermenü für Geschwindigkeits-, Kilometer- und Ladeanzeige. Diese Werte sind keine normalen Benutzereinstellungen. Eine falsche Kalibrierung kann die Anzeige verfälschen; deshalb hier keine pauschalen Werte oder Änderungsanleitung für fremde Fahrzeuge.
 
 ## Räder, Speichen und mechanische Teile
 

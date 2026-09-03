@@ -40,6 +40,7 @@ declare global {
 }
 
 const faqItems: FaqItem[] = faqContent.items;
+const faqLastUpdated = faqContent.lastUpdated;
 
 type Resource = {
   kind: CardKind;
@@ -539,6 +540,21 @@ const partTechnicalEvidence: Record<string, { text: string; href: string; label:
     href: '/pdfs/17-ips-dtd110s1210-datasheet.pdf',
     label: 'IPS-Datenblatt öffnen',
   },
+  display: {
+    text: 'Das CT-22-Dashboard-Handbuch beschreibt die frühe Wildfire-Anzeige mit ADJ-/SET-Tasten, km/h-/mph-Umschaltung, Tageskilometer-Reset und einem passwortgeschützten Kalibriermenü. Anzeigeversion, Stecker und Fahrzeugstand vor dem Ersatz vergleichen.',
+    href: '/pdfs/14-ct22-dashboard-manual.pdf',
+    label: 'CT-22-Handbuch öffnen',
+  },
+  'bluetooth-dongle': {
+    text: 'Die Wildfire-Unterlagen beschreiben die FarDriver-App und Bluetooth-Verbindung als konfigurationsabhängig. Dongle, Controllerrevision, Firmware und App-Zugriff müssen zusammenpassen; der Dongle ist kein Beleg für eine universelle Kompatibilität.',
+    href: '/pdfs/12-wildfire-handbuch-1-4-community.pdf',
+    label: 'Wildfire-Handbuch öffnen',
+  },
+  'schuko-ladekabel-fur-wildfire': {
+    text: 'Die Community-Dokumente nennen für das Laden an Haushaltssteckdose und Ladesäule unterschiedliche Rahmenbedingungen. Stromstärke, Ladegerät, Kabel, Phase und Fahrzeugkonfiguration vor dem Einsatz abgleichen.',
+    href: '/hilfe/laden',
+    label: 'Lade-Reparaturhilfe öffnen',
+  },
 };
 
 const partSafetyByCategory: Record<PartCategory, string> = {
@@ -573,7 +589,7 @@ const partSummaryOverrides: Record<string, string> = {
   'copy-of-off-road-schutz': 'Dual-Sport-Lenker mit Mittelstrebe und 28-mm-Konifizierung im angegebenen Bereich. Klemmmaß, Biegung und Bedienelemente müssen zur Wildfire passen.',
   'dcdc-converter': 'DC/DC-Wandler für die Fahrzeug-Elektrik. Eingang, Ausgang, Strom, Pinout, Stecker und Einbauraum müssen vor einem Ersatz abgeglichen werden.',
   'dual-sport-reifen-upgrade': 'Heidenau K60/K36 in den lokal dokumentierten Größen 90/90-18 vorn, 3.50-18 vorn/offroad und 110/80-18 hinten. Traglast, Index, Felge und Zulassung prüfen.',
-  display: 'Tachometer-/Anzeigeeinheit für die Bonfire. Anzeigeversion, Protokoll, Stecker und Halterung müssen vor dem Ersatz verglichen werden.',
+  display: 'Tachometer-/Anzeigeeinheit für Bonfire oder frühe Wildfire. CT-22 und andere Anzeigeversionen unterscheiden sich bei Tasten, Protokoll, Kalibrierung, Stecker und Halterung; vor dem Ersatz den konkreten Fahrzeugstand vergleichen.',
   'enduro-fender': 'Enduro-Kotflügel für Bonfire oder Wildfire. Länge, Befestigung, Reifenfreiheit und Fahrzeugvariante vor dem Kauf prüfen.',
   felge: '18-Zoll-Felge für Vorder- oder Hinterrad. Nabe, Achse, Felgenbreite, Speichenbohrung und Felgenbett müssen zur konkreten Radvariante passen.',
   'foot-pegs-set': 'Fußrasten-Set für die Bonfire. Aufnahme, Gewinde, Position, Klappmechanik und Fahrzeugseite vor dem Kauf vergleichen.',
@@ -957,7 +973,8 @@ const repairGuides: RepairGuide[] = [
     steps: [
       'Fahrzeug ausschalten, Ladegerät trennen und auf Wärme, Geruch, Wasser- oder Gehäuseschäden achten.',
       'Akku-, Controller- und Fahrzeugdaten sowie auffällige Stecker oder Kabel fotografieren und notieren.',
-      'BMS, Zellspannungen, Kommunikation und mögliche Wasserschäden fachkundig prüfen lassen. Erst danach über Reparatur oder Ersatz entscheiden.'
+      'BMS, Zellspannungen, Kommunikation und mögliche Wasserschäden fachkundig prüfen lassen. Erst danach über Reparatur oder Ersatz entscheiden.',
+      'Ein Zell-Datenblatt niemals als Freigabe für einen kompletten Fahrzeugakku oder einen beliebigen Ersatzakku verstehen.'
     ],
     safety: 'Akku nicht öffnen, überbrücken oder durch einen beliebigen Ersatzakku ersetzen. Es besteht Hochvolt- und Brandrisiko.',
     sourceLabel: 'ElektroRoller-Forum · „Reparatur Bonfire-Akku“ · Thema 48850',
@@ -983,9 +1000,10 @@ const repairGuides: RepairGuide[] = [
       },
       {
         title: '3. BMS und Zellseite fachkundig prüfen',
-        paragraphs: ['Die Fachdiagnose trennt Akku-, BMS-, Ladegerät- und Fahrzeugseite. Dazu gehören je nach Befund Kommunikationsprüfung, Zellspannungen, Steckverbindungen und Hinweise auf Wasserschäden. Erst danach lässt sich entscheiden, ob eine Reparatur, ein BMS-Tausch oder ein Ersatzakku überhaupt vertretbar ist.'],
+        paragraphs: ['Die Fachdiagnose trennt Akku-, BMS-, Ladegerät- und Fahrzeugseite. Dazu gehören je nach Befund Kommunikationsprüfung, Zellspannungen, Steckverbindungen und Hinweise auf Wasserschäden. Erst danach lässt sich entscheiden, ob eine Reparatur, ein BMS-Tausch oder ein Ersatzakku überhaupt vertretbar ist. Das zusätzlich geprüfte BAK-Datenblatt bezieht sich nur auf die einzelne N21700CG-50-Zelle und nicht auf einen Wildfire-Akkupack.'],
         bullets: [
           'Keinen beliebigen Ersatzakku anhand der Nennspannung auswählen.',
+          'Zellblattwerte wie 5 Ah, 3,60 V Nennspannung und 0–45 °C Ladetemperatur nicht ungeprüft auf den Batteriepack übertragen.',
           'BMS niemals überbrücken und Zellen nicht selbst ausgleichen oder öffnen.',
           'Reparatur- und Prüfbericht mit Akkuvariante und Datum aufbewahren.'
         ]
@@ -1356,7 +1374,8 @@ repairGuides.push(
     steps: [
       'Ladegerät, Kabel, Steckdose oder Säule, Akkuzahl und Anzeigezustand dokumentieren.',
       'Nur das passende Ladegerät und ein passendes Typ-2-Kabel verwenden; bei Abbruch nicht wiederholt unter denselben Bedingungen starten.',
-      'Temperatur, Ladezustand, BMS-Meldung und LED-Verhalten fachkundig prüfen lassen, bevor Ladeparameter geändert werden.'
+      'Temperatur, Ladezustand, BMS-Meldung und LED-Verhalten fachkundig prüfen lassen, bevor Ladeparameter geändert werden.',
+      'Die dokumentierten Lade- und Rekuperationswerte als versionsabhängige Orientierung behandeln, nicht als universelle Einstellung.'
     ],
     safety: 'Nicht laden bei Wärme, Geruch, sichtbarem Akkuschaden oder unter 0 °C. Ladegerät und Akku nicht öffnen und keine Ladeleitung überbrücken.',
     sourceLabel: 'ElektroRoller-Forum · „Wildfire – Laden Steckdose und Typ 2 öffentlich“ · Thema 44905',
@@ -1373,11 +1392,12 @@ repairGuides.push(
       },
       {
         title: '2. Temperatur und Strompfad prüfen',
-        paragraphs: ['Die lokale Wartungszusammenfassung nennt temperaturabhängige Ladegrenzen und eine Abkühlphase nach der Fahrt. Konkrete Stromwerte bleiben modell- und versionsabhängig und dürfen nicht ungeprüft übernommen werden.'],
+        paragraphs: ['Die lokale Wartungszusammenfassung nennt temperaturabhängige Ladegrenzen und eine Abkühlphase nach der Fahrt. Die ergänzten Wildfire-Unterlagen nennen als Orientierung: unter 0 °C nicht laden, nach der Fahrt ungefähr eine Stunde abkühlen lassen und bei kaltem Wetter keinen vollständig entladenen Akku lagern. Konkrete Stromwerte bleiben modell- und versionsabhängig.'],
         bullets: [
           'Akku vor dem Laden abkühlen lassen und bei Frost nicht laden.',
           'Passendes Ladegerät, Kabel, Steckverbindungen und Sicherung prüfen lassen.',
-          'Ladeleistung nicht erhöhen, um einen Abbruch zu erzwingen.'
+          'Ladeleistung nicht erhöhen, um einen Abbruch zu erzwingen.',
+          'Bei einer Ladebegrenzung auch die mögliche Rekuperation prüfen lassen; die Community nennt dafür 10 A bei 8 A, 20 A bei 16 A und 40 A bei 32 A Ladestrom.'
         ]
       },
       {
@@ -1524,6 +1544,63 @@ repairGuides.push(
     ],
   },
 );
+
+repairGuides.push({
+  id: 'hilfe-fehlercodes',
+  path: '/hilfe/fehlercodes',
+  title: 'Wildfire-Fehlercodes richtig einordnen',
+  model: 'Wildfire · FarDriver / Antrieb',
+  intro: 'Pieptöne und Kontrollleuchte helfen bei der Eingrenzung. Sie ersetzen keine Prüfung von Akku, Motor, Controller und Verkabelung.',
+  steps: [
+    'Fahrzeug sicher abstellen, Ladegerät trennen und nicht weiterfahren, wenn Leistung fehlt, der Antrieb ruckelt oder ein Bauteil heiß wird.',
+    'Pieptöne zählen und zusammen mit Displaymeldung, Kontrollleuchte, Akkuanzahl, Fahrmodus und Situation beim Auftreten notieren.',
+    'Fehlercode und Fahrzeugstand einer qualifizierten Fachkraft geben; Controller, Akku oder Motor nicht allein anhand des Codes tauschen.'
+  ],
+  safety: 'Fehler an Hochvolt, BMS, Controller, Motorphasen und MOSFETs sind sicherheitskritisch. Akku und Controller nicht öffnen, überbrücken oder unter Spannung abstecken.',
+  sourceLabel: 'Wildfire-Handbuch 1.4 · Community-PDF und Forum · Thema 47365',
+  sourceHref: 'https://www.elektroroller-forum.de/viewtopic.php?t=47365',
+  detailSections: [
+    {
+      title: 'Fehlerklasse nach Pieptönen',
+      paragraphs: ['Die folgende Zuordnung stammt aus der bereitgestellten Wildfire-Handbuchfassung. Ein Piepton-Code bezeichnet eine Fehlerklasse und beweist nicht, dass genau ein bestimmtes Teil defekt ist.'],
+      bullets: [
+        '1: Hall-Sensoren am Motor beschädigt oder nicht verbunden.',
+        '2: Gasgriff beschädigt, nicht verbunden oder Signal unplausibel.',
+        '3: Schutzfehler des Antriebsstrangs.',
+        '4: Phasenstrom zu hoch.',
+        '5: Über- oder Unterspannung.',
+        '6: Fahrzeug falsch eingeschaltet.',
+        '7: Motor überhitzt.',
+        '8: Controller überhitzt.',
+        '9: Batteriestrom zu hoch.',
+        '10: Interner Controllerfehler.',
+        '11: Kurzschluss der Motorphasen.',
+        '12: Interner Controlleralarm.',
+        '13: High-Side der MOSFETs beschädigt.',
+        '14: Low-Side der MOSFETs beschädigt.',
+        '15: Hardware-Überstrom.'
+      ]
+    },
+    {
+      title: 'Was der Code nicht sagt',
+      paragraphs: ['Ein Code grenzt die Suche ein, trennt aber nicht automatisch Controller, Motor, Hall-Sensoren, Phasenleitungen, Gasgriff, BMS und Akku voneinander. Besonders bei Über- oder Unterspannung, Wärme und Kommunikationsfehlern müssen die Bedingungen des Ausfalls mitgeprüft werden.'],
+      bullets: [
+        'Fehler vor dem Löschen fotografieren und die Piepserfolge nicht aus dem Gedächtnis rekonstruieren.',
+        'Vorherige Änderungen an FarDriver, BMS, Akkuanzahl oder Kabelbaum dokumentieren.',
+        'Bei sichtbarer Beschädigung, Geruch, Rauch, starker Wärme oder wiederholter Abschaltung nicht weiter testen.'
+      ]
+    },
+    {
+      title: 'Nach der Behebung',
+      paragraphs: ['Die Kontrollleuchte kann laut den Unterlagen nach behobenem Fehler noch mehrere Fahrten sichtbar bleiben. Erst wenn die Ursache geprüft und die Reparatur dokumentiert ist, darf eine kontrollierte Funktionsprüfung erfolgen.'],
+      bullets: [
+        'Teilenummer, Firmware-/Softwarestand, Messwerte und Reparaturdatum festhalten.',
+        'Zuerst im Stand und anschließend mit geringer Last prüfen.',
+        'Bei erneutem Piepton, Ruckeln oder Leistungsverlust sofort abbrechen.'
+      ]
+    }
+  ],
+});
 
 const sourcingCards: SourcingCard[] = [
   {
@@ -2309,6 +2386,7 @@ function getSeoMetadata(path: string, guide?: RepairGuide, part?: HistoricalShop
             description,
             url: `${siteOrigin}/faq`,
             inLanguage: 'de-DE',
+            dateModified: faqLastUpdated,
             mainEntity: faqItems.map((item) => ({
               '@type': 'Question',
               name: item.question,
@@ -3308,6 +3386,7 @@ function FaqPage() {
           <div className="eyebrow handwritten">fragen aus der suche · selbst erklärt</div>
           <h1>FAQ</h1>
           <p>Die häufigsten Fragen rund um Black Tea Bonfire und Wildfire sowie zum laufenden Insolvenzverfahren — kurz beantwortet und mit den passenden Quellen verknüpft.</p>
+          <div className="wiki-last-updated"><time dateTime={faqLastUpdated}>Zuletzt geprüft: {formatWikiDate(faqLastUpdated)}</time></div>
         </section>
 
         <section className="faq-section section-pad">

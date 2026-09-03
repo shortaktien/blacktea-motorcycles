@@ -6,6 +6,8 @@ const scriptDirectory = dirname(fileURLToPath(import.meta.url));
 const frontendRoot = resolve(scriptDirectory, '..');
 const distRoot = join(frontendRoot, 'dist');
 const publicRoot = join(frontendRoot, 'public');
+const faqContent = JSON.parse(readFileSync(join(frontendRoot, '..', 'content', 'faq.json'), 'utf8'));
+const faqLastUpdated = faqContent.lastUpdated;
 const siteOrigin = (process.env.SEO_SITE_ORIGIN ?? 'https://btm.shortaktien.de').replace(/\/$/, '');
 const httpOrigin = process.env.LINKTEST_BASE_URL?.replace(/\/$/, '') ?? '';
 const failures = [];
@@ -114,6 +116,11 @@ async function checkStructuredData() {
     checks += 1;
     if (faqPages.length !== 1) {
       fail(`Schema /faq: genau eine FAQPage erwartet, ${faqPages.length} gefunden`);
+    }
+
+    checks += 1;
+    if (faqPages[0]?.dateModified !== faqLastUpdated) {
+      fail(`Schema /faq: dateModified muss ${faqLastUpdated} sein`);
     }
 
     const questions = findSchemaObjects(faqSchema, 'Question');
