@@ -16,21 +16,7 @@ type FaqItem = {
   sourceHref?: string;
 };
 
-type FaqSearch = {
-  query: string;
-  questionCount: number;
-  href: string;
-};
-
-type FaqReference = {
-  title: string;
-  detail: string;
-  href: string;
-};
-
 const faqItems: FaqItem[] = faqContent.items;
-const faqSearches: FaqSearch[] = faqContent.searches;
-const faqReferences: FaqReference[] = faqContent.references;
 
 type Resource = {
   kind: CardKind;
@@ -3224,28 +3210,6 @@ function FaqPage() {
           </div>
           {filteredFaqItems.length === 0 && <div className="empty-state card-doodle">Nichts gefunden. Versuch es mit „Insolvenz“, „Wildfire“, „PayPal“ oder „Akku“.</div>}
 
-          <div className="faq-sources card-doodle">
-            <div className="eyebrow handwritten">recherchebasis</div>
-            <h2>Acht Google-Suchen, neun eindeutige Fragen.</h2>
-            <p>Diese Suchanfragen wurden im offenen Google-Browser geprüft. Die Zahl zeigt, wie viele „Weitere Fragen“ in der jeweiligen Suche sichtbar waren; Wiederholungen wurden nicht doppelt übernommen.</p>
-            <div className="source-list">
-              {faqSearches.map((search) => (
-                <a className="source-row" href={search.href} target="_blank" rel="nofollow noreferrer" key={search.href}>
-                  <span><strong>{search.query}</strong><small>{search.questionCount === 0 ? 'Keine „Weitere Fragen“ angezeigt' : `${search.questionCount} Fragen angezeigt`}</small></span>
-                  <span aria-hidden="true">↗</span>
-                </a>
-              ))}
-            </div>
-            <h3>Quellen für die Einordnung.</h3>
-            <div className="source-list">
-              {faqReferences.map((reference) => (
-                <a className="source-row" href={reference.href} target="_blank" rel="nofollow noreferrer" key={reference.href}>
-                  <span><strong>{reference.title}</strong><small>{reference.detail}</small></span>
-                  <span aria-hidden="true">↗</span>
-                </a>
-              ))}
-            </div>
-          </div>
         </section>
       </main>
       <GuideFooter />
