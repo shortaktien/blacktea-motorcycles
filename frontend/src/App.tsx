@@ -2468,10 +2468,11 @@ function PasswordResetPage() {
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const token = useMemo(() => typeof window === 'undefined' ? '' : new URLSearchParams(window.location.search).get('token') ?? '', []);
+  const [token, setToken] = useState('');
 
   useEffect(() => {
     document.title = 'Passwort zurücksetzen — Black Tea Motorbikes – Hilfe';
+    setToken(new URLSearchParams(window.location.search).get('token') ?? '');
     window.scrollTo(0, 0);
   }, []);
 
