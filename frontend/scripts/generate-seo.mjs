@@ -4,6 +4,7 @@ import { dirname, join, resolve } from 'node:path';
 
 const frontendRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const publicRoot = join(frontendRoot, 'public');
+const wikiRoot = join(frontendRoot, '..', 'content', 'wiki');
 const appSource = readFileSync(join(frontendRoot, 'src', 'App.tsx'), 'utf8');
 const siteConfig = JSON.parse(readFileSync(join(frontendRoot, 'src', 'site-config.json'), 'utf8'));
 const partsCatalog = JSON.parse(readFileSync(join(frontendRoot, '..', 'research', 'parts.json'), 'utf8'));
@@ -39,6 +40,30 @@ const parts = (partsCatalog.historical_product_slugs ?? []).map((slug) => ({
   path: `/ersatzteile/${slug}`,
 }));
 
+const collectMarkdownFiles = (directory) => readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+  const entryPath = join(directory, entry.name);
+  return entry.isDirectory() ? collectMarkdownFiles(entryPath) : entry.name.toLowerCase().endsWith('.md') ? [entryPath] : [];
+});
+const parseWikiArticle = (filePath) => {
+  const source = readFileSync(filePath, 'utf8');
+  const frontmatterMatch = source.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+  const fields = {};
+  for (const line of (frontmatterMatch?.[1] ?? '').split(/\r?\n/)) {
+    const separator = line.indexOf(':');
+    if (separator < 1) continue;
+    fields[line.slice(0, separator).trim()] = line.slice(separator + 1).trim().replace(/^("|')([\s\S]*)\1$/, '$2');
+  }
+  const relativePath = filePath.slice(wikiRoot.length + 1).replaceAll('\\', '/');
+  const articlePath = relativePath.replace(/\.md$/, '').replace(/\/index$/, '');
+  return {
+    path: `/bikes/${articlePath}`,
+    title: fields.title ?? articlePath,
+    model: fields.model ?? 'Bikes',
+    intro: fields.intro ?? 'Redaktionell aufbereiteter Wiki-Artikel aus lokal gesicherten Quellen.',
+  };
+};
+const wikiArticles = collectMarkdownFiles(wikiRoot).map(parseWikiArticle).sort((left, right) => left.title.localeCompare(right.title, 'de'));
+
 if (guides.length === 0) {
   throw new Error('Keine Reparaturhilfen aus App.tsx gefunden. SEO-Dateien werden nicht erzeugt.');
 }
@@ -52,16 +77,19 @@ const staticPages = [
   { path: '/impressum', title: 'Impressum — Black Tea Hilfe', description: 'Anbieterinformationen und rechtliche Hinweise zu Black Tea Hilfe.' },
   { path: '/datenschutz', title: 'Datenschutz — Black Tea Hilfe', description: 'Datenschutzhinweise zu Kommentaren, Bildanhängen und dem Betrieb von Black Tea Hilfe.' },
   { path: '/wiki', title: 'Wiki — Black Tea Hilfe', description: 'Das BTM-Wiki wird vorbereitet.' },
+  { path: '/bikes/bonfire', title: 'Bonfire — Bikes — Black Tea Hilfe', description: 'Technische Wiki-Seite zur Black Tea Bonfire mit Handbuchdaten, Modellvarianten und nachvollziehbaren Quellen.' },
+  { path: '/bikes/wildfire', title: 'Wildfire — Bikes — Black Tea Hilfe', description: 'Technische Wiki-Seite zur Black Tea Wildfire mit Handbuchdaten, Modellvarianten und nachvollziehbaren Quellen.' },
 ];
 
 const pdfFiles = readdirSync(join(publicRoot, 'pdfs')).filter((file) => file.toLowerCase().endsWith('.pdf')).sort();
-const ownPaths = [
+const ownPaths = [...new Set([
   ...staticPages.map((page) => page.path),
   ...guides.map((guide) => guide.path),
   ...parts.map((part) => part.path),
+  ...wikiArticles.map((article) => article.path),
   '/pdfs/index.html',
   ...pdfFiles.map((file) => `/pdfs/${file}`),
-];
+])];
 
 const absoluteUrl = (path) => `${siteOrigin}${path === '/' ? '/' : path}`;
 const escapeXml = (value) => value.replace(/[<>&'\"]/g, (character) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', "'": '&apos;', '"': '&quot;' }[character]));
@@ -76,6 +104,7 @@ const sitemap = [
 
 const guideLinks = guides.map((guide) => `- [${guide.title}](${absoluteUrl(guide.path)}): ${guide.model}. ${guide.intro}`).join('\n');
 const pdfLinks = pdfFiles.map((file) => `- [${file}](${absoluteUrl(`/pdfs/${file}`)}): Lokale PDF-Kopie im Dokumentenarchiv.`).join('\n');
+const wikiLinks = wikiArticles.map((article) => `- [${article.title}](${absoluteUrl(article.path)}): ${article.model}. ${article.intro}`).join('\n');
 
 const llms = [
   '# Black Tea Hilfe',
@@ -99,6 +128,10 @@ const llms = [
   '## Dokumente',
   '',
   `- [PDF-Index](${absoluteUrl('/pdfs/index.html')}): Übersicht der lokal gesicherten Handbücher, Schaltpläne, Datenblätter und Community-PDFs.`,
+  '',
+  '## Bikes-Wiki',
+  '',
+  wikiLinks,
   '',
   '## Optional',
   '',
@@ -143,6 +176,16 @@ const fullLlms = [
     '- Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.',
     '',
   ]).flat(),
+  '## Bikes-Wiki',
+  '',
+  ...wikiArticles.flatMap((article) => [
+    `### ${article.title}`,
+    '',
+    `- [Wiki-Artikel öffnen](${absoluteUrl(article.path)})`,
+    `- Modellbezug: ${article.model}`,
+    `- Kurzbeschreibung: ${article.intro}`,
+    '',
+  ]),
   '## Lokale PDFs',
   '',
   `- [PDF-Index](${absoluteUrl('/pdfs/index.html')}): Vollständige Übersicht der gesicherten Dokumente.`,
@@ -172,7 +215,7 @@ const robots = [
   '',
 ].join('\n');
 
-const prerenderedPaths = [...staticPages.map((page) => page.path), ...guides.map((guide) => guide.path), ...parts.map((part) => part.path), '/admin'];
+const prerenderedPaths = [...new Set([...staticPages.map((page) => page.path), ...guides.map((guide) => guide.path), ...parts.map((part) => part.path), ...wikiArticles.map((article) => article.path), '/admin'])];
 const redirects = prerenderedPaths
   .filter((path) => path !== '/')
   .map((path) => `${path} ${path}/index.html 200`)

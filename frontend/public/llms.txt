@@ -14,6 +14,8 @@ Die Website richtet sich an Besitzerinnen und Besitzer von Bonfire- und Wildfire
 - [Impressum — Black Tea Hilfe](https://btm.shortaktien.de/impressum): Anbieterinformationen und rechtliche Hinweise zu Black Tea Hilfe.
 - [Datenschutz — Black Tea Hilfe](https://btm.shortaktien.de/datenschutz): Datenschutzhinweise zu Kommentaren, Bildanhängen und dem Betrieb von Black Tea Hilfe.
 - [Wiki — Black Tea Hilfe](https://btm.shortaktien.de/wiki): Das BTM-Wiki wird vorbereitet.
+- [Bonfire — Bikes — Black Tea Hilfe](https://btm.shortaktien.de/bikes/bonfire): Technische Wiki-Seite zur Black Tea Bonfire mit Handbuchdaten, Modellvarianten und nachvollziehbaren Quellen.
+- [Wildfire — Bikes — Black Tea Hilfe](https://btm.shortaktien.de/bikes/wildfire): Technische Wiki-Seite zur Black Tea Wildfire mit Handbuchdaten, Modellvarianten und nachvollziehbaren Quellen.
 
 ## Reparaturhilfen
 
@@ -39,6 +41,11 @@ Die Website richtet sich an Besitzerinnen und Besitzer von Bonfire- und Wildfire
 ## Dokumente
 
 - [PDF-Index](https://btm.shortaktien.de/pdfs/index.html): Übersicht der lokal gesicherten Handbücher, Schaltpläne, Datenblätter und Community-PDFs.
+
+## Bikes-Wiki
+
+- [Bonfire](https://btm.shortaktien.de/bikes/bonfire): Bonfire. Technische Grundlagen, Modellvarianten und belegte Wartungsspuren zur Black Tea Bonfire.
+- [Wildfire](https://btm.shortaktien.de/bikes/wildfire): Wildfire. Technische Dokumente, elektrische Systeme und belegte Diagnosehinweise zur Black Tea Wildfire.
 
 ## Optional
 

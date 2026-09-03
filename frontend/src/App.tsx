@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent } from 'react';
+import ReactMarkdown, { type Components } from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import partsCatalog from '../../research/parts.json';
 import partDetailsCatalog from '../../research/parts-details.json';
 import siteConfig from './site-config.json';
@@ -38,6 +40,24 @@ type RepairGuide = {
   detailSections: RepairSection[];
 };
 
+type WikiArticle = {
+  slug: string;
+  path: string;
+  title: string;
+  model: string;
+  intro: string;
+  status: string;
+  sourceHref?: string;
+  sourceLabel?: string;
+  body: string;
+};
+
+type WikiTocItem = {
+  id: string;
+  label: string;
+  level: 2 | 3;
+};
+
 type FeedbackSummary = {
   guide: string;
   up: number;
@@ -47,8 +67,12 @@ type FeedbackSummary = {
 
 type PublicComment = {
   id: string;
+  kind?: 'comment' | 'wiki_suggestion';
   name: string;
   body: string;
+  topic?: string | null;
+  section?: string | null;
+  source?: string | null;
   createdAt: string;
   imageUrl: string | null;
 };
@@ -1458,6 +1482,107 @@ const slugify = (value: string) => value
 const getLocationKey = () => `${normalizePath(window.location.pathname)}${window.location.hash}`;
 const siteOrigin = (import.meta.env.VITE_SITE_URL || siteConfig.siteOrigin).replace(/\/+$/, '');
 
+type BikeProfile = {
+  slug: 'bonfire' | 'wildfire';
+  path: string;
+  name: string;
+  intro: string;
+  description: string;
+};
+
+const bikeProfiles: BikeProfile[] = [
+  {
+    slug: 'bonfire',
+    path: '/bikes/bonfire',
+    name: 'Bonfire',
+    intro: 'Die Wiki-Seite zur Black Tea Bonfire wird gerade aus den lokal gesicherten Handbüchern und belegten Quellen aufgebaut.',
+    description: 'Technische Wiki-Seite zur Black Tea Bonfire mit Handbuchdaten, Modellvarianten und nachvollziehbaren Quellen.',
+  },
+  {
+    slug: 'wildfire',
+    path: '/bikes/wildfire',
+    name: 'Wildfire',
+    intro: 'Die Wiki-Seite zur Black Tea Wildfire wird gerade aus den lokal gesicherten Handbüchern und belegten Quellen aufgebaut.',
+    description: 'Technische Wiki-Seite zur Black Tea Wildfire mit Handbuchdaten, Modellvarianten und nachvollziehbaren Quellen.',
+  },
+];
+
+const wikiMarkdownModules = import.meta.glob('../../content/wiki/**/*.md', { eager: true, query: '?raw', import: 'default' }) as Record<string, string>;
+
+function parseWikiMarkdown(source: string, filePath: string): WikiArticle {
+  const frontmatterMatch = source.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
+  const fields: Record<string, string> = {};
+  const body = frontmatterMatch?.[2] ?? source;
+
+  for (const line of (frontmatterMatch?.[1] ?? '').split(/\r?\n/)) {
+    const separator = line.indexOf(':');
+    if (separator < 1) continue;
+    const key = line.slice(0, separator).trim();
+    const value = line.slice(separator + 1).trim().replace(/^("|')([\s\S]*)\1$/, '$2');
+    fields[key] = value;
+  }
+
+  const relativePath = filePath.match(/content\/wiki\/(.+)$/)?.[1] ?? filePath.split('/').slice(-2).join('/');
+  const articlePath = relativePath.replace(/\.md$/, '').replace(/\/index$/, '');
+  const path = `/bikes/${articlePath}`;
+
+  return {
+    slug: articlePath.replace(/\//g, '-'),
+    path,
+    title: fields.title ?? articlePath,
+    model: fields.model ?? 'Bikes',
+    intro: fields.intro ?? 'Redaktionell aufbereiteter Wiki-Artikel aus lokal gesicherten Quellen.',
+    status: fields.status ?? 'Entwurf',
+    sourceHref: fields.source,
+    sourceLabel: fields.sourceLabel,
+    body: body.trim(),
+  };
+}
+
+const wikiArticles = Object.entries(wikiMarkdownModules)
+  .map(([filePath, source]) => parseWikiMarkdown(source, filePath))
+  .sort((left, right) => left.title.localeCompare(right.title, 'de'));
+
+function slugifyWikiHeading(value: string): string {
+  return value
+    .toLocaleLowerCase('de')
+    .replace(/ß/g, 'ss')
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '') || 'abschnitt';
+}
+
+function getWikiToc(body: string): WikiTocItem[] {
+  const usedIds = new Map<string, number>();
+  const items: WikiTocItem[] = [];
+
+  for (const line of body.split(/\r?\n/)) {
+    const match = line.match(/^(#{2,3})\s+(.+?)\s*#*\s*$/);
+    if (!match) continue;
+    const level = match[1].length as 2 | 3;
+    const label = match[2].trim();
+    const baseId = slugifyWikiHeading(label);
+    const occurrence = usedIds.get(baseId) ?? 0;
+    usedIds.set(baseId, occurrence + 1);
+    items.push({ id: occurrence === 0 ? baseId : `${baseId}-${occurrence + 1}`, label, level });
+  }
+
+  return items;
+}
+
+function getWikiSearchMatches(query: string): Array<{ article: WikiArticle; sections: WikiTocItem[] }> {
+  const normalizedQuery = query.trim().toLocaleLowerCase('de');
+  if (!normalizedQuery) return wikiArticles.map((article) => ({ article, sections: getWikiToc(article.body) }));
+
+  return wikiArticles.flatMap((article) => {
+    const sections = getWikiToc(article.body);
+    const searchable = `${article.title} ${article.model} ${article.intro} ${sections.map((section) => section.label).join(' ')} ${article.body}`.toLocaleLowerCase('de');
+    if (!searchable.includes(normalizedQuery)) return [];
+    return [{ article, sections: sections.filter((section) => section.label.toLocaleLowerCase('de').includes(normalizedQuery)) }];
+  });
+}
+
 async function apiJson<T>(input: RequestInfo | URL, init?: RequestInit): Promise<T> {
   const response = await fetch(input, init);
   const payload = await response.json().catch(() => ({}));
@@ -1493,7 +1618,7 @@ const breadcrumbSchema = (items: Array<{ name: string; url: string }>) => ({
   })),
 });
 
-function getSeoMetadata(path: string, guide?: RepairGuide, part?: HistoricalShopPart): SeoMetadata {
+function getSeoMetadata(path: string, guide?: RepairGuide, part?: HistoricalShopPart, bike?: BikeProfile, wikiArticle?: WikiArticle): SeoMetadata {
   if (path === '/admin') {
     return {
       title: 'Admin — Black Tea Hilfe',
@@ -1571,6 +1696,65 @@ function getSeoMetadata(path: string, guide?: RepairGuide, part?: HistoricalShop
     };
   }
 
+  if (wikiArticle) {
+    return {
+      title: `${wikiArticle.title} — ${wikiArticle.model} — Black Tea Hilfe`,
+      description: wikiArticle.intro,
+      canonicalPath: wikiArticle.path,
+      robots: 'index,follow,max-image-preview:large',
+      jsonLd: {
+        '@context': 'https://schema.org',
+        '@graph': [
+          websiteSchema,
+          {
+            '@type': 'Article',
+            '@id': `${siteOrigin}${wikiArticle.path}#article`,
+            headline: wikiArticle.title,
+            description: wikiArticle.intro,
+            url: `${siteOrigin}${wikiArticle.path}`,
+            inLanguage: 'de-DE',
+            isPartOf: { '@id': `${siteOrigin}/#website` },
+            about: { '@type': 'Vehicle', name: wikiArticle.model, brand: { '@type': 'Brand', name: 'Black Tea Motorbikes' } },
+          },
+          breadcrumbSchema([
+            { name: 'Startseite', url: `${siteOrigin}/` },
+            { name: 'Bikes', url: `${siteOrigin}/bikes/${wikiArticle.model.toLowerCase()}` },
+            { name: wikiArticle.title, url: `${siteOrigin}${wikiArticle.path}` },
+          ]),
+        ],
+      },
+    };
+  }
+
+  if (bike) {
+    return {
+      title: `${bike.name} — Bikes — Black Tea Hilfe`,
+      description: bike.description,
+      canonicalPath: bike.path,
+      robots: 'index,follow,max-image-preview:large',
+      jsonLd: {
+        '@context': 'https://schema.org',
+        '@graph': [
+          websiteSchema,
+          {
+            '@type': 'WebPage',
+            '@id': `${siteOrigin}${bike.path}#webpage`,
+            name: `${bike.name} — Bikes — Black Tea Hilfe`,
+            description: bike.description,
+            url: `${siteOrigin}${bike.path}`,
+            inLanguage: 'de-DE',
+            about: { '@type': 'Vehicle', name: bike.name, brand: { '@type': 'Brand', name: 'Black Tea Motorbikes' } },
+          },
+          breadcrumbSchema([
+            { name: 'Startseite', url: `${siteOrigin}/` },
+            { name: 'Bikes', url: `${siteOrigin}${bike.path}` },
+            { name: bike.name, url: `${siteOrigin}${bike.path}` },
+          ]),
+        ],
+      },
+    };
+  }
+
   const metadata: Record<string, { title: string; description: string }> = {
     '/': {
       title: 'Black Tea Hilfe — Dokumente, Ersatzteile & Updates',
@@ -1602,7 +1786,7 @@ function getSeoMetadata(path: string, guide?: RepairGuide, part?: HistoricalShop
     },
     '/wiki': {
       title: 'Wiki — Black Tea Hilfe',
-      description: 'Das BTM-Wiki wird vorbereitet.',
+      description: 'Technische Grundlagen, Handbuchdaten und nachvollziehbare Hinweise zu den Black Tea Bikes Bonfire und Wildfire.',
     },
   };
   const page = metadata[path] ?? metadata['/'];
@@ -1697,7 +1881,9 @@ function App() {
   const [path, hash = ''] = locationKey.split('#');
   const guide = repairGuides.find((candidate) => candidate.path === path || (path === '/' && hash === candidate.id));
   const part = historicalShopParts.find((candidate) => candidate.path === path);
-  const seoMetadata = getSeoMetadata(path, guide, part);
+  const bike = bikeProfiles.find((candidate) => candidate.path === path);
+  const wikiArticle = wikiArticles.find((candidate) => candidate.path === path);
+  const seoMetadata = getSeoMetadata(path, guide, part, bike, wikiArticle);
 
   useEffect(() => {
     applySeoMetadata(seoMetadata);
@@ -1712,6 +1898,8 @@ function App() {
   if (path === '/quellen' || (path === '/' && hash === 'quellen')) return <SourcesPage />;
   if (path === '/impressum' || (path === '/' && hash === 'impressum')) return <LegalPage kind="impressum" />;
   if (path === '/datenschutz' || (path === '/' && hash === 'datenschutz')) return <LegalPage kind="datenschutz" />;
+  if (bike) return <BikePage bike={bike} article={wikiArticle} />;
+  if (wikiArticle) return <WikiArticlePage article={wikiArticle} />;
   if (path === '/wiki') return <WikiPage />;
   return <HomePage />;
 }
@@ -1755,8 +1943,8 @@ function HomePage() {
           <a href="#wissen">PDFs</a>
           <a href="/hilfe">Reparatur</a>
           <a href="/ersatzteile">Ersatzteile</a>
+          <BikeMenu />
           <a href="/quellen">Quellen</a>
-          <a href="/wiki">Wiki</a>
         </nav>
         <a className="header-link" href={localPartArchiveHref}>
           Quellen & Archivstand ↗
@@ -2022,9 +2210,9 @@ function LegalPage({ kind }: { kind: 'impressum' | 'datenschutz' }) {
                 <h3>Verantwortlicher</h3>
                 <p>Alexander Komissarov<br />Teplitzer Str. 104<br />01219 Dresden<br />Deutschland<br /><a href="mailto:hallo@shortaktien.de">hallo@shortaktien.de</a></p>
                 <h3>Besuch der Website</h3>
-                <p>Diese Website stellt Dokumente und Hinweise bereit. Es gibt hier keine Nutzerkonten, Newsletter oder eingebauten Analyse- und Marketingdienste. Unter den Reparaturhilfen können moderierte Kommentare abgegeben werden.</p>
+                <p>Diese Website stellt Dokumente und Hinweise bereit. Es gibt hier keine Nutzerkonten, Newsletter oder eingebauten Analyse- und Marketingdienste. Unter Reparaturhilfen und Wiki-Artikeln können moderierte Kommentare oder Ergänzungsvorschläge abgegeben werden.</p>
                 <h3>Kommentare und Bildanhänge</h3>
-                <p>Wenn du einen Kommentar abgibst, werden dein Name, deine E-Mail-Adresse, der Kommentartext und optional ein Bild zur redaktionellen Prüfung gespeichert. Die E-Mail-Adresse bleibt intern und wird nicht veröffentlicht. Der Kommentar erscheint erst nach Freigabe; nicht freigegebene oder gelöschte Beiträge werden nicht öffentlich angezeigt.</p>
+                <p>Wenn du einen Kommentar oder Wiki-Vorschlag abgibst, werden dein Name, deine E-Mail-Adresse, der Beitragstext, bei Wiki-Vorschlägen optional eine Quellenangabe und optional ein Bild zur redaktionellen Prüfung gespeichert. Die E-Mail-Adresse bleibt intern und wird nicht veröffentlicht. Der Beitrag erscheint erst nach Freigabe; nicht freigegebene oder gelöschte Beiträge werden nicht öffentlich angezeigt.</p>
                 <p>Beim Aufruf können technisch notwendige Zugriffsdaten wie aufgerufene Seite, Datum und Uhrzeit, übertragene Datenmenge, Browser-/Betriebssysteminformationen, Referrer-URL und IP-Adresse in Server-Logs des Hostings verarbeitet werden. Das dient dem sicheren und stabilen Betrieb.</p>
                 <h3>Externe Links und Rechte</h3>
                 <p>Erst beim Anklicken eines externen Links, etwa zu Amazon, einem Fachhändler oder einem Forum, wird eine Verbindung zum jeweiligen Anbieter hergestellt. Es gelten dann dessen Datenschutzbestimmungen.</p>
@@ -2079,13 +2267,31 @@ function GuideHeader() {
         <a href="/#wissen">PDFs</a>
         <a href="/hilfe">Reparatur</a>
         <a href="/ersatzteile">Ersatzteile</a>
+        <BikeMenu />
         <a href="/quellen">Quellen</a>
-        <a href="/wiki">Wiki</a>
       </nav>
       <a className="header-link" href={localPartArchiveHref}>
         Quellen & Archivstand ↗
       </a>
     </header>
+  );
+}
+
+function BikeMenu() {
+  return (
+    <div className="nav-dropdown">
+      <button className="nav-dropdown-trigger" type="button" aria-haspopup="menu">
+        Bikes <span className="nav-dropdown-caret" aria-hidden="true" />
+      </button>
+      <div className="nav-dropdown-menu" role="menu">
+        {bikeProfiles.map((bike) => (
+          <a className="nav-dropdown-item" href={bike.path} role="menuitem" key={bike.slug}>
+            <strong>{bike.name}</strong>
+            <span>Wiki-Seite öffnen</span>
+          </a>
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -2101,17 +2307,289 @@ function GuideFooter() {
 }
 
 function WikiPage() {
+  const [query, setQuery] = useState('');
+
   useEffect(() => {
     document.title = 'Wiki — Black Tea Hilfe';
     window.scrollTo(0, 0);
   }, []);
 
+  const matches = useMemo(() => getWikiSearchMatches(query), [query]);
+
   return (
     <div className="site-shell">
       <GuideHeader />
-      <main className="wiki-page-main" aria-label="Wiki" />
+      <main className="wiki-page-main" aria-label="Bike-Wiki">
+        <section className="wiki-index-hero section-pad">
+          <div className="eyebrow handwritten">wiki · black tea bikes</div>
+          <h1>Das Bike-Wiki.</h1>
+          <p>Technische Grundlagen, Handbuchdaten und nachvollziehbare Hinweise zu Bonfire und Wildfire — gemeinsam aufgebaut und redaktionell geprüft.</p>
+        </section>
+        <section className="wiki-index-section section-pad">
+          <div className="wiki-search card-doodle">
+            <label className="search-box">
+              <span aria-hidden="true">⌕</span>
+              <span className="sr-only">Bike-Wiki durchsuchen</span>
+              <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="z. B. Reifen, Ladegerät, Akku, Wildfire …" />
+            </label>
+            <span className="wiki-search-count">{query.trim() ? `${matches.length} Treffer` : `${wikiArticles.length} Bike-Wikis`}</span>
+          </div>
+
+          <div className="wiki-index-grid">
+            {matches.map(({ article, sections }, index) => (
+              <article className={`wiki-index-card card-doodle ${index % 2 ? 'wiki-index-card-tilt-right' : 'wiki-index-card-tilt-left'}`} key={article.path}>
+                <div className="wiki-index-card-topline"><span className="kind-chip doc">{article.model}</span><span>{article.status}</span></div>
+                <h2><a href={article.path}>{article.title}</a></h2>
+                <p>{article.intro}</p>
+                <div className="wiki-index-topics">
+                  {sections.slice(0, 4).map((section) => <a href={`${article.path}#${section.id}`} key={`${article.path}-${section.id}`}>{section.label}</a>)}
+                </div>
+                <a className="resource-link" href={article.path}>Wiki-Artikel öffnen ↗</a>
+              </article>
+            ))}
+          </div>
+          {matches.length === 0 && <div className="empty-state card-doodle">Nichts gefunden. Versuch es mit „Bonfire“, „Wildfire“, „Reifen“ oder „Akku“.</div>}
+          <p className="content-note handwritten">Jede Überschrift ist offen für Ergänzungen. Ein Hinweis über „Bearbeiten“ landet zuerst bei uns zur Prüfung.</p>
+        </section>
+      </main>
       <GuideFooter />
     </div>
+  );
+}
+
+function BikePage({ bike, article }: { bike: BikeProfile; article?: WikiArticle }) {
+  useEffect(() => {
+    document.title = `${article?.title ?? bike.name} — ${article?.model ?? 'Bikes'} — Black Tea Hilfe`;
+    window.scrollTo(0, 0);
+  }, [article?.model, article?.title, bike.name]);
+
+  if (article) return <WikiArticlePage article={article} />;
+
+  return (
+    <div className="site-shell">
+      <GuideHeader />
+      <main className="bike-page-main">
+        <section className="bike-page-hero section-pad">
+          <a className="repair-back" href="/">← Zur Sammelmappe</a>
+          <div className="eyebrow handwritten">bikes · wiki-artikel</div>
+          <h1>{bike.name}</h1>
+          <p>{bike.intro}</p>
+        </section>
+        <section className="bike-placeholder-section section-pad">
+          <article className="bike-placeholder card-doodle">
+            <div className="eyebrow handwritten">inhalt folgt</div>
+            <h2>Diese Seite wird gerade aufgebaut.</h2>
+            <p>Hier entsteht eine übersichtliche Wiki-Seite mit technischen Daten, Modellvarianten, Handbuchauszügen und verlinkten Quellen.</p>
+          </article>
+        </section>
+      </main>
+      <GuideFooter />
+    </div>
+  );
+}
+
+function WikiArticlePage({ article }: { article: WikiArticle }) {
+  useEffect(() => {
+    document.title = `${article.title} — ${article.model} — Black Tea Hilfe`;
+    window.scrollTo(0, 0);
+  }, [article.model, article.title]);
+
+  const sourceIsExternal = article.sourceHref?.startsWith('http') ?? false;
+  const modelPath = `/bikes/${article.model.toLowerCase()}`;
+  const toc = getWikiToc(article.body);
+  const [editingHeading, setEditingHeading] = useState<string | null>(null);
+  const headingIds = new Map(toc.map((item) => [item.label, item.id]));
+  const markdownComponents: Components = {
+    h2: ({ children }) => {
+      const label = String(children);
+      return <h2 id={headingIds.get(label) ?? slugifyWikiHeading(label)}><span className="wiki-heading-text">{children}</span><button className="wiki-heading-edit" type="button" onClick={() => setEditingHeading(label)}>Bearbeiten</button></h2>;
+    },
+    h3: ({ children }) => {
+      const label = String(children);
+      return <h3 id={headingIds.get(label) ?? slugifyWikiHeading(label)}><span className="wiki-heading-text">{children}</span><button className="wiki-heading-edit" type="button" onClick={() => setEditingHeading(label)}>Bearbeiten</button></h3>;
+    },
+  };
+
+  useEffect(() => {
+    if (!editingHeading) return undefined;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setEditingHeading(null);
+    };
+    document.addEventListener('keydown', closeOnEscape);
+    return () => {
+      document.removeEventListener('keydown', closeOnEscape);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [editingHeading]);
+
+  return (
+    <div className="site-shell">
+      <GuideHeader />
+      <main className="wiki-article-page-main">
+        <section className="wiki-article-page-hero section-pad">
+          <div className="wiki-breadcrumb">
+            <a className="repair-back" href={article.path === modelPath ? '/' : modelPath}>← {article.path === modelPath ? 'Zur Sammelmappe' : `Zur ${article.model}-Übersicht`}</a>
+            <div className="eyebrow handwritten">wiki · {article.model}</div>
+          </div>
+          <h1>{article.title}</h1>
+          <p>{article.intro}</p>
+        </section>
+        <section className="wiki-article-section section-pad">
+          <div className="wiki-article-layout">
+            {toc.length > 0 && (
+              <nav className="wiki-toc card-doodle" aria-label="Inhaltsverzeichnis">
+                <div className="eyebrow handwritten">auf dieser seite</div>
+                <h2>Inhalt</h2>
+                <ol>
+                  {toc.map((item) => (
+                    <li key={item.id} className={item.level === 3 ? 'wiki-toc-subitem' : undefined}>
+                      <a href={`#${item.id}`}>{item.label}</a>
+                    </li>
+                  ))}
+                </ol>
+              </nav>
+            )}
+            <article className="wiki-article card-doodle">
+              <div className="wiki-article-topline"><span className="kind-chip doc">Wiki-Artikel</span><span>{article.status}</span></div>
+              <div className="wiki-markdown"><ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>{article.body}</ReactMarkdown></div>
+              <WikiContributions guideSlug={`wiki-${article.slug}`} editingHeading={editingHeading} onCloseEditor={() => setEditingHeading(null)} />
+              {article.sourceHref && (
+                <div className="wiki-source-box">
+                  <span className="repair-subhead">Quellenangabe</span>
+                  <a href={article.sourceHref} target={sourceIsExternal ? '_blank' : undefined} rel={sourceIsExternal ? 'nofollow noreferrer' : undefined}>
+                    {article.sourceLabel ?? 'Lokale Quelle öffnen'} ↗
+                  </a>
+                </div>
+              )}
+            </article>
+          </div>
+        </section>
+      </main>
+      <GuideFooter />
+    </div>
+  );
+}
+
+function WikiContributions({ guideSlug, editingHeading, onCloseEditor }: { guideSlug: string; editingHeading: string | null; onCloseEditor: () => void }) {
+  const [summary, setSummary] = useState<FeedbackSummary | null>(null);
+  const loadContributions = async () => {
+    try {
+      const payload = await apiJson<FeedbackSummary>(`/api/feedback/${guideSlug}`);
+      setSummary(payload);
+    } catch {
+      setSummary({ guide: guideSlug, up: 0, down: 0, comments: [] });
+    }
+  };
+
+  useEffect(() => {
+    void loadContributions();
+  }, [guideSlug]);
+
+  return (
+    <section className="wiki-contributions" aria-label="Wiki-Ergänzung vorschlagen">
+      <div className="wiki-contributions-heading">
+        <div>
+          <div className="eyebrow handwritten">mitmachen</div>
+          <h3>Etwas ergänzen oder korrigieren?</h3>
+        </div>
+        <span className="comment-count">{summary?.comments.length ?? 0} freigegeben</span>
+      </div>
+      <p className="wiki-contributions-intro">Du hast eine technische Angabe, ein Foto oder eine Korrektur? Schick sie uns direkt hier. Wir prüfen jeden Vorschlag redaktionell und übernehmen bestätigte Informationen ins Wiki.</p>
+      <details className="wiki-inline-contribution">
+        <summary><span>Wiki-Ergänzung vorschlagen</span><span className="wiki-inline-contribution-toggle" aria-hidden="true">aufklappen ↓</span></summary>
+        <WikiContributionForm guideSlug={guideSlug} onSubmitted={loadContributions} />
+      </details>
+      <div className="approved-comments wiki-approved-contributions">
+        {summary?.comments.length ? summary.comments.map((comment) => {
+          const sourceIsExternal = /^https?:\/\//i.test(comment.source ?? '');
+          return (
+            <article className="approved-comment wiki-approved-contribution" key={comment.id}>
+              <div className="approved-comment-topline"><strong>{comment.name}</strong><time dateTime={comment.createdAt}>{new Date(comment.createdAt).toLocaleDateString('de-DE')}</time></div>
+              {comment.topic && <h4>{comment.topic}</h4>}
+              {comment.section && <small className="wiki-contribution-section">Bezug: {comment.section}</small>}
+              <p>{comment.body}</p>
+              {comment.source && (sourceIsExternal ? <a className="wiki-contribution-source" href={comment.source} target="_blank" rel="nofollow noreferrer">Quelle prüfen ↗</a> : <small className="wiki-contribution-source">Quelle: {comment.source}</small>)}
+              {comment.imageUrl && <img src={comment.imageUrl} alt={`Bild von ${comment.name}`} loading="lazy" />}
+            </article>
+          );
+        }) : <p className="no-comments">Noch keine freigegebenen Ergänzungen.</p>}
+      </div>
+      {editingHeading && (
+        <div className="wiki-contribution-modal" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) onCloseEditor(); }}>
+          <div className="wiki-contribution-dialog card-doodle" role="dialog" aria-modal="true" aria-labelledby="wiki-contribution-dialog-title">
+            <div className="wiki-contribution-dialog-topline"><span className="eyebrow handwritten">wiki-bearbeitung</span><button className="wiki-contribution-modal-close" type="button" onClick={onCloseEditor} aria-label="Fenster schließen">×</button></div>
+            <h3 id="wiki-contribution-dialog-title">Etwas ergänzen oder korrigieren?</h3>
+            <p className="wiki-contribution-dialog-context">Du beziehst dich auf die Überschrift „{editingHeading}“. Beschreibe möglichst genau, welche Information dort ergänzt oder geändert werden sollte.</p>
+            <WikiContributionForm guideSlug={guideSlug} heading={editingHeading} onSubmitted={loadContributions} />
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
+
+function WikiContributionForm({ guideSlug, heading, onSubmitted }: { guideSlug: string; heading?: string; onSubmitted: () => Promise<void> | void }) {
+  const [contributionError, setContributionError] = useState('');
+  const [contributionNotice, setContributionNotice] = useState('');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] ?? null;
+    setContributionError('');
+    setContributionNotice('');
+    if (file && file.size > 1048576) {
+      setSelectedFile(null);
+      event.target.value = '';
+      setContributionError('Das Bild darf höchstens 1 MB groß sein.');
+      return;
+    }
+    setSelectedFile(file);
+  };
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSubmitting(true);
+    setContributionError('');
+    setContributionNotice('');
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    formData.set('guide', guideSlug);
+    formData.set('kind', 'wiki_suggestion');
+    formData.delete('image');
+    if (selectedFile) formData.append('image', selectedFile);
+
+    try {
+      await apiJson<{ message: string }>('/api/comments', { method: 'POST', body: formData });
+      form.reset();
+      setSelectedFile(null);
+      setContributionNotice('Danke! Dein Vorschlag wartet jetzt auf die redaktionelle Prüfung.');
+      await onSubmitted();
+    } catch (error) {
+      setContributionError(error instanceof Error ? error.message : 'Der Vorschlag konnte nicht gesendet werden.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <form className="comment-form wiki-contribution-form" onSubmit={handleSubmit}>
+      <input type="hidden" name="section" value={heading ?? ''} />
+      <label>Thema oder kurze Überschrift<input name="topic" defaultValue={heading} required minLength={2} maxLength={120} placeholder="z. B. Reifengröße der Bonfire X" /></label>
+      <div className="comment-form-grid">
+        <label>Name<input name="name" required minLength={2} maxLength={80} autoComplete="name" /></label>
+        <label>E-Mail<input name="email" type="email" required maxLength={180} autoComplete="email" /><small>wird nicht öffentlich angezeigt</small></label>
+      </div>
+      <label>Dein Vorschlag<textarea name="body" required minLength={10} maxLength={4000} rows={5} placeholder="Was sollte ergänzt, geändert oder belegt werden?" /></label>
+      <label>Quelle (optional)<input name="source" maxLength={500} placeholder="z. B. Bonfire-Handbuch, S. 12 oder https://…" /><small>Eine Seitenzahl, PDF oder Webadresse hilft bei der Prüfung.</small></label>
+      <label>Bild (optional, max. 1 MB)<input name="image" type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={handleImageChange} /><small>JPG, PNG, WEBP oder GIF</small></label>
+      <label className="comment-honeypot" aria-hidden="true">Website<input name="website" tabIndex={-1} autoComplete="off" /></label>
+      {contributionError && <p className="form-message form-message-error" role="alert">{contributionError}</p>}
+      {contributionNotice && <p className="form-message form-message-success" role="status">{contributionNotice}</p>}
+      <button className="button button-ink" type="submit" disabled={submitting}>{submitting ? 'Wird geprüft …' : 'Vorschlag zur Prüfung senden'} <span aria-hidden="true">↗</span></button>
+    </form>
   );
 }
 
@@ -2368,6 +2846,7 @@ function AdminPage() {
   const [loginEmail, setLoginEmail] = useState('hallo@shortaktien.de');
   const [password, setPassword] = useState('');
   const [comments, setComments] = useState<AdminComment[]>([]);
+  const [adminFilter, setAdminFilter] = useState<'all' | 'wiki' | 'comments'>('all');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
@@ -2469,6 +2948,10 @@ function AdminPage() {
     setAdminEmail('');
   };
 
+  const wikiSuggestions = comments.filter((comment) => comment.kind === 'wiki_suggestion');
+  const experienceComments = comments.filter((comment) => comment.kind !== 'wiki_suggestion');
+  const visibleComments = adminFilter === 'wiki' ? wikiSuggestions : adminFilter === 'comments' ? experienceComments : comments;
+
   return (
     <div className="site-shell">
       <GuideHeader />
@@ -2476,8 +2959,8 @@ function AdminPage() {
         <section className="admin-page-hero section-pad">
           <a className="repair-back" href="/hilfe">← Zur Reparaturhilfe</a>
           <div className="eyebrow handwritten">redaktion · intern</div>
-          <h1>Kommentarprüfung</h1>
-          <p>Hier werden Erfahrungsberichte geprüft, bevor sie unter einer Reparaturhilfe erscheinen.</p>
+          <h1>Beiträge prüfen</h1>
+          <p>Hier werden Erfahrungsberichte und Wiki-Vorschläge geprüft, bevor sie öffentlich erscheinen.</p>
         </section>
         {!checked ? <p className="admin-loading section-pad">Sitzung wird geprüft …</p> : !authenticated ? (
           <section className="admin-login-section section-pad">
@@ -2498,20 +2981,26 @@ function AdminPage() {
             </div>
             {error && <p className="form-message form-message-error" role="alert">{error}</p>}
             {notice && <p className="form-message form-message-success" role="status">{notice}</p>}
+            <div className="admin-filter-tabs" role="tablist" aria-label="Beiträge filtern">
+              <button className={adminFilter === 'all' ? 'active' : ''} type="button" role="tab" aria-selected={adminFilter === 'all'} onClick={() => setAdminFilter('all')}>Alle <strong>{comments.length}</strong></button>
+              <button className={adminFilter === 'wiki' ? 'active' : ''} type="button" role="tab" aria-selected={adminFilter === 'wiki'} onClick={() => setAdminFilter('wiki')}>Wiki <strong>{wikiSuggestions.length}</strong></button>
+              <button className={adminFilter === 'comments' ? 'active' : ''} type="button" role="tab" aria-selected={adminFilter === 'comments'} onClick={() => setAdminFilter('comments')}>Kommentare <strong>{experienceComments.length}</strong></button>
+            </div>
             <div className="admin-comment-list">
-              {comments.length ? comments.map((comment) => (
+              {visibleComments.length ? visibleComments.map((comment) => (
                 <article className={`admin-comment card-doodle ${comment.status === 'pending' ? 'admin-comment-pending' : ''}`} key={comment.id}>
                   <div className="admin-comment-header">
-                    <div><span className={`admin-status ${comment.status}`}>{comment.status === 'pending' ? 'wartet auf Prüfung' : 'freigegeben'}</span><h2>{comment.name}</h2><p>{comment.email} · {comment.guide} · {new Date(comment.createdAt).toLocaleString('de-DE')}</p></div>
+                    <div><span className={`admin-status ${comment.status}`}>{comment.status === 'pending' ? 'wartet auf Prüfung' : 'freigegeben'}</span><span className="admin-kind">{comment.kind === 'wiki_suggestion' ? 'Wiki-Vorschlag' : 'Erfahrungsbericht'}</span><h2>{comment.topic ?? comment.name}</h2><p>{comment.topic ? `${comment.name} · ` : ''}{comment.email} · {comment.guide} · {new Date(comment.createdAt).toLocaleString('de-DE')}</p>{comment.section && <p className="admin-comment-target"><strong>Betroffener Abschnitt:</strong> „{comment.section}“</p>}</div>
                     <div className="admin-comment-actions">
                       {comment.status === 'pending' ? <button className="button button-ink" type="button" disabled={busy} onClick={() => void handleStatus(comment, 'approved')}>Freigeben</button> : <button className="button button-ghost" type="button" disabled={busy} onClick={() => void handleStatus(comment, 'pending')}>Zurückstellen</button>}
                       <button className="button button-danger" type="button" disabled={busy} onClick={() => void handleDelete(comment)}>Löschen</button>
                     </div>
                   </div>
                   <p className="admin-comment-body">{comment.body}</p>
+                  {comment.source && <p className="admin-comment-source"><strong>Quelle:</strong> {comment.source}</p>}
                   {comment.imageUrl && <a href={comment.imageUrl} target="_blank" rel="noreferrer"><img className="admin-comment-image" src={comment.imageUrl} alt={`Anhang von ${comment.name}`} /></a>}
                 </article>
-              )) : <div className="admin-empty card-doodle"><h2>Alles ruhig.</h2><p>Aktuell liegen keine Kommentare zur Prüfung vor.</p></div>}
+              )) : <div className="admin-empty card-doodle"><h2>Alles ruhig.</h2><p>{adminFilter === 'wiki' ? 'Aktuell liegen keine Wiki-Vorschläge zur Prüfung vor.' : adminFilter === 'comments' ? 'Aktuell liegen keine Erfahrungsberichte zur Prüfung vor.' : 'Aktuell liegen keine Beiträge zur Prüfung vor.'}</p></div>}
             </div>
           </section>
         )}
