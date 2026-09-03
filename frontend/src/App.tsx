@@ -192,6 +192,11 @@ const sourceLinks = [
     href: 'https://www.versteigerungskalender.de/insolvenzkalender/blaeck-tea-motorbikes-gmbh',
   },
   {
+    title: 'MOTORRAD Online · Bonfire und Wildfire',
+    detail: 'Retro-E-Motorräder aus München · veröffentlicht am 02.09.2026',
+    href: 'https://www.motorradonline.de/elektro/retro-e-motorrader-black-tea-bonfire-und-wildfire-a1-und-b196/',
+  },
+  {
     title: 'Bonfire-Handbuch',
     detail: 'Lokale Kopie des gesicherten 44-seitigen Handbuchs',
     href: '/pdfs/15-bonfire-handbuch-lokal.pdf',
@@ -2246,6 +2251,7 @@ function HomePage() {
             <TimelineItem date="14.07.2026" title="Sicherungsmaßnahmen angeordnet" text="Das Amtsgericht München ordnet vorläufige Insolvenzverwaltung an. Aktenzeichen: 1513 IN 2588/26." sourceHref={sourceLinks[0].href} sourceLabel="Verfahrensquelle" />
             <TimelineItem date="16.07.2026" title="Erste öffentliche Berichte" text="Die ersten Berichte ordnen die Situation ein. Welche Folgen das für Bestellungen, Reparaturen und Ersatzteile hat, war zu diesem Zeitpunkt noch offen." sourceHref={sourceLinks[0].href} sourceLabel="Verfahrensquelle" />
             <TimelineItem date="01.09.2026" title="Verfahrensstand erneut veröffentlicht" text="Der laufende Verfahrensstand ist erneut öffentlich dokumentiert. Für verbindliche rechtliche Fragen ist die zuständige Stelle maßgeblich." sourceHref={sourceLinks[0].href} sourceLabel="Verfahrensquelle" />
+            <TimelineItem date="02.09.2026" title="MOTORRAD Online ordnet Folgen ein" text="MOTORRAD Online beschreibt die 2026er Bonfire und Wildfire und weist auf das vorläufige Insolvenzverfahren hin. Liefertermine, Verfügbarkeit, Gewährleistung/Service und Ersatzteilversorgung sind dadurch schwerer verlässlich einzuschätzen." sourceHref={sourceLinks[1].href} sourceLabel="MOTORRAD Online" />
           </div>
         </section>
 
