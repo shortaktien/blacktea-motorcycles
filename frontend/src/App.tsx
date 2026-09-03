@@ -16,6 +16,29 @@ type FaqItem = {
   sourceHref?: string;
 };
 
+type WebMcpScope = 'all' | 'faq' | 'wiki' | 'repair';
+
+type WebMcpToolDefinition = {
+  name: string;
+  description: string;
+  inputSchema: {
+    type: 'object';
+    properties: Record<string, { type: 'string'; description?: string; enum?: string[] }>;
+    required?: string[];
+    additionalProperties?: boolean;
+  };
+  annotations?: { readOnlyHint?: boolean; untrustedContentHint?: boolean };
+  execute: (input: { query?: unknown; scope?: unknown }, options?: { signal: AbortSignal }) => Promise<string>;
+};
+
+declare global {
+  interface Document {
+    modelContext?: {
+      registerTool: (tool: WebMcpToolDefinition, options?: { signal?: AbortSignal }) => Promise<void>;
+    };
+  }
+}
+
 const faqItems: FaqItem[] = faqContent.items;
 
 type Resource = {
@@ -1868,6 +1891,113 @@ function getWikiArticleSearchResults(body: string, query: string): WikiTocItem[]
     .map(({ id, label, level }) => ({ id, label, level }));
 }
 
+type WebMcpKnowledgeEntry = {
+  kind: Exclude<WebMcpScope, 'all'>;
+  title: string;
+  text: string;
+  href: string;
+};
+
+const webMcpKnowledgeEntries: WebMcpKnowledgeEntry[] = [
+  ...faqItems.map((item) => ({
+    kind: 'faq' as const,
+    title: item.question,
+    text: `${item.question} ${item.answer} ${item.sourceLabel ?? ''}`,
+    href: item.linkHref,
+  })),
+  ...wikiArticles.map((article) => ({
+    kind: 'wiki' as const,
+    title: article.title,
+    text: `${article.title} ${article.intro} ${article.body}`,
+    href: article.path,
+  })),
+  ...repairGuides.map((guide) => ({
+    kind: 'repair' as const,
+    title: guide.title,
+    text: `${guide.title} ${guide.model} ${guide.intro} ${guide.steps.join(' ')} ${guide.safety}`,
+    href: guide.path,
+  })),
+];
+
+function cleanWebMcpText(value: string): string {
+  return value
+    .replace(/!\[([^\]]*)\]\([^)]*\)/g, '$1')
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
+    .replace(/[#*_`|]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function webMcpExcerpt(text: string, query: string): string {
+  const cleaned = cleanWebMcpText(text);
+  const lowerText = cleaned.toLocaleLowerCase('de');
+  const matchIndex = lowerText.indexOf(query.toLocaleLowerCase('de'));
+  if (matchIndex < 0) return `${cleaned.slice(0, 180)}${cleaned.length > 180 ? ' …' : ''}`;
+
+  const start = Math.max(0, matchIndex - 55);
+  const end = Math.min(cleaned.length, matchIndex + query.length + 125);
+  return `${start > 0 ? '…' : ''}${cleaned.slice(start, end)}${end < cleaned.length ? ' …' : ''}`;
+}
+
+function searchBtmKnowledge(queryValue: unknown, scopeValue: unknown): string {
+  const query = typeof queryValue === 'string' ? queryValue.trim().slice(0, 120) : '';
+  const requestedScope = typeof scopeValue === 'string' ? scopeValue : 'all';
+  const scope: WebMcpScope = ['all', 'faq', 'wiki', 'repair'].includes(requestedScope) ? requestedScope as WebMcpScope : 'all';
+
+  if (!query) {
+    return JSON.stringify({ ok: false, message: 'Bitte gib einen Suchbegriff für FAQ, Wiki oder Reparaturhilfe an.' });
+  }
+
+  const normalizedQuery = query.toLocaleLowerCase('de');
+  const matches = webMcpKnowledgeEntries.filter((entry) => {
+    if (scope !== 'all' && entry.kind !== scope) return false;
+    return `${entry.title} ${entry.text}`.toLocaleLowerCase('de').includes(normalizedQuery);
+  });
+  const results = matches.slice(0, 4).map((entry) => ({
+    type: entry.kind,
+    title: entry.title,
+    excerpt: webMcpExcerpt(entry.text, query),
+    url: `${siteOrigin}${entry.href}`,
+  }));
+
+  return JSON.stringify({
+    ok: true,
+    query,
+    scope,
+    resultCount: matches.length,
+    truncated: matches.length > results.length,
+    results,
+  });
+}
+
+function WebMcpTools() {
+  useEffect(() => {
+    const modelContext = document.modelContext;
+    if (!modelContext) return undefined;
+
+    const controller = new AbortController();
+    void modelContext.registerTool({
+      name: 'search_btm_knowledge',
+      description: 'Search the public Black Tea Motorbikes FAQ, bike wiki, and repair guides. Returns short excerpts and links; it never accesses private data or changes state.',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          query: { type: 'string', description: 'Search term, symptom, model, part, or question.' },
+          scope: { type: 'string', enum: ['all', 'faq', 'wiki', 'repair'], description: 'Optional area to search; defaults to all.' },
+        },
+        required: ['query'],
+        additionalProperties: false,
+      },
+      annotations: { readOnlyHint: true, untrustedContentHint: true },
+      execute: async ({ query, scope }) => searchBtmKnowledge(query, scope),
+    }, { signal: controller.signal }).catch(() => undefined);
+
+    return () => controller.abort();
+  }, []);
+
+  return null;
+}
+
 async function apiJson<T>(input: RequestInfo | URL, init?: RequestInit): Promise<T> {
   const response = await fetch(input, { credentials: 'same-origin', ...init });
   const payload = await response.json().catch(() => ({}));
@@ -2427,7 +2557,7 @@ function CookieConsentBanner() {
 }
 
 export function App(props: { initialPath?: string } = {}) {
-  return <AuthProvider><AppContent {...props} /><CookieConsentBanner /></AuthProvider>;
+  return <AuthProvider><WebMcpTools /><AppContent {...props} /><CookieConsentBanner /></AuthProvider>;
 }
 
 function NotFoundPage({ path }: { path: string }) {
