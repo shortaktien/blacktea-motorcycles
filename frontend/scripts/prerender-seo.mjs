@@ -78,7 +78,7 @@ const staticPages = [
   { path: '/quellen', title: 'Quellen — Black Tea Motorbikes – Hilfe', description: 'Nachvollziehbare Quellen zu Insolvenzstatus, Handbüchern, lokalen PDFs, Ersatzteilspuren und Community-Wissen.' },
   { path: '/impressum', title: 'Impressum — Black Tea Motorbikes – Hilfe', description: 'Anbieterinformationen und rechtliche Hinweise zu Black Tea Motorbikes – Hilfe.' },
   { path: '/datenschutz', title: 'Datenschutz — Black Tea Motorbikes – Hilfe', description: 'Datenschutzhinweise zu Kommentaren, Bildanhängen und dem Betrieb von Black Tea Motorbikes – Hilfe.' },
-  { path: '/wiki', title: 'Wiki — Black Tea Motorbikes – Hilfe', description: 'Das BTM-Wiki wird vorbereitet.' },
+  { path: '/wiki', title: 'Wiki — Black Tea Motorbikes – Hilfe', description: 'Das BTM-Wiki enthält redaktionell geprüfte Artikel zu Bonfire und Wildfire und wird gemeinsam erweitert.' },
   { path: '/bikes/bonfire', title: 'Bonfire — Bikes — Black Tea Motorbikes – Hilfe', description: 'Technische Wiki-Seite zur Black Tea Bonfire mit Handbuchdaten, Modellvarianten und nachvollziehbaren Quellen.' },
   { path: '/bikes/wildfire', title: 'Wildfire — Bikes — Black Tea Motorbikes – Hilfe', description: 'Technische Wiki-Seite zur Black Tea Wildfire mit Handbuchdaten, Modellvarianten und nachvollziehbaren Quellen.' },
   { path: '/admin', title: 'Admin — Black Tea Motorbikes – Hilfe', description: 'Interner Bereich zur redaktionellen Prüfung von Kommentaren.', robots: 'noindex,nofollow,noarchive' },
