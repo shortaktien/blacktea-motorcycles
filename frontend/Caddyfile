@@ -1,4 +1,6 @@
-:80 {
+# Port 80 ist der Produktionsstandard. Port 5173 bleibt als interner
+# Kompatibilitätsport für die bestehende öffentliche Caddy-Konfiguration aktiv.
+:80, :5173 {
     encode zstd gzip
     root * /srv
 
