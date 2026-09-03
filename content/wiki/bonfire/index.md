@@ -3,6 +3,7 @@ title: Bonfire
 model: Bonfire
 intro: Technische Grundlagen, Modellvarianten und belegte Wartungsspuren zur Black Tea Bonfire.
 status: Startartikel · offen für Ergänzungen
+lastUpdated: 2026-09-03
 source: /pdfs/15-bonfire-handbuch-lokal.pdf
 sourceLabel: Bonfire-Handbuch lokal öffnen
 ---

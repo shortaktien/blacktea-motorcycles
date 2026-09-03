@@ -9,6 +9,8 @@ const appSource = readFileSync(join(frontendRoot, 'src', 'App.tsx'), 'utf8');
 const siteConfig = JSON.parse(readFileSync(join(frontendRoot, 'src', 'site-config.json'), 'utf8'));
 const partsCatalog = JSON.parse(readFileSync(join(frontendRoot, '..', 'research', 'parts.json'), 'utf8'));
 const partDetailsCatalog = JSON.parse(readFileSync(join(frontendRoot, '..', 'research', 'parts-details.json'), 'utf8'));
+const faqContent = JSON.parse(readFileSync(join(frontendRoot, '..', 'content', 'faq.json'), 'utf8'));
+const faqItems = faqContent.items ?? [];
 const siteOrigin = (process.env.VITE_SITE_URL || siteConfig.siteOrigin).replace(/\/+$/, '');
 const indexPath = join(distRoot, 'index.html');
 const serverEntryPath = join(frontendRoot, 'dist-server', 'entry-server.js');
@@ -62,6 +64,7 @@ const parseWikiArticle = (filePath) => {
     title: fields.title ?? articlePath,
     model: fields.model ?? 'Bikes',
     intro: fields.intro ?? 'Redaktionell aufbereiteter Wiki-Artikel aus lokal gesicherten Quellen.',
+    lastUpdated: fields.lastUpdated ?? fields.updated ?? fields.dateModified,
   };
 };
 const wikiArticles = collectMarkdownFiles(wikiRoot).map(parseWikiArticle).sort((left, right) => left.title.localeCompare(right.title, 'de'));
@@ -76,6 +79,7 @@ const staticPages = [
   { path: '/hilfe/anfragen', title: 'Reparatur anfragen — Black Tea Motorbikes – Hilfe', description: 'Reparaturanfragen zu Black Tea Bonfire und Wildfire stellen, Erfahrungen teilen und gemeinsam nachvollziehbare Lösungen dokumentieren.' },
   { path: '/ersatzteile', title: 'Ersatzteile — Black Tea Motorbikes – Hilfe', description: 'Historischer BTM-Ersatzteilkatalog mit Modellbezug, Teilenamen und Quellen. Bestand und Preise vor dem Kauf prüfen.' },
   { path: '/community', title: 'BTM Community-Wissen — Black Tea Motorbikes – Hilfe', description: 'Technische Hinweise aus der Black Tea Community verständlich zusammengefasst, mit lokalen PDFs und Originalquellen.' },
+  { path: '/faq', title: 'FAQ — Black Tea Motorbikes – Hilfe', description: 'Eigenständig beantwortete Fragen zu Black Tea Bonfire und Wildfire: Varianten, Reichweite, Display, Akku, Bremsen und Wartung.' },
   { path: '/quellen', title: 'Quellen — Black Tea Motorbikes – Hilfe', description: 'Nachvollziehbare Quellen zu Insolvenzstatus, Handbüchern, lokalen PDFs, Ersatzteilspuren und Community-Wissen.' },
   { path: '/impressum', title: 'Impressum — Black Tea Motorbikes – Hilfe', description: 'Anbieterinformationen und rechtliche Hinweise zu Black Tea Motorbikes – Hilfe.' },
   { path: '/datenschutz', title: 'Datenschutz — Black Tea Motorbikes – Hilfe', description: 'Datenschutzhinweise zu Kommentaren, Bildanhängen und dem Betrieb von Black Tea Motorbikes – Hilfe.' },
@@ -135,7 +139,19 @@ const breadcrumbSchema = (page) => ({
 const schemaFor = (page) => {
   if (page.robots?.startsWith('noindex')) return null;
 
-  const pageSchema = page.guide ? {
+  const pageSchema = page.path === '/faq' ? {
+    '@type': 'FAQPage',
+    '@id': `${absoluteUrl(page.path)}#faqpage`,
+    name: page.title,
+    description: page.description,
+    url: absoluteUrl(page.path),
+    inLanguage: 'de-DE',
+    mainEntity: faqItems.map((item) => ({
+      '@type': 'Question',
+      name: item.question,
+      acceptedAnswer: { '@type': 'Answer', text: item.answer },
+    })),
+  } : page.guide ? {
     '@type': 'HowTo',
     '@id': `${absoluteUrl(page.path)}#howto`,
     name: page.guide.title,
@@ -149,14 +165,13 @@ const schemaFor = (page) => {
       text: step,
     })),
   } : page.part ? {
-    '@type': 'Product',
-    '@id': `${absoluteUrl(page.path)}#product`,
+    '@type': 'WebPage',
+    '@id': `${absoluteUrl(page.path)}#webpage`,
     name: page.part.title,
     description: page.description,
     url: absoluteUrl(page.path),
-    category: 'Ersatzteil',
-    sku: `btm-${page.part.id}`,
-    brand: { '@type': 'Brand', name: 'Black Tea Motorbikes' },
+    inLanguage: 'de-DE',
+    about: { '@type': 'Thing', name: page.part.title },
   } : page.wikiArticle ? {
     '@type': 'Article',
     '@id': `${absoluteUrl(page.path)}#article`,
@@ -164,8 +179,9 @@ const schemaFor = (page) => {
     description: page.description,
     url: absoluteUrl(page.path),
     inLanguage: 'de-DE',
+    ...(page.wikiArticle.lastUpdated ? { dateModified: page.wikiArticle.lastUpdated } : {}),
     isPartOf: { '@id': `${siteOrigin}/#website` },
-    about: { '@type': 'Vehicle', name: page.wikiArticle.model, brand: { '@type': 'Brand', name: 'Black Tea Motorbikes' } },
+    about: { '@type': 'Thing', name: page.wikiArticle.model },
   } : {
     '@type': page.path === '/hilfe' || page.path === '/ersatzteile' || page.path === '/community' || page.path === '/quellen' ? 'CollectionPage' : 'WebPage',
     '@id': `${absoluteUrl(page.path)}#webpage`,

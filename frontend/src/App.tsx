@@ -1,10 +1,36 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ChangeEvent, type FormEvent, type MouseEvent, type ReactNode } from 'react';
+import faqContent from '../../content/faq.json';
 import partsCatalog from '../../research/parts.json';
 import partDetailsCatalog from '../../research/parts-details.json';
 import siteConfig from './site-config.json';
 
 type CardKind = 'Dokument' | 'Ersatzteil' | 'Community';
 type Filter = 'Alle' | CardKind;
+
+type FaqItem = {
+  question: string;
+  answer: string;
+  linkLabel: string;
+  linkHref: string;
+  sourceLabel?: string;
+  sourceHref?: string;
+};
+
+type FaqSearch = {
+  query: string;
+  questionCount: number;
+  href: string;
+};
+
+type FaqReference = {
+  title: string;
+  detail: string;
+  href: string;
+};
+
+const faqItems: FaqItem[] = faqContent.items;
+const faqSearches: FaqSearch[] = faqContent.searches;
+const faqReferences: FaqReference[] = faqContent.references;
 
 type Resource = {
   kind: CardKind;
@@ -45,6 +71,7 @@ type WikiArticle = {
   model: string;
   intro: string;
   status: string;
+  lastUpdated?: string;
   sourceHref?: string;
   sourceLabel?: string;
   body: string;
@@ -1597,6 +1624,7 @@ function parseWikiMarkdown(source: string, filePath: string): WikiArticle {
     model: fields.model ?? 'Bikes',
     intro: fields.intro ?? 'Redaktionell aufbereiteter Wiki-Artikel aus lokal gesicherten Quellen.',
     status: fields.status ?? 'Entwurf',
+    lastUpdated: fields.lastUpdated ?? fields.updated ?? fields.dateModified,
     sourceHref: fields.source,
     sourceLabel: fields.sourceLabel,
     body: body.trim(),
@@ -1615,6 +1643,12 @@ function slugifyWikiHeading(value: string): string {
     .replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '') || 'abschnitt';
+}
+
+function formatWikiDate(value: string): string {
+  const date = new Date(`${value}T12:00:00`);
+  if (Number.isNaN(date.getTime())) return value;
+  return new Intl.DateTimeFormat('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(date);
 }
 
 function getWikiToc(body: string): WikiTocItem[] {
@@ -2062,15 +2096,13 @@ function getSeoMetadata(path: string, guide?: RepairGuide, part?: HistoricalShop
         '@graph': [
           websiteSchema,
           {
-            '@type': 'Product',
-            '@id': `${siteOrigin}${part.path}#product`,
+            '@type': 'WebPage',
+            '@id': `${siteOrigin}${part.path}#webpage`,
             name: part.title,
             description,
             url: `${siteOrigin}${part.path}`,
-            category: part.category,
-            sku: `btm-${part.id}`,
-            brand: { '@type': 'Brand', name: 'Black Tea Motorbikes' },
-            isRelatedTo: { '@type': 'Vehicle', name: part.model },
+            inLanguage: 'de-DE',
+            about: { '@type': 'Thing', name: part.title },
           },
           breadcrumbSchema([
             { name: 'Startseite', url: `${siteOrigin}/` },
@@ -2099,8 +2131,9 @@ function getSeoMetadata(path: string, guide?: RepairGuide, part?: HistoricalShop
             description: wikiArticle.intro,
             url: `${siteOrigin}${wikiArticle.path}`,
             inLanguage: 'de-DE',
+            ...(wikiArticle.lastUpdated ? { dateModified: wikiArticle.lastUpdated } : {}),
             isPartOf: { '@id': `${siteOrigin}/#website` },
-            about: { '@type': 'Vehicle', name: wikiArticle.model, brand: { '@type': 'Brand', name: 'Black Tea Motorbikes' } },
+            about: { '@type': 'Thing', name: wikiArticle.model },
           },
           breadcrumbSchema([
             { name: 'Startseite', url: `${siteOrigin}/` },
@@ -2129,12 +2162,46 @@ function getSeoMetadata(path: string, guide?: RepairGuide, part?: HistoricalShop
             description: bike.description,
             url: `${siteOrigin}${bike.path}`,
             inLanguage: 'de-DE',
-            about: { '@type': 'Vehicle', name: bike.name, brand: { '@type': 'Brand', name: 'Black Tea Motorbikes' } },
+            about: { '@type': 'Thing', name: bike.name },
           },
           breadcrumbSchema([
             { name: 'Startseite', url: `${siteOrigin}/` },
             { name: 'Bikes', url: `${siteOrigin}${bike.path}` },
             { name: bike.name, url: `${siteOrigin}${bike.path}` },
+          ]),
+        ],
+      },
+    };
+  }
+
+  if (path === '/faq') {
+    const title = 'FAQ — Black Tea Motorbikes – Hilfe';
+    const description = 'Eigenständig beantwortete Fragen zu Black Tea Bonfire und Wildfire sowie zum laufenden Insolvenzverfahren: Bestellungen, Forderungen, Ersatzteile und Verfahrensstatus.';
+    return {
+      title,
+      description,
+      canonicalPath: path,
+      robots: 'index,follow,max-image-preview:large',
+      jsonLd: {
+        '@context': 'https://schema.org',
+        '@graph': [
+          websiteSchema,
+          {
+            '@type': 'FAQPage',
+            '@id': `${siteOrigin}/faq#faqpage`,
+            name: title,
+            description,
+            url: `${siteOrigin}/faq`,
+            inLanguage: 'de-DE',
+            mainEntity: faqItems.map((item) => ({
+              '@type': 'Question',
+              name: item.question,
+              acceptedAnswer: { '@type': 'Answer', text: item.answer },
+            })),
+          },
+          breadcrumbSchema([
+            { name: 'Startseite', url: `${siteOrigin}/` },
+            { name: 'FAQ', url: `${siteOrigin}/faq` },
           ]),
         ],
       },
@@ -2299,6 +2366,7 @@ function AppContent({ initialPath }: { initialPath?: string } = {}) {
     || Boolean(repairRequestId)
     || path === '/ersatzteile'
     || path === '/community'
+    || path === '/faq'
     || path === '/quellen'
     || path === '/impressum'
     || path === '/datenschutz'
@@ -2324,6 +2392,7 @@ function AppContent({ initialPath }: { initialPath?: string } = {}) {
   if (part) return <PartDetailPage part={part} />;
   if (path === '/ersatzteile' || (path === '/' && hash === 'teile')) return <PartsPage />;
   if (path === '/community') return <CommunityPage />;
+  if (path === '/faq') return <FaqPage />;
   if (path === '/quellen' || (path === '/' && hash === 'quellen')) return <SourcesPage />;
   if (path === '/impressum' || (path === '/' && hash === 'impressum')) return <LegalPage kind="impressum" />;
   if (path === '/datenschutz' || (path === '/' && hash === 'datenschutz')) return <LegalPage kind="datenschutz" />;
@@ -2898,6 +2967,7 @@ function HomePage() {
           <RepairMenu />
           <a href="/ersatzteile">Ersatzteile</a>
           <BikeMenu />
+          <a href="/faq">FAQ</a>
           <a href="/quellen">Quellen</a>
         </nav>
         <AccountMenu />
@@ -3099,6 +3169,90 @@ function SourcesPage() {
   );
 }
 
+function FaqPage() {
+  const [query, setQuery] = useState('');
+
+  useEffect(() => {
+    document.title = 'FAQ — Black Tea Motorbikes – Hilfe';
+    window.scrollTo(0, 0);
+  }, []);
+
+  const filteredFaqItems = useMemo(() => {
+    const normalizedQuery = query.trim().toLocaleLowerCase('de');
+    if (!normalizedQuery) return faqItems;
+    return faqItems.filter((item) => [item.question, item.answer, item.sourceLabel ?? ''].some((value) => value.toLocaleLowerCase('de').includes(normalizedQuery)));
+  }, [query]);
+
+  return (
+    <div className="site-shell">
+      <GuideHeader />
+      <main className="repair-page-main faq-page-main">
+        <section className="repair-page-hero faq-page-hero section-pad">
+          <a className="repair-back" href="/">← Zur Sammelmappe</a>
+          <div className="eyebrow handwritten">fragen aus der suche · selbst erklärt</div>
+          <h1>FAQ</h1>
+          <p>Die häufigsten Fragen rund um Black Tea Bonfire und Wildfire sowie zum laufenden Insolvenzverfahren — kurz beantwortet und mit den passenden Quellen verknüpft.</p>
+        </section>
+
+        <section className="faq-section section-pad">
+          <div className="faq-intro card-doodle">
+            <div className="eyebrow handwritten">keine copy-paste-antworten</div>
+            <h2>Was du wirklich wissen willst.</h2>
+            <p>Wir haben die Suchbegriffe aus deinem Google-Screenshot im offenen Browser geprüft und ausschließlich die dort angezeigten Fragen aus „Weitere Fragen“ übernommen. Doppelte Fragen aus mehreren Suchen erscheinen hier nur einmal. Die Antworten sind eigenständig formuliert; technische Werte und Sicherheitsangaben bitte immer mit der konkreten Variante und dem Handbuch gegenprüfen.</p>
+          </div>
+
+          <div className="faq-search card-doodle">
+            <label className="search-box">
+              <span aria-hidden="true">⌕</span>
+              <span className="sr-only">FAQ durchsuchen</span>
+              <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="z. B. Insolvenz, Wildfire, PayPal, Akku …" />
+            </label>
+            <span className="faq-search-count">{query.trim() ? `${filteredFaqItems.length} Treffer` : `${faqItems.length} Fragen`}</span>
+          </div>
+
+          <div className="faq-list">
+            {filteredFaqItems.map((item, index) => (
+              <details className="faq-item card-doodle" key={item.question}>
+                <summary>{highlightWikiText(item.question, query, `faq-question-${index}`)}</summary>
+                <div className="faq-answer">
+                  <p>{highlightWikiText(item.answer, query, `faq-answer-${index}`)}</p>
+                  <a href={item.linkHref}>{item.linkLabel} ↗</a>
+                  {item.sourceHref && <a className="faq-source-link" href={item.sourceHref} target="_blank" rel="nofollow noreferrer">{item.sourceLabel ?? 'Quelle öffnen'} ↗</a>}
+                </div>
+              </details>
+            ))}
+          </div>
+          {filteredFaqItems.length === 0 && <div className="empty-state card-doodle">Nichts gefunden. Versuch es mit „Insolvenz“, „Wildfire“, „PayPal“ oder „Akku“.</div>}
+
+          <div className="faq-sources card-doodle">
+            <div className="eyebrow handwritten">recherchebasis</div>
+            <h2>Acht Google-Suchen, neun eindeutige Fragen.</h2>
+            <p>Diese Suchanfragen wurden im offenen Google-Browser geprüft. Die Zahl zeigt, wie viele „Weitere Fragen“ in der jeweiligen Suche sichtbar waren; Wiederholungen wurden nicht doppelt übernommen.</p>
+            <div className="source-list">
+              {faqSearches.map((search) => (
+                <a className="source-row" href={search.href} target="_blank" rel="nofollow noreferrer" key={search.href}>
+                  <span><strong>{search.query}</strong><small>{search.questionCount === 0 ? 'Keine „Weitere Fragen“ angezeigt' : `${search.questionCount} Fragen angezeigt`}</small></span>
+                  <span aria-hidden="true">↗</span>
+                </a>
+              ))}
+            </div>
+            <h3>Quellen für die Einordnung.</h3>
+            <div className="source-list">
+              {faqReferences.map((reference) => (
+                <a className="source-row" href={reference.href} target="_blank" rel="nofollow noreferrer" key={reference.href}>
+                  <span><strong>{reference.title}</strong><small>{reference.detail}</small></span>
+                  <span aria-hidden="true">↗</span>
+                </a>
+              ))}
+            </div>
+          </div>
+        </section>
+      </main>
+      <GuideFooter />
+    </div>
+  );
+}
+
 function SourceList() {
   return (
     <div className="source-list">
@@ -3207,6 +3361,7 @@ function GuideHeader() {
           <a href="/ersatzteile">Ersatzteile</a>
           <BikeMenu />
           <a href="/#wissen">PDFs</a>
+          <a href="/faq">FAQ</a>
           <a href="/quellen">Quellen</a>
         </nav>
         <AccountMenu />
@@ -3517,6 +3672,7 @@ function WikiArticlePage({ article }: { article: WikiArticle }) {
           </div>
           <h1>{highlightWikiText(article.title, query, 'wiki-article-hero-title')}</h1>
           <p>{highlightWikiText(article.intro, query, 'wiki-article-hero-intro')}</p>
+          {article.lastUpdated && <div className="wiki-last-updated"><time dateTime={article.lastUpdated}>Zuletzt aktualisiert: {formatWikiDate(article.lastUpdated)}</time></div>}
         </section>
         <section className="wiki-article-section section-pad">
           <div className="wiki-search wiki-article-search card-doodle">

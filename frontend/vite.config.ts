@@ -38,6 +38,7 @@ const routeMetadata: Record<string, { title: string; description: string; robots
   '/passwort-zuruecksetzen': { title: 'Passwort zurücksetzen — Black Tea Hilfe', description: 'Passwort für ein BTM-Hilfe-Konto zurücksetzen.', robots: 'noindex,nofollow,noarchive' },
   '/bikes/bonfire': { title: 'Bonfire — Bikes — Black Tea Hilfe', description: 'Technische Wiki-Seite zur Black Tea Bonfire mit Handbuchdaten, Modellvarianten und nachvollziehbaren Quellen.' },
   '/bikes/wildfire': { title: 'Wildfire — Bikes — Black Tea Hilfe', description: 'Technische Wiki-Seite zur Black Tea Wildfire mit Handbuchdaten, Modellvarianten und nachvollziehbaren Quellen.' },
+  '/faq': { title: 'FAQ — Black Tea Hilfe', description: 'Eigenständig beantwortete Fragen zu Black Tea Bonfire und Wildfire: Varianten, Reichweite, Display, Akku, Bremsen und Wartung.' },
 };
 const securityHeaders = {
   'X-Content-Type-Options': 'nosniff',

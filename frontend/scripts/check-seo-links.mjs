@@ -77,6 +77,79 @@ function readDistText(pathname, label) {
   }
 }
 
+function readJsonLd(pathname, label) {
+  const html = readDistText(pathname, label);
+  const match = html.match(/<script id=["']site-jsonld["'][^>]*>([\s\S]*?)<\/script>/i);
+  if (!match) {
+    fail(`${label}: JSON-LD fehlt`);
+    return null;
+  }
+
+  try {
+    return JSON.parse(match[1]);
+  } catch (error) {
+    fail(`${label}: JSON-LD ist ungültig (${error.message})`);
+    return null;
+  }
+}
+
+function findSchemaObjects(value, type) {
+  if (Array.isArray(value)) return value.flatMap((item) => findSchemaObjects(item, type));
+  if (!value || typeof value !== 'object') return [];
+
+  const declaredTypes = Array.isArray(value['@type']) ? value['@type'] : [value['@type']];
+  const matches = declaredTypes.includes(type) ? [value] : [];
+  return [
+    ...matches,
+    ...Object.entries(value)
+      .filter(([key]) => key !== '@type')
+      .flatMap(([, child]) => findSchemaObjects(child, type)),
+  ];
+}
+
+async function checkStructuredData() {
+  const faqSchema = readJsonLd('/faq', 'Schema /faq');
+  if (faqSchema) {
+    const faqPages = findSchemaObjects(faqSchema, 'FAQPage');
+    checks += 1;
+    if (faqPages.length !== 1) {
+      fail(`Schema /faq: genau eine FAQPage erwartet, ${faqPages.length} gefunden`);
+    }
+
+    const questions = findSchemaObjects(faqSchema, 'Question');
+    checks += 1;
+    if (questions.length === 0) {
+      fail('Schema /faq: keine Questions gefunden');
+    }
+    for (const question of questions) {
+      checks += 1;
+      if (!question.name || !question.acceptedAnswer?.text) {
+        fail('Schema /faq: Question ohne Frage oder Antwort');
+      }
+    }
+  }
+
+  for (const pathname of ['/bikes/bonfire', '/bikes/wildfire']) {
+    const schema = readJsonLd(pathname, `Schema ${pathname}`);
+    if (!schema) continue;
+
+    checks += 1;
+    if (findSchemaObjects(schema, 'Product').length > 0 || findSchemaObjects(schema, 'Vehicle').length > 0) {
+      fail(`Schema ${pathname}: keine Product- oder Vehicle-Entität ohne Produktdaten ausgeben`);
+    }
+  }
+
+  const partSchema = readJsonLd('/ersatzteile/display', 'Schema /ersatzteile/display');
+  if (!partSchema) return;
+
+  for (const product of findSchemaObjects(partSchema, 'Product')) {
+    checks += 1;
+    if (!product.offers && !product.review && !product.aggregateRating) {
+      fail('Schema /ersatzteile/display: Product ohne offers, review oder aggregateRating');
+    }
+  }
+}
+
 function extractUrls(text) {
   return [...text.matchAll(/https?:\/\/[^\s)<>"']+/g)]
     .map(([value]) => value.replace(/[.,;:!?]+$/, ''));
@@ -208,6 +281,7 @@ if (!existsSync(distRoot)) {
   await checkLlmFiles();
   await checkPdfArchive();
   await checkAuthRoutes();
+  await checkStructuredData();
 }
 
 if (failures.length > 0) {
@@ -215,5 +289,5 @@ if (failures.length > 0) {
   for (const failure of failures) console.error(`- ${failure}`);
   process.exitCode = 1;
 } else {
-  console.log(`SEO-Linktest erfolgreich: ${checks} Checks für Sitemap, LLM-Dateien, PDF-Archiv und Auth-Routen.`);
+  console.log(`SEO-Linktest erfolgreich: ${checks} Checks für Sitemap, LLM-Dateien, PDF-Archiv, Auth-Routen und Structured Data.`);
 }
