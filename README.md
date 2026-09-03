@@ -13,8 +13,49 @@ Black Tea Motorcycles ist deshalb eine **unabhängige, nicht-offizielle Sammelst
 - Community-Erfahrungen, Reparaturhinweise und Fehlersymptome
 - Ersatzteilnamen, Teilenummern und mögliche Bezugsquellen
 - eine statische React/Vite-Website mit einer kleinen Symfony-API für Feedback und moderierte Kommentare
+- ein offenes Bikes-Wiki, dessen Markdown-Artikel per Pull Request gemeinschaftlich erweitert werden können
 
 Der Grundsatz lautet: **so viel wie möglich bewahren, aber nichts als offiziell, sicher, kompatibel oder aktuell ausgeben, wenn es nicht belegt ist.** Sicherheitskritische Arbeiten an Akku, Hochvolt, Bremse, Fahrwerk und Antrieb gehören in qualifizierte Hände.
+
+## Zum Bikes-Wiki beitragen
+
+Das Wiki ist der gemeinschaftliche Bereich für technische Informationen zu den Black Tea **Bonfire**- und **Wildfire**-Modellen. Die sichtbaren Einstiege findest du auf der Website unter:
+
+- [Bonfire-Wiki](https://btm.shortaktien.de/bikes/bonfire)
+- [Wildfire-Wiki](https://btm.shortaktien.de/bikes/wildfire)
+
+Die Inhalte liegen direkt im Repository unter [`content/wiki/`](content/wiki/). Jede Markdown-Datei wird beim nächsten Build automatisch als Wiki-Artikel eingebunden. `content/wiki/bonfire/index.md` erzeugt zum Beispiel die Bonfire-Seite; weitere Dateien in diesem Ordner werden zu eigenen Unterseiten. Entsprechend gilt das für `content/wiki/wildfire/`.
+
+### So kannst du einen Artikel ergänzen
+
+1. Repository auf GitHub forken und einen eigenen Branch anlegen.
+2. Einen bestehenden Artikel unter [`content/wiki/bonfire/`](content/wiki/bonfire/) oder [`content/wiki/wildfire/`](content/wiki/wildfire/) öffnen – oder eine neue Datei mit einem kurzen Dateinamen wie `akku-bms.md` anlegen.
+3. Den Artikel in Markdown schreiben: verständliche Überschriften, kurze Absätze und Listen verwenden.
+4. Jede technische Aussage mit Modellbezug und Quelle belegen. Bei PDFs möglichst den Dateinamen und die Seitenzahl im Text nennen; lokal gesicherte PDFs sind gegenüber flüchtigen externen Links vorzuziehen.
+5. Änderungen committen und einen Pull Request gegen `main` öffnen. Die [Beitragsregeln](CONTRIBUTING.md) und die Pull-Request-Checkliste helfen bei der Einreichung.
+
+Ein neuer oder geänderter Artikel wird erst nach der redaktionellen Prüfung veröffentlicht. So können Besitzer:innen beitragen, während unklare Angaben, private Daten und unbelegte Sicherheits- oder Kompatibilitätsversprechen draußen bleiben.
+
+### Kopfbereich eines Wiki-Artikels
+
+Jede Datei beginnt mit einem kleinen Metadatenblock. `model`, `source` und `sourceLabel` sollten immer gepflegt werden:
+
+```md
+---
+title: Akku und BMS
+model: Bonfire
+intro: Kurze Einordnung des Artikels für die Übersichtsseite.
+status: Entwurf
+source: /pdfs/15-bonfire-handbuch-lokal.pdf
+sourceLabel: Bonfire-Handbuch lokal öffnen
+---
+
+## Überblick
+
+Hier stehen die belegten, verständlich formulierten Informationen.
+```
+
+Für eine lokale Vorschau reicht anschließend `docker compose up --build`; die Seite ist dann unter `http://localhost:5173/bikes/bonfire` beziehungsweise `http://localhost:5173/bikes/wildfire` erreichbar. Ausführliche Formatregeln und die vollständige Checkliste stehen in [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 ## Rechtlicher und redaktioneller Hinweis
 
@@ -132,10 +173,13 @@ Die Frontend-API-Adresse ist für die Docker-Entwicklung über den Vite-Proxy vo
 frontend/              React/Vite-Website und öffentliche Archivdateien
 frontend/public/pdfs/  lokal gesicherte Handbücher, Pläne und Datenblätter
 backend/               Symfony-API, Health-Check und Kommentar-Moderation
+content/wiki/          gemeinschaftliche Wiki-Artikel zu Bonfire und Wildfire
 research/              Quellen, Provenienz, Ersatzteil- und Rechte-Metadaten
 docker-compose.yml     lokale Entwicklungsumgebung
 deploy/Caddyfile.btm.example  Caddy-Site-Block für btm.shortaktien.de
 ```
+
+Wiki-Beiträge werden über GitHub-Pull-Requests eingereicht und vor der Veröffentlichung geprüft. Format und Checkliste stehen in [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Neue Quellen oder Dokumente ergänzen
 
