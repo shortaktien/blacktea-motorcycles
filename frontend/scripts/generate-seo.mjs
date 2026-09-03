@@ -10,7 +10,16 @@ const siteConfig = JSON.parse(readFileSync(join(frontendRoot, 'src', 'site-confi
 const partsCatalog = JSON.parse(readFileSync(join(frontendRoot, '..', 'research', 'parts.json'), 'utf8'));
 const partDetailsCatalog = JSON.parse(readFileSync(join(frontendRoot, '..', 'research', 'parts-details.json'), 'utf8'));
 const siteOrigin = (process.env.VITE_SITE_URL || siteConfig.siteOrigin).replace(/\/+$/, '');
-const lastModified = process.env.SEO_LASTMOD || new Date().toISOString().slice(0, 10);
+const generatedAt = new Date().toISOString().slice(0, 10);
+const explicitLastmod = process.env.SEO_LASTMOD?.trim() || null;
+let lastmodByPath = {};
+if (process.env.SEO_LASTMOD_MAP) {
+  try {
+    lastmodByPath = JSON.parse(process.env.SEO_LASTMOD_MAP);
+  } catch (error) {
+    throw new Error(`SEO_LASTMOD_MAP ist kein gültiges JSON: ${error.message}`);
+  }
+}
 
 const guidePattern = /id:\s*'([^']+)',\s*path:\s*'([^']+)',\s*title:\s*'([^']+)',\s*model:\s*'([^']+)',\s*intro:\s*'([^']+)'/g;
 const guides = [...appSource.matchAll(guidePattern)].map((match) => ({
@@ -69,16 +78,16 @@ if (guides.length === 0) {
 }
 
 const staticPages = [
-  { path: '/', title: 'Black Tea Hilfe — Dokumente, Ersatzteile & Updates', description: 'Unabhängige Sammelstelle für Black Tea Motorbikes: lokale PDFs, Ersatzteile, Reparaturhilfen und nachvollziehbare Quellen.' },
-  { path: '/hilfe', title: 'Reparaturhilfe — Black Tea Hilfe', description: 'Redaktionell geordnete Reparaturhilfen für typische Bonfire- und Wildfire-Fehlerbilder — mit Kurzablauf, ausführlicher Prüfung, Sicherheit und Quelle.' },
-  { path: '/ersatzteile', title: 'Ersatzteile — Black Tea Hilfe', description: 'Historischer BTM-Ersatzteilkatalog mit Modellbezug, Teilenamen und Quellen. Bestand und Preise vor dem Kauf prüfen.' },
-  { path: '/community', title: 'BTM Community-Wissen — Black Tea Hilfe', description: 'Technische Hinweise aus der Black Tea Community verständlich zusammengefasst, mit lokalen PDFs und Originalquellen.' },
-  { path: '/quellen', title: 'Quellen — Black Tea Hilfe', description: 'Nachvollziehbare Quellen zu Insolvenzstatus, Handbüchern, lokalen PDFs, Ersatzteilspuren und Community-Wissen.' },
-  { path: '/impressum', title: 'Impressum — Black Tea Hilfe', description: 'Anbieterinformationen und rechtliche Hinweise zu Black Tea Hilfe.' },
-  { path: '/datenschutz', title: 'Datenschutz — Black Tea Hilfe', description: 'Datenschutzhinweise zu Kommentaren, Bildanhängen und dem Betrieb von Black Tea Hilfe.' },
-  { path: '/wiki', title: 'Wiki — Black Tea Hilfe', description: 'Das BTM-Wiki wird vorbereitet.' },
-  { path: '/bikes/bonfire', title: 'Bonfire — Bikes — Black Tea Hilfe', description: 'Technische Wiki-Seite zur Black Tea Bonfire mit Handbuchdaten, Modellvarianten und nachvollziehbaren Quellen.' },
-  { path: '/bikes/wildfire', title: 'Wildfire — Bikes — Black Tea Hilfe', description: 'Technische Wiki-Seite zur Black Tea Wildfire mit Handbuchdaten, Modellvarianten und nachvollziehbaren Quellen.' },
+  { path: '/', title: 'Black Tea Motorbikes – Hilfe — Dokumente, Ersatzteile & Updates', description: 'Unabhängige Sammelstelle für Black Tea Motorbikes: lokale PDFs, Ersatzteile, Reparaturhilfen und nachvollziehbare Quellen.' },
+  { path: '/hilfe', title: 'Reparaturhilfe — Black Tea Motorbikes – Hilfe', description: 'Redaktionell geordnete Reparaturhilfen für typische Bonfire- und Wildfire-Fehlerbilder — mit Kurzablauf, ausführlicher Prüfung, Sicherheit und Quelle.' },
+  { path: '/ersatzteile', title: 'Ersatzteile — Black Tea Motorbikes – Hilfe', description: 'Historischer BTM-Ersatzteilkatalog mit Modellbezug, Teilenamen und Quellen. Bestand und Preise vor dem Kauf prüfen.' },
+  { path: '/community', title: 'BTM Community-Wissen — Black Tea Motorbikes – Hilfe', description: 'Technische Hinweise aus der Black Tea Community verständlich zusammengefasst, mit lokalen PDFs und Originalquellen.' },
+  { path: '/quellen', title: 'Quellen — Black Tea Motorbikes – Hilfe', description: 'Nachvollziehbare Quellen zu Insolvenzstatus, Handbüchern, lokalen PDFs, Ersatzteilspuren und Community-Wissen.' },
+  { path: '/impressum', title: 'Impressum — Black Tea Motorbikes – Hilfe', description: 'Anbieterinformationen und rechtliche Hinweise zu Black Tea Motorbikes – Hilfe.' },
+  { path: '/datenschutz', title: 'Datenschutz — Black Tea Motorbikes – Hilfe', description: 'Datenschutzhinweise zu Kommentaren, Bildanhängen und dem Betrieb von Black Tea Motorbikes – Hilfe.' },
+  { path: '/wiki', title: 'Wiki — Black Tea Motorbikes – Hilfe', description: 'Das BTM-Wiki wird vorbereitet.' },
+  { path: '/bikes/bonfire', title: 'Bonfire — Bikes — Black Tea Motorbikes – Hilfe', description: 'Technische Wiki-Seite zur Black Tea Bonfire mit Handbuchdaten, Modellvarianten und nachvollziehbaren Quellen.' },
+  { path: '/bikes/wildfire', title: 'Wildfire — Bikes — Black Tea Motorbikes – Hilfe', description: 'Technische Wiki-Seite zur Black Tea Wildfire mit Handbuchdaten, Modellvarianten und nachvollziehbaren Quellen.' },
 ];
 
 const pdfFiles = readdirSync(join(publicRoot, 'pdfs')).filter((file) => file.toLowerCase().endsWith('.pdf')).sort();
@@ -93,11 +102,15 @@ const ownPaths = [...new Set([
 
 const absoluteUrl = (path) => `${siteOrigin}${path === '/' ? '/' : path}`;
 const escapeXml = (value) => value.replace(/[<>&'\"]/g, (character) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', "'": '&apos;', '"': '&quot;' }[character]));
+const lastmodFor = (path) => {
+  const value = lastmodByPath[path] ?? explicitLastmod;
+  return typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value) ? `<lastmod>${value}</lastmod>` : '';
+};
 
 const sitemap = [
   '<?xml version="1.0" encoding="UTF-8"?>',
   '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
-  ...ownPaths.map((path) => `  <url><loc>${escapeXml(absoluteUrl(path))}</loc><lastmod>${lastModified}</lastmod></url>`),
+  ...ownPaths.map((path) => `  <url><loc>${escapeXml(absoluteUrl(path))}</loc>${lastmodFor(path)}</url>`),
   '</urlset>',
   '',
 ].join('\n');
@@ -107,7 +120,7 @@ const pdfLinks = pdfFiles.map((file) => `- [${file}](${absoluteUrl(`/pdfs/${file
 const wikiLinks = wikiArticles.map((article) => `- [${article.title}](${absoluteUrl(article.path)}): ${article.model}. ${article.intro}`).join('\n');
 
 const llms = [
-  '# Black Tea Hilfe',
+  '# Black Tea Motorbikes – Hilfe',
   '',
   '> Unabhängige deutschsprachige Sammelstelle für Black Tea Motorbikes mit lokalen Dokumenten, Ersatzteilspuren, Reparaturhilfen und überprüfbaren Quellen.',
   '',
@@ -141,13 +154,13 @@ const llms = [
 ].join('\n');
 
 const fullLlms = [
-  '# Black Tea Hilfe — vollständiger Inhaltsindex',
+  '# Black Tea Motorbikes – Hilfe — vollständiger Inhaltsindex',
   '',
-  `> Vollständige, maschinenlesbare Übersicht der öffentlich zugänglichen Inhalte von ${siteOrigin}. Stand: ${lastModified}.`,
+  `> Vollständige, maschinenlesbare Übersicht der öffentlich zugänglichen Inhalte von ${siteOrigin}. Build-Index: ${generatedAt}.`,
   '',
   '## Einordnung',
   '',
-  '- Black Tea Hilfe ist eine unabhängige private Sammelstelle und nicht mit der Black Tea Motorbikes GmbH verbunden.',
+  '- Black Tea Motorbikes – Hilfe ist eine unabhängige private Sammelstelle und nicht mit der Black Tea Motorbikes GmbH verbunden.',
   '- Die offiziellen Seiten und Shopangaben können historisch sein. Preise, Bestand, Modellzuordnung und Passform müssen vor jeder Bestellung geprüft werden.',
   '- Community-Hinweise werden redaktionell gekürzt und mit Quellen versehen. Sie ersetzen keine Reparatur-, Rechts- oder Garantieberatung.',
   '- Akku, BMS, Hochvolt, Controller, Fahrwerk und Bremsen sind sicherheitskritisch. Keine Arbeiten unter Spannung oder ohne passende Fachkenntnis empfehlen.',
@@ -199,7 +212,7 @@ const fullLlms = [
   '',
   '## Daten und Aktualität',
   '',
-  `- Letzte automatische Index-Aktualisierung: ${lastModified}.`,
+  `- Automatischer Index-Build: ${generatedAt}.`,
   '- Für aktuelle Verfügbarkeit, Preise und rechtliche Verfahrensstände immer die jeweils verlinkte Quelle und den eigenen Modell-/Baujahrstand prüfen.',
   '',
 ].join('\n');

@@ -1,6 +1,6 @@
 # Zum Wiki beitragen
 
-Black Tea Hilfe ist ein offenes, gemeinschaftlich gepflegtes Archiv. Jeder kann Verbesserungen, Ergänzungen und neue Wiki-Artikel vorschlagen.
+Black Tea Motorbikes – Hilfe ist ein offenes, gemeinschaftlich gepflegtes Archiv. Jeder kann Verbesserungen, Ergänzungen und neue Wiki-Artikel vorschlagen.
 
 ## Ohne GitHub mitmachen
 

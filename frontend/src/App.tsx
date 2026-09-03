@@ -1580,7 +1580,7 @@ type SeoMetadata = {
 const websiteSchema = {
   '@type': 'WebSite',
   '@id': `${siteOrigin}/#website`,
-  name: 'Black Tea Hilfe',
+  name: 'Black Tea Motorbikes – Hilfe',
   url: `${siteOrigin}/`,
   inLanguage: 'de-DE',
 };
@@ -1598,7 +1598,7 @@ const breadcrumbSchema = (items: Array<{ name: string; url: string }>) => ({
 function getSeoMetadata(path: string, guide?: RepairGuide, part?: HistoricalShopPart, bike?: BikeProfile, wikiArticle?: WikiArticle): SeoMetadata {
   if (path === '/admin') {
     return {
-      title: 'Admin — Black Tea Hilfe',
+      title: 'Admin — Black Tea Motorbikes – Hilfe',
       description: 'Interner Bereich zur redaktionellen Prüfung von Kommentaren.',
       canonicalPath: '/admin',
       robots: 'noindex,nofollow,noarchive',
@@ -1608,7 +1608,7 @@ function getSeoMetadata(path: string, guide?: RepairGuide, part?: HistoricalShop
 
   if (guide) {
     return {
-      title: `${guide.title} — Black Tea Hilfe`,
+      title: `${guide.title} — Black Tea Motorbikes – Hilfe`,
       description: guide.intro,
       canonicalPath: guide.path,
       robots: 'index,follow,max-image-preview:large',
@@ -1644,7 +1644,7 @@ function getSeoMetadata(path: string, guide?: RepairGuide, part?: HistoricalShop
   if (part) {
     const description = `${part.title} für ${part.model}: historischer BTM-Shop-Eintrag mit lokal gesicherten Archivdaten und Bezugsstatus ohne unbestätigte Kaufempfehlung.`;
     return {
-      title: `${part.title} — Ersatzteil — Black Tea Hilfe`,
+      title: `${part.title} — Ersatzteil — Black Tea Motorbikes – Hilfe`,
       description,
       canonicalPath: part.path,
       robots: 'index,follow,max-image-preview:large',
@@ -1675,7 +1675,7 @@ function getSeoMetadata(path: string, guide?: RepairGuide, part?: HistoricalShop
 
   if (wikiArticle) {
     return {
-      title: `${wikiArticle.title} — ${wikiArticle.model} — Black Tea Hilfe`,
+      title: `${wikiArticle.title} — ${wikiArticle.model} — Black Tea Motorbikes – Hilfe`,
       description: wikiArticle.intro,
       canonicalPath: wikiArticle.path,
       robots: 'index,follow,max-image-preview:large',
@@ -1705,7 +1705,7 @@ function getSeoMetadata(path: string, guide?: RepairGuide, part?: HistoricalShop
 
   if (bike) {
     return {
-      title: `${bike.name} — Bikes — Black Tea Hilfe`,
+      title: `${bike.name} — Bikes — Black Tea Motorbikes – Hilfe`,
       description: bike.description,
       canonicalPath: bike.path,
       robots: 'index,follow,max-image-preview:large',
@@ -1716,7 +1716,7 @@ function getSeoMetadata(path: string, guide?: RepairGuide, part?: HistoricalShop
           {
             '@type': 'WebPage',
             '@id': `${siteOrigin}${bike.path}#webpage`,
-            name: `${bike.name} — Bikes — Black Tea Hilfe`,
+            name: `${bike.name} — Bikes — Black Tea Motorbikes – Hilfe`,
             description: bike.description,
             url: `${siteOrigin}${bike.path}`,
             inLanguage: 'de-DE',
@@ -1734,39 +1734,48 @@ function getSeoMetadata(path: string, guide?: RepairGuide, part?: HistoricalShop
 
   const metadata: Record<string, { title: string; description: string }> = {
     '/': {
-      title: 'Black Tea Hilfe — Dokumente, Ersatzteile & Updates',
+      title: 'Black Tea Motorbikes – Hilfe — Dokumente, Ersatzteile & Updates',
       description: 'Unabhängige Sammelstelle für Black Tea Motorbikes: lokale PDFs, Ersatzteile, Reparaturhilfen und nachvollziehbare Quellen.',
     },
     '/hilfe': {
-      title: 'Reparaturhilfe — Black Tea Hilfe',
+      title: 'Reparaturhilfe — Black Tea Motorbikes – Hilfe',
       description: 'Redaktionell geordnete Reparaturhilfen für typische Bonfire- und Wildfire-Fehlerbilder — mit Kurzablauf, ausführlicher Prüfung, Sicherheit und Quelle.',
     },
     '/ersatzteile': {
-      title: 'Ersatzteile — Black Tea Hilfe',
+      title: 'Ersatzteile — Black Tea Motorbikes – Hilfe',
       description: 'Historischer BTM-Ersatzteilkatalog mit Modellbezug, Teilenamen und Quellen. Bestand und Preise vor dem Kauf prüfen.',
     },
     '/community': {
-      title: 'BTM Community-Wissen — Black Tea Hilfe',
+      title: 'BTM Community-Wissen — Black Tea Motorbikes – Hilfe',
       description: 'Technische Hinweise aus der Black Tea Community verständlich zusammengefasst, mit lokalen PDFs und Originalquellen.',
     },
     '/quellen': {
-      title: 'Quellen — Black Tea Hilfe',
+      title: 'Quellen — Black Tea Motorbikes – Hilfe',
       description: 'Nachvollziehbare Quellen zu Insolvenzstatus, Handbüchern, lokalen PDFs, Ersatzteilspuren und Community-Wissen.',
     },
     '/impressum': {
-      title: 'Impressum — Black Tea Hilfe',
-      description: 'Anbieterinformationen und rechtliche Hinweise zu Black Tea Hilfe.',
+      title: 'Impressum — Black Tea Motorbikes – Hilfe',
+      description: 'Anbieterinformationen und rechtliche Hinweise zu Black Tea Motorbikes – Hilfe.',
     },
     '/datenschutz': {
-      title: 'Datenschutz — Black Tea Hilfe',
-      description: 'Datenschutzhinweise zu Kommentaren, Bildanhängen und dem Betrieb von Black Tea Hilfe.',
+      title: 'Datenschutz — Black Tea Motorbikes – Hilfe',
+      description: 'Datenschutzhinweise zu Kommentaren, Bildanhängen und dem Betrieb von Black Tea Motorbikes – Hilfe.',
     },
     '/wiki': {
-      title: 'Wiki — Black Tea Hilfe',
+      title: 'Wiki — Black Tea Motorbikes – Hilfe',
       description: 'Technische Grundlagen, Handbuchdaten und nachvollziehbare Hinweise zu den Black Tea Bikes Bonfire und Wildfire.',
     },
   };
-  const page = metadata[path] ?? metadata['/'];
+  const page = metadata[path];
+  if (!page) {
+    return {
+      title: 'Seite nicht gefunden — Black Tea Motorbikes – Hilfe',
+      description: 'Die angeforderte Seite wurde nicht gefunden.',
+      canonicalPath: path,
+      robots: 'noindex,nofollow,noarchive',
+      jsonLd: {},
+    };
+  }
   const collectionItems = path === '/hilfe'
     ? repairGuides.map((item) => ({ name: item.title, url: `${siteOrigin}${item.path}` }))
     : path === '/ersatzteile'
@@ -1842,8 +1851,8 @@ function applySeoMetadata(metadata: SeoMetadata): void {
   structuredData.textContent = JSON.stringify(metadata.jsonLd);
 }
 
-function App() {
-  const [locationKey, setLocationKey] = useState(() => getLocationKey());
+function App({ initialPath }: { initialPath?: string } = {}) {
+  const [locationKey, setLocationKey] = useState(() => initialPath ?? getLocationKey());
 
   useEffect(() => {
     const handleLocationChange = () => setLocationKey(getLocationKey());
@@ -1861,6 +1870,19 @@ function App() {
   const bike = bikeProfiles.find((candidate) => candidate.path === path);
   const wikiArticle = wikiArticles.find((candidate) => candidate.path === path);
   const seoMetadata = getSeoMetadata(path, guide, part, bike, wikiArticle);
+  const isKnownPath = path === '/'
+    || path === '/admin'
+    || path === '/hilfe'
+    || path === '/ersatzteile'
+    || path === '/community'
+    || path === '/quellen'
+    || path === '/impressum'
+    || path === '/datenschutz'
+    || path === '/wiki'
+    || Boolean(guide)
+    || Boolean(part)
+    || Boolean(bike)
+    || Boolean(wikiArticle);
 
   useEffect(() => {
     applySeoMetadata(seoMetadata);
@@ -1878,7 +1900,23 @@ function App() {
   if (bike) return <BikePage bike={bike} article={wikiArticle} />;
   if (wikiArticle) return <WikiArticlePage article={wikiArticle} />;
   if (path === '/wiki') return <WikiPage />;
+  if (!isKnownPath) return <NotFoundPage path={path} />;
   return <HomePage />;
+}
+
+function NotFoundPage({ path }: { path: string }) {
+  return (
+    <div className="site-shell">
+      <GuideHeader />
+      <main className="not-found-page section-pad">
+        <div className="eyebrow handwritten">404 · nicht gefunden</div>
+        <h1>Diese Seite gibt es nicht.</h1>
+        <p>Der Pfad <code>{path}</code> gehört nicht zu den veröffentlichten Inhalten von Black Tea Motorbikes – Hilfe.</p>
+        <a className="resource-link" href="/">Zur Startseite ↗</a>
+      </main>
+      <GuideFooter />
+    </div>
+  );
 }
 
 function HomePage() {
@@ -1886,7 +1924,7 @@ function HomePage() {
   const [query, setQuery] = useState('');
 
   useEffect(() => {
-    document.title = 'Black Tea Hilfe — Dokumente, Ersatzteile & Updates';
+    document.title = 'Black Tea Motorbikes – Hilfe — Dokumente, Ersatzteile & Updates';
   }, []);
 
   const filteredResources = useMemo(() => {
@@ -1911,9 +1949,9 @@ function HomePage() {
   return (
     <div className="site-shell">
       <header className="site-header">
-        <a className="wordmark" href="#top" aria-label="Black Tea Hilfe Startseite">
+        <a className="wordmark" href="#top" aria-label="Black Tea Motorbikes – Hilfe Startseite">
           <span className="wordmark-mark" aria-hidden="true">BTM</span>
-          <span>blacktea <strong>hilfe</strong></span>
+          <span>black tea motorbikes – <strong>hilfe</strong></span>
         </a>
         <nav className="main-nav" aria-label="Hauptnavigation">
           <a href="#status">Status</a>
@@ -1923,9 +1961,6 @@ function HomePage() {
           <BikeMenu />
           <a href="/quellen">Quellen</a>
         </nav>
-        <a className="header-link" href={localPartArchiveHref}>
-          Quellen & Archivstand ↗
-        </a>
       </header>
 
       <main id="top">
@@ -2082,9 +2117,9 @@ function HomePage() {
       </main>
 
       <footer className="site-footer">
-        <span className="wordmark"><span className="wordmark-mark" aria-hidden="true">BTM</span>blacktea <strong>hilfe</strong></span>
+        <span className="wordmark"><span className="wordmark-mark" aria-hidden="true">BTM</span>black tea motorbikes – <strong>hilfe</strong></span>
         <span className="handwritten">gebaut für die leute, die weiterfahren wollen.</span>
-        <span className="footer-links"><a href="/impressum">Impressum</a><a href="/datenschutz">Datenschutz</a></span>
+        <span className="footer-links"><a href={localPartArchiveHref}>Quellen &amp; Archivstand</a><a href="/impressum">Impressum</a><a href="/datenschutz">Datenschutz</a></span>
         <a href="#top">nach oben ↑</a>
       </footer>
     </div>
@@ -2093,7 +2128,7 @@ function HomePage() {
 
 function SourcesPage() {
   useEffect(() => {
-    document.title = 'Quellen — Black Tea Hilfe';
+    document.title = 'Quellen — Black Tea Motorbikes – Hilfe';
     window.scrollTo(0, 0);
   }, []);
 
@@ -2148,7 +2183,7 @@ function LegalPage({ kind }: { kind: 'impressum' | 'datenschutz' }) {
   const isPrivacy = kind === 'datenschutz';
 
   useEffect(() => {
-    document.title = `${isPrivacy ? 'Datenschutz' : 'Impressum'} — Black Tea Hilfe`;
+    document.title = `${isPrivacy ? 'Datenschutz' : 'Impressum'} — Black Tea Motorbikes – Hilfe`;
     window.scrollTo(0, 0);
   }, [isPrivacy]);
 
@@ -2160,7 +2195,7 @@ function LegalPage({ kind }: { kind: 'impressum' | 'datenschutz' }) {
           <a className="repair-back" href="/">← Zur Sammelmappe</a>
           <div className="eyebrow handwritten">rechtliches</div>
           <h1>{isPrivacy ? 'Datenschutz' : 'Impressum'}</h1>
-          <p>{isPrivacy ? 'Wie Kommentare, Bildanhänge und technisch notwendige Zugriffsdaten bei Black Tea Hilfe verarbeitet werden.' : 'Anbieterinformationen und rechtliche Hinweise zu dieser unabhängigen Sammelstelle.'}</p>
+          <p>{isPrivacy ? 'Wie Kommentare, Bildanhänge und technisch notwendige Zugriffsdaten bei Black Tea Motorbikes – Hilfe verarbeitet werden.' : 'Anbieterinformationen und rechtliche Hinweise zu dieser unabhängigen Sammelstelle.'}</p>
         </section>
 
         <section className="legal-page-section section-pad">
@@ -2188,7 +2223,7 @@ function LegalPage({ kind }: { kind: 'impressum' | 'datenschutz' }) {
                 <p>Alexander Komissarov<br />Teplitzer Str. 104<br />01219 Dresden<br />Deutschland</p>
                 <h3>Kontakt</h3>
                 <p>E-Mail: <a href="mailto:hallo@shortaktien.de">hallo@shortaktien.de</a></p>
-                <p>Black Tea Hilfe ist eine unabhängige private Sammelstelle für Dokumente, Ersatzteilspuren und Community-Hinweise. Es besteht keine Verbindung zur Black Tea Motorbikes GmbH.</p>
+                <p>Black Tea Motorbikes – Hilfe ist eine unabhängige private Sammelstelle für Dokumente, Ersatzteilspuren und Community-Hinweise. Es besteht keine Verbindung zur Black Tea Motorbikes GmbH.</p>
                 <h3>Haftung für Inhalte und Links</h3>
                 <p>Die Inhalte werden mit Sorgfalt zusammengestellt. Für Richtigkeit, Vollständigkeit und Aktualität wird keine Gewähr übernommen. Für externe Seiten sind die jeweiligen Anbieter verantwortlich.</p>
               </>
@@ -2221,9 +2256,9 @@ function ResourceCard({ resource, index }: { resource: Resource; index: number }
 function GuideHeader() {
   return (
     <header className="site-header">
-      <a className="wordmark" href="/" aria-label="Black Tea Hilfe Startseite">
+      <a className="wordmark" href="/" aria-label="Black Tea Motorbikes – Hilfe Startseite">
         <span className="wordmark-mark" aria-hidden="true">BTM</span>
-        <span>blacktea <strong>hilfe</strong></span>
+        <span>black tea motorbikes – <strong>hilfe</strong></span>
       </a>
       <nav className="main-nav" aria-label="Hauptnavigation">
         <a href="/#status">Status</a>
@@ -2233,9 +2268,6 @@ function GuideHeader() {
         <BikeMenu />
         <a href="/quellen">Quellen</a>
       </nav>
-      <a className="header-link" href={localPartArchiveHref}>
-        Quellen & Archivstand ↗
-      </a>
     </header>
   );
 }
@@ -2261,9 +2293,9 @@ function BikeMenu() {
 function GuideFooter() {
   return (
     <footer className="site-footer">
-      <span className="wordmark"><span className="wordmark-mark" aria-hidden="true">BTM</span>blacktea <strong>hilfe</strong></span>
+      <span className="wordmark"><span className="wordmark-mark" aria-hidden="true">BTM</span>black tea motorbikes – <strong>hilfe</strong></span>
       <span className="handwritten">gebaut für die leute, die weiterfahren wollen.</span>
-      <span className="footer-links"><a href="/impressum">Impressum</a><a href="/datenschutz">Datenschutz</a></span>
+      <span className="footer-links"><a href={localPartArchiveHref}>Quellen &amp; Archivstand</a><a href="/impressum">Impressum</a><a href="/datenschutz">Datenschutz</a></span>
       <a href="/hilfe">zur Reparatur ↑</a>
     </footer>
   );
@@ -2273,7 +2305,7 @@ function WikiPage() {
   const [query, setQuery] = useState('');
 
   useEffect(() => {
-    document.title = 'Wiki — Black Tea Hilfe';
+    document.title = 'Wiki — Black Tea Motorbikes – Hilfe';
     window.scrollTo(0, 0);
   }, []);
 
@@ -2322,7 +2354,7 @@ function WikiPage() {
 
 function BikePage({ bike, article }: { bike: BikeProfile; article?: WikiArticle }) {
   useEffect(() => {
-    document.title = `${article?.title ?? bike.name} — ${article?.model ?? 'Bikes'} — Black Tea Hilfe`;
+    document.title = `${article?.title ?? bike.name} — ${article?.model ?? 'Bikes'} — Black Tea Motorbikes – Hilfe`;
     window.scrollTo(0, 0);
   }, [article?.model, article?.title, bike.name]);
 
@@ -2353,7 +2385,7 @@ function BikePage({ bike, article }: { bike: BikeProfile; article?: WikiArticle 
 
 function WikiArticlePage({ article }: { article: WikiArticle }) {
   useEffect(() => {
-    document.title = `${article.title} — ${article.model} — Black Tea Hilfe`;
+    document.title = `${article.title} — ${article.model} — Black Tea Motorbikes – Hilfe`;
     window.scrollTo(0, 0);
   }, [article.model, article.title]);
 
@@ -2558,7 +2590,7 @@ function WikiContributionForm({ guideSlug, heading, onSubmitted }: { guideSlug: 
 
 function RepairGuideIndexPage() {
   useEffect(() => {
-    document.title = 'Reparaturhilfe — Black Tea Hilfe';
+    document.title = 'Reparaturhilfe — Black Tea Motorbikes – Hilfe';
     window.scrollTo(0, 0);
   }, []);
 
@@ -2591,7 +2623,7 @@ function RepairGuideIndexPage() {
 
 function RepairGuidePage({ guide }: { guide: RepairGuide }) {
   useEffect(() => {
-    document.title = `${guide.title} — Black Tea Hilfe`;
+    document.title = `${guide.title} — Black Tea Motorbikes – Hilfe`;
     window.scrollTo(0, 0);
   }, [guide.title]);
 
@@ -2815,7 +2847,7 @@ function AdminPage() {
   const [notice, setNotice] = useState('');
 
   useEffect(() => {
-    document.title = 'Admin — Black Tea Hilfe';
+    document.title = 'Admin — Black Tea Motorbikes – Hilfe';
     window.scrollTo(0, 0);
     void checkSession();
   }, []);
@@ -2975,7 +3007,7 @@ function AdminPage() {
 
 function CommunityPage() {
   useEffect(() => {
-    document.title = 'BTM Community-Wissen — Black Tea Hilfe';
+    document.title = 'BTM Community-Wissen — Black Tea Motorbikes – Hilfe';
     window.scrollTo(0, 0);
   }, []);
 
@@ -3052,7 +3084,7 @@ function PartsPage() {
   const [query, setQuery] = useState('');
 
   useEffect(() => {
-    document.title = 'Ersatzteile — Black Tea Hilfe';
+    document.title = 'Ersatzteile — Black Tea Motorbikes – Hilfe';
     window.scrollTo(0, 0);
   }, []);
 
@@ -3150,7 +3182,7 @@ function PartAvailabilityBadge({ part }: { part: HistoricalShopPart }) {
 
 function PartDetailPage({ part }: { part: HistoricalShopPart }) {
   useEffect(() => {
-    document.title = `${part.title} — Ersatzteil — Black Tea Hilfe`;
+    document.title = `${part.title} — Ersatzteil — Black Tea Motorbikes – Hilfe`;
     window.scrollTo(0, 0);
   }, [part.title]);
 

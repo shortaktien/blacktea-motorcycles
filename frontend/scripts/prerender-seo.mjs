@@ -11,6 +11,7 @@ const partsCatalog = JSON.parse(readFileSync(join(frontendRoot, '..', 'research'
 const partDetailsCatalog = JSON.parse(readFileSync(join(frontendRoot, '..', 'research', 'parts-details.json'), 'utf8'));
 const siteOrigin = (process.env.VITE_SITE_URL || siteConfig.siteOrigin).replace(/\/+$/, '');
 const indexPath = join(distRoot, 'index.html');
+const serverEntryPath = join(frontendRoot, 'dist-server', 'entry-server.js');
 
 const guidePattern = /id:\s*'([^']+)',\s*path:\s*'([^']+)',\s*title:\s*'([^']+)',\s*model:\s*'([^']+)',\s*intro:\s*'([^']+)',\s*steps:\s*\[([\s\S]*?)\]\s*,\s*safety:/g;
 const guides = [...appSource.matchAll(guidePattern)].map((match) => ({
@@ -70,17 +71,17 @@ if (guides.length === 0 || !readFileSync(indexPath, 'utf8')) {
 }
 
 const staticPages = [
-  { path: '/', title: 'Black Tea Hilfe — Dokumente, Ersatzteile & Updates', description: 'Unabhängige Sammelstelle für Black Tea Motorbikes: lokale PDFs, Ersatzteile, Reparaturhilfen und nachvollziehbare Quellen.' },
-  { path: '/hilfe', title: 'Reparaturhilfe — Black Tea Hilfe', description: 'Redaktionell geordnete Reparaturhilfen für typische Bonfire- und Wildfire-Fehlerbilder — mit Kurzablauf, ausführlicher Prüfung, Sicherheit und Quelle.' },
-  { path: '/ersatzteile', title: 'Ersatzteile — Black Tea Hilfe', description: 'Historischer BTM-Ersatzteilkatalog mit Modellbezug, Teilenamen und Quellen. Bestand und Preise vor dem Kauf prüfen.' },
-  { path: '/community', title: 'BTM Community-Wissen — Black Tea Hilfe', description: 'Technische Hinweise aus der Black Tea Community verständlich zusammengefasst, mit lokalen PDFs und Originalquellen.' },
-  { path: '/quellen', title: 'Quellen — Black Tea Hilfe', description: 'Nachvollziehbare Quellen zu Insolvenzstatus, Handbüchern, lokalen PDFs, Ersatzteilspuren und Community-Wissen.' },
-  { path: '/impressum', title: 'Impressum — Black Tea Hilfe', description: 'Anbieterinformationen und rechtliche Hinweise zu Black Tea Hilfe.' },
-  { path: '/datenschutz', title: 'Datenschutz — Black Tea Hilfe', description: 'Datenschutzhinweise zu Kommentaren, Bildanhängen und dem Betrieb von Black Tea Hilfe.' },
-  { path: '/wiki', title: 'Wiki — Black Tea Hilfe', description: 'Das BTM-Wiki wird vorbereitet.' },
-  { path: '/bikes/bonfire', title: 'Bonfire — Bikes — Black Tea Hilfe', description: 'Technische Wiki-Seite zur Black Tea Bonfire mit Handbuchdaten, Modellvarianten und nachvollziehbaren Quellen.' },
-  { path: '/bikes/wildfire', title: 'Wildfire — Bikes — Black Tea Hilfe', description: 'Technische Wiki-Seite zur Black Tea Wildfire mit Handbuchdaten, Modellvarianten und nachvollziehbaren Quellen.' },
-  { path: '/admin', title: 'Admin — Black Tea Hilfe', description: 'Interner Bereich zur redaktionellen Prüfung von Kommentaren.', robots: 'noindex,nofollow,noarchive' },
+  { path: '/', title: 'Black Tea Motorbikes – Hilfe — Dokumente, Ersatzteile & Updates', description: 'Unabhängige Sammelstelle für Black Tea Motorbikes: lokale PDFs, Ersatzteile, Reparaturhilfen und nachvollziehbare Quellen.' },
+  { path: '/hilfe', title: 'Reparaturhilfe — Black Tea Motorbikes – Hilfe', description: 'Redaktionell geordnete Reparaturhilfen für typische Bonfire- und Wildfire-Fehlerbilder — mit Kurzablauf, ausführlicher Prüfung, Sicherheit und Quelle.' },
+  { path: '/ersatzteile', title: 'Ersatzteile — Black Tea Motorbikes – Hilfe', description: 'Historischer BTM-Ersatzteilkatalog mit Modellbezug, Teilenamen und Quellen. Bestand und Preise vor dem Kauf prüfen.' },
+  { path: '/community', title: 'BTM Community-Wissen — Black Tea Motorbikes – Hilfe', description: 'Technische Hinweise aus der Black Tea Community verständlich zusammengefasst, mit lokalen PDFs und Originalquellen.' },
+  { path: '/quellen', title: 'Quellen — Black Tea Motorbikes – Hilfe', description: 'Nachvollziehbare Quellen zu Insolvenzstatus, Handbüchern, lokalen PDFs, Ersatzteilspuren und Community-Wissen.' },
+  { path: '/impressum', title: 'Impressum — Black Tea Motorbikes – Hilfe', description: 'Anbieterinformationen und rechtliche Hinweise zu Black Tea Motorbikes – Hilfe.' },
+  { path: '/datenschutz', title: 'Datenschutz — Black Tea Motorbikes – Hilfe', description: 'Datenschutzhinweise zu Kommentaren, Bildanhängen und dem Betrieb von Black Tea Motorbikes – Hilfe.' },
+  { path: '/wiki', title: 'Wiki — Black Tea Motorbikes – Hilfe', description: 'Das BTM-Wiki wird vorbereitet.' },
+  { path: '/bikes/bonfire', title: 'Bonfire — Bikes — Black Tea Motorbikes – Hilfe', description: 'Technische Wiki-Seite zur Black Tea Bonfire mit Handbuchdaten, Modellvarianten und nachvollziehbaren Quellen.' },
+  { path: '/bikes/wildfire', title: 'Wildfire — Bikes — Black Tea Motorbikes – Hilfe', description: 'Technische Wiki-Seite zur Black Tea Wildfire mit Handbuchdaten, Modellvarianten und nachvollziehbaren Quellen.' },
+  { path: '/admin', title: 'Admin — Black Tea Motorbikes – Hilfe', description: 'Interner Bereich zur redaktionellen Prüfung von Kommentaren.', robots: 'noindex,nofollow,noarchive' },
 ];
 
 const pages = [
@@ -90,23 +91,24 @@ const pages = [
   }),
   ...wikiArticles
     .filter((article) => !staticPages.some((page) => page.path === article.path))
-    .map((article) => ({ ...article, title: `${article.title} — ${article.model} — Black Tea Hilfe`, description: article.intro, robots: 'index,follow,max-image-preview:large', wikiArticle: article })),
-  ...guides.map((guide) => ({ ...guide, title: `${guide.title} — Black Tea Hilfe`, description: guide.intro, robots: 'index,follow,max-image-preview:large', guide })),
+    .map((article) => ({ ...article, title: `${article.title} — ${article.model} — Black Tea Motorbikes – Hilfe`, description: article.intro, robots: 'index,follow,max-image-preview:large', wikiArticle: article })),
+  ...guides.map((guide) => ({ ...guide, title: `${guide.title} — Black Tea Motorbikes – Hilfe`, description: guide.intro, robots: 'index,follow,max-image-preview:large', guide })),
   ...parts.map((part) => ({
     ...part,
-    title: `${part.title} — Ersatzteil — Black Tea Hilfe`,
+    title: `${part.title} — Ersatzteil — Black Tea Motorbikes – Hilfe`,
     description: `${part.title} für Black Tea Motorbikes: historischer BTM-Shop-Eintrag mit lokal gesicherten Archivdaten und Bezugsstatus ohne unbestätigte Kaufempfehlung.`,
     robots: 'index,follow,max-image-preview:large',
     part,
   })),
 ];
 const source = readFileSync(indexPath, 'utf8');
+const { render } = await import(serverEntryPath);
 const absoluteUrl = (path) => `${siteOrigin}${path === '/' ? '/' : path}`;
 const escapeAttribute = (value) => String(value).replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character]));
 const websiteSchema = {
   '@type': 'WebSite',
   '@id': `${siteOrigin}/#website`,
-  name: 'Black Tea Hilfe',
+  name: 'Black Tea Motorbikes – Hilfe',
   url: `${siteOrigin}/`,
   inLanguage: 'de-DE',
 };
@@ -176,6 +178,7 @@ const replaceTag = (html, pattern, replacement) => html.replace(pattern, replace
 
 for (const page of pages) {
   let html = source;
+  const renderedBody = render(page.path);
   const robots = page.robots || 'index,follow,max-image-preview:large';
   const canonical = absoluteUrl(page.path);
   html = replaceTag(html, /<title>[\s\S]*?<\/title>/, `<title>${escapeAttribute(page.title)}</title>`);
@@ -192,6 +195,7 @@ for (const page of pages) {
   const schema = schemaFor(page);
   const schemaTag = schema ? `<script id="site-jsonld" type="application/ld+json">${JSON.stringify(schema, null, 2).replace(/</g, '\\u003c')}</script>` : '';
   html = replaceTag(html, /<script id="site-jsonld" type="application\/ld\+json">[\s\S]*?<\/script>/, schemaTag);
+  html = html.replace('<div id="root"></div>', `<div id="root">${renderedBody}</div>`);
 
   if (page.path === '/') {
     writeFileSync(indexPath, html);
