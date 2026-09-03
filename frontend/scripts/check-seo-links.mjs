@@ -148,15 +148,26 @@ async function checkPdfArchive() {
   const linkedPdfs = [...index.matchAll(/href=["'](\/pdfs\/[^"']+\.pdf)["']/gi)]
     .map((match) => decodeURIComponent(new URL(match[1], siteOrigin).pathname.split('/').pop()));
 
-  if (linkedPdfs.length !== sourcePdfs.length) {
-    fail(`PDF-Index: ${linkedPdfs.length} PDF-Links für ${sourcePdfs.length} lokale PDFs gefunden`);
+  if (linkedPdfs.length === 0) {
+    fail('PDF-Index: keine PDF-Links gefunden');
   }
 
-  const linkedPdfSet = new Set(linkedPdfs);
-  for (const file of sourcePdfs) {
-    if (!linkedPdfSet.has(file)) {
-      fail(`PDF-Index: lokales PDF nicht verlinkt (${file})`);
+  // Die PDF-Dateien werden aus Lizenz- und Betriebsgründen nicht im Git-Checkout
+  // mitgeführt. Auf dem VPS liegen sie separat; lokal können sie optional für
+  // die zusätzliche Datei- und Headerprüfung vorhanden sein.
+  if (sourcePdfs.length > 0) {
+    if (linkedPdfs.length !== sourcePdfs.length) {
+      fail(`PDF-Index: ${linkedPdfs.length} PDF-Links für ${sourcePdfs.length} lokale PDFs gefunden`);
     }
+
+    const linkedPdfSet = new Set(linkedPdfs);
+    for (const file of sourcePdfs) {
+      if (!linkedPdfSet.has(file)) {
+        fail(`PDF-Index: lokales PDF nicht verlinkt (${file})`);
+      }
+    }
+  } else {
+    console.log(`PDF-Archiv: ${linkedPdfs.length} Links im Index gefunden; lokale PDFs werden separat verwaltet.`);
   }
 
   for (const file of sourcePdfs) {
