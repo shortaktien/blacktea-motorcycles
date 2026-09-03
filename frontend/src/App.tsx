@@ -2231,6 +2231,10 @@ function applySeoMetadata(metadata: SeoMetadata): void {
   canonical.href = `${siteOrigin}${metadata.canonicalPath === '/' ? '/' : metadata.canonicalPath}`;
 
   let structuredData = document.head.querySelector<HTMLScriptElement>('#site-jsonld');
+  if (typeof metadata.jsonLd['@context'] !== 'string' || metadata.jsonLd['@context'].trim() === '') {
+    structuredData?.remove();
+    return;
+  }
   if (!structuredData) {
     structuredData = document.createElement('script');
     structuredData.id = 'site-jsonld';

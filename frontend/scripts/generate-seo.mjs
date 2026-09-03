@@ -92,6 +92,7 @@ const staticPages = [
   { path: '/login', title: 'Einloggen — Black Tea Motorbikes – Hilfe', description: 'In den persönlichen BTM-Hilfe-Bereich einloggen.', robots: 'noindex,nofollow,noarchive' },
   { path: '/registrieren', title: 'Registrieren — Black Tea Motorbikes – Hilfe', description: 'Ein persönliches BTM-Hilfe-Konto mit Mailjet-Bestätigung anlegen.', robots: 'noindex,nofollow,noarchive' },
   { path: '/konto', title: 'Mein Bereich — Black Tea Motorbikes – Hilfe', description: 'Persönliche Bike-Einstellungen und Benachrichtigungen bei BTM-Hilfe.', robots: 'noindex,nofollow,noarchive' },
+  { path: '/passwort-zuruecksetzen', title: 'Passwort zurücksetzen — Black Tea Motorbikes – Hilfe', description: 'Sicheren Link zum Zurücksetzen des BTM-Hilfe-Passworts verwenden.', robots: 'noindex,nofollow,noarchive' },
 ];
 
 const pdfFiles = readdirSync(join(publicRoot, 'pdfs')).filter((file) => file.toLowerCase().endsWith('.pdf')).sort();

@@ -11,6 +11,7 @@
 /login /login/index.html 200
 /registrieren /registrieren/index.html 200
 /konto /konto/index.html 200
+/passwort-zuruecksetzen /passwort-zuruecksetzen/index.html 200
 /hilfe/dcdc /hilfe/dcdc/index.html 200
 /hilfe/akku-bms /hilfe/akku-bms/index.html 200
 /hilfe/fehleranalyse /hilfe/fehleranalyse/index.html 200
