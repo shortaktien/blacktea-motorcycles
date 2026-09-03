@@ -1,0 +1,20 @@
+# In den bestehenden Caddyfile übernehmen.
+# Voraussetzung: Caddy läuft im selben Docker-Netzwerk wie der BTM-Stack.
+# Die Compose-Service-Namen bleiben dadurch stabil; keine Container-ID verwenden.
+
+btm.shortaktien.de {
+\tencode zstd gzip
+
+\theader {
+\t\tStrict-Transport-Security "max-age=31536000; includeSubDomains"
+\t\tX-Content-Type-Options "nosniff"
+\t\tReferrer-Policy "strict-origin-when-cross-origin"
+\t\tPermissions-Policy "camera=(), microphone=(), geolocation=()"
+\t\t-Server
+\t}
+
+\t@api path /api/*
+\treverse_proxy @api backend:8000
+
+\treverse_proxy frontend:5173
+}

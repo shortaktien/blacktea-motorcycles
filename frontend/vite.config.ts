@@ -38,6 +38,12 @@ const securityHeaders = {
   'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
 };
 
+type PageMetadata = {
+  title: string;
+  description: string;
+  robots?: string;
+};
+
 export default defineConfig({
   plugins: [
     {
@@ -46,7 +52,7 @@ export default defineConfig({
         const requestedPath = new URL(context.originalUrl ?? context.path, 'http://localhost').pathname.replace(/\/index\.html$/, '') || '/';
         const guide = guides.find((item) => item.path === requestedPath);
         const part = parts.find((item) => item.path === requestedPath);
-        const page = guide
+        const page: PageMetadata = guide
           ? { ...guide, title: `${guide.title} — Black Tea Hilfe` }
           : part
             ? { title: `${part.title} — Ersatzteil — Black Tea Hilfe`, description: `${part.title} für Black Tea Motorbikes: historischer BTM-Shop-Eintrag, Archivquelle und aktuelle Kaufoptionen zur Gegenprüfung.` }

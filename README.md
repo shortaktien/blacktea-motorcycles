@@ -132,6 +132,7 @@ frontend/public/pdfs/  lokal gesicherte Handbücher, Pläne und Datenblätter
 backend/               Symfony-API, Health-Check und Kommentar-Moderation
 research/              Quellen, Provenienz, Ersatzteil- und Rechte-Metadaten
 docker-compose.yml     lokale Entwicklungsumgebung
+deploy/Caddyfile.btm.example  Caddy-Site-Block für btm.shortaktien.de
 ```
 
 ## Neue Quellen oder Dokumente ergänzen
@@ -158,6 +159,8 @@ Die PDF-Dateien unter `frontend/public/pdfs/` sind ausdrücklich erfasst und wer
 ## VPS-Deployment nach Review
 
 Der Workflow in [.github/workflows/deploy-vps.yml](.github/workflows/deploy-vps.yml) ist bis zu einem separaten Review **manuell** und reagiert nicht automatisch auf jeden Push. Für einen Deploy sollte GitHub zusätzlich eine geschützte `production`-Umgebung mit mindestens einem Required Reviewer erhalten. Benötigt werden außerdem die dort hinterlegten Secrets `VPS_HOST`, `VPS_USER`, `VPS_PORT`, `VPS_APP_PATH`, `VPS_SSH_PRIVATE_KEY` und `VPS_SSH_KNOWN_HOSTS`. Der Deploy-Benutzer darf nicht `root` sein; er benötigt auf dem VPS die erforderlichen Docker-Rechte. Deployments werden nur vom `main`-Branch akzeptiert.
+
+Für den öffentlichen Host muss der Site-Block aus [deploy/Caddyfile.btm.example](deploy/Caddyfile.btm.example) in die bestehende Caddy-Konfiguration übernommen werden. Caddy muss dafür im selben Docker-Netzwerk wie der BTM-Stack laufen; dann sind die Compose-Dienste unter `backend:8000` und `frontend:5173` erreichbar. Läuft Caddy direkt auf dem VPS-Host, müssen diese beiden Ziele stattdessen auf `127.0.0.1:8000` und `127.0.0.1:5173` zeigen. Nach dem Einfügen mit `caddy validate` prüfen und Caddy kontrolliert neu laden.
 
 ## Quellen und Status
 

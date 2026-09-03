@@ -655,27 +655,7 @@
 ## Lokale PDFs
 
 - [PDF-Index](https://btm.shortaktien.de/pdfs/index.html): Vollständige Übersicht der gesicherten Dokumente.
-- [01-wildfire-willkommenshinweis.pdf](https://btm.shortaktien.de/pdfs/01-wildfire-willkommenshinweis.pdf): Lokale PDF-Kopie im Dokumentenarchiv.
-- [02-wildfire-kabelbaum.pdf](https://btm.shortaktien.de/pdfs/02-wildfire-kabelbaum.pdf): Lokale PDF-Kopie im Dokumentenarchiv.
-- [03-wildfire-system-harness-12v.pdf](https://btm.shortaktien.de/pdfs/03-wildfire-system-harness-12v.pdf): Lokale PDF-Kopie im Dokumentenarchiv.
-- [04-wildfire-software.pdf](https://btm.shortaktien.de/pdfs/04-wildfire-software.pdf): Lokale PDF-Kopie im Dokumentenarchiv.
-- [05-btm-vib.pdf](https://btm.shortaktien.de/pdfs/05-btm-vib.pdf): Lokale PDF-Kopie im Dokumentenarchiv.
-- [06-gasgriff-domino-hall.pdf](https://btm.shortaktien.de/pdfs/06-gasgriff-domino-hall.pdf): Lokale PDF-Kopie im Dokumentenarchiv.
-- [07-manual-bonfire-x-de.pdf](https://btm.shortaktien.de/pdfs/07-manual-bonfire-x-de.pdf): Lokale PDF-Kopie im Dokumentenarchiv.
-- [08-kabelbaum-extended.pdf](https://btm.shortaktien.de/pdfs/08-kabelbaum-extended.pdf): Lokale PDF-Kopie im Dokumentenarchiv.
-- [09-tacho-bonfire-ct22.pdf](https://btm.shortaktien.de/pdfs/09-tacho-bonfire-ct22.pdf): Lokale PDF-Kopie im Dokumentenarchiv.
-- [10-wildfire-tipps-community.pdf](https://btm.shortaktien.de/pdfs/10-wildfire-tipps-community.pdf): Lokale PDF-Kopie im Dokumentenarchiv.
-- [11-wildfire-handbuch-1-3-community.pdf](https://btm.shortaktien.de/pdfs/11-wildfire-handbuch-1-3-community.pdf): Lokale PDF-Kopie im Dokumentenarchiv.
-- [12-wildfire-handbuch-1-4-community.pdf](https://btm.shortaktien.de/pdfs/12-wildfire-handbuch-1-4-community.pdf): Lokale PDF-Kopie im Dokumentenarchiv.
-- [13-fardriver-einstellungen-community.pdf](https://btm.shortaktien.de/pdfs/13-fardriver-einstellungen-community.pdf): Lokale PDF-Kopie im Dokumentenarchiv.
-- [14-ct22-dashboard-manual.pdf](https://btm.shortaktien.de/pdfs/14-ct22-dashboard-manual.pdf): Lokale PDF-Kopie im Dokumentenarchiv.
-- [15-bonfire-handbuch-lokal.pdf](https://btm.shortaktien.de/pdfs/15-bonfire-handbuch-lokal.pdf): Lokale PDF-Kopie im Dokumentenarchiv.
-- [17-ips-dtd110s1210-datasheet.pdf](https://btm.shortaktien.de/pdfs/17-ips-dtd110s1210-datasheet.pdf): Lokale PDF-Kopie im Dokumentenarchiv.
-- [18-mean-well-ddr-120d12-datasheet.pdf](https://btm.shortaktien.de/pdfs/18-mean-well-ddr-120d12-datasheet.pdf): Lokale PDF-Kopie im Dokumentenarchiv.
-- [19-wildfire-handbuch-community.pdf](https://btm.shortaktien.de/pdfs/19-wildfire-handbuch-community.pdf): Lokale PDF-Kopie im Dokumentenarchiv.
-- [20-wildfire-wartung-community.pdf](https://btm.shortaktien.de/pdfs/20-wildfire-wartung-community.pdf): Lokale PDF-Kopie im Dokumentenarchiv.
-- [21-gabelabdichtung-community.pdf](https://btm.shortaktien.de/pdfs/21-gabelabdichtung-community.pdf): Lokale PDF-Kopie im Dokumentenarchiv.
-- [22-wildfire-fardriver-settings-community.pdf](https://btm.shortaktien.de/pdfs/22-wildfire-fardriver-settings-community.pdf): Lokale PDF-Kopie im Dokumentenarchiv.
+
 
 ## Bezugs- und Quellenlogik
 
