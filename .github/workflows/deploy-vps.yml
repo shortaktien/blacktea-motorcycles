@@ -87,6 +87,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          # Dieser Ordner wird separat auf dem VPS gepflegt und darf nicht überschrieben werden.
           rsync -az --delete \
             --exclude='.git/' \
             --exclude='.github/' \
@@ -97,7 +98,7 @@ jobs:
             --exclude='backend/vendor/' \
             --exclude='backend/var/' \
             --exclude='backend/.env' \
-            --exclude='frontend/public/pdfs/*.pdf' \
+            --exclude='frontend/public/pdfs/' \
             --exclude='.env' \
             -e "ssh -i $HOME/.ssh/btm_deploy_key -p $VPS_PORT -o BatchMode=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts" \
             ./ "$VPS_USER@$VPS_HOST:$VPS_APP_PATH/"
@@ -128,6 +129,10 @@ jobs:
 
           docker compose version
           docker compose config >/dev/null
+          # Das Named Volume kann ältere node_modules enthalten als das aktuelle Image.
+          # Vor dem Start mit dem Lockfile synchronisieren, damit neue Frontend-Pakete
+          # trotz des Bind-Mounts auf /app verfügbar sind.
+          docker compose run --rm --no-deps --build frontend npm ci
           docker compose up -d --build --remove-orphans
 
           for attempt in $(seq 1 30); do

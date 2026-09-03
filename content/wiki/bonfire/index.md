@@ -13,6 +13,25 @@ Diese Seite sammelt die wichtigsten technischen Anlaufpunkte zur Black Tea Bonfi
 
 Für die Einordnung sollte vor jeder Bestellung oder Reparatur zuerst die genaue Variante notiert werden: Bonfire, Bonfire 45 oder Bonfire X, Baujahr sowie sichtbare Unterschiede bei Akku, Bremse, Rädern, Steckern und Anzeige.
 
+## Technische Eckdaten für den Abgleich
+
+Diese Übersicht verdichtet die Werte, die bei einer Ersatzteilsuche, Wartung oder Werkstattanfrage am schnellsten weiterhelfen. Sie stammt aus dem lokal gesicherten [Bonfire-Handbuch](/pdfs/15-bonfire-handbuch-lokal.pdf) und ist kein vollständiges Datenblatt für jede Variante.
+
+| Bereich | Dokumentierter Wert | Einordnung |
+| --- | --- | --- |
+| Akku | 52 V Li-Ion, herausnehmbar | Zwei Akkuplätze sind dokumentiert; Ausstattung und Ausführung am Bike prüfen. |
+| Kapazität | 1,8 kWh | pro Akku |
+| Ladegerät | 58,8 V · 10 A | Im Handbuch ist eine Ladung auf 80 % in ungefähr 3 Stunden angegeben. |
+| Akkugewicht | 11,5 kg | pro Akku |
+| Abmessungen | 1.900 × 700 × 1.250 mm | Länge × Breite × Höhe |
+| Radstand | 1.300 mm | Handbuchangabe |
+| Gewicht | 87 / 110 kg | trocken / mit zwei Akkus |
+| Zulässiges Gesamtgewicht | 260 kg | Handbuchangabe |
+| Reifendruck | 230 kPa · 2,3 bar | Handbuchangabe; am konkreten Fahrzeug und Reifen prüfen. |
+| Bremse | CBS, hydraulisch | 265 mm vorn · 180 mm hinten |
+
+Für die Reifen nennt die Handbuchspur [90/90-18 vorn und 110/80-18 hinten für die Straße sowie 3.50-18 vorn für die Offroad-Variante](/pdfs/15-bonfire-handbuch-lokal.pdf). Das sind dokumentierte Größen, aber keine pauschale Freigabe: Felge, Traglast, Geschwindigkeitsindex, Baujahr und Fahrzeugvariante müssen vor dem Kauf übereinstimmen.
+
 ## Was im Handbuch dokumentiert ist
 
 ### Reifen und Größen

@@ -1442,11 +1442,34 @@ const sourcingCards: SourcingCard[] = [
   },
 ];
 
-const technicalFacts = [
-  { value: '2 × 52 V', label: 'herausnehmbare Akkupacks · Bonfire-Handbuch' },
-  { value: '3 kW', label: 'Nennleistung des Antriebs · Bonfire-Handbuch' },
-  { value: '35 / 40 / 45 km/h', label: 'Fahrmodi im EU-Handbuchstand' },
-  { value: '1.900 mm', label: 'Fahrzeuglänge · Bonfire-Handbuch' },
+const technicalGroups = [
+  {
+    title: 'Akku & Laden',
+    items: [
+      { label: 'Akku', value: '52 V Li-Ion', note: 'herausnehmbar' },
+      { label: 'Kapazität', value: '1,8 kWh', note: 'pro Akku' },
+      { label: 'Ladegerät', value: '58,8 V · 10 A', note: '80 % in ca. 3 Stunden' },
+      { label: 'Akkugewicht', value: '11,5 kg', note: 'pro Akku' },
+    ],
+  },
+  {
+    title: 'Maße & Gewicht',
+    items: [
+      { label: 'Abmessungen', value: '1.900 × 700 × 1.250 mm', note: 'L × B × H' },
+      { label: 'Radstand', value: '1.300 mm', note: 'Handbuchangabe' },
+      { label: 'Gewicht', value: '87 / 110 kg', note: 'trocken / mit 2 Akkus' },
+      { label: 'Zul. Gesamtgewicht', value: '260 kg', note: 'Handbuchangabe' },
+    ],
+  },
+  {
+    title: 'Reifen & Bremsen',
+    items: [
+      { label: 'Reifen Straße', value: '90/90-18 · 110/80-18', note: 'vorn · hinten' },
+      { label: 'Reifen Offroad', value: '3.50-18 · 110/80-18', note: 'vorn · hinten' },
+      { label: 'Reifendruck', value: '230 kPa · 2,3 bar', note: 'Handbuchangabe' },
+      { label: 'Bremse', value: 'CBS · hydraulisch', note: '265 mm vorn · 180 mm hinten' },
+    ],
+  },
 ];
 
 const normalizePath = (value: string) => value.replace(/\/+$/, '') || '/';
@@ -1762,7 +1785,7 @@ function getSeoMetadata(path: string, guide?: RepairGuide, part?: HistoricalShop
       description: 'Datenschutzhinweise zu Kommentaren, Bildanhängen und dem Betrieb von Black Tea Motorbikes – Hilfe.',
     },
     '/wiki': {
-      title: 'Wiki — Black Tea Motorbikes – Hilfe',
+      title: 'Wiki — Black Tea Hilfe',
       description: 'Technische Grundlagen, Handbuchdaten und nachvollziehbare Hinweise zu den Black Tea Bikes Bonfire und Wildfire.',
     },
   };
@@ -2088,14 +2111,28 @@ function HomePage() {
         <section className="technical-section section-pad">
           <div className="technical-inner">
             <div className="technical-copy">
-              <div className="eyebrow handwritten">zum einordnen</div>
-              <h2>Technische Daten der Bonfire.</h2>
-              <p>Diese vier Werte stammen aus den technischen Angaben des lokal gesicherten Bonfire-Handbuchs. Varianten, Baujahre und Softwarestände können voneinander abweichen.</p>
-              <a href={sourceLinks[1].href} target="_blank" rel="nofollow noreferrer" className="text-link">Handbuch gegenprüfen ↗</a>
+              <div className="eyebrow handwritten">für werkstatt & ersatzteilsuche</div>
+              <h2>Bonfire: die Daten, die beim Abgleich helfen.</h2>
+              <p>Maße, Akku, Reifen und Bremsen auf einen Blick — genau die Angaben, die du vor einer Bestellung, Wartung oder Reparatur am eigenen Fahrzeug gegenprüfen kannst.</p>
+              <a href={sourceLinks[1].href} target="_blank" rel="nofollow noreferrer" className="text-link">Bonfire-Handbuch öffnen ↗</a>
             </div>
-            <div className="fact-cards">
-              {technicalFacts.map((fact) => <div className="fact-card" key={fact.value}><strong>{fact.value}</strong><span>{fact.label}</span></div>)}
+            <div className="technical-groups">
+              {technicalGroups.map((group) => (
+                <section className="technical-group" key={group.title}>
+                  <h3>{group.title}</h3>
+                  <dl className="technical-list">
+                    {group.items.map((item) => (
+                      <div className="technical-item" key={item.label}>
+                        <dt>{item.label}</dt>
+                        <dd>{item.value}</dd>
+                        <small>{item.note}</small>
+                      </div>
+                    ))}
+                  </dl>
+                </section>
+              ))}
             </div>
+            <p className="technical-note">Handbuchstand, keine pauschale Freigabe: Varianten und Baujahre können abweichen. Reifen, Bremsen, Akku und Zulassung am konkreten Bike prüfen.</p>
           </div>
         </section>
 
@@ -2354,7 +2391,7 @@ function WikiPage() {
 
 function BikePage({ bike, article }: { bike: BikeProfile; article?: WikiArticle }) {
   useEffect(() => {
-    document.title = `${article?.title ?? bike.name} — ${article?.model ?? 'Bikes'} — Black Tea Motorbikes – Hilfe`;
+    document.title = `${article?.title ?? bike.name} — ${article?.model ?? 'Bikes'} — Black Tea Hilfe`;
     window.scrollTo(0, 0);
   }, [article?.model, article?.title, bike.name]);
 
@@ -2376,6 +2413,90 @@ function BikePage({ bike, article }: { bike: BikeProfile; article?: WikiArticle 
             <h2>Diese Seite wird gerade aufgebaut.</h2>
             <p>Hier entsteht eine übersichtliche Wiki-Seite mit technischen Daten, Modellvarianten, Handbuchauszügen und verlinkten Quellen.</p>
           </article>
+        </section>
+      </main>
+      <GuideFooter />
+    </div>
+  );
+}
+
+function WikiArticlePage({ article }: { article: WikiArticle }) {
+  useEffect(() => {
+    document.title = `${article.title} — ${article.model} — Black Tea Hilfe`;
+    window.scrollTo(0, 0);
+  }, [article.model, article.title]);
+
+  const sourceIsExternal = article.sourceHref?.startsWith('http') ?? false;
+  const modelPath = `/bikes/${article.model.toLowerCase()}`;
+  const toc = getWikiToc(article.body);
+  const [editingHeading, setEditingHeading] = useState<string | null>(null);
+  const headingIds = new Map(toc.map((item) => [item.label, item.id]));
+  const markdownComponents: Components = {
+    h2: ({ children }) => {
+      const label = String(children);
+      return <h2 id={headingIds.get(label) ?? slugifyWikiHeading(label)}><span className="wiki-heading-text">{children}</span><button className="wiki-heading-edit" type="button" onClick={() => setEditingHeading(label)}>Bearbeiten</button></h2>;
+    },
+    h3: ({ children }) => {
+      const label = String(children);
+      return <h3 id={headingIds.get(label) ?? slugifyWikiHeading(label)}><span className="wiki-heading-text">{children}</span><button className="wiki-heading-edit" type="button" onClick={() => setEditingHeading(label)}>Bearbeiten</button></h3>;
+    },
+  };
+
+  useEffect(() => {
+    if (!editingHeading) return undefined;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setEditingHeading(null);
+    };
+    document.addEventListener('keydown', closeOnEscape);
+    return () => {
+      document.removeEventListener('keydown', closeOnEscape);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [editingHeading]);
+
+  return (
+    <div className="site-shell">
+      <GuideHeader />
+      <main className="wiki-article-page-main">
+        <section className="wiki-article-page-hero section-pad">
+          <div className="wiki-breadcrumb">
+            <a className="repair-back" href={article.path === modelPath ? '/' : modelPath}>← {article.path === modelPath ? 'Zur Sammelmappe' : `Zur ${article.model}-Übersicht`}</a>
+            <div className="eyebrow handwritten">wiki · {article.model}</div>
+          </div>
+          <h1>{article.title}</h1>
+          <p>{article.intro}</p>
+        </section>
+        <section className="wiki-article-section section-pad">
+          <div className="wiki-article-layout">
+            {toc.length > 0 && (
+              <nav className="wiki-toc card-doodle" aria-label="Inhaltsverzeichnis">
+                <div className="eyebrow handwritten">auf dieser seite</div>
+                <h2>Inhalt</h2>
+                <ol>
+                  {toc.map((item) => (
+                    <li key={item.id} className={item.level === 3 ? 'wiki-toc-subitem' : undefined}>
+                      <a href={`#${item.id}`}>{item.label}</a>
+                    </li>
+                  ))}
+                </ol>
+              </nav>
+            )}
+            <article className="wiki-article card-doodle">
+              <div className="wiki-article-topline"><span className="kind-chip doc">Wiki-Artikel</span><span>{article.status}</span></div>
+              <div className="wiki-markdown"><ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>{article.body}</ReactMarkdown></div>
+              <WikiContributions guideSlug={`wiki-${article.slug}`} editingHeading={editingHeading} onCloseEditor={() => setEditingHeading(null)} />
+              {article.sourceHref && (
+                <div className="wiki-source-box">
+                  <span className="repair-subhead">Quellenangabe</span>
+                  <a href={article.sourceHref} target={sourceIsExternal ? '_blank' : undefined} rel={sourceIsExternal ? 'nofollow noreferrer' : undefined}>
+                    {article.sourceLabel ?? 'Lokale Quelle öffnen'} ↗
+                  </a>
+                </div>
+              )}
+            </article>
+          </div>
         </section>
       </main>
       <GuideFooter />

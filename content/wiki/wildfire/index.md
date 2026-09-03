@@ -13,6 +13,29 @@ Diese Seite bündelt die wichtigsten technischen Anlaufpunkte zur Black Tea Wild
 
 Vor einer Diagnose deshalb Modelljahr, Anzeige-/Controller-Version, Akku-Konfiguration und die konkrete Fahrzeugvariante festhalten. Fotos von Steckern und Bauteilaufklebern helfen bei der späteren Zuordnung.
 
+## Technische Eckdaten aus den Community-Unterlagen
+
+Die folgenden Werte helfen beim ersten Abgleich von Reichweite, Fahrmodus, Akku und Wartung. Sie stammen aus dem [Wildfire-Handbuch der Community](/pdfs/19-wildfire-handbuch-community.pdf), dem [Wartungshinweis](/pdfs/20-wildfire-wartung-community.pdf) und dem [Willkommenshinweis](/pdfs/01-wildfire-willkommenshinweis.pdf). Es gibt hier bewusst keine scheinbar einheitliche Hersteller-Tabelle: Die Dokumente beziehen sich auf unterschiedliche Stände und enthalten beim Reifendruck sogar abweichende Angaben.
+
+### Reichweite, Fahrmodi und Akku
+
+- **Reichweite:** ungefähr 60–120 km pro Akku, abhängig von Tempo, Gelände, Reifen, Reifendruck und Fahrergewicht.
+- **Eco:** bis 90 km/h, 7 kW pro Akku und sanfte Beschleunigung.
+- **Normal:** bis 100 km/h, 10 kW pro Akku.
+- **Sport:** 110 km/h mit einem Akku beziehungsweise 125 km/h mit zwei Akkus; im Dokument als Modus für kurze Strecken und Überholvorgänge beschrieben.
+- **Ladetemperatur:** unter 0 °C nicht laden.
+- **Lebensdauer:** ungefähr 800 Vollzyklen bis etwa 80 % Restkapazität; das ist ein Orientierungswert aus der Community-Dokumentation.
+- **Spannungsanzeige:** Die Community-Tabelle ordnet 115 V ungefähr 100 % und 87 V ungefähr 0 % zu. Diese Werte nicht als universelle BMS- oder Controller-Grenzen übernehmen.
+
+### Reifen, Bremse und Pflege
+
+- **Reifendruck:** Ein Dokument nennt 2,5 bar vorn und hinten. Ein anderer Abschnitt nennt mindestens 2,4 bar vorn und 2,6 bar hinten. Vor jeder Fahrt gilt die passende Vorgabe für das konkrete Fahrzeug und den montierten Reifen.
+- **Bremse:** Die kombinierte Hinterrad-/Vorderradbremse liegt links am Lenker, die Vorderradbremse rechts; eine Fußbremse ist nicht vorgesehen.
+- **Druckprüfung:** Im Willkommenshinweis wird eine Prüfung alle zwei Wochen empfohlen, weil Speichenräder etwa 0,1–0,3 bar pro Woche verlieren können.
+- **Inspektion:** Der Community-Wartungshinweis nennt eine erste Inspektion nach 12.000 km oder innerhalb der ersten zwei Jahre, danach alle 12.000 km. Das ist eine historische Community-Spur und ersetzt keinen fahrzeugspezifischen Wartungsplan.
+
+Diese Angaben sind für die Vorauswahl und das Gespräch mit einer Werkstatt nützlich. Sie ersetzen weder die Prüfung von Modelljahr, Softwarestand und Akkuanzahl noch eine Freigabe für Reifen, Bremsen, Controller oder Ersatzteile.
+
 ## Die wichtigsten Dokumentenspuren
 
 Für die Wildfire sind mehrere Dokumenttypen erfasst:
