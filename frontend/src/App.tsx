@@ -3,6 +3,8 @@ import faqContent from '../../content/faq.json';
 import partsCatalog from '../../research/parts.json';
 import partDetailsCatalog from '../../research/parts-details.json';
 import siteConfig from './site-config.json';
+import { communityMapCountries, communityMapSubdivisions, communityMapViewBox, getCommunityMapPoint, type CommunityMapRegion, type PostalCountry } from './community-map';
+import { searchBtmKnowledge, type WebMcpKnowledgeEntry } from './webmcp-search';
 
 type CardKind = 'Dokument' | 'Ersatzteil' | 'Community';
 type Filter = 'Alle' | CardKind;
@@ -15,8 +17,6 @@ type FaqItem = {
   sourceLabel?: string;
   sourceHref?: string;
 };
-
-type WebMcpScope = 'all' | 'faq' | 'wiki' | 'repair';
 
 type WebMcpToolDefinition = {
   name: string;
@@ -269,6 +269,8 @@ type AuthUser = {
   role: 'member' | 'moderator' | string;
   model: 'Bonfire' | 'Wildfire' | null;
   kilometers: number;
+  country: PostalCountry;
+  postalCode: string;
   avatarStyle: number;
   avatarUrl: string | null;
   notifyReplies: boolean;
@@ -283,7 +285,7 @@ type AuthContextValue = {
   login: (email: string, password: string) => Promise<void>;
   register: (name: string, email: string, password: string, passwordConfirm: string) => Promise<string>;
   logout: () => Promise<void>;
-  updateProfile: (profile: Pick<AuthUser, 'name' | 'model' | 'kilometers' | 'notifyReplies' | 'newsletterSubscribed'>) => Promise<void>;
+  updateProfile: (profile: Pick<AuthUser, 'name' | 'model' | 'kilometers' | 'country' | 'postalCode' | 'notifyReplies' | 'newsletterSubscribed'>) => Promise<void>;
   uploadAvatar: (file: File) => Promise<void>;
   markNotificationRead: (id: string) => Promise<void>;
 };
@@ -1968,13 +1970,6 @@ function getWikiArticleSearchResults(body: string, query: string): WikiTocItem[]
     .map(({ id, label, level }) => ({ id, label, level }));
 }
 
-type WebMcpKnowledgeEntry = {
-  kind: Exclude<WebMcpScope, 'all'>;
-  title: string;
-  text: string;
-  href: string;
-};
-
 const webMcpKnowledgeEntries: WebMcpKnowledgeEntry[] = [
   ...faqItems.map((item) => ({
     kind: 'faq' as const,
@@ -1991,61 +1986,17 @@ const webMcpKnowledgeEntries: WebMcpKnowledgeEntry[] = [
   ...repairGuides.map((guide) => ({
     kind: 'repair' as const,
     title: guide.title,
-    text: `${guide.title} ${guide.model} ${guide.intro} ${guide.steps.join(' ')} ${guide.safety}`,
+    text: [
+      guide.title,
+      guide.model,
+      guide.intro,
+      ...guide.steps,
+      guide.safety,
+      ...guide.detailSections.flatMap((section) => [section.title, ...section.paragraphs, ...(section.bullets ?? [])]),
+    ].join(' '),
     href: guide.path,
   })),
 ];
-
-function cleanWebMcpText(value: string): string {
-  return value
-    .replace(/!\[([^\]]*)\]\([^)]*\)/g, '$1')
-    .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
-    .replace(/[#*_`|]/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
-
-function webMcpExcerpt(text: string, query: string): string {
-  const cleaned = cleanWebMcpText(text);
-  const lowerText = cleaned.toLocaleLowerCase('de');
-  const matchIndex = lowerText.indexOf(query.toLocaleLowerCase('de'));
-  if (matchIndex < 0) return `${cleaned.slice(0, 180)}${cleaned.length > 180 ? ' …' : ''}`;
-
-  const start = Math.max(0, matchIndex - 55);
-  const end = Math.min(cleaned.length, matchIndex + query.length + 125);
-  return `${start > 0 ? '…' : ''}${cleaned.slice(start, end)}${end < cleaned.length ? ' …' : ''}`;
-}
-
-function searchBtmKnowledge(queryValue: unknown, scopeValue: unknown): string {
-  const query = typeof queryValue === 'string' ? queryValue.trim().slice(0, 120) : '';
-  const requestedScope = typeof scopeValue === 'string' ? scopeValue : 'all';
-  const scope: WebMcpScope = ['all', 'faq', 'wiki', 'repair'].includes(requestedScope) ? requestedScope as WebMcpScope : 'all';
-
-  if (!query) {
-    return JSON.stringify({ ok: false, message: 'Bitte gib einen Suchbegriff für FAQ, Wiki oder Reparaturhilfe an.' });
-  }
-
-  const normalizedQuery = query.toLocaleLowerCase('de');
-  const matches = webMcpKnowledgeEntries.filter((entry) => {
-    if (scope !== 'all' && entry.kind !== scope) return false;
-    return `${entry.title} ${entry.text}`.toLocaleLowerCase('de').includes(normalizedQuery);
-  });
-  const results = matches.slice(0, 4).map((entry) => ({
-    type: entry.kind,
-    title: entry.title,
-    excerpt: webMcpExcerpt(entry.text, query),
-    url: `${siteOrigin}${entry.href}`,
-  }));
-
-  return JSON.stringify({
-    ok: true,
-    query,
-    scope,
-    resultCount: matches.length,
-    truncated: matches.length > results.length,
-    results,
-  });
-}
 
 function WebMcpTools() {
   useEffect(() => {
@@ -2066,7 +2017,7 @@ function WebMcpTools() {
         additionalProperties: false,
       },
       annotations: { readOnlyHint: true, untrustedContentHint: true },
-      execute: async ({ query, scope }) => searchBtmKnowledge(query, scope),
+      execute: async ({ query, scope }) => searchBtmKnowledge(webMcpKnowledgeEntries, siteOrigin, query, scope),
     }, { signal: controller.signal }).catch(() => undefined);
 
     return () => controller.abort();
@@ -2158,7 +2109,7 @@ function AuthProvider({ children }: { children: ReactNode }) {
     setCsrfToken('');
   };
 
-  const updateProfile = async (profile: Pick<AuthUser, 'name' | 'model' | 'kilometers' | 'notifyReplies' | 'newsletterSubscribed'>) => {
+  const updateProfile = async (profile: Pick<AuthUser, 'name' | 'model' | 'kilometers' | 'country' | 'postalCode' | 'notifyReplies' | 'newsletterSubscribed'>) => {
     const response = await apiJson<{ user: AuthUser }>('/api/auth/profile', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
@@ -2423,6 +2374,10 @@ function getSeoMetadata(path: string, guide?: RepairGuide, part?: HistoricalShop
       title: 'BTM Community-Wissen — Black Tea Motorbikes – Hilfe',
       description: 'Technische Hinweise aus der Black Tea Community verständlich zusammengefasst, mit lokalen PDFs und Originalquellen.',
     },
+    '/karte': {
+      title: 'Community-Karte — Black Tea Motorbikes – Hilfe',
+      description: 'Ungefähre PLZ-Regionen der BTM-Community in Deutschland, Österreich und der Schweiz.',
+    },
     '/quellen': {
       title: 'Quellen — Black Tea Motorbikes – Hilfe',
       description: 'Nachvollziehbare Quellen zu Insolvenzstatus, Handbüchern, lokalen PDFs, Ersatzteilspuren und Community-Wissen.',
@@ -2560,6 +2515,7 @@ function AppContent({ initialPath }: { initialPath?: string } = {}) {
     || Boolean(repairRequestId)
     || path === '/ersatzteile'
     || path === '/community'
+    || path === '/karte'
     || path === '/faq'
     || path === '/quellen'
     || path === '/impressum'
@@ -2586,6 +2542,7 @@ function AppContent({ initialPath }: { initialPath?: string } = {}) {
   if (part) return <PartDetailPage part={part} />;
   if (path === '/ersatzteile' || (path === '/' && hash === 'teile')) return <PartsPage />;
   if (path === '/community') return <CommunityPage />;
+  if (path === '/karte') return <CommunityMapPage />;
   if (path === '/faq') return <FaqPage />;
   if (path === '/quellen' || (path === '/' && hash === 'quellen')) return <SourcesPage />;
   if (path === '/impressum' || (path === '/' && hash === 'impressum')) return <LegalPage kind="impressum" />;
@@ -2835,6 +2792,8 @@ function AccountPage() {
   const [name, setName] = useState('');
   const [model, setModel] = useState<'Bonfire' | 'Wildfire' | ''>('');
   const [kilometers, setKilometers] = useState(0);
+  const [country, setCountry] = useState<PostalCountry>('D');
+  const [postalCode, setPostalCode] = useState('');
   const [notifyReplies, setNotifyReplies] = useState(true);
   const [newsletterSubscribed, setNewsletterSubscribed] = useState(false);
   const [error, setError] = useState('');
@@ -2853,6 +2812,8 @@ function AccountPage() {
     setName(normaliseDisplayName(user.name));
     setModel(user.model ?? '');
     setKilometers(user.kilometers);
+    setCountry(user.country ?? 'D');
+    setPostalCode(user.postalCode ?? '');
     setNotifyReplies(user.notifyReplies);
     setNewsletterSubscribed(user.newsletterSubscribed);
   }, [user]);
@@ -2866,7 +2827,7 @@ function AccountPage() {
     setError('');
     setNotice('');
     try {
-      await updateProfile({ name, model: model || null, kilometers: Number(kilometers), notifyReplies, newsletterSubscribed });
+      await updateProfile({ name, model: model || null, kilometers: Number(kilometers), country, postalCode, notifyReplies, newsletterSubscribed });
       setNotice('Gespeichert. Dein BTM-Bereich ist auf dem aktuellen Stand.');
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : 'Die Einstellungen konnten nicht gespeichert werden.');
@@ -2898,6 +2859,8 @@ function AccountPage() {
 
   const unread = user.notifications.filter((notification) => !notification.readAt);
   const previewUser = user;
+  const postalCodeLength = country === 'D' ? 5 : 4;
+  const postalCodePlaceholder = country === 'D' ? 'z. B. 01219' : country === 'A' ? 'z. B. 1010' : 'z. B. 8001';
   return (
     <div className="site-shell">
       <GuideHeader />
@@ -2925,6 +2888,9 @@ function AccountPage() {
               <label>Anzeigename<input value={name} onChange={(event) => setName(normaliseDisplayName(event.target.value))} minLength={2} maxLength={80} autoCapitalize="none" autoCorrect="off" spellCheck={false} pattern="[a-z0-9äöüß]+" title="Nur Kleinbuchstaben und Zahlen, ohne Leerzeichen, Sonderzeichen oder Emojis." required /><small>Nur Kleinbuchstaben und Zahlen, ohne Leerzeichen oder Emojis.</small></label>
               <label>Dein Modell<select value={model} onChange={(event) => setModel(event.target.value as 'Bonfire' | 'Wildfire' | '')}><option value="">Noch nicht festgelegt</option><option value="Bonfire">Bonfire</option><option value="Wildfire">Wildfire</option></select></label>
               <label>Kilometerstand<input value={kilometers} onChange={(event) => setKilometers(Number(event.target.value))} type="number" min="0" max="999999" step="1" /><small>Nur für deinen persönlichen Bereich – keine öffentliche Statistik.</small></label>
+              <div className="account-location-note"><strong>Für die Community-Karte (freiwillig)</strong><span>Land und Postleitzahl werden ausschließlich für die grobe Darstellung auf der Karte verwendet und für keinen anderen Zweck.</span></div>
+              <label>Land (freiwillig)<select value={country} onChange={(event) => { const nextCountry = event.target.value as PostalCountry; setCountry(nextCountry); setPostalCode((current) => current.slice(0, nextCountry === 'D' ? 5 : 4)); }}><option value="D">D — Deutschland</option><option value="A">A — Österreich</option><option value="CH">CH — Schweiz</option></select></label>
+              <label>Postleitzahl (freiwillig)<input value={postalCode} onChange={(event) => setPostalCode(event.target.value.replace(/\D/g, '').slice(0, postalCodeLength))} type="text" inputMode="numeric" autoComplete="postal-code" maxLength={postalCodeLength} pattern={country === 'D' ? '[0-9]{5}' : '[1-9][0-9]{3}'} placeholder={postalCodePlaceholder} /><small>{country === 'D' ? 'Fünf Ziffern, zum Beispiel 01219.' : 'Vier Ziffern; die erste Ziffer beginnt nicht mit 0.'}</small></label>
               <label className="account-check"><input checked={notifyReplies} onChange={(event) => setNotifyReplies(event.target.checked)} type="checkbox" /> Benachrichtigungen bei Antworten aktivieren</label>
               <div className="account-consent-setting"><label className="account-check"><input checked={newsletterSubscribed} onChange={(event) => setNewsletterSubscribed(event.target.checked)} type="checkbox" /> Newsletter erhalten</label><small>Neuigkeiten und wichtige Updates per E-Mail. Du kannst ihn hier jederzeit abbestellen.</small></div>
               <div className="avatar-upload"><label>Eigenes Bild (optional)<input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleAvatarUpload} disabled={uploading} /><small>{uploading ? 'Bild wird gespeichert …' : 'JPG, PNG oder WEBP · maximal 2 MB. Dein eigenes Bild ersetzt den zugewiesenen Avatar.'}</small></label></div>
@@ -3157,12 +3123,12 @@ function HomePage() {
         </a>
         <nav className="main-nav" aria-label="Hauptnavigation">
           <a href="#status">Status</a>
+          <a href="/karte">Karte</a>
           <a href="#wissen">PDFs</a>
           <RepairMenu />
           <a href="/ersatzteile">Ersatzteile</a>
           <BikeMenu />
           <a href="/faq">FAQ</a>
-          <a href="/quellen">Quellen</a>
         </nav>
         <AccountMenu />
       </header>
@@ -3363,6 +3329,128 @@ function SourcesPage() {
   );
 }
 
+function CommunityMapPage() {
+  const [regions, setRegions] = useState<CommunityMapRegion[]>([]);
+  const [memberCount, setMemberCount] = useState(0);
+  const [activeKey, setActiveKey] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    document.title = 'Community-Karte — Black Tea Motorbikes – Hilfe';
+    window.scrollTo(0, 0);
+    let active = true;
+    const loadMap = async () => {
+      try {
+        const response = await apiJson<{ regions: CommunityMapRegion[]; memberCount: number; regionCount: number }>('/api/community/map');
+        if (!active) return;
+        setRegions(response.regions ?? []);
+        setMemberCount(response.memberCount ?? 0);
+        setError('');
+      } catch (reason) {
+        if (active) setError(reason instanceof Error ? reason.message : 'Die Community-Karte konnte gerade nicht geladen werden.');
+      } finally {
+        if (active) setLoading(false);
+      }
+    };
+    void loadMap();
+    const refreshTimer = window.setInterval(() => { void loadMap(); }, 60000);
+    return () => {
+      active = false;
+      window.clearInterval(refreshTimer);
+    };
+  }, []);
+
+  const points = useMemo(() => regions.flatMap((region) => {
+    const point = getCommunityMapPoint(region);
+    return point ? [{ region, point, key: `${region.country}:${region.prefix}` }] : [];
+  }), [regions]);
+  const activePoint = points.find((entry) => entry.key === activeKey) ?? null;
+  const membersByCountry = regions.reduce<Record<PostalCountry, number>>((counts, region) => {
+    counts[region.country] += region.memberCount;
+    return counts;
+  }, { D: 0, A: 0, CH: 0 });
+
+  return (
+    <div className="site-shell">
+      <GuideHeader />
+      <main className="community-map-page-main">
+        <section className="community-map-hero section-pad">
+          <a className="repair-back" href="/">← Zur Sammelmappe</a>
+          <div className="eyebrow handwritten">community · ungefähr verortet</div>
+          <h1>Die BTM-Karte.</h1>
+          <p>Du bist nicht allein. Entdecke, wie viele BTM-Rider bereits in deiner Region unterwegs sind, und finde heraus, wo sich unsere Community in Deutschland, Österreich und der Schweiz verteilt. Jeder Punkt steht für einen groben PLZ-Bereich und zeigt dir, wie viele Fahrer dort zusammenkommen.</p>
+        </section>
+
+        <section className="community-map-section section-pad">
+          <div className="community-map-stats" aria-label="Zusammenfassung der Community-Karte">
+            <div><strong>{memberCount}</strong><span>Mitglieder gesamt</span></div>
+            <div><strong>{membersByCountry.D}</strong><span>Mitglieder in Deutschland</span></div>
+            <div><strong>{membersByCountry.A}</strong><span>Mitglieder in Österreich</span></div>
+            <div><strong>{membersByCountry.CH}</strong><span>Mitglieder in der Schweiz</span></div>
+          </div>
+          <div className="community-map-card card-doodle" aria-busy={loading}>
+            <div className="community-map-card-heading">
+              <div>
+                <div className="eyebrow handwritten">live aus den Profileinstellungen</div>
+                <h2>Unsere Fahrer</h2>
+              </div>
+              <span className="community-map-legend"><i aria-hidden="true" /> ein Punkt = ein PLZ-Bereich</span>
+            </div>
+            {error && <p className="form-message form-message-error" role="alert">{error}</p>}
+            <div className="community-map-canvas">
+              <svg className="community-map-svg" viewBox={communityMapViewBox} role="group" aria-label="Karte von Deutschland, Österreich und der Schweiz mit Community-Regionen">
+                {communityMapCountries.map(country => (
+                  <path key={country.code} className={`community-map-country community-map-country-${country.code.toLowerCase()}`} d={country.path} fillRule="evenodd" />
+                ))}
+                {communityMapSubdivisions.map((subdivision, index) => (
+                  <path key={`${subdivision.country}-${subdivision.name}-${index}`} className={`community-map-subdivision community-map-subdivision-${subdivision.country.toLowerCase()}`} d={subdivision.path} aria-hidden="true" />
+                ))}
+                {communityMapCountries.map(country => (
+                  <text key={country.code} className="community-map-country-label" x={country.labelPoint.x} y={country.labelPoint.y}>{country.label}</text>
+                ))}
+                {points.map(({ region, point, key }) => {
+                  const isActive = key === activeKey;
+                  const radius = Math.min(22, 8 + Math.sqrt(region.memberCount) * 3);
+                  return (
+                    <g
+                      className={`community-map-point ${isActive ? 'is-active' : ''}`}
+                      key={key}
+                      role="button"
+                      tabIndex={0}
+                      aria-label={`${point.countryLabel}, ${point.label}: ${region.memberCount} ${region.memberCount === 1 ? 'Mitglied' : 'Mitglieder'}`}
+                      onClick={() => setActiveKey(key)}
+                      onFocus={() => setActiveKey(key)}
+                      onMouseEnter={() => setActiveKey(key)}
+                      onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); setActiveKey(key); } }}
+                    >
+                      <circle className="community-map-point-halo" cx={point.x} cy={point.y} r={radius + 9} />
+                      <circle className="community-map-point-circle" cx={point.x} cy={point.y} r={radius} />
+                      <text className="community-map-point-count" x={point.x} y={point.y + 4}>{region.memberCount}</text>
+                    </g>
+                  );
+                })}
+              </svg>
+            </div>
+            {activePoint ? (
+              <div className="community-map-selection" role="status">
+                <strong>{activePoint.point.countryLabel} · {activePoint.point.label}</strong>
+                <span>{activePoint.region.memberCount} {activePoint.region.memberCount === 1 ? 'Mitglied' : 'Mitglieder'} in diesem groben PLZ-Bereich</span>
+              </div>
+            ) : (
+              <p className="community-map-hint">Klicke auf einen Punkt, um die grobe Region und die Anzahl der dort eingetragenen Mitglieder zu sehen.</p>
+            )}
+          </div>
+          <p className="community-map-note"><strong>Privatsphäre zuerst:</strong> Es werden nur aktive Konten mit freiwillig eingetragener Land-/PLZ-Kombination gezählt. Namen, E-Mail-Adressen und die vollständige PLZ bleiben verborgen; die Darstellung fasst jeweils die ersten beiden PLZ-Ziffern zusammen.</p>
+          {!loading && regions.length > points.length && <p className="community-map-note">{regions.length - points.length} PLZ-Bereiche konnten noch nicht geografisch zugeordnet werden.</p>}
+          <p className="community-map-note">Kartendaten: <a href="https://www.naturalearthdata.com/" target="_blank" rel="noreferrer">Natural Earth</a> · PLZ-Regionen: <a href="https://www.geonames.org/" target="_blank" rel="noreferrer">GeoNames</a> (<a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">CC BY 4.0</a>), zu regionalen Übersichtspunkten zusammengefasst.</p>
+        </section>
+      </main>
+      <GuideFooter />
+    </div>
+  );
+}
+
 function FaqPage() {
   const [query, setQuery] = useState('');
 
@@ -3530,12 +3618,12 @@ function GuideHeader() {
         </a>
         <nav className="main-nav" aria-label="Hauptnavigation">
           <a href="/#status">Status</a>
+          <a href="/karte">Karte</a>
           <RepairMenu />
           <a href="/ersatzteile">Ersatzteile</a>
           <BikeMenu />
           <a href="/#wissen">PDFs</a>
           <a href="/faq">FAQ</a>
-          <a href="/quellen">Quellen</a>
         </nav>
         <AccountMenu />
       </header>

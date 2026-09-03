@@ -56,6 +56,8 @@ final class UserAuthService
             'role' => ($user['role'] ?? 'member') === 'moderator' ? 'moderator' : 'member',
             'model' => $user['model'] ?? null,
             'kilometers' => (int) ($user['kilometers'] ?? 0),
+            'country' => in_array($user['country'] ?? null, ['D', 'A', 'CH'], true) ? $user['country'] : 'D',
+            'postalCode' => is_string($user['postalCode'] ?? null) ? $user['postalCode'] : '',
             'avatarStyle' => (int) ($user['avatarStyle'] ?? 0),
             'avatarUrl' => !empty($user['avatarFile'])
                 ? '/api/auth/avatar/' . rawurlencode((string) $user['id']) . '?v=' . substr(hash('sha256', (string) $user['avatarFile']), 0, 16)

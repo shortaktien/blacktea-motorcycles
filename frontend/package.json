@@ -10,6 +10,7 @@
   "scripts": {
     "seo:generate": "node scripts/generate-seo.mjs",
     "check:seo": "node scripts/check-seo-links.mjs",
+    "check:webmcp": "node --experimental-strip-types scripts/check-webmcp.mjs",
     "prebuild": "npm run seo:generate",
     "dev": "vite",
     "build": "tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.node.json --noEmit && vite build && vite build --ssr src/entry-server.tsx --outDir dist-server && node scripts/prerender-seo.mjs",

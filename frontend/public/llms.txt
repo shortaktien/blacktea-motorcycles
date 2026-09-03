@@ -12,6 +12,7 @@ Die Website richtet sich an Besitzerinnen und Besitzer von Bonfire- und Wildfire
 - [Ersatzteile — Black Tea Motorbikes – Hilfe](https://btm.shortaktien.de/ersatzteile): Historischer BTM-Ersatzteilkatalog mit Modellbezug, Teilenamen und Quellen. Bestand und Preise vor dem Kauf prüfen.
 - [BTM Community-Wissen — Black Tea Motorbikes – Hilfe](https://btm.shortaktien.de/community): Technische Hinweise aus der Black Tea Community verständlich zusammengefasst, mit lokalen PDFs und Originalquellen.
 - [FAQ — Black Tea Motorbikes – Hilfe](https://btm.shortaktien.de/faq): Eigenständig beantwortete Fragen zu Black Tea Bonfire und Wildfire: Varianten, Reichweite, Display, Akku, Bremsen und Wartung.
+- [Community-Karte — Black Tea Motorbikes – Hilfe](https://btm.shortaktien.de/karte): Ungefähre PLZ-Regionen der BTM-Community in Deutschland, Österreich und der Schweiz.
 - [Quellen — Black Tea Motorbikes – Hilfe](https://btm.shortaktien.de/quellen): Nachvollziehbare Quellen zu Insolvenzstatus, Handbüchern, lokalen PDFs, Ersatzteilspuren und Community-Wissen.
 - [Impressum — Black Tea Motorbikes – Hilfe](https://btm.shortaktien.de/impressum): Anbieterinformationen und rechtliche Hinweise zu Black Tea Motorbikes – Hilfe.
 - [Datenschutz — Black Tea Motorbikes – Hilfe](https://btm.shortaktien.de/datenschutz): Datenschutzhinweise zu Kommentaren, Bildanhängen und dem Betrieb von Black Tea Motorbikes – Hilfe.

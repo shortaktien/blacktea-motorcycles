@@ -86,6 +86,8 @@ final class AuthController
             'emailConfirmationExpiresAt' => $confirmation['expiresAt'],
             'model' => null,
             'kilometers' => 0,
+            'country' => 'D',
+            'postalCode' => '',
             'avatarStyle' => 0,
             'avatarFile' => null,
             'avatarMime' => null,
@@ -377,6 +379,8 @@ final class AuthController
         $name = $payload['name'] ?? $user['name'];
         $model = $payload['model'] ?? $user['model'];
         $kilometers = $payload['kilometers'] ?? $user['kilometers'];
+        $country = $payload['country'] ?? ($user['country'] ?? 'D');
+        $postalCode = $payload['postalCode'] ?? ($user['postalCode'] ?? '');
         $notifyReplies = $payload['notifyReplies'] ?? $user['notifyReplies'];
         $newsletterSubscribed = $payload['newsletterSubscribed'] ?? ($user['newsletterSubscribed'] ?? false);
         if (!is_string($name) || $this->length(trim($name)) < 2 || $this->length(trim($name)) > 80) {
@@ -391,6 +395,19 @@ final class AuthController
         if (filter_var($kilometers, FILTER_VALIDATE_INT) === false || (int) $kilometers < 0 || (int) $kilometers > 999999) {
             return $this->error('Bitte einen Kilometerstand zwischen 0 und 999.999 angeben.', Response::HTTP_BAD_REQUEST);
         }
+        if (!is_string($country) || !in_array($country, ['D', 'A', 'CH'], true)) {
+            return $this->error('Bitte ein gültiges Land auswählen.', Response::HTTP_BAD_REQUEST);
+        }
+        if (!is_string($postalCode)) {
+            return $this->error('Die Postleitzahl ist nicht gültig.', Response::HTTP_BAD_REQUEST);
+        }
+        $postalCode = trim($postalCode);
+        $postalPattern = $country === 'D' ? '/^\d{5}$/' : '/^[1-9]\d{3}$/';
+        if ($postalCode !== '' && preg_match($postalPattern, $postalCode) !== 1) {
+            return $this->error($country === 'D'
+                ? 'Die deutsche Postleitzahl muss aus fünf Ziffern bestehen.'
+                : 'Die Postleitzahl muss aus vier Ziffern bestehen und darf nicht mit 0 beginnen.', Response::HTTP_BAD_REQUEST);
+        }
         if (!is_bool($notifyReplies)) {
             return $this->error('Die Profileinstellungen sind nicht gültig.', Response::HTTP_BAD_REQUEST);
         }
@@ -403,7 +420,7 @@ final class AuthController
 
         $updated = null;
         $duplicateName = false;
-        $this->users->update(static function (array &$data) use ($user, $name, $model, $kilometers, $notifyReplies, $newsletterSubscribed, &$updated, &$duplicateName): void {
+        $this->users->update(static function (array &$data) use ($user, $name, $model, $kilometers, $country, $postalCode, $notifyReplies, $newsletterSubscribed, &$updated, &$duplicateName): void {
             foreach ($data['users'] as $candidate) {
                 if (($candidate['id'] ?? null) !== $user['id'] && self::normaliseName((string) ($candidate['name'] ?? '')) === self::normaliseName($name)) {
                     $duplicateName = true;
@@ -417,6 +434,8 @@ final class AuthController
                 $candidate['name'] = trim($name);
                 $candidate['model'] = $model;
                 $candidate['kilometers'] = (int) $kilometers;
+                $candidate['country'] = $country;
+                $candidate['postalCode'] = $postalCode;
                 $candidate['notifyReplies'] = $notifyReplies;
                 $candidate['newsletterSubscribed'] = $newsletterSubscribed;
                 $updated = $candidate;

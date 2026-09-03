@@ -70,6 +70,45 @@ final class CommunityController
         return $response;
     }
 
+    #[Route('/api/community/map', name: 'api_community_map', methods: ['GET'])]
+    public function communityMap(): JsonResponse
+    {
+        $regions = [];
+        foreach ($this->userStorage->read()['users'] ?? [] as $user) {
+            if (($user['status'] ?? null) !== 'active') {
+                continue;
+            }
+
+            $country = $user['country'] ?? null;
+            $postalCode = $user['postalCode'] ?? null;
+            $postalPattern = $country === 'D' ? '/^\d{5}$/' : '/^[1-9]\d{3}$/';
+            if (!is_string($country) || !in_array($country, ['D', 'A', 'CH'], true) || !is_string($postalCode) || preg_match($postalPattern, $postalCode) !== 1) {
+                continue;
+            }
+
+            $prefix = substr($postalCode, 0, 2);
+            $key = $country . ':' . $prefix;
+            if (!isset($regions[$key])) {
+                $regions[$key] = [
+                    'country' => $country,
+                    'prefix' => $prefix,
+                    'memberCount' => 0,
+                ];
+            }
+            $regions[$key]['memberCount']++;
+        }
+
+        $regionList = array_values($regions);
+        usort($regionList, static fn (array $left, array $right): int => [$left['country'], $left['prefix']] <=> [$right['country'], $right['prefix']]);
+        $response = new JsonResponse([
+            'regions' => $regionList,
+            'memberCount' => array_sum(array_column($regionList, 'memberCount')),
+            'regionCount' => count($regionList),
+        ]);
+        $response->headers->set('Cache-Control', 'no-store');
+        return $response;
+    }
+
     #[Route('/api/feedback', name: 'api_feedback_vote', methods: ['POST'])]
     public function vote(Request $request): JsonResponse
     {
