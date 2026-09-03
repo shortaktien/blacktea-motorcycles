@@ -53,7 +53,7 @@ type WikiArticle = {
 type WikiTocItem = {
   id: string;
   label: string;
-  level: 2 | 3;
+  level: 2 | 3 | 4;
 };
 
 type FeedbackSummary = {
@@ -1622,9 +1622,9 @@ function getWikiToc(body: string): WikiTocItem[] {
   const items: WikiTocItem[] = [];
 
   for (const line of body.split(/\r?\n/)) {
-    const match = line.match(/^(#{2,3})\s+(.+?)\s*#*\s*$/);
+    const match = line.match(/^(#{2,4})\s+(.+?)\s*#*\s*$/);
     if (!match) continue;
-    const level = match[1].length as 2 | 3;
+    const level = match[1].length as 2 | 3 | 4;
     const label = match[2].trim();
     const baseId = slugifyWikiHeading(label);
     const occurrence = usedIds.get(baseId) ?? 0;
@@ -1690,6 +1690,18 @@ function isWikiTableSeparator(line: string): boolean {
   return parseWikiTableRow(line).every((cell) => /^:?-{3,}:?$/.test(cell));
 }
 
+function isWikiImageSource(value: string): boolean {
+  return value.startsWith('/') || /^https?:\/\//i.test(value);
+}
+
+const wikiImageDimensions: Record<string, { width: number; height: number }> = {
+  '/images/bonfire-aufbau-scharf.webp': { width: 1598, height: 984 },
+  '/images/bonfire-akku-foto-scharf.webp': { width: 1241, height: 1268 },
+  '/images/bonfire-bedienelemente-scharf.webp': { width: 2179, height: 722 },
+  '/images/bonfire-display-scharf.webp': { width: 1715, height: 917 },
+  '/images/bonfire-bedienpanel-scharf.webp': { width: 1622, height: 969 },
+};
+
 function renderWikiMarkdown(body: string, onEditHeading: (heading: string) => void, query = ''): ReactNode[] {
   const lines = body.split(/\r?\n/);
   const blocks: ReactNode[] = [];
@@ -1702,12 +1714,24 @@ function renderWikiMarkdown(body: string, onEditHeading: (heading: string) => vo
       continue;
     }
 
-    const headingMatch = line.match(/^(#{2,3})\s+(.+?)\s*#*\s*$/);
+    const headingMatch = line.match(/^(#{2,4})\s+(.+?)\s*#*\s*$/);
     if (headingMatch) {
-      const level = headingMatch[1].length === 2 ? 'h2' : 'h3';
+      const level = headingMatch[1].length === 2 ? 'h2' : headingMatch[1].length === 3 ? 'h3' : 'h4';
       const Heading = level;
       const heading = headingMatch[2].trim();
       blocks.push(<Heading key={`wiki-block-${index}`} id={slugifyWikiHeading(heading)}><span className="wiki-heading-text">{highlightWikiText(heading, query, `wiki-heading-${index}`)}</span><button className="wiki-heading-edit" type="button" onClick={() => onEditHeading(heading)}>Bearbeiten</button></Heading>);
+      index += 1;
+      continue;
+    }
+
+    const imageMatch = line.trim().match(/^!\[([^\]]+)\]\(([^)\s]+)\)$/);
+    if (imageMatch && isWikiImageSource(imageMatch[2])) {
+      const dimensions = wikiImageDimensions[imageMatch[2]];
+      blocks.push(
+        <figure className="wiki-image-figure" key={`wiki-block-${index}`}>
+          <img className="wiki-image" src={imageMatch[2]} alt={imageMatch[1]} title={imageMatch[1]} width={dimensions?.width} height={dimensions?.height} loading="lazy" decoding="async" />
+        </figure>,
+      );
       index += 1;
       continue;
     }
@@ -1770,7 +1794,7 @@ function renderWikiMarkdown(body: string, onEditHeading: (heading: string) => vo
     const paragraphLines: string[] = [];
     while (index < lines.length && lines[index].trim()) {
       const current = lines[index];
-      if (paragraphLines.length > 0 && (/^(#{2,3})\s+/.test(current) || /^\s*[-*]\s+/.test(current) || /^\s*\d+[.)]\s+/.test(current) || current.trim().startsWith('>') || (current.trim().startsWith('|') && index + 1 < lines.length && lines[index + 1].trim().startsWith('|') && isWikiTableSeparator(lines[index + 1])))) break;
+      if (paragraphLines.length > 0 && (/^(#{2,4})\s+/.test(current) || /^\s*[-*]\s+/.test(current) || /^\s*\d+[.)]\s+/.test(current) || current.trim().startsWith('>') || (current.trim().startsWith('|') && index + 1 < lines.length && lines[index + 1].trim().startsWith('|') && isWikiTableSeparator(lines[index + 1])))) break;
       paragraphLines.push(current);
       index += 1;
     }
@@ -1805,14 +1829,14 @@ function getWikiArticleSearchResults(body: string, query: string): WikiTocItem[]
   };
 
   for (const line of body.split(/\r?\n/)) {
-    const headingMatch = line.match(/^(#{2,3})\s+(.+?)\s*#*\s*$/);
+    const headingMatch = line.match(/^(#{2,4})\s+(.+?)\s*#*\s*$/);
     if (headingMatch) {
       finishSection();
       const label = headingMatch[2].trim();
       const baseId = slugifyWikiHeading(label);
       const occurrence = usedIds.get(baseId) ?? 0;
       usedIds.set(baseId, occurrence + 1);
-      current = { id: occurrence === 0 ? baseId : `${baseId}-${occurrence + 1}`, label, level: headingMatch[1].length as 2 | 3, text: '' };
+      current = { id: occurrence === 0 ? baseId : `${baseId}-${occurrence + 1}`, label, level: headingMatch[1].length as 2 | 3 | 4, text: '' };
       continue;
     }
     if (current) current.text += ` ${line}`;
@@ -3453,7 +3477,19 @@ function WikiArticlePage({ article }: { article: WikiArticle }) {
 
   const sourceIsExternal = article.sourceHref?.startsWith('http') ?? false;
   const modelPath = `/bikes/${article.model.toLowerCase()}`;
-  const toc = getWikiToc(article.body);
+  const toc = useMemo(() => getWikiToc(article.body), [article.body]);
+  const tocGroups = useMemo(() => {
+    const groups: Array<{ heading: WikiTocItem; children: WikiTocItem[] }> = [];
+    for (const item of toc) {
+      if (item.level === 2 || groups.length === 0) {
+        groups.push({ heading: item, children: item.level === 2 ? [] : [item] });
+      } else {
+        groups[groups.length - 1].children.push(item);
+      }
+    }
+    return groups;
+  }, [toc]);
+  const [expandedTocSections, setExpandedTocSections] = useState<Record<string, boolean>>({});
   const searchResults = useMemo(() => getWikiArticleSearchResults(article.body, query), [article.body, query]);
   const [editingHeading, setEditingHeading] = useState<string | null>(null);
   useEffect(() => {
@@ -3502,11 +3538,38 @@ function WikiArticlePage({ article }: { article: WikiArticle }) {
                 <div className="eyebrow handwritten">auf dieser seite</div>
                 <h2>Inhalt</h2>
                 <ol>
-                  {toc.map((item) => (
-                    <li key={item.id} className={item.level === 3 ? 'wiki-toc-subitem' : undefined}>
-                      <a href={`#${item.id}`}>{highlightWikiText(item.label, query, `wiki-toc-${item.id}`)}</a>
-                    </li>
-                  ))}
+                  {tocGroups.map(({ heading, children }) => {
+                    const hasChildren = children.length > 0;
+                    const expanded = Boolean(query.trim()) || expandedTocSections[heading.id] !== false;
+                    return (
+                      <li key={heading.id} className={hasChildren ? 'wiki-toc-group' : undefined}>
+                        <div className="wiki-toc-group-heading">
+                          <a href={`#${heading.id}`}>{highlightWikiText(heading.label, query, `wiki-toc-${heading.id}`)}</a>
+                          {hasChildren && (
+                            <button
+                              type="button"
+                              className="wiki-toc-toggle"
+                              aria-expanded={expanded}
+                              aria-controls={`wiki-toc-group-${heading.id}`}
+                              aria-label={`${expanded ? 'Unterpunkte ausblenden' : 'Unterpunkte anzeigen'}: ${heading.label}`}
+                              onClick={() => setExpandedTocSections((current) => ({ ...current, [heading.id]: !expanded }))}
+                            >
+                              <span aria-hidden="true">{expanded ? '▾' : '▸'}</span>
+                            </button>
+                          )}
+                        </div>
+                        {hasChildren && expanded && (
+                          <ol id={`wiki-toc-group-${heading.id}`} className="wiki-toc-children">
+                            {children.map((item) => (
+                              <li key={item.id} className={item.level === 3 ? 'wiki-toc-subitem' : 'wiki-toc-subsubitem'}>
+                                <a href={`#${item.id}`}>{highlightWikiText(item.label, query, `wiki-toc-${item.id}`)}</a>
+                              </li>
+                            ))}
+                          </ol>
+                        )}
+                      </li>
+                    );
+                  })}
                 </ol>
               </nav>
             )}

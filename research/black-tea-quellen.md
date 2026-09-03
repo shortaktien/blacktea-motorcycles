@@ -32,6 +32,10 @@ Für die spätere Ersatzteilsuche gilt: Amazon.de ist die primäre Bezugsquelle.
 - [Wayback-Suche für BTM-Produktseiten](https://web.archive.org/web/*/https://www.blackteamotorbikes.com/products/*) – historische Produktnamen und Varianten.
 - [Wayback-Suche für BTM-Seiten](https://web.archive.org/web/*/https://www.blackteamotorbikes.com/pages/*) – weitere archivierte Service-, FAQ-, Garantie- und Produktseiten.
 
+### ADAC-Motorradkatalog
+
+- [Black Tea Bonfire X](https://www.adac.de/rund-ums-fahrzeug/zweirad/motorrad-roller/motorradkatalog/marken/black-tea/black-tea-bonfire-x-11066/) – externer Referenzdatensatz mit Modell-, Maß-, Akku-, Motor-, Fahrwerks-, Reifen- und Bremsdaten. Die Werte sind in der [Bonfire-Wiki](/bikes/bonfire) als eigener Bonfire-X-Quellenblock erfasst; sie dürfen wegen möglicher Varianten- und Definitionsunterschiede nicht mit der allgemeinen Bonfire-Handbuchspur vermischt werden.
+
 ### ElektroRoller-Forum
 
 - [Forum-Unterforum Black Tea](https://www.elektroroller-forum.de/viewforum.php?f=159) – 56 Themen, drei Seiten.
@@ -210,6 +214,12 @@ Aus der archivierten Bonfire-/Wildfire-Dokumentation stammen Anzeige-/Spannungsb
 - **Wartungsintervall, historisch:** Erstinspektion nach 12.000 km oder zwei Jahren, danach alle 12.000 km.
 - **Community-Werte, noch nicht freigeben:** ca. 2,4 bar vorne, 2,6 bar hinten (max. 3 bar), 150 Nm Hinterachse, 120 Nm Vorderachse. Vor Veröffentlichung mit dem richtigen offiziellen Drehmomentblatt für Modell/Baujahr abgleichen.
 - **Laden/Akku:** Nur passende BTM-Ladegeräte und die im Handbuch genannten Ladebedingungen verwenden; beschädigte, gefrorene oder ungewöhnlich warme Akkus nicht laden.
+
+### Bonfire X, ADAC-Katalog
+
+Der ADAC-Datensatz zur Bonfire X nennt **112 kg Leergewicht**, **260 kg zulässiges Gesamtgewicht**, **1.900 × 700 × 1.250 mm**, **800 mm Sitzhöhe**, **3,6 kWh**, **99 km/h**, **5,0 kW Maximalleistung**, **8 kW Spitzenleistung**, **104 V Betriebsspannung**, **195,0 Nm**, **1.300 mm Radstand**, **90/90-18 vorn**, **110/80-18 hinten**, **265 mm CBS-Scheibe vorn** und **180 mm Scheibe hinten**. Im Datensatz stehen außerdem **750 U/min**, **Euro 5** und **kein ABS**. Die Einordnung von Spitzen-/Maximalleistung, Betriebsspannung und dem Euro-5-Feld ist dort nicht weiter erläutert; die Werte sind daher als unveränderte Referenzdaten und nicht als universelle technische Freigabe zu führen.
+
+Die Angaben unterscheiden sich teilweise von der lokalen Bonfire-Handbuchspur, die unter anderem 52 V, 1,8 kWh pro Akku und 87/110 kg nennt. Das ist ohne genaue Modell-/Baujahrzuordnung kein belastbarer Widerspruch. Für die Veröffentlichung werden beide Quellen getrennt und mit ihrer jeweiligen Modellbezeichnung angezeigt.
 
 ## 6. Empfohlenes Datenmodell für die spätere Website
 
