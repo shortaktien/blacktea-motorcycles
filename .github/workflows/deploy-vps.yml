@@ -40,6 +40,12 @@ jobs:
       - name: Build frontend
         run: npm run build
 
+      - name: Test pSEO catalog quality
+        run: npm run check:pseo
+
+      - name: Test regional content policy
+        run: npm run check:content-policy
+
       - name: Start static preview for link tests
         shell: bash
         run: |
@@ -60,6 +66,11 @@ jobs:
         env:
           LINKTEST_BASE_URL: http://127.0.0.1:4173
         run: npm run check:seo
+
+      - name: Run Lighthouse and accessibility audit
+        env:
+          LIGHTHOUSE_BASE_URL: http://127.0.0.1:4173
+        run: npm run check:lighthouse
 
       - name: Test WebMCP tool contract
         run: npm run check:webmcp

@@ -1,0 +1,2523 @@
+{
+  "manifestType": "BTM Open Knowledge",
+  "schemaVersion": "1.0",
+  "generatedAt": "2026-09-04",
+  "language": "de-DE",
+  "licensePolicy": "Eigene redaktionelle Aufbereitungen werden als solche gekennzeichnet; Originalquellen bleiben bei ihren jeweiligen Rechteinhabern.",
+  "regionalContentPolicy": "Regionale Seiten werden erst veröffentlicht, wenn sie eigenen lokalen Mehrwert bieten. Die ungefähre PLZ-Verortung bleibt bis dahin auf /karte gebündelt.",
+  "entries": [
+    {
+      "kind": "wiki",
+      "url": "https://btm.shortaktien.de/bikes/bonfire",
+      "title": "Bonfire",
+      "model": "Bonfire",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene redaktionelle Aufbereitung; Originalquellen bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Lokale Dokumente → redaktionelle Aufbereitung → geprüfte Community-Ergänzungen",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Quellenkette und Wissensstatus ergänzt"
+        },
+        {
+          "date": "2026-09-03",
+          "label": "Technische Wiki-Grundlage redaktionell geordnet"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://btm.shortaktien.de/pdfs/15-bonfire-handbuch-lokal.pdf",
+          "label": "Bonfire-Handbuch lokal öffnen"
+        }
+      ]
+    },
+    {
+      "kind": "wiki",
+      "url": "https://btm.shortaktien.de/bikes/wildfire",
+      "title": "Wildfire",
+      "model": "Wildfire",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene redaktionelle Aufbereitung; Originalquellen bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Lokale Dokumente → redaktionelle Aufbereitung → geprüfte Community-Ergänzungen",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Quellenkette und Wissensstatus ergänzt"
+        },
+        {
+          "date": "2026-09-03",
+          "label": "Technische Wiki-Grundlage redaktionell geordnet"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://btm.shortaktien.de/pdfs/19-wildfire-handbuch-community.pdf",
+          "label": "Wildfire-Handbuch lokal öffnen"
+        }
+      ]
+    },
+    {
+      "kind": "repair-guide",
+      "url": "https://btm.shortaktien.de/hilfe/dcdc",
+      "title": "12-V-Versorgung prüfen",
+      "model": "Wildfire · DC/DC-Wandler",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
+      "licenseStatus": "Eigene redaktionelle Aufbereitung; Originalquelle bleibt bei ihrem Rechteinhaber.",
+      "sourceChain": "Community-Hinweise → redaktionelle Reparaturhilfe → geprüfte Community-Ergänzungen",
+      "history": [
+        {
+          "date": "2026-09-02",
+          "label": "Reparaturhilfe redaktionell geprüft"
+        }
+      ],
+      "sources": []
+    },
+    {
+      "kind": "repair-guide",
+      "url": "https://btm.shortaktien.de/hilfe/akku-bms",
+      "title": "Akku wird nicht erkannt",
+      "model": "Bonfire & Wildfire · Akku / BMS",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
+      "licenseStatus": "Eigene redaktionelle Aufbereitung; Originalquelle bleibt bei ihrem Rechteinhaber.",
+      "sourceChain": "Community-Hinweise → redaktionelle Reparaturhilfe → geprüfte Community-Ergänzungen",
+      "history": [
+        {
+          "date": "2026-09-02",
+          "label": "Reparaturhilfe redaktionell geprüft"
+        }
+      ],
+      "sources": []
+    },
+    {
+      "kind": "repair-guide",
+      "url": "https://btm.shortaktien.de/hilfe/fehleranalyse",
+      "title": "Fehlerbild systematisch eingrenzen",
+      "model": "Bonfire & Wildfire · Diagnose",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
+      "licenseStatus": "Eigene redaktionelle Aufbereitung; Originalquelle bleibt bei ihrem Rechteinhaber.",
+      "sourceChain": "Community-Hinweise → redaktionelle Reparaturhilfe → geprüfte Community-Ergänzungen",
+      "history": [
+        {
+          "date": "2026-09-02",
+          "label": "Reparaturhilfe redaktionell geprüft"
+        }
+      ],
+      "sources": []
+    },
+    {
+      "kind": "repair-guide",
+      "url": "https://btm.shortaktien.de/hilfe/mosfet",
+      "title": "MOSFET-Fehler: Wildfire bleibt stehen",
+      "model": "Wildfire · FarDriver / Antrieb",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
+      "licenseStatus": "Eigene redaktionelle Aufbereitung; Originalquelle bleibt bei ihrem Rechteinhaber.",
+      "sourceChain": "Community-Hinweise → redaktionelle Reparaturhilfe → geprüfte Community-Ergänzungen",
+      "history": [
+        {
+          "date": "2026-09-02",
+          "label": "Reparaturhilfe redaktionell geprüft"
+        }
+      ],
+      "sources": []
+    },
+    {
+      "kind": "repair-guide",
+      "url": "https://btm.shortaktien.de/hilfe/controller",
+      "title": "Controller-Ausfall richtig zuordnen",
+      "model": "Bonfire Performance · FarDriver / CAN",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
+      "licenseStatus": "Eigene redaktionelle Aufbereitung; Originalquelle bleibt bei ihrem Rechteinhaber.",
+      "sourceChain": "Community-Hinweise → redaktionelle Reparaturhilfe → geprüfte Community-Ergänzungen",
+      "history": [
+        {
+          "date": "2026-09-02",
+          "label": "Reparaturhilfe redaktionell geprüft"
+        }
+      ],
+      "sources": []
+    },
+    {
+      "kind": "repair-guide",
+      "url": "https://btm.shortaktien.de/hilfe/vibrationen",
+      "title": "Vibrationen und Schläge aus dem Antrieb",
+      "model": "Wildfire · Motor, Rad und Controller",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
+      "licenseStatus": "Eigene redaktionelle Aufbereitung; Originalquelle bleibt bei ihrem Rechteinhaber.",
+      "sourceChain": "Community-Hinweise → redaktionelle Reparaturhilfe → geprüfte Community-Ergänzungen",
+      "history": [
+        {
+          "date": "2026-09-02",
+          "label": "Reparaturhilfe redaktionell geprüft"
+        }
+      ],
+      "sources": []
+    },
+    {
+      "kind": "repair-guide",
+      "url": "https://btm.shortaktien.de/hilfe/gabelbruecke",
+      "title": "Gabelbrücke: Schrauben gerissen",
+      "model": "Wildfire · Fahrwerk / sicherheitskritisch",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
+      "licenseStatus": "Eigene redaktionelle Aufbereitung; Originalquelle bleibt bei ihrem Rechteinhaber.",
+      "sourceChain": "Community-Hinweise → redaktionelle Reparaturhilfe → geprüfte Community-Ergänzungen",
+      "history": [
+        {
+          "date": "2026-09-02",
+          "label": "Reparaturhilfe redaktionell geprüft"
+        }
+      ],
+      "sources": []
+    },
+    {
+      "kind": "repair-guide",
+      "url": "https://btm.shortaktien.de/hilfe/gabelabdichtung",
+      "title": "Undichte Gabel abdichten",
+      "model": "Wildfire · USD-Gabel",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
+      "licenseStatus": "Eigene redaktionelle Aufbereitung; Originalquelle bleibt bei ihrem Rechteinhaber.",
+      "sourceChain": "Community-Hinweise → redaktionelle Reparaturhilfe → geprüfte Community-Ergänzungen",
+      "history": [
+        {
+          "date": "2026-09-02",
+          "label": "Reparaturhilfe redaktionell geprüft"
+        }
+      ],
+      "sources": []
+    },
+    {
+      "kind": "repair-guide",
+      "url": "https://btm.shortaktien.de/hilfe/vorderrad",
+      "title": "Vorderrad ausbauen und wieder einsetzen",
+      "model": "Bonfire · Vorderrad / Bremse",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
+      "licenseStatus": "Eigene redaktionelle Aufbereitung; Originalquelle bleibt bei ihrem Rechteinhaber.",
+      "sourceChain": "Community-Hinweise → redaktionelle Reparaturhilfe → geprüfte Community-Ergänzungen",
+      "history": [
+        {
+          "date": "2026-09-02",
+          "label": "Reparaturhilfe redaktionell geprüft"
+        }
+      ],
+      "sources": []
+    },
+    {
+      "kind": "repair-guide",
+      "url": "https://btm.shortaktien.de/hilfe/hinterrad",
+      "title": "Hinterrad und Nabenmotor prüfen",
+      "model": "Wildfire · Hinterrad / Nabenmotor",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
+      "licenseStatus": "Eigene redaktionelle Aufbereitung; Originalquelle bleibt bei ihrem Rechteinhaber.",
+      "sourceChain": "Community-Hinweise → redaktionelle Reparaturhilfe → geprüfte Community-Ergänzungen",
+      "history": [
+        {
+          "date": "2026-09-02",
+          "label": "Reparaturhilfe redaktionell geprüft"
+        }
+      ],
+      "sources": []
+    },
+    {
+      "kind": "repair-guide",
+      "url": "https://btm.shortaktien.de/hilfe/laden",
+      "title": "Laden bricht ab oder Typ 2 startet nicht",
+      "model": "Bonfire & Wildfire · Laden / BMS",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
+      "licenseStatus": "Eigene redaktionelle Aufbereitung; Originalquelle bleibt bei ihrem Rechteinhaber.",
+      "sourceChain": "Community-Hinweise → redaktionelle Reparaturhilfe → geprüfte Community-Ergänzungen",
+      "history": [
+        {
+          "date": "2026-09-02",
+          "label": "Reparaturhilfe redaktionell geprüft"
+        }
+      ],
+      "sources": []
+    },
+    {
+      "kind": "repair-guide",
+      "url": "https://btm.shortaktien.de/hilfe/nfc",
+      "title": "NFC / Keyless nachrüsten und prüfen",
+      "model": "Wildfire · Startsystem",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
+      "licenseStatus": "Eigene redaktionelle Aufbereitung; Originalquelle bleibt bei ihrem Rechteinhaber.",
+      "sourceChain": "Community-Hinweise → redaktionelle Reparaturhilfe → geprüfte Community-Ergänzungen",
+      "history": [
+        {
+          "date": "2026-09-02",
+          "label": "Reparaturhilfe redaktionell geprüft"
+        }
+      ],
+      "sources": []
+    },
+    {
+      "kind": "repair-guide",
+      "url": "https://btm.shortaktien.de/hilfe/qs8",
+      "title": "QS8-Akkuanschluss sicher prüfen",
+      "model": "Bonfire · Akkuanschluss / Hochstrom",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
+      "licenseStatus": "Eigene redaktionelle Aufbereitung; Originalquelle bleibt bei ihrem Rechteinhaber.",
+      "sourceChain": "Community-Hinweise → redaktionelle Reparaturhilfe → geprüfte Community-Ergänzungen",
+      "history": [
+        {
+          "date": "2026-09-02",
+          "label": "Reparaturhilfe redaktionell geprüft"
+        }
+      ],
+      "sources": []
+    },
+    {
+      "kind": "repair-guide",
+      "url": "https://btm.shortaktien.de/hilfe/wartung",
+      "title": "Reifen, Bremsen und Lager warten",
+      "model": "Bonfire & Wildfire · Wartung",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
+      "licenseStatus": "Eigene redaktionelle Aufbereitung; Originalquelle bleibt bei ihrem Rechteinhaber.",
+      "sourceChain": "Community-Hinweise → redaktionelle Reparaturhilfe → geprüfte Community-Ergänzungen",
+      "history": [
+        {
+          "date": "2026-09-02",
+          "label": "Reparaturhilfe redaktionell geprüft"
+        }
+      ],
+      "sources": []
+    },
+    {
+      "kind": "repair-guide",
+      "url": "https://btm.shortaktien.de/hilfe/fehlercodes",
+      "title": "Wildfire-Fehlercodes richtig einordnen",
+      "model": "Wildfire · FarDriver / Antrieb",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
+      "licenseStatus": "Eigene redaktionelle Aufbereitung; Originalquelle bleibt bei ihrem Rechteinhaber.",
+      "sourceChain": "Community-Hinweise → redaktionelle Reparaturhilfe → geprüfte Community-Ergänzungen",
+      "history": [
+        {
+          "date": "2026-09-02",
+          "label": "Reparaturhilfe redaktionell geprüft"
+        }
+      ],
+      "sources": []
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/alu-topcase",
+      "title": "Alu-Topcase",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20240416181434id_/https://www.blackteamotorbikes.com/products/alu-topcase",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/bar-end-mirrors",
+      "title": "Lenkerendenspiegel",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20230514052827id_/https://www.blackteamotorbikes.com/products/bar-end-mirrors",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/bearings",
+      "title": "Lager",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20240623012125id_/https://www.blackteamotorbikes.com/products/bearings",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/change-the-color-of-my-off-road-protection",
+      "title": "Farbauswahl Offroad-Schutz",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20250317135835id_/https://www.blackteamotorbikes.com/products/change-the-color-of-my-off-road-protection",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/blinkerhalterung-vorne",
+      "title": "Blinkerhalterung (vorne)",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20230928050545id_/https://www.blackteamotorbikes.com/products/blinkerhalterung-vorne",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/bluetooth-dongle",
+      "title": "Bluetooth Dongle",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20241214015001id_/https://www.blackteamotorbikes.com/products/bluetooth-dongle",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/bremsbelage",
+      "title": "Bremsbeläge",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20231130201331id_/https://www.blackteamotorbikes.com/products/bremsbelage",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/bremsen",
+      "title": "Bremsen",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20250317152751id_/https://www.blackteamotorbikes.com/products/bremsen",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/bremsleitung",
+      "title": "Bremsleitung",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20231130195649id_/https://www.blackteamotorbikes.com/products/bremsleitung",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/bremslichtkabel",
+      "title": "Bremslichtkabel",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20240524171025id_/https://www.blackteamotorbikes.com/products/bremslichtkabel",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/bremsscheibe",
+      "title": "Bremsscheibe",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20231130205640id_/https://www.blackteamotorbikes.com/products/bremsscheibe",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/bremszylinder",
+      "title": "Bremssattel",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20231130213148id_/https://www.blackteamotorbikes.com/products/bremszylinder",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/bremszylinder-und-hebel",
+      "title": "Bremszylinder und -hebel",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20230928052714id_/https://www.blackteamotorbikes.com/products/bremszylinder-und-hebel",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/charger-upgrade",
+      "title": "10A Charger Upgrade",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20210423150236id_/https://blackteamotorbikes.com/products/charger-upgrade",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/charging-bundle",
+      "title": "Charging Bundle",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20230928044452id_/https://www.blackteamotorbikes.com/products/charging-bundle",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/copy-of-52-v-batterie",
+      "title": "52 V Batterie",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20230929070936id_/https://www.blackteamotorbikes.com/products/copy-of-52-v-batterie",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/copy-of-beifahrerfussrasten",
+      "title": "Schwinge",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20240229082559id_/https://www.blackteamotorbikes.com/products/copy-of-beifahrerfussrasten",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/copy-of-achse",
+      "title": "Beifahrerfußrasten",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20240229092106id_/https://www.blackteamotorbikes.com/products/copy-of-achse",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/copy-of-federbeine",
+      "title": "Achse",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20240229094639id_/https://www.blackteamotorbikes.com/products/copy-of-federbeine",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/copy-of-gabelbruckenset",
+      "title": "Motorhalterung-Set",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20240229094407id_/https://www.blackteamotorbikes.com/products/copy-of-gabelbruckenset",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/copy-of-motorhalterung-set",
+      "title": "Mutterabdeckung-Set",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20240229073833id_/https://www.blackteamotorbikes.com/products/copy-of-motorhalterung-set",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/copy-of-off-road-schutz",
+      "title": "Dual Sport Lenker",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20240416162934id_/https://www.blackteamotorbikes.com/products/copy-of-off-road-schutz",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/classic-indicator",
+      "title": "Klassische Blinker",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20240623025205id_/https://www.blackteamotorbikes.com/products/classic-indicator",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/classic-mirrors",
+      "title": "Klassische Spiegel",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20240522024120id_/https://www.blackteamotorbikes.com/products/classic-mirrors",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/dcdc-converter",
+      "title": "DC/DC-Wandler",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20240623020107id_/https://www.blackteamotorbikes.com/products/dcdc-converter",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/display",
+      "title": "Display",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20240623024019id_/https://www.blackteamotorbikes.com/products/display",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/dual-sport-reifen-upgrade",
+      "title": "Dual-Sport-Reifen-Upgrade",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20230929061318id_/https://www.blackteamotorbikes.com/products/dual-sport-reifen-upgrade",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/enduro-fender",
+      "title": "Enduro-Kotflügel",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20241202164631id_/https://www.blackteamotorbikes.com/products/enduro-fender",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/felge",
+      "title": "Felge",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20240623005132id_/https://www.blackteamotorbikes.com/products/felge",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/fork-stabiliser",
+      "title": "Gabelstabilisator",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20210423143255id_/https://blackteamotorbikes.com/products/fork-stabiliser",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/front-wheel",
+      "title": "Vorderrad",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20250917145425id_/https://www.blackteamotorbikes.com/products/front-wheel",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/foot-pegs-set",
+      "title": "Fußrasten-Set",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20250917142630id_/https://www.blackteamotorbikes.com/products/foot-pegs-set",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/gabelbrucke-mit-lenkerklemmen",
+      "title": "Gabelbrückenset",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20230928043527id_/https://www.blackteamotorbikes.com/products/gabelbrucke-mit-lenkerklemmen",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/gabelset",
+      "title": "Gabelset",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20230929064906id_/https://www.blackteamotorbikes.com/products/gabelset",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/gasdruck-federbeine",
+      "title": "Gasdruck-Federbeine",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20240524161652id_/https://www.blackteamotorbikes.com/products/gasdruck-federbeine",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/goldene-usd-gabel",
+      "title": "Goldene USD-Gabel",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20241108005431id_/https://www.blackteamotorbikes.com/products/goldene-usd-gabel",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/handguards",
+      "title": "Aluminium Handguards",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20240416164841id_/https://www.blackteamotorbikes.com/products/handguards",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/handlebar-crash-bars",
+      "title": "Lenker-Sturzbügel",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20230928051418id_/https://www.blackteamotorbikes.com/products/handlebar-crash-bars",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/handlebar-risers",
+      "title": "Lenkererhöhung",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20220119080322id_/https://blackteamotorbikes.com/products/handlebar-risers",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/headlight",
+      "title": "Scheinwerfer",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20240623022347id_/https://www.blackteamotorbikes.com/products/headlight",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/headlight-grill",
+      "title": "Scheinwerfergitter",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20210423132508id_/https://blackteamotorbikes.com/products/headlight-grill",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/hintere-stossdampfer",
+      "title": "Hintere Stoßdämpfer",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20230929064518id_/https://www.blackteamotorbikes.com/products/hintere-stossdampfer",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/hinterer-radschutz",
+      "title": "Hinterer Radschutz",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20240623012928id_/https://www.blackteamotorbikes.com/products/hinterer-radschutz",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/hub-motor",
+      "title": "Radnabenmotor",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20241012160510id_/https://www.blackteamotorbikes.com/products/hub-motor",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/kabel",
+      "title": "Kabel",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20240229080137id_/https://www.blackteamotorbikes.com/products/kabel",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/key-set",
+      "title": "Schlüsselsatz",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20240524160306id_/https://www.blackteamotorbikes.com/products/key-set",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/keyless-go",
+      "title": "Keyless Go",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20230928044821id_/https://www.blackteamotorbikes.com/products/keyless-go",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/keyless-go-retro-fit",
+      "title": "Keyless-Go-Retrofit",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20230530151253id_/https://www.blackteamotorbikes.com/products/keyless-go-retro-fit",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/kill-switch",
+      "title": "Kill-Switch",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20230929081544id_/https://www.blackteamotorbikes.com/products/kill-switch",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/ladegerat",
+      "title": "Ladegerät",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20230929073950id_/https://www.blackteamotorbikes.com/products/ladegerat",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/langer-alu-radschutz",
+      "title": "Langer Alu-Radschutz",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20241108015839id_/https://www.blackteamotorbikes.com/products/langer-alu-radschutz",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/langer-bonfire-sitz",
+      "title": "Langer Bonfire-Sitz",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20240523123259id_/https://www.blackteamotorbikes.com/products/langer-bonfire-sitz",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/led-blinker",
+      "title": "LED-Blinker",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20250917141127id_/https://www.blackteamotorbikes.com/products/led-blinker",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/led-indicators",
+      "title": "LED Blinker",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20230514052827id_/https://www.blackteamotorbikes.com/products/led-indicators",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/lenker",
+      "title": "Lenker",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20230928044110id_/https://www.blackteamotorbikes.com/products/lenker",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/light-holder",
+      "title": "Scheinwerferhalter",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20240524160356id_/https://www.blackteamotorbikes.com/products/light-holder",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/lower-foot-rests",
+      "title": "Lower Foot Rests",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20220119075545id_/https://blackteamotorbikes.com/products/lower-foot-rests",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/luftgekuhlt",
+      "title": "Luftgekühlt",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20240229080451id_/https://www.blackteamotorbikes.com/products/luftgekuhlt",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/modern-bundle",
+      "title": "Modern-Bundle",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20231130210336id_/https://www.blackteamotorbikes.com/products/modern-bundle",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/moped-license-plate-holder",
+      "title": "Moped-Kennzeichenhalter",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20230928043605id_/https://www.blackteamotorbikes.com/products/moped-license-plate-holder",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/mutterabdeckung-set",
+      "title": "Mutterabdeckung Set",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": []
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/nfc-karte-nachrustkit",
+      "title": "NFC-Karte / Nachrüstkit",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20250804095643id_/https://www.blackteamotorbikes.com/products/nfc-karte-nachrustkit",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/off-road-bundle",
+      "title": "Offroad-Bundle",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20230928050835id_/https://www.blackteamotorbikes.com/products/off-road-bundle",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/off-road-schutz",
+      "title": "Offroad-Schutz",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": []
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/passenger-hold",
+      "title": "Soziushalter",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20240524155112id_/https://www.blackteamotorbikes.com/products/passenger-hold",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/performance-bundle",
+      "title": "Performance-Bundle",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20230928034448id_/https://www.blackteamotorbikes.com/products/performance-bundle",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/radabdeckung",
+      "title": "Radabdeckung",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20230929073204id_/https://www.blackteamotorbikes.com/products/radabdeckung",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/range-extender-bundle",
+      "title": "Reichweiten-Bundle",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20230610153458id_/https://www.blackteamotorbikes.com/products/range-extender-bundle",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/rear-light",
+      "title": "Rücklicht",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20240524163349id_/https://www.blackteamotorbikes.com/products/rear-light",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/rear-rack",
+      "title": "Gepäckträger hinten",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20210423140141id_/https://blackteamotorbikes.com/products/rear-rack",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/reflektoren",
+      "title": "Reflektoren",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20240229080801id_/https://www.blackteamotorbikes.com/products/reflektoren",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/reparatur-qs8s-stecker",
+      "title": "QS8-S-Stecker-Reparatur",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": []
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/retro-windschild",
+      "title": "Retro-Windschild",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20220522135645id_/https://blackteamotorbikes.com/products/retro-windschild",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/ride-mode-button",
+      "title": "Fahrmodi-Taster",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20240623020705id_/https://www.blackteamotorbikes.com/products/ride-mode-button",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/schaltereinheit",
+      "title": "Schaltereinheit",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20230929080546id_/https://www.blackteamotorbikes.com/products/schaltereinheit",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/scheinwerfer-retrofit",
+      "title": "Scheinwerfer-Retrofit",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20250804091728id_/https://www.blackteamotorbikes.com/products/scheinwerfer-retrofit",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/schuko-auf-typ-2-adapter",
+      "title": "Schuko-auf-Typ-2-Adapter",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20240804120422id_/https://www.blackteamotorbikes.com/products/schuko-auf-typ-2-adapter",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/schuko-ladekabel-fur-wildfire",
+      "title": "Schuko-Ladekabel für Wildfire",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20250804085718id_/https://www.blackteamotorbikes.com/products/schuko-ladekabel-fur-wildfire",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/seat",
+      "title": "Sitz",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20240623004757id_/https://www.blackteamotorbikes.com/products/seat",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/seitenstander-kill-switch",
+      "title": "Seitenständer Kill Switch",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20230929073809id_/https://www.blackteamotorbikes.com/products/seitenstander-kill-switch",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/side-bag",
+      "title": "Seitentasche",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20230609033448id_/https://www.blackteamotorbikes.com/products/side-bag",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/side-cover",
+      "title": "Seitenabdeckung",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20240623011033id_/https://www.blackteamotorbikes.com/products/side-cover",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/side-stand",
+      "title": "Seitenständer",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20240623020054id_/https://www.blackteamotorbikes.com/products/side-stand",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/side-stand-spring-set",
+      "title": "Seitenständer-Feder-Set",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20240623023908id_/https://www.blackteamotorbikes.com/products/side-stand-spring-set",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/sitz-b-ware-gebraucht",
+      "title": "Sitz (B-Ware / gebraucht)",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20240416175559id_/https://www.blackteamotorbikes.com/products/sitz-b-ware-gebraucht",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/speiche-mit-nippel",
+      "title": "Speiche mit Nippel",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20240523225106id_/https://www.blackteamotorbikes.com/products/speiche-mit-nippel",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/stand",
+      "title": "Montageständer",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20240416170443id_/https://www.blackteamotorbikes.com/products/stand",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/stander-copy",
+      "title": "Ständer",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20240804120812id_/https://www.blackteamotorbikes.com/products/stander-copy",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/starter-relais-12-v",
+      "title": "12-V-Starterrelais",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20230929081310id_/https://www.blackteamotorbikes.com/products/starter-relais-12-v",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/sticker-set",
+      "title": "Sticker-Set",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20230610145248id_/https://www.blackteamotorbikes.com/products/sticker-set",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/surf-rack",
+      "title": "Surf-Rack",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20210423141549id_/https://blackteamotorbikes.com/products/surf-rack",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/tall-rider-bundle",
+      "title": "Tall-Rider-Bundle",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20230610135946id_/https://www.blackteamotorbikes.com/products/tall-rider-bundle",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/tank",
+      "title": "Tank",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20240524171856id_/https://www.blackteamotorbikes.com/products/tank",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/tank-b-ware",
+      "title": "Tank (B-Ware)",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20231130213355id_/https://www.blackteamotorbikes.com/products/tank-b-ware",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/tankgummi-set",
+      "title": "Tankgummi Set",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20230929065701id_/https://www.blackteamotorbikes.com/products/tankgummi-set",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/tft-touch-display-retrofit",
+      "title": "TFT-Touchdisplay-Retrofit",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20250804085158id_/https://www.blackteamotorbikes.com/products/tft-touch-display-retrofit",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/typ-2-kabel",
+      "title": "Typ-2-Kabel",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20241012165318id_/https://www.blackteamotorbikes.com/products/typ-2-kabel",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/usb-charging-port",
+      "title": "USB-Ladeport",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20230514052827id_/https://www.blackteamotorbikes.com/products/usb-charging-port",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/usd-gabelset",
+      "title": "USD-Gabel-Set",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20251013055424id_/https://www.blackteamotorbikes.com/products/usd-gabelset",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/wildfire",
+      "title": "Wildfire",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20240416172408id_/https://www.blackteamotorbikes.com/products/wildfire",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/wildfire-abs",
+      "title": "Wildfire ABS",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20240416163819id_/https://www.blackteamotorbikes.com/products/wildfire-abs",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/wildfire-gabelbruckenset",
+      "title": "Wildfire-Gabelbrücken-Set",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20251013061324id_/https://www.blackteamotorbikes.com/products/wildfire-gabelbruckenset",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/wildfire-konfiguration",
+      "title": "Wildfire-Konfiguration",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20240416160406id_/https://www.blackteamotorbikes.com/products/wildfire-konfiguration",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/wildfire-performance",
+      "title": "Wildfire Performance",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20240229094130id_/https://www.blackteamotorbikes.com/products/wildfire-performance",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/windschild",
+      "title": "Windschild",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": []
+    },
+    {
+      "kind": "part",
+      "url": "https://btm.shortaktien.de/ersatzteile/xlr-charging-port",
+      "title": "XLR-Ladeport",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
+      "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://web.archive.org/web/20230928031437id_/https://www.blackteamotorbikes.com/products/xlr-charging-port",
+          "label": "Archivierter Originaleintrag"
+        }
+      ]
+    }
+  ]
+}

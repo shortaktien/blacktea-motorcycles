@@ -196,6 +196,45 @@ try {
     $assert(count($legacyActivity) === 1 && $legacyActivity[0]['type'] === 'repair_request' && $legacyActivity[0]['replyCount'] === 1, 'Repair requests expose their unified answer count in the feed');
     $as($member);
     $status($controller->communityReplies($legacyRequestId, $request('POST', ['body' => 'Zweiter Antwortweg'])), 409, 'Community replies are closed for repair requests');
+
+    // Production must not expose local demo fixtures, while keeping them available for local QA.
+    $previousAppEnv = [
+        'env' => $_ENV['APP_ENV'] ?? null,
+        'server' => $_SERVER['APP_ENV'] ?? null,
+        'process' => getenv('APP_ENV'),
+    ];
+    try {
+        $_ENV['APP_ENV'] = $_SERVER['APP_ENV'] = 'prod';
+        putenv('APP_ENV=prod');
+        $demoUser = str_repeat('e', 32);
+        $demoPost = str_repeat('f', 32);
+        $community->update(static function (array &$data) use ($demoUser, $demoPost, $now): void {
+            $data['comments'][] = [
+                'id' => $demoPost, 'guide' => 'community-erfahrungen', 'kind' => 'comment', 'status' => 'approved',
+                'userId' => $demoUser, 'name' => 'lokaler Test', 'email' => 'local@btm.test', 'topic' => null,
+                'body' => 'Ein lokaler Testbeitrag darf nicht im Produktionsfeed erscheinen.', 'section' => 'Bonfire',
+                'source' => null, 'parentId' => null, 'createdAt' => $now, 'approvedAt' => $now,
+                'imageFile' => null, 'imageMime' => null,
+            ];
+        });
+        $users->update(static function (array &$data) use ($demoUser, $now): void {
+            $data['users'][] = [
+                'id' => $demoUser, 'name' => 'lokaler Test', 'email' => 'local@btm.test', 'status' => 'active',
+                'role' => 'member', 'isLocalDemo' => true, 'country' => 'D', 'postalCode' => '01219',
+                'kilometers' => 500, 'createdAt' => $now,
+            ];
+        });
+        $as(null);
+        $productionActivity = $json($controller->communityActivity($request('GET')));
+        $assert(!in_array($demoPost, array_column($productionActivity['activities'], 'id'), true), 'Production hides demo posts from feed');
+        $assert($json($controller->readFeedback('community-erfahrungen'))['comments'] === [], 'Production hides demo posts from feedback');
+        $status($controller->publicProfile($demoUser), 404, 'Production hides demo profiles');
+        $assert($json($controller->communityMap())['totalKilometers'] === 0, 'Production hides demo profiles from map');
+    } finally {
+        if ($previousAppEnv['env'] === null) unset($_ENV['APP_ENV']); else $_ENV['APP_ENV'] = $previousAppEnv['env'];
+        if ($previousAppEnv['server'] === null) unset($_SERVER['APP_ENV']); else $_SERVER['APP_ENV'] = $previousAppEnv['server'];
+        if ($previousAppEnv['process'] === false) putenv('APP_ENV'); else putenv('APP_ENV=' . $previousAppEnv['process']);
+    }
 } finally {
     if (session_status() === PHP_SESSION_ACTIVE) session_write_close();
     $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST);

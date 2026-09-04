@@ -10,7 +10,10 @@
   "scripts": {
     "seo:generate": "node scripts/generate-seo.mjs",
     "check:seo": "node scripts/check-seo-links.mjs",
+    "check:content-policy": "node scripts/check-content-policy.mjs",
+    "check:lighthouse": "node scripts/check-lighthouse.mjs",
     "check:parts": "node scripts/check-parts.mjs",
+    "check:pseo": "node scripts/check-pseo.mjs",
     "check:production-routing": "node scripts/check-production-routing.mjs",
     "check:mentions": "node --experimental-strip-types scripts/check-mentions.mjs",
     "check:images": "node scripts/check-image-loading.mjs",
@@ -29,6 +32,7 @@
     "@types/node": "^22.20.1",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
+    "lighthouse": "^13.4.1",
     "typescript": "^5.7.3",
     "vite": "^6.0.7"
   }

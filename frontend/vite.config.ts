@@ -25,7 +25,7 @@ const partWordOverrides = mapFromApp('partWordOverrides');
 const humanizePartSlug = (slug: string) => partTitleOverrides[slug] ?? slug.replace(/^copy-of-/, '').split('-').map((word) => partWordOverrides[word] ?? `${word.slice(0, 1).toUpperCase()}${word.slice(1)}`).join(' ');
 const parts = (partsCatalog.historical_product_slugs ?? []).map((slug) => ({ path: `/ersatzteile/${slug}`, title: partDetailsCatalog.entries?.find((entry) => entry.slug === slug && entry.ok)?.title ?? humanizePartSlug(slug) }));
 const routeMetadata: Record<string, { title: string; description: string; robots?: string }> = {
-  '/': { title: 'Black Tea Hilfe — Dokumente, Ersatzteile & Updates', description: 'Unabhängige Sammelstelle für Black Tea Motorbikes: lokale PDFs, Ersatzteile, Reparaturhilfen und nachvollziehbare Quellen.' },
+  '/': { title: 'Black Tea Motorbikes – Hilfe — Community & Reparaturwissen', description: 'Der Treffpunkt für Bonfire- und Wildfire-Rider: Community, DACH-Karte, Reparaturhilfe, Ersatzteile, Wiki und PDFs. Wissen finden und Erfahrungen teilen.' },
   '/hilfe': { title: 'Reparaturhilfe — Black Tea Hilfe', description: 'Redaktionell geordnete Reparaturhilfen für typische Bonfire- und Wildfire-Fehlerbilder — mit Kurzablauf, ausführlicher Prüfung, Sicherheit und Quelle.' },
   '/hilfe/anfragen': { title: 'Reparatur anfragen — Black Tea Hilfe', description: 'Reparaturanfragen zu Black Tea Bonfire und Wildfire stellen, Erfahrungen teilen und gemeinsam nachvollziehbare Lösungen dokumentieren.' },
   '/ersatzteile': { title: 'Ersatzteile — Black Tea Hilfe', description: 'Historischer BTM-Ersatzteilkatalog mit Modellbezug, Teilenamen und Quellen. Bestand und Preise vor dem Kauf prüfen.' },

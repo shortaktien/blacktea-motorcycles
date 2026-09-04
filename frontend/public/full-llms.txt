@@ -11,7 +11,7 @@
 
 ## Übersichtsseiten
 
-- [Black Tea Motorbikes – Hilfe — Dokumente, Ersatzteile & Updates](https://btm.shortaktien.de/): Unabhängige Sammelstelle für Black Tea Motorbikes: lokale PDFs, Ersatzteile, Reparaturhilfen und nachvollziehbare Quellen.
+- [Black Tea Motorbikes – Hilfe — Community & Reparaturwissen](https://btm.shortaktien.de/): Der Treffpunkt für Bonfire- und Wildfire-Rider: Community, DACH-Karte, Reparaturhilfe, Ersatzteile, Wiki und PDFs. Wissen finden und Erfahrungen teilen.
 - [Reparaturhilfe — Black Tea Motorbikes – Hilfe](https://btm.shortaktien.de/hilfe): Redaktionell geordnete Reparaturhilfen für typische Bonfire- und Wildfire-Fehlerbilder — mit Kurzablauf, ausführlicher Prüfung, Sicherheit und Quelle.
 - [Reparatur anfragen — Black Tea Motorbikes – Hilfe](https://btm.shortaktien.de/hilfe/anfragen): Reparaturanfragen zu Black Tea Bonfire und Wildfire stellen, Erfahrungen teilen und gemeinsam nachvollziehbare Lösungen dokumentieren.
 - [Ersatzteile — Black Tea Motorbikes – Hilfe](https://btm.shortaktien.de/ersatzteile): Historischer BTM-Ersatzteilkatalog mit Modellbezug, Teilenamen und Quellen. Bestand und Preise vor dem Kauf prüfen.
@@ -671,12 +671,18 @@
 - [Wiki-Artikel öffnen](https://btm.shortaktien.de/bikes/bonfire)
 - Modellbezug: Bonfire
 - Kurzbeschreibung: Technische Grundlagen, Modellvarianten und belegte Wartungsspuren zur Black Tea Bonfire.
+- Wissensstatus: Version 2026-09-04, letzte Prüfung 2026-09-04.
+- Lizenzstatus: Eigene redaktionelle Aufbereitung; Originalquellen bleiben bei ihren Rechteinhabern.
+- Quellenkette: Lokale Dokumente → redaktionelle Aufbereitung → geprüfte Community-Ergänzungen
 
 ### Wildfire
 
 - [Wiki-Artikel öffnen](https://btm.shortaktien.de/bikes/wildfire)
 - Modellbezug: Wildfire
 - Kurzbeschreibung: Technische Dokumente, elektrische Systeme und belegte Diagnosehinweise zur Black Tea Wildfire.
+- Wissensstatus: Version 2026-09-04, letzte Prüfung 2026-09-04.
+- Lizenzstatus: Eigene redaktionelle Aufbereitung; Originalquellen bleiben bei ihren Rechteinhabern.
+- Quellenkette: Lokale Dokumente → redaktionelle Aufbereitung → geprüfte Community-Ergänzungen
 
 ## Lokale PDFs
 

@@ -71,9 +71,53 @@ trait CommunityInteractionTrait
         return null;
     }
 
+    private function demoContentIsVisible(): bool
+    {
+        $override = $_ENV['SHOW_DEMO_CONTENT'] ?? $_SERVER['SHOW_DEMO_CONTENT'] ?? getenv('SHOW_DEMO_CONTENT');
+        if (is_string($override) && $override !== '') {
+            return filter_var($override, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? false;
+        }
+
+        $environment = $_ENV['APP_ENV'] ?? $_SERVER['APP_ENV'] ?? getenv('APP_ENV');
+        return $environment !== 'prod';
+    }
+
+    private function isDemoUser(array $user): bool
+    {
+        if ($this->demoContentIsVisible()) {
+            return false;
+        }
+
+        $email = strtolower(trim((string) ($user['email'] ?? '')));
+        return ($user['isLocalDemo'] ?? false) === true
+            || str_ends_with($email, '@demo.invalid')
+            || in_array($email, ['local@btm.test', 'moderation-demo@example.com'], true);
+    }
+
+    private function isDemoComment(array $comment): bool
+    {
+        if ($this->demoContentIsVisible()) {
+            return false;
+        }
+
+        $email = strtolower(trim((string) ($comment['email'] ?? '')));
+        $name = strtolower(trim((string) ($comment['name'] ?? '')));
+        if ($email === 'moderation-demo@example.com'
+            || str_ends_with($email, '@demo.invalid')
+            || str_ends_with($email, '@btm.test')
+            || str_starts_with($name, 'demo ')
+            || str_contains($name, 'mailjet test')
+        ) {
+            return true;
+        }
+
+        $userId = $comment['userId'] ?? null;
+        return is_string($userId) && $userId !== '' && $this->isDemoUser($this->userStorage->findById($userId) ?? []);
+    }
+
     private function isCommunityVisible(array $comment, array $comments): bool
     {
-        if (($comment['status'] ?? null) !== 'approved' || !is_string($comment['userId'] ?? null)) {
+        if ($this->isDemoComment($comment) || ($comment['status'] ?? null) !== 'approved' || !is_string($comment['userId'] ?? null)) {
             return false;
         }
         if (($this->userStorage->findById($comment['userId'])['status'] ?? null) !== 'active') {

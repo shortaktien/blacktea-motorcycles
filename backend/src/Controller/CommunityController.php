@@ -64,6 +64,7 @@ final class CommunityController
         $comments = array_values(array_filter(
             $data['comments'],
             fn (array $comment): bool => ($comment['status'] ?? null) === 'approved'
+                && !$this->isDemoComment($comment)
                 && ((($comment['guide'] ?? null) === $guide && in_array(($comment['kind'] ?? 'comment'), $expectedKinds, true))
                     || ($guide === self::REPAIR_REQUEST_GUIDE
                         && ($comment['kind'] ?? null) === 'community_reply'
@@ -334,7 +335,7 @@ final class CommunityController
         $matches = [];
         if (preg_match('/^[a-z0-9äöüß]{1,80}$/u', $query) === 1) {
             foreach ($this->userStorage->read()['users'] as $user) {
-                if (($user['status'] ?? null) !== 'active' || ($user['communicationBlocked'] ?? false)) continue;
+                if (($user['status'] ?? null) !== 'active' || ($user['communicationBlocked'] ?? false) || $this->isDemoUser($user)) continue;
                 if (!str_starts_with(mb_strtolower($user['name'], 'UTF-8'), $query)) continue;
                 // Deliberately expose only public handles and profile IDs, never contact/location data.
                 $matches[] = ['id' => $user['id'], 'name' => $user['name']];
@@ -354,7 +355,7 @@ final class CommunityController
         }
 
         $user = $this->userStorage->findById($id);
-        if ($user === null || ($user['status'] ?? null) !== 'active') {
+        if ($user === null || ($user['status'] ?? null) !== 'active' || $this->isDemoUser($user)) {
             return $this->error('Profil nicht gefunden.', Response::HTTP_NOT_FOUND);
         }
 
@@ -424,7 +425,7 @@ final class CommunityController
             return $this->error('Bild nicht gefunden.', Response::HTTP_NOT_FOUND);
         }
         $user = $this->userStorage->findById($id);
-        if ($user === null || ($user['status'] ?? null) !== 'active') {
+        if ($user === null || ($user['status'] ?? null) !== 'active' || $this->isDemoUser($user)) {
             return $this->error('Bild nicht gefunden.', Response::HTTP_NOT_FOUND);
         }
         $filename = $user['avatarFile'] ?? null;
@@ -447,7 +448,7 @@ final class CommunityController
     #[Route('/api/community/groups', name: 'api_community_groups', methods: ['GET'])]
     public function communityGroups(): JsonResponse
     {
-        $activeUsers = array_values(array_filter($this->userStorage->read()['users'] ?? [], static fn (array $user): bool => ($user['status'] ?? null) === 'active'));
+        $activeUsers = array_values(array_filter($this->userStorage->read()['users'] ?? [], fn (array $user): bool => ($user['status'] ?? null) === 'active' && !$this->isDemoUser($user)));
         $countModel = static function (array $models) use ($activeUsers): int {
             return count(array_filter($activeUsers, static fn (array $user): bool => in_array($user['model'] ?? null, $models, true)));
         };
@@ -484,7 +485,7 @@ final class CommunityController
         $viewer = $this->users->currentUser();
         $activeUsers = [];
         foreach ($this->userStorage->read()['users'] ?? [] as $user) {
-            if (($user['status'] ?? null) === 'active' && is_string($user['id'] ?? null)) {
+            if (($user['status'] ?? null) === 'active' && is_string($user['id'] ?? null) && !$this->isDemoUser($user)) {
                 $activeUsers[$user['id']] = $user;
             }
         }
@@ -594,7 +595,7 @@ final class CommunityController
         $regions = [];
         $totalKilometers = 0;
         foreach ($this->userStorage->read()['users'] ?? [] as $user) {
-            if (($user['status'] ?? null) !== 'active') {
+            if (($user['status'] ?? null) !== 'active' || $this->isDemoUser($user)) {
                 continue;
             }
 

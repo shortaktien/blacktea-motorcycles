@@ -6,6 +6,7 @@ import partDetailsCatalog from '../../research/parts-details.json';
 import siteConfig from './site-config.json';
 import { communityMapCountries, communityMapSubdivisions, communityMapViewBox, getCommunityMapPoint, type CommunityMapModel, type CommunityMapRegion, type PostalCountry } from './community-map';
 import { cleanWebMcpText, searchBtmKnowledge, webMcpExcerpt, type WebMcpKnowledgeEntry } from './webmcp-search';
+import { sourceKindFromType, sourceKindLabel, type SourceReference } from './source-reference';
 
 type CardKind = 'Dokument' | 'Ersatzteil' | 'Community';
 type Filter = 'Alle' | CardKind;
@@ -76,6 +77,19 @@ type RepairGuide = {
   detailSections: RepairSection[];
 };
 
+type KnowledgeHistoryEntry = {
+  date: string;
+  label: string;
+};
+
+type KnowledgeRecord = {
+  revision: string;
+  reviewedAt: string;
+  licenseStatus: string;
+  sourceChain: string;
+  history: KnowledgeHistoryEntry[];
+};
+
 type WikiArticle = {
   slug: string;
   path: string;
@@ -84,8 +98,8 @@ type WikiArticle = {
   intro: string;
   status: string;
   lastUpdated?: string;
-  sourceHref?: string;
-  sourceLabel?: string;
+  source?: SourceReference;
+  knowledge: KnowledgeRecord;
   body: string;
 };
 
@@ -195,6 +209,8 @@ type PartResearchEntry = {
   source_type?: string;
   source_url?: string;
   archive_lookup?: string;
+  manufacturer_reference?: string;
+  manufacturer_datasheet?: string;
   amazon_url?: string;
   amazon_search_url?: string;
   fallbacks?: Array<{ name: string; url: string; fit_status?: string }>;
@@ -235,6 +251,7 @@ type HistoricalShopPart = {
   variants?: string[];
   variantDetails?: Array<{ label: string; price?: number; available?: boolean }>;
   archiveHref: string;
+  sources: SourceReference[];
   historicalSummary: string;
   compatibilityNote: string;
   confidence: string;
@@ -727,8 +744,13 @@ const historicalShopParts: HistoricalShopPart[] = partsCatalog.historical_produc
   const model = details?.model ?? (slug.includes('wildfire') || archived?.title?.toLowerCase().includes('wildfire') ? 'Wildfire' : 'Bonfire-Familie, Variante prüfen');
   const category = inferPartCategory(slug);
   const title = partTitleOverrides[slug] ?? archived?.title ?? humanizePartSlug(slug);
-  const archivedVariants = archived?.variants?.map((variant) => variant.title ?? variant.name ?? '').filter(Boolean) as string[] | undefined;
-  const archivedVariantDetails = archived?.variants?.map((variant) => ({ label: variant.title ?? variant.name ?? '', price: variant.price_eur, available: variant.available })).filter((variant) => variant.label);
+  const archivedVariantLabel = (variant: NonNullable<ArchivedPartDetail['variants']>[number]): string => {
+    const title = variant.title?.trim();
+    const name = variant.name?.trim();
+    return title && !/^default(?: title)?$/i.test(title) ? title : name ?? '';
+  };
+  const archivedVariants = archived?.variants?.map(archivedVariantLabel).filter(Boolean) as string[] | undefined;
+  const archivedVariantDetails = archived?.variants?.map((variant) => ({ label: archivedVariantLabel(variant), price: variant.price_eur, available: variant.available })).filter((variant) => variant.label);
   const confirmedPurchase = research?.purchase_status === 'confirmed' && Boolean(research.amazon_url || research.fallbacks?.length || research.supplier_link);
   const candidatePurchase = research?.purchase_status === 'candidate' && Boolean(research.amazon_url || research.purchase_options?.length);
   const confirmedFallback = confirmedPurchase ? research?.fallbacks?.[0] ?? (research?.supplier_link ? { name: 'Hersteller-/Fachquelle', url: research.supplier_link } : undefined) : undefined;
@@ -742,6 +764,45 @@ const historicalShopParts: HistoricalShopPart[] = partsCatalog.historical_produc
       : undefined;
   const hasPurchaseOptions = Boolean(purchaseOptions?.length);
   const technicalEvidence = partTechnicalEvidence[slug];
+  const sources: SourceReference[] = [
+    {
+      href: localPartArchiveHref,
+      label: 'Ersatzteil-Archiv',
+      kind: 'archive' as const,
+      status: 'lokal gesichert',
+      checkedAt: research?.checked_at,
+      rights: 'Link und Archivdaten zur Gegenprüfung',
+    },
+    ...(archived?.archive ? [{
+      href: archived.archive,
+      label: 'Archivierter Originaleintrag',
+      kind: 'archive' as const,
+      status: 'historische Aufnahme',
+      checkedAt: archived.timestamp?.slice(0, 4),
+    }] : []),
+    ...(research?.source_url ? [{
+      href: research.source_url,
+      label: sourceKindLabel(sourceKindFromType(research.source_type)),
+      kind: sourceKindFromType(research.source_type),
+      status: research.source_type === 'community_report' ? 'Recherchegrundlage' : undefined,
+      checkedAt: research.checked_at,
+      rights: research.rights_status,
+    }] : []),
+    ...(research?.manufacturer_reference ? [{
+      href: research.manufacturer_reference,
+      label: 'Hersteller-/Datenquelle',
+      kind: 'manufacturer' as const,
+      status: 'technischer Abgleich',
+      checkedAt: research.checked_at,
+    }] : []),
+    ...(research?.manufacturer_datasheet ? [{
+      href: research.manufacturer_datasheet,
+      label: 'Hersteller-Datenblatt',
+      kind: 'manufacturer' as const,
+      status: 'technischer Abgleich',
+      checkedAt: research.checked_at,
+    }] : []),
+  ].filter((source, index, all) => all.findIndex((candidate) => candidate.href === source.href) === index);
   return {
     id: slug,
     checkedAt: research?.checked_at ?? '2026-09-02',
@@ -754,6 +815,7 @@ const historicalShopParts: HistoricalShopPart[] = partsCatalog.historical_produc
     variants: archivedVariants?.length ? archivedVariants : research?.variants ?? details?.variants,
     variantDetails: archivedVariantDetails?.length ? archivedVariantDetails : undefined,
     archiveHref: localPartArchiveHref,
+    sources,
     historicalSummary: partSummaryOverrides[slug] ?? research?.specification_lead ?? `Historischer Ersatzteil-Eintrag für ${model}. Die archivierten Varianten und der alte Preis dienen nur als Orientierung; konkrete Maße, Befestigung, Stecker und Modellstand müssen vor dem Kauf geprüft werden.`,
     compatibilityNote: research?.compatibility_note ?? 'Die archivierten Angaben ersetzen keine Passformprüfung. Vor einer Bestellung Modellvariante, Maße, Befestigung, Stecker und Zulassung am Fahrzeug abgleichen.',
     confidence: research?.confidence ?? 'historischer Produktname; aktuelle Verfügbarkeit ungeprüft',
@@ -1721,6 +1783,18 @@ function parseWikiMarkdown(source: string, filePath: string): WikiArticle {
   const relativePath = filePath.match(/content\/wiki\/(.+)$/)?.[1] ?? filePath.split('/').slice(-2).join('/');
   const articlePath = relativePath.replace(/\.md$/, '').replace(/\/index$/, '');
   const path = `/bikes/${articlePath}`;
+  const lastUpdated = fields.lastUpdated ?? fields.updated ?? fields.dateModified ?? 'unbekannt';
+  const history = (fields.history ?? '')
+    .split(';')
+    .map((entry) => entry.trim())
+    .filter(Boolean)
+    .map((entry) => {
+      const separator = entry.indexOf('|');
+      return separator > 0
+        ? { date: entry.slice(0, separator).trim(), label: entry.slice(separator + 1).trim() }
+        : { date: lastUpdated, label: entry };
+    })
+    .filter((entry) => entry.label);
 
   return {
     slug: articlePath.replace(/\//g, '-'),
@@ -1729,9 +1803,22 @@ function parseWikiMarkdown(source: string, filePath: string): WikiArticle {
     model: fields.model ?? 'Bikes',
     intro: fields.intro ?? 'Redaktionell aufbereiteter Wiki-Artikel aus lokal gesicherten Quellen.',
     status: fields.status ?? 'Entwurf',
-    lastUpdated: fields.lastUpdated ?? fields.updated ?? fields.dateModified,
-    sourceHref: fields.source,
-    sourceLabel: fields.sourceLabel,
+    lastUpdated,
+    source: fields.source ? {
+      href: fields.source,
+      label: fields.sourceLabel ?? 'Lokale Quelle öffnen',
+      kind: sourceKindFromType(fields.sourceType ?? fields.source),
+      status: fields.sourceStatus,
+      checkedAt: fields.sourceCheckedAt ?? fields.lastUpdated ?? fields.updated ?? fields.dateModified,
+      rights: fields.rightsStatus,
+    } : undefined,
+    knowledge: {
+      revision: fields.revision ?? lastUpdated,
+      reviewedAt: fields.reviewedAt ?? lastUpdated,
+      licenseStatus: fields.licenseStatus ?? 'Eigene redaktionelle Aufbereitung; Originalquellen bleiben bei ihren Rechteinhabern.',
+      sourceChain: fields.sourceChain ?? 'Lokale Dokumente → redaktionelle Aufbereitung → geprüfte Community-Ergänzungen',
+      history: history.length ? history : [{ date: lastUpdated, label: 'Artikel redaktionell erfasst' }],
+    },
     body: body.trim(),
   };
 }
@@ -1985,6 +2072,62 @@ function getWikiArticleSearchResults(body: string, query: string): WikiTocItem[]
   return sections
     .filter((section) => `${section.label} ${section.text}`.toLocaleLowerCase('de').includes(normalizedQuery))
     .map(({ id, label, level }) => ({ id, label, level }));
+}
+
+type RelatedKnowledgeItem = {
+  kind: 'Reparaturhilfe' | 'FAQ' | 'Ersatzteil' | 'PDF';
+  title: string;
+  description: string;
+  href: string;
+};
+
+function getRelatedKnowledge(article: WikiArticle): RelatedKnowledgeItem[] {
+  const modelTerm = article.model.toLocaleLowerCase('de');
+  const modelMatches = (value: string) => value.toLocaleLowerCase('de').includes(modelTerm);
+  const keywords = getWikiToc(article.body)
+    .flatMap((section) => section.label.toLocaleLowerCase('de').split(/[^a-zäöüß]+/))
+    .filter((word) => word.length >= 5);
+  const score = (text: string, bonus: number) => {
+    const normalized = text.toLocaleLowerCase('de');
+    return bonus + keywords.reduce((total, keyword) => total + (normalized.includes(keyword) ? 1 : 0), 0);
+  };
+  const candidates: Array<RelatedKnowledgeItem & { score: number }> = [
+    ...repairGuides.map((guide) => ({
+      kind: 'Reparaturhilfe' as const,
+      title: guide.title,
+      description: guide.intro,
+      href: guide.path,
+      score: score(`${guide.title} ${guide.model} ${guide.intro}`, modelMatches(guide.model) ? 8 : 0),
+    })),
+    ...faqItems.map((item) => ({
+      kind: 'FAQ' as const,
+      title: item.question,
+      description: item.answer,
+      href: item.linkHref,
+      score: score(`${item.question} ${item.answer}`, modelMatches(`${item.question} ${item.answer}`) ? 5 : 0),
+    })),
+    ...resources.filter((resource) => resource.kind === 'Dokument').map((resource) => ({
+      kind: 'PDF' as const,
+      title: resource.title,
+      description: resource.description,
+      href: resource.href,
+      score: score(`${resource.title} ${resource.description} ${resource.tags.join(' ')}`, modelMatches(`${resource.title} ${resource.description}`) ? 6 : 0),
+    })),
+    ...historicalShopParts.map((part) => ({
+      kind: 'Ersatzteil' as const,
+      title: part.title,
+      description: part.historicalSummary,
+      href: part.path,
+      score: score(`${part.title} ${part.model} ${part.category} ${part.historicalSummary}`, modelMatches(part.model) ? 4 : 0),
+    })),
+  ];
+
+  const selected = new Set<string>();
+  return candidates
+    .sort((left, right) => right.score - left.score || left.title.localeCompare(right.title, 'de'))
+    .filter((item) => item.score > 0 && !selected.has(item.href) && selected.add(item.href))
+    .slice(0, 8)
+    .map(({ score: _score, ...item }) => item);
 }
 
 const webMcpKnowledgeEntries: WebMcpKnowledgeEntry[] = [
@@ -2493,8 +2636,8 @@ function getSeoMetadata(path: string, guide?: RepairGuide, part?: HistoricalShop
 
   const metadata: Record<string, { title: string; description: string }> = {
     '/': {
-      title: 'Black Tea Motorbikes – Hilfe — Dokumente, Ersatzteile & Updates',
-      description: 'Unabhängige Sammelstelle für Black Tea Motorbikes: lokale PDFs, Ersatzteile, Reparaturhilfen und nachvollziehbare Quellen.',
+      title: 'Black Tea Motorbikes – Hilfe — Community & Reparaturwissen',
+      description: 'Der Treffpunkt für Bonfire- und Wildfire-Rider: Community, DACH-Karte, Reparaturhilfe, Ersatzteile, Wiki und PDFs. Wissen finden und Erfahrungen teilen.',
     },
     '/hilfe': {
       title: 'Reparaturhilfe — Black Tea Motorbikes – Hilfe',
@@ -3314,7 +3457,7 @@ function HomePage() {
   const [query, setQuery] = useState('');
 
   useEffect(() => {
-    document.title = 'Black Tea Motorbikes – Hilfe — Dokumente, Ersatzteile & Updates';
+    document.title = 'Black Tea Motorbikes – Hilfe — Community & Reparaturwissen';
   }, []);
 
   const filteredResources = useMemo(() => {
@@ -3344,10 +3487,10 @@ function HomePage() {
           <a href="#status">Status</a>
           <a href="/karte">Karte</a>
           <a href="/community">Community</a>
-          <a href="#wissen">PDFs</a>
           <RepairMenu />
           <a href="/ersatzteile">Ersatzteile</a>
           <BikeMenu />
+          <a href="#wissen">PDFs</a>
           <a href="/faq">FAQ</a>
           <a href="/suche">Suche</a>
         </nav>
@@ -3358,14 +3501,14 @@ function HomePage() {
       <main id="top">
         <section className="hero section-pad">
           <div className="hero-copy">
-            <div className="eyebrow handwritten">eine unabhängige sammelstelle</div>
+            <div className="eyebrow handwritten">von ridern · für rider</div>
             <h1>Damit gute Bikes<br /><span className="scribble-underline">weiterfahren.</span></h1>
-            <p className="hero-lede">Dokumente, Ersatzteile und verlässliche Hinweise für die Black Tea Community — gesammelt an einem Ort, solange sich die offizielle Lage sortiert.</p>
+            <p className="hero-lede">Dein Treffpunkt für Bonfire und Wildfire. Tausche dich mit anderen BTM-Ridern aus, finde Hilfe für dein Bike und teile, was du unterwegs oder beim Schrauben gelernt hast. Gemeinsam wissen wir mehr.</p>
             <div className="hero-actions">
-              <a className="button button-ink" href="#wissen">Unterlagen finden <span aria-hidden="true">↓</span></a>
-              <a className="button button-ghost" href="#status">Was ist passiert?</a>
+              <a className="button button-ink" href="/community">Community entdecken <span aria-hidden="true">↗</span></a>
+              <a className="button button-ghost" href="/hilfe">Reparaturhilfe finden <span aria-hidden="true">↗</span></a>
             </div>
-            <p className="micro-note handwritten">↳ zuletzt geprüft: 02.09.2026</p>
+            <p className="micro-note handwritten">↳ unabhängig, gemeinsam und mit Lust aufs Weiterfahren.</p>
           </div>
 
           <div className="hero-doodle">
@@ -3378,6 +3521,34 @@ function HomePage() {
               <img className="hero-concept-image" src="/images/bonfire-konzept-skizze.webp" width="1536" height="1024" alt="Designer-Konzeptskizze einer Black Tea Bonfire" loading="eager" decoding="async" {...({ fetchpriority: 'high' } as Record<string, string>)} />
             </picture>
           </div>
+        </section>
+
+        <section id="entdecken" className="home-discover section-pad" aria-labelledby="home-discover-heading">
+          <div className="section-heading compact">
+            <div>
+              <div className="eyebrow handwritten">mehr als eine sammelmappe</div>
+              <h2 id="home-discover-heading">Dein Bike. Deine Leute.<br />Dein nächster Schritt.</h2>
+            </div>
+            <span className="section-arrow handwritten">mitlesen, mitreden,<br />weiterhelfen →</span>
+          </div>
+          <div className="home-feature-grid">
+            {[
+              { href: '/community', label: 'Austausch', title: 'Was beschäftigt die Rider?', text: 'Geschichten, Umbauten und Fragen aus der Community. Like Beiträge, diskutiere mit und erwähne andere Rider mit @Name.', action: 'Zum Community-Feed' },
+              { href: '/karte', label: 'Deutschland · Österreich · Schweiz', title: 'Du bist nicht allein.', text: 'Entdecke die Community auf der DACH-Karte und filtere nach Land, Modell und PLZ-Bereich. Freiwillige Angaben zeigen grobe Regionen, keine genauen Standorte.', action: 'Rider auf der Karte entdecken' },
+              { href: '/hilfe/anfragen', label: 'Fragen & Lösungen', title: 'Zusammen weiterkommen.', text: 'Beschreibe dein Problem mit bis zu drei Bildern, tausche Lösungsansätze aus und markiere die Antwort, die dir geholfen hat. Neue Antworten kannst du abonnieren.', action: 'Zu den Reparaturanfragen' },
+              { href: '/wiki', label: 'Bonfire & Wildfire', title: 'Wissen, das weiterhilft.', text: 'Lerne dein Modell kennen: Im Wiki findest du Technik, Bedienung und Reparaturwissen. Mit eigenen Ergänzungen hilfst du auch den nächsten Ridern.', action: 'Im Wiki stöbern' },
+              { href: '/ersatzteile', label: 'Teile & Bezugslinks', title: 'Das passende Teil finden.', text: 'Durchsuche den Ersatzteilkatalog mit Modellhinweisen und bereits gefundenen Bezugslinks. Teile deine Erfahrungen mit Passform und Einbau.', action: 'Ersatzteile entdecken' },
+              { href: '/suche', label: 'Eine Suche für alles', title: 'Weniger suchen. Mehr finden.', text: 'Suche zentral nach Themen aus Wiki, PDF-Unterlagen, FAQ und Reparaturfällen — vom Schaltplan bis zum passenden Lösungsansatz.', action: 'Wissen durchsuchen' },
+            ].map((feature) => (
+              <a className="home-feature-card card-doodle" href={feature.href} key={feature.href}>
+                <span className="eyebrow handwritten">{feature.label}</span>
+                <h3>{feature.title}</h3>
+                <p>{feature.text}</p>
+                <span className="home-feature-action">{feature.action} <span aria-hidden="true">↗</span></span>
+              </a>
+            ))}
+          </div>
+          <p className="home-discover-note">Mit deinem Konto kannst du mitreden, dein Fahrerprofil gestalten und Benachrichtigungen zu Antworten, Erwähnungen und Reaktionen erhalten. Zum Lesen und Stöbern brauchst du kein Konto.</p>
         </section>
 
         <section id="status" className="status-section section-pad">
@@ -3430,7 +3601,7 @@ function HomePage() {
           <div className="section-heading">
             <div>
               <div className="eyebrow handwritten">wissen, das nicht verschwinden soll</div>
-              <h2>Die Sammelmappe</h2>
+              <h2>Unterlagen &amp; Wissen</h2>
             </div>
             <div className="section-arrow handwritten">sortieren, suchen,<br />weitergeben →</div>
           </div>
@@ -3454,7 +3625,7 @@ function HomePage() {
             {filteredResources.map((resource, index) => <ResourceCard key={`${resource.kind}-${resource.title}`} resource={resource} index={index} />)}
           </div>
           {filteredResources.length === 0 && <div className="empty-state card-doodle">Nichts gefunden. Versuch es mit „Bonfire“, „Wildfire“ oder „Akku“.</div>}
-          <p className="content-note handwritten">Alle Links führen zur Originalquelle oder zu einer klar gekennzeichneten Spiegelung. Bestand und Preise können sich ändern.</p>
+          <p className="content-note handwritten">Noch nicht das Richtige dabei? <a href="/suche">Durchsuche auch Wiki, FAQ und Reparaturfälle →</a></p>
         </section>
 
         <section id="teile" className="parts-section section-pad">
@@ -3465,21 +3636,20 @@ function HomePage() {
             </div>
             <a className="button button-ghost" href="/ersatzteile">Alle Ersatzteile ansehen ↗</a>
           </div>
-          <p className="parts-section-lede">Im Ersatzteilkatalog findest du alle früheren BTM-Shop-Einträge. Kaufbare Treffer zeigen wir unten direkt mit Link; die vollständigen Archivdaten liegen auf der eigenen Ersatzteilseite.</p>
+          <p className="parts-section-lede">Vom Bremsbelag bis zum Ladestecker: Finde Teile für dein Modell, vergleiche Alternativen und profitiere von den Einbauerfahrungen anderer Rider. Bereits gefundene Bezugslinks helfen dir bei der Suche.</p>
         </section>
 
         <section id="bezugsquellen" className="sourcing-section section-pad">
           <div className="section-heading compact">
             <div>
-              <div className="eyebrow handwritten">kauf-links · amazon zuerst</div>
+              <div className="eyebrow handwritten">vom suchen zum passenden teil</div>
               <h2>Gefundene Kaufoptionen</h2>
             </div>
             <a className="button button-ghost" href="/ersatzteile">Ersatzteilkatalog öffnen ↗</a>
           </div>
           <div className="sourcing-intro card-doodle">
-            <span className="sourcing-badge">1. Amazon</span>
-            <p>Hier erscheinen nur Produkte mit einem konkreten Kauf-Link. Die vier belegten Treffer bleiben stabil, damit Suchmaschinen und Menschen dieselben Inhalte sehen. Den Passformstatus findest du direkt am jeweiligen Artikel.</p>
-            <strong>Alibaba bleibt draußen.</strong>
+            <span className="sourcing-badge">Mit Bezugslink</span>
+            <p>Diese Teile haben wir bereits mit einem Bezugslink ergänzt. Schau dir die Hinweise zu Modell, Maßen und Passform an — und teile am Artikel, ob das Teil bei deinem Bike funktioniert hat.</p>
           </div>
           <div className="sourcing-grid">
             {featuredSourcingCards.map((card, index) => <SourcingCard key={card.title} card={card} index={index} />)}
@@ -3502,7 +3672,6 @@ function HomePage() {
 
       </main>
 
-      <BugReportWidget />
       <footer className="site-footer">
         <span className="wordmark"><span className="wordmark-mark" aria-hidden="true">BTM</span>black tea motorbikes – <strong>hilfe</strong></span>
         <span className="handwritten">gebaut für die leute, die weiterfahren wollen.</span>
@@ -3785,6 +3954,92 @@ function SourceList() {
   );
 }
 
+function SourceReferenceList({ sources, title = 'Quellenangabe' }: { sources: SourceReference[]; title?: string }) {
+  const uniqueSources = sources.filter((source, index, all) => all.findIndex((candidate) => candidate.href === source.href) === index);
+  if (!uniqueSources.length) return null;
+
+  return (
+    <div className="wiki-source-box source-reference-list">
+      <span className="repair-subhead">{title}</span>
+      <ul>
+        {uniqueSources.map((source) => {
+          const external = source.href.startsWith('http');
+          const metadata = [sourceKindLabel(source.kind), source.status].filter(Boolean).join(' · ');
+          return (
+            <li key={source.href}>
+              <a href={source.href} target={external ? '_blank' : undefined} rel={external ? 'nofollow noreferrer' : undefined}>
+                {source.label} ↗
+              </a>
+              {metadata && <small>{metadata}</small>}
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+}
+
+function KnowledgeProvenance({ record, title = 'Wissens-Steckbrief' }: { record: KnowledgeRecord; title?: string }) {
+  const dateLabel = (value: string) => value === 'unbekannt' ? value : formatWikiDate(value);
+
+  return (
+    <section className="knowledge-provenance" aria-labelledby="knowledge-provenance-heading">
+      <div className="knowledge-provenance-heading">
+        <div>
+          <div className="eyebrow handwritten">open knowledge</div>
+          <h2 id="knowledge-provenance-heading">{title}</h2>
+        </div>
+        <span className="knowledge-provenance-revision">Version {record.revision}</span>
+      </div>
+      <dl className="knowledge-provenance-facts">
+        <div>
+          <dt>Letzte Prüfung</dt>
+          <dd><time dateTime={record.reviewedAt}>{dateLabel(record.reviewedAt)}</time></dd>
+        </div>
+        <div>
+          <dt>Lizenzstatus</dt>
+          <dd>{record.licenseStatus}</dd>
+        </div>
+        <div>
+          <dt>Quellenkette</dt>
+          <dd>{record.sourceChain}</dd>
+        </div>
+      </dl>
+      <details className="knowledge-provenance-history">
+        <summary>Bearbeitungshistorie anzeigen</summary>
+        <ol>
+          {record.history.map((entry, index) => (
+            <li key={`${entry.date}-${entry.label}-${index}`}>
+              <time dateTime={entry.date}>{dateLabel(entry.date)}</time>
+              <span>{entry.label}</span>
+            </li>
+          ))}
+        </ol>
+      </details>
+    </section>
+  );
+}
+
+function getRepairGuideKnowledge(guide: RepairGuide): KnowledgeRecord {
+  return {
+    revision: '2026-09-02',
+    reviewedAt: '2026-09-02',
+    licenseStatus: 'Eigene redaktionelle Aufbereitung; Originalquelle bleibt bei ihrem Rechteinhaber.',
+    sourceChain: `${guide.sourceLabel} → redaktionelle Reparaturhilfe → geprüfte Community-Ergänzungen`,
+    history: [{ date: '2026-09-02', label: 'Reparaturhilfe redaktionell geprüft' }],
+  };
+}
+
+function getPartKnowledge(part: HistoricalShopPart): KnowledgeRecord {
+  return {
+    revision: part.checkedAt,
+    reviewedAt: part.checkedAt,
+    licenseStatus: 'Eigene Beschreibung; Archiv-, Hersteller- und Community-Inhalte bleiben bei ihren Rechteinhabern.',
+    sourceChain: 'Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar',
+    history: [{ date: part.checkedAt, label: 'Ersatzteil-Datensatz zuletzt redaktionell geprüft' }],
+  };
+}
+
 function LegalPage({ kind }: { kind: 'impressum' | 'datenschutz' }) {
   const isPrivacy = kind === 'datenschutz';
 
@@ -3938,9 +4193,13 @@ function BikeMenu() {
   return (
     <div className="nav-dropdown">
       <button className="nav-dropdown-trigger" type="button" aria-haspopup="menu">
-        Bikes <span className="nav-dropdown-caret" aria-hidden="true" />
+        Wiki <span className="nav-dropdown-caret" aria-hidden="true" />
       </button>
       <div className="nav-dropdown-menu" role="menu">
+        <a className="nav-dropdown-item" href="/wiki" role="menuitem">
+          <strong>Bike-Wiki</strong>
+          <span>Technisches Verzeichnis öffnen</span>
+        </a>
         {bikeProfiles.map((bike) => (
           <a className="nav-dropdown-item" href={bike.path} role="menuitem" key={bike.slug}>
             <strong>{bike.name}</strong>
@@ -4067,6 +4326,7 @@ function WikiPage() {
   }, []);
 
   const matches = useMemo(() => getWikiSearchMatches(query), [query]);
+  const technicalSectionCount = wikiArticles.reduce((total, article) => total + getWikiToc(article.body).length, 0);
 
   return (
     <div className="site-shell">
@@ -4078,6 +4338,12 @@ function WikiPage() {
           <p>Technische Grundlagen, Handbuchdaten und nachvollziehbare Hinweise zu Bonfire und Wildfire — gemeinsam aufgebaut und redaktionell geprüft.</p>
         </section>
         <section className="wiki-index-section section-pad">
+          <div className="wiki-index-stats" aria-label="Umfang des öffentlichen Bike-Wikis">
+            <div><strong>{wikiArticles.length}</strong><span>Bike-Wikis</span></div>
+            <div><strong>{technicalSectionCount}</strong><span>technische Abschnitte</span></div>
+            <div><strong>{repairGuides.length}</strong><span>Reparaturhilfen</span></div>
+            <div><strong>{historicalShopParts.length}</strong><span>Ersatzteilseiten</span></div>
+          </div>
           <div className="wiki-search card-doodle">
             <label className="search-box">
               <span aria-hidden="true">⌕</span>
@@ -4150,7 +4416,6 @@ function WikiArticlePage({ article }: { article: WikiArticle }) {
     window.scrollTo(0, 0);
   }, [article.model, article.title]);
 
-  const sourceIsExternal = article.sourceHref?.startsWith('http') ?? false;
   const modelPath = `/bikes/${article.model.toLowerCase()}`;
   const toc = useMemo(() => getWikiToc(article.body), [article.body]);
   const tocGroups = useMemo(() => {
@@ -4166,6 +4431,7 @@ function WikiArticlePage({ article }: { article: WikiArticle }) {
   }, [toc]);
   const [expandedTocSections, setExpandedTocSections] = useState<Record<string, boolean>>({});
   const searchResults = useMemo(() => getWikiArticleSearchResults(article.body, query), [article.body, query]);
+  const relatedKnowledge = useMemo(() => getRelatedKnowledge(article), [article]);
   const [editingHeading, setEditingHeading] = useState<string | null>(null);
   useEffect(() => {
     if (!editingHeading) return undefined;
@@ -4252,15 +4518,25 @@ function WikiArticlePage({ article }: { article: WikiArticle }) {
             <article className="wiki-article card-doodle">
               <div className="wiki-article-topline"><span className="kind-chip doc">Wiki-Artikel</span><span>{article.status}</span></div>
               <div className="wiki-markdown">{renderWikiMarkdown(article.body, setEditingHeading, query)}</div>
-              <WikiContributions guideSlug={`wiki-${article.slug}`} editingHeading={editingHeading} onCloseEditor={() => setEditingHeading(null)} />
-              {article.sourceHref && (
-                <div className="wiki-source-box">
-                  <span className="repair-subhead">Quellenangabe</span>
-                  <a href={article.sourceHref} target={sourceIsExternal ? '_blank' : undefined} rel={sourceIsExternal ? 'nofollow noreferrer' : undefined}>
-                    {article.sourceLabel ?? 'Lokale Quelle öffnen'} ↗
-                  </a>
-                </div>
+              {relatedKnowledge.length > 0 && (
+                <section className="wiki-related-content" aria-labelledby="wiki-related-heading">
+                  <div className="eyebrow handwritten">weiterführend</div>
+                  <h2 id="wiki-related-heading">Passende Inhalte</h2>
+                  <div className="wiki-related-grid">
+                    {relatedKnowledge.map((item) => (
+                      <a className="wiki-related-card" href={item.href} key={`${item.kind}-${item.href}`}>
+                        <span className="kind-chip doc">{item.kind}</span>
+                        <strong>{item.title}</strong>
+                        <span>{item.description}</span>
+                        <em>Öffnen ↗</em>
+                      </a>
+                    ))}
+                  </div>
+                </section>
               )}
+              <KnowledgeProvenance record={article.knowledge} />
+              <WikiContributions guideSlug={`wiki-${article.slug}`} editingHeading={editingHeading} onCloseEditor={() => setEditingHeading(null)} />
+              {article.source && <SourceReferenceList sources={[article.source]} />}
             </article>
           </div>
         </section>
@@ -5015,6 +5291,7 @@ function RepairGuidePage({ guide }: { guide: RepairGuide }) {
               ))}
             </div>
             <RepairComments guideSlug={guide.id} />
+            <KnowledgeProvenance record={getRepairGuideKnowledge(guide)} />
             <div className="repair-source-box">
               <span className="repair-subhead">Quellenangabe</span>
               <p>Diese Anleitung ist redaktionell aus den Community-Hinweisen aufbereitet. Die Quelle dient zum Nachvollziehen und Gegenprüfen — sie ersetzt keine Fachprüfung und keine fahrzeugspezifische Freigabe.</p>
@@ -6344,7 +6621,7 @@ function PartDetailPage({ part }: { part: HistoricalShopPart }) {
                 {part.price !== undefined && <div className="part-detail-fact"><strong>{part.priceMax && part.priceMax !== part.price ? `${part.price}–${part.priceMax}` : part.price} €</strong><span>Alter Originalpreis — nicht aktuell</span></div>}
                 <p className="part-archive-status"><strong>Archivstatus:</strong> {part.historicalAvailability}{part.archiveTimestamp ? ` · Aufnahme ${part.archiveTimestamp.slice(0, 4)}-${part.archiveTimestamp.slice(4, 6)}-${part.archiveTimestamp.slice(6, 8)}` : ''}</p>
                 {part.variants && <div className="part-detail-variants"><strong>{part.variantDetails?.some((variant) => variant.price !== undefined) ? 'Alte Originalpreise' : 'Originalvarianten'}</strong><ul>{part.variantDetails?.length ? part.variantDetails.map((variant) => <li key={variant.label}>{variant.label}{variant.price !== undefined ? ` · ${variant.price} €` : ''}</li>) : part.variants.map((variant) => <li key={variant}>{variant}</li>)}</ul></div>}
-                <a className="text-link" href={part.archiveHref}>Lokalen Ersatzteil-Datensatz öffnen ↗</a>
+                <SourceReferenceList sources={part.sources} />
               </section>
 
               <section className="part-detail-check">
@@ -6373,6 +6650,7 @@ function PartDetailPage({ part }: { part: HistoricalShopPart }) {
               </div> : <div className="part-no-purchase"><span className="part-buy-label">Noch kein passender Link</span><strong>Momentan haben wir keinen passenden Artikel gefunden.</strong><p>{part.purchaseNote}</p></div>}
             </section>
 
+            <KnowledgeProvenance record={getPartKnowledge(part)} />
             <RepairFeedback guideSlug={`ersatzteil-${part.id}`} />
             <RepairComments guideSlug={`ersatzteil-${part.id}`} collapsible />
 

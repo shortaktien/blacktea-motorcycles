@@ -1,0 +1,76 @@
+name: BTM Content and accessibility quality
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: '30 3 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Build and audit public content
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Build frontend
+        run: npm run build
+
+      - name: Validate pSEO catalog
+        run: npm run check:pseo
+
+      - name: Validate regional content policy
+        run: npm run check:content-policy
+
+      - name: Start static preview
+        shell: bash
+        run: |
+          set -euo pipefail
+          nohup npm run preview -- --host 127.0.0.1 > "$RUNNER_TEMP/btm-preview.log" 2>&1 &
+          echo $! > "$RUNNER_TEMP/btm-preview.pid"
+          for attempt in $(seq 1 20); do
+            if curl --fail --silent --show-error --max-time 5 http://127.0.0.1:4173/ >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat "$RUNNER_TEMP/btm-preview.log"
+          exit 1
+
+      - name: Validate SEO, links and structured data
+        env:
+          LINKTEST_BASE_URL: http://127.0.0.1:4173
+        run: npm run check:seo
+
+      - name: Run Lighthouse accessibility audit
+        env:
+          LIGHTHOUSE_BASE_URL: http://127.0.0.1:4173
+        run: npm run check:lighthouse
+
+      - name: Stop static preview
+        if: always()
+        shell: bash
+        run: |
+          if [ -f "$RUNNER_TEMP/btm-preview.pid" ]; then
+            kill "$(cat "$RUNNER_TEMP/btm-preview.pid")" 2>/dev/null || true
+          fi

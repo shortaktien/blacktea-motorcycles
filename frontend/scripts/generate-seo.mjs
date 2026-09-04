@@ -64,11 +64,25 @@ const parseWikiArticle = (filePath) => {
   }
   const relativePath = filePath.slice(wikiRoot.length + 1).replaceAll('\\', '/');
   const articlePath = relativePath.replace(/\.md$/, '').replace(/\/index$/, '');
+  const lastUpdated = fields.lastUpdated ?? fields.updated ?? fields.dateModified;
+  const history = (fields.history ?? '').split(';').map((entry) => {
+    const separator = entry.indexOf('|');
+    return separator > 0
+      ? { date: entry.slice(0, separator).trim(), label: entry.slice(separator + 1).trim() }
+      : { date: lastUpdated ?? 'unbekannt', label: entry.trim() };
+  }).filter((entry) => entry.label);
   return {
     path: `/bikes/${articlePath}`,
     title: fields.title ?? articlePath,
     model: fields.model ?? 'Bikes',
     intro: fields.intro ?? 'Redaktionell aufbereiteter Wiki-Artikel aus lokal gesicherten Quellen.',
+    revision: fields.revision ?? lastUpdated,
+    reviewedAt: fields.reviewedAt ?? lastUpdated,
+    licenseStatus: fields.licenseStatus ?? 'Eigene redaktionelle Aufbereitung; Originalquellen bleiben bei ihren Rechteinhabern.',
+    sourceChain: fields.sourceChain ?? 'Lokale Dokumente → redaktionelle Aufbereitung → geprüfte Community-Ergänzungen',
+    source: fields.source,
+    sourceLabel: fields.sourceLabel,
+    history: history.length ? history : [{ date: lastUpdated ?? 'unbekannt', label: 'Artikel redaktionell erfasst' }],
   };
 };
 const wikiArticles = collectMarkdownFiles(wikiRoot).map(parseWikiArticle).sort((left, right) => left.title.localeCompare(right.title, 'de'));
@@ -78,7 +92,9 @@ if (guides.length === 0) {
 }
 
 const staticPages = [
-  { path: '/', title: 'Black Tea Motorbikes – Hilfe — Dokumente, Ersatzteile & Updates', description: 'Unabhängige Sammelstelle für Black Tea Motorbikes: lokale PDFs, Ersatzteile, Reparaturhilfen und nachvollziehbare Quellen.' },
+  // Regionale PLZ-Seiten bleiben bewusst außen vor, bis dort eigener lokaler
+  // Mehrwert existiert. Die ungefähre Verortung läuft ausschließlich über /karte.
+  { path: '/', title: 'Black Tea Motorbikes – Hilfe — Community & Reparaturwissen', description: 'Der Treffpunkt für Bonfire- und Wildfire-Rider: Community, DACH-Karte, Reparaturhilfe, Ersatzteile, Wiki und PDFs. Wissen finden und Erfahrungen teilen.' },
   { path: '/hilfe', title: 'Reparaturhilfe — Black Tea Motorbikes – Hilfe', description: 'Redaktionell geordnete Reparaturhilfen für typische Bonfire- und Wildfire-Fehlerbilder — mit Kurzablauf, ausführlicher Prüfung, Sicherheit und Quelle.' },
   { path: '/hilfe/anfragen', title: 'Reparatur anfragen — Black Tea Motorbikes – Hilfe', description: 'Reparaturanfragen zu Black Tea Bonfire und Wildfire stellen, Erfahrungen teilen und gemeinsam nachvollziehbare Lösungen dokumentieren.' },
   { path: '/ersatzteile', title: 'Ersatzteile — Black Tea Motorbikes – Hilfe', description: 'Historischer BTM-Ersatzteilkatalog mit Modellbezug, Teilenamen und Quellen. Bestand und Preise vor dem Kauf prüfen.' },
@@ -126,6 +142,59 @@ const guideLinks = guides.map((guide) => `- [${guide.title}](${absoluteUrl(guide
 const pdfLinks = pdfFiles.map((file) => `- [${file}](${absoluteUrl(`/pdfs/${file}`)}): Lokale PDF-Kopie im Dokumentenarchiv.`).join('\n');
 const wikiLinks = wikiArticles.map((article) => `- [${article.title}](${absoluteUrl(article.path)}): ${article.model}. ${article.intro}`).join('\n');
 
+const openKnowledgeManifest = {
+  manifestType: 'BTM Open Knowledge',
+  schemaVersion: '1.0',
+  generatedAt,
+  language: 'de-DE',
+  licensePolicy: 'Eigene redaktionelle Aufbereitungen werden als solche gekennzeichnet; Originalquellen bleiben bei ihren jeweiligen Rechteinhabern.',
+  regionalContentPolicy: 'Regionale Seiten werden erst veröffentlicht, wenn sie eigenen lokalen Mehrwert bieten. Die ungefähre PLZ-Verortung bleibt bis dahin auf /karte gebündelt.',
+  entries: [
+    ...wikiArticles.map((article) => ({
+      kind: 'wiki',
+      url: absoluteUrl(article.path),
+      title: article.title,
+      model: article.model,
+      revision: article.revision ?? 'unbekannt',
+      lastReviewed: article.reviewedAt ?? 'unbekannt',
+      licenseStatus: article.licenseStatus,
+      sourceChain: article.sourceChain,
+      history: article.history,
+      sources: article.source ? [{ url: article.source.startsWith('http') ? article.source : absoluteUrl(article.source), label: article.sourceLabel ?? 'Lokale Quelle' }] : [],
+    })),
+    ...guides.map((guide) => ({
+      kind: 'repair-guide',
+      url: absoluteUrl(guide.path),
+      title: guide.title,
+      model: guide.model,
+      revision: '2026-09-02',
+      lastReviewed: '2026-09-02',
+      licenseStatus: 'Eigene redaktionelle Aufbereitung; Originalquelle bleibt bei ihrem Rechteinhaber.',
+      sourceChain: 'Community-Hinweise → redaktionelle Reparaturhilfe → geprüfte Community-Ergänzungen',
+      history: [{ date: '2026-09-02', label: 'Reparaturhilfe redaktionell geprüft' }],
+      sources: [],
+    })),
+    ...parts.map((part) => {
+      const archived = partDetailsCatalog.entries?.find((entry) => entry.slug === part.id && entry.ok);
+      const sourceUrl = archived?.archive;
+      const reviewedAt = partsCatalog.sourcing_policy?.checked_at ?? '2026-09-04';
+      return {
+        kind: 'part',
+        url: absoluteUrl(part.path),
+        title: part.title,
+        revision: reviewedAt,
+        lastReviewed: reviewedAt,
+        licenseStatus: 'Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.',
+        sourceChain: 'Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar',
+        history: [{ date: reviewedAt, label: 'Ersatzteil-Datensatz zuletzt redaktionell geprüft' }],
+        sources: sourceUrl ? [{ url: sourceUrl, label: 'Archivierter Originaleintrag' }] : [],
+      };
+    }),
+  ],
+};
+
+writeFileSync(join(publicRoot, 'open-knowledge.json'), `${JSON.stringify(openKnowledgeManifest, null, 2)}\n`);
+
 const llms = [
   '# Black Tea Motorbikes – Hilfe',
   '',
@@ -156,6 +225,7 @@ const llms = [
   '## Optional',
   '',
   `- [Vollständiger LLM-Index](${absoluteUrl('/full-llms.txt')}): Ausführliche Seiten-, Reparatur- und Dokumentübersicht.`,
+  `- [Open-Knowledge-Manifest](${absoluteUrl('/open-knowledge.json')}): Version, letzte Prüfung, Lizenzstatus, Bearbeitungshistorie und Quellenkette je Wissenseintrag.`,
   `- [Sitemap](${absoluteUrl('/sitemap.xml')}): Indexierbare HTML- und PDF-URLs.`,
   '',
 ].join('\n');
@@ -204,6 +274,9 @@ const fullLlms = [
     `- [Wiki-Artikel öffnen](${absoluteUrl(article.path)})`,
     `- Modellbezug: ${article.model}`,
     `- Kurzbeschreibung: ${article.intro}`,
+    `- Wissensstatus: Version ${article.revision ?? 'unbekannt'}, letzte Prüfung ${article.reviewedAt ?? 'unbekannt'}.`,
+    `- Lizenzstatus: ${article.licenseStatus}`,
+    `- Quellenkette: ${article.sourceChain}`,
     '',
   ]),
   '## Lokale PDFs',

@@ -6,7 +6,7 @@ Die Website richtet sich an Besitzerinnen und Besitzer von Bonfire- und Wildfire
 
 ## Kernseiten
 
-- [Black Tea Motorbikes – Hilfe — Dokumente, Ersatzteile & Updates](https://btm.shortaktien.de/): Unabhängige Sammelstelle für Black Tea Motorbikes: lokale PDFs, Ersatzteile, Reparaturhilfen und nachvollziehbare Quellen.
+- [Black Tea Motorbikes – Hilfe — Community & Reparaturwissen](https://btm.shortaktien.de/): Der Treffpunkt für Bonfire- und Wildfire-Rider: Community, DACH-Karte, Reparaturhilfe, Ersatzteile, Wiki und PDFs. Wissen finden und Erfahrungen teilen.
 - [Reparaturhilfe — Black Tea Motorbikes – Hilfe](https://btm.shortaktien.de/hilfe): Redaktionell geordnete Reparaturhilfen für typische Bonfire- und Wildfire-Fehlerbilder — mit Kurzablauf, ausführlicher Prüfung, Sicherheit und Quelle.
 - [Reparatur anfragen — Black Tea Motorbikes – Hilfe](https://btm.shortaktien.de/hilfe/anfragen): Reparaturanfragen zu Black Tea Bonfire und Wildfire stellen, Erfahrungen teilen und gemeinsam nachvollziehbare Lösungen dokumentieren.
 - [Ersatzteile — Black Tea Motorbikes – Hilfe](https://btm.shortaktien.de/ersatzteile): Historischer BTM-Ersatzteilkatalog mit Modellbezug, Teilenamen und Quellen. Bestand und Preise vor dem Kauf prüfen.
@@ -54,4 +54,5 @@ Die Website richtet sich an Besitzerinnen und Besitzer von Bonfire- und Wildfire
 ## Optional
 
 - [Vollständiger LLM-Index](https://btm.shortaktien.de/full-llms.txt): Ausführliche Seiten-, Reparatur- und Dokumentübersicht.
+- [Open-Knowledge-Manifest](https://btm.shortaktien.de/open-knowledge.json): Version, letzte Prüfung, Lizenzstatus, Bearbeitungshistorie und Quellenkette je Wissenseintrag.
 - [Sitemap](https://btm.shortaktien.de/sitemap.xml): Indexierbare HTML- und PDF-URLs.

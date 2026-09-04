@@ -155,6 +155,33 @@ async function checkStructuredData() {
       fail('Schema /ersatzteile/display: Product ohne offers, review oder aggregateRating');
     }
   }
+
+  const sitemap = readDistText('/sitemap.xml', 'Schema-Sitemap');
+  const publicPaths = [...sitemap.matchAll(/<loc>\s*([^<]+?)\s*<\/loc>/g)]
+    .map((match) => new URL(match[1]).pathname)
+    .filter((pathname) => !pathname.toLowerCase().endsWith('.pdf') && pathname !== '/pdfs/index.html');
+
+  for (const pathname of publicPaths) {
+    const schema = readJsonLd(pathname, `Schema ${pathname}`);
+    if (!schema) continue;
+    const canonical = new URL(pathname, siteOrigin).toString();
+    const graph = Array.isArray(schema['@graph']) ? schema['@graph'] : [];
+    const websiteCount = findSchemaObjects(schema, 'WebSite').length;
+    const breadcrumbCount = findSchemaObjects(schema, 'BreadcrumbList').length;
+    const pageEntity = graph.find((entry) => {
+      const types = Array.isArray(entry?.['@type']) ? entry['@type'] : [entry?.['@type']];
+      return types.some((type) => ['Article', 'CollectionPage', 'FAQPage', 'HowTo', 'WebPage'].includes(type));
+    });
+
+    checks += 1;
+    if (websiteCount !== 1) fail(`Schema ${pathname}: genau eine WebSite-Entität erwartet, ${websiteCount} gefunden`);
+    checks += 1;
+    if (breadcrumbCount !== 1) fail(`Schema ${pathname}: genau eine BreadcrumbList erwartet, ${breadcrumbCount} gefunden`);
+    checks += 1;
+    if (!pageEntity?.url || pageEntity.url !== canonical || !pageEntity.description) {
+      fail(`Schema ${pathname}: Seitenentität ohne passende URL oder Beschreibung`);
+    }
+  }
 }
 
 function extractUrls(text) {
@@ -214,6 +241,42 @@ async function checkLlmFiles() {
       await assertHttpPath(path, `LLM-Link ${pathnameOnly}`);
     }
   }
+}
+
+async function checkOpenKnowledgeManifest() {
+  const content = readDistText('/open-knowledge.json', 'Open-Knowledge-Manifest');
+  if (!content.trim()) return;
+
+  let manifest;
+  try {
+    manifest = JSON.parse(content);
+  } catch (error) {
+    fail(`Open-Knowledge-Manifest: ungültiges JSON (${error.message})`);
+    return;
+  }
+
+  checks += 1;
+  if (manifest.manifestType !== 'BTM Open Knowledge' || manifest.schemaVersion !== '1.0') {
+    fail('Open-Knowledge-Manifest: manifestType oder schemaVersion fehlt');
+  }
+
+  const entries = Array.isArray(manifest.entries) ? manifest.entries : [];
+  checks += 1;
+  if (entries.length < 2) fail('Open-Knowledge-Manifest: zu wenige Wissenseinträge');
+
+  const urls = new Set();
+  for (const entry of entries) {
+    checks += 1;
+    if (!entry.url || !entry.title || !entry.kind || !entry.revision || !entry.lastReviewed || !entry.licenseStatus || !entry.sourceChain || !Array.isArray(entry.history)) {
+      fail(`Open-Knowledge-Manifest: unvollständiger Eintrag (${entry.title ?? 'ohne Titel'})`);
+    }
+    if (entry.url) {
+      if (urls.has(entry.url)) fail(`Open-Knowledge-Manifest: doppelte URL (${entry.url})`);
+      urls.add(entry.url);
+    }
+  }
+
+  await assertHttpPath('/open-knowledge.json', 'Open-Knowledge-Manifest');
 }
 
 async function checkPdfArchive() {
@@ -286,6 +349,7 @@ if (!existsSync(distRoot)) {
 } else {
   await checkSitemap();
   await checkLlmFiles();
+  await checkOpenKnowledgeManifest();
   await checkPdfArchive();
   await checkAuthRoutes();
   await checkStructuredData();
