@@ -269,6 +269,12 @@ h3 { margin-bottom: 10px; color: var(--charcoal); font-size: 21px; line-height: 
 .repair-comments { margin-top: 20px; padding: 22px 19px 18px; border-top: 2px solid var(--line); background: rgba(251,250,247,.62); }
 .repair-comments-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
 .repair-comments-heading h3 { margin: 6px 0 0; font-size: 24px; }
+.repair-comments-heading-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; }
+.repair-comments-summary { cursor: pointer; list-style: none; }
+.repair-comments-summary::-webkit-details-marker { display: none; }
+.repair-comments-summary:focus-visible { outline: 2px solid var(--ink); outline-offset: 6px; border-radius: 4px; }
+.repair-comments-toggle { color: var(--ink); font-size: 12px; font-weight: 800; white-space: nowrap; }
+.repair-comments-disclosure:not([open]) .when-open, .repair-comments-disclosure[open] .when-closed { display: none; }
 .comment-count { color: #898790; font-size: 11px; font-weight: 750; white-space: nowrap; }
 .repair-comments-intro { max-width: 630px; margin: 10px 0 18px; color: #6d6b76; font-size: 13px; line-height: 1.55; }
 .comment-form { display: grid; gap: 13px; padding: 15px; border: 1.5px dashed var(--line); border-radius: 9px 7px 10px 6px; background: rgba(255,255,255,.56); }

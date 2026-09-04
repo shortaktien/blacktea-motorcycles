@@ -5040,13 +5040,15 @@ function RepairFeedback({ guideSlug }: { guideSlug: string }) {
   );
 }
 
-function RepairComments({ guideSlug }: { guideSlug: string }) {
+function RepairComments({ guideSlug, collapsible = false }: { guideSlug: string; collapsible?: boolean }) {
   const { user } = useAuth();
   const [summary, setSummary] = useState<FeedbackSummary | null>(null);
   const [commentError, setCommentError] = useState('');
   const [commentNotice, setCommentNotice] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const Container = collapsible ? 'details' : 'div';
+  const Heading = collapsible ? 'summary' : 'div';
 
   const loadFeedback = async () => {
     try {
@@ -5100,13 +5102,17 @@ function RepairComments({ guideSlug }: { guideSlug: string }) {
 
   return (
     <section className="repair-comments" aria-label="Erfahrung teilen">
-      <div className="repair-comments-heading">
+      <Container className={collapsible ? 'repair-comments-disclosure' : undefined}>
+      <Heading className={`repair-comments-heading${collapsible ? ' repair-comments-summary' : ''}`}>
         <div>
           <div className="eyebrow handwritten">erfahrung teilen</div>
           <h3>Hinweis oder Ergänzung?</h3>
         </div>
-        <span className="comment-count">{summary?.comments.length ?? 0} freigegeben</span>
-      </div>
+        <span className="repair-comments-heading-actions">
+          <span className="comment-count">{summary?.comments.length ?? 0} freigegeben</span>
+          {collapsible && <span className="repair-comments-toggle"><span className="when-closed">Aufklappen +</span><span className="when-open">Zuklappen −</span></span>}
+        </span>
+      </Heading>
       <p className="repair-comments-intro">Schreib kurz, was bei dir funktioniert hat oder wo ein Schritt anders war. Kommentare werden vor der Veröffentlichung geprüft; deine E-Mail bleibt intern.</p>
       <form className="comment-form" onSubmit={handleCommentSubmit}>
         {user ? <><input type="hidden" name="name" value={user.name} /><input type="hidden" name="email" value={user.email} /></> : <div className="comment-form-grid">
@@ -5129,6 +5135,7 @@ function RepairComments({ guideSlug }: { guideSlug: string }) {
           </article>
         )) : <p className="no-comments">Noch keine freigegebenen Erfahrungsberichte.</p>}
       </div>
+      </Container>
     </section>
   );
 }
@@ -6303,7 +6310,7 @@ function PartDetailPage({ part }: { part: HistoricalShopPart }) {
             </section>
 
             <RepairFeedback guideSlug={`ersatzteil-${part.id}`} />
-            <RepairComments guideSlug={`ersatzteil-${part.id}`} />
+            <RepairComments guideSlug={`ersatzteil-${part.id}`} collapsible />
 
           </article>
         </section>

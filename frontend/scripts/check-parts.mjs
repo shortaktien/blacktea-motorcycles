@@ -6,6 +6,10 @@ import { render } from '../dist-server/entry-server.js';
 const page = (slug) => render(`/ersatzteile/${slug}`).replace(/<!--[\s\S]*?-->/g, '');
 const buyCards = (html) => [...html.matchAll(/<a\b[^>]*class="part-buy-card[^>]*>[\s\S]*?<\/a>/g)].map(([card]) => card);
 const dcdc = page('dcdc-converter');
+assert.match(dcdc, /<details class="repair-comments-disclosure"><summary class="repair-comments-heading repair-comments-summary">/);
+assert.doesNotMatch(dcdc, /<details[^>]*\bopen(?:=|\s|>)/, 'Parts comments start collapsed');
+assert.match(dcdc, /Aufklappen \+/);
+assert.match(dcdc, /Zuklappen −/);
 const cards = buyCards(dcdc);
 assert.equal(cards.length, 2);
 assert.match(cards[0], /amazon\.de\/dp\/B0DK94C25L/);
@@ -43,4 +47,3 @@ assert.match(buyCards(page('bremsbelage'))[0], /B0068NSX98/);
 assert.match(page('usd-gabelset'), /keine verlässliche Modellzuordnung/);
 assert.match(buyCards(page('dual-sport-reifen-upgrade'))[0], /Amazon · Handbuchabgleich/);
 console.log('Ersatzteiltests erfolgreich: Varianten, Lieferantenlabels, Passformgrenzen und bestehende Amazon-Links.');
-
