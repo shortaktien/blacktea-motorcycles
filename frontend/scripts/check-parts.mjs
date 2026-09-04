@@ -5,6 +5,11 @@ import { render } from '../dist-server/entry-server.js';
 // with no Amazon URL (specialist suppliers) and multi-marketplace alternatives.
 const page = (slug) => render(`/ersatzteile/${slug}`).replace(/<!--[\s\S]*?-->/g, '');
 const buyCards = (html) => [...html.matchAll(/<a\b[^>]*class="part-buy-card[^>]*>[\s\S]*?<\/a>/g)].map(([card]) => card);
+const catalog = render('/ersatzteile').replace(/<!--[\s\S]*?-->/g, '');
+const linkedProductCount = (catalog.match(/class="part-availability-badge"/g) ?? []).length;
+assert.ok(linkedProductCount > 0);
+assert.match(catalog, new RegExp(`<strong>${linkedProductCount}</strong><span>Produkte mit Bezugslink</span>`), 'Count products with purchase options, not individual links');
+assert.doesNotMatch(catalog, /aktuelle Verfügbarkeitszusagen/);
 const dcdc = page('dcdc-converter');
 assert.match(dcdc, /<details class="repair-comments-disclosure"><summary class="repair-comments-heading repair-comments-summary">/);
 assert.doesNotMatch(dcdc, /<details[^>]*\bopen(?:=|\s|>)/, 'Parts comments start collapsed');

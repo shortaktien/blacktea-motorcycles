@@ -6183,7 +6183,7 @@ function PartsPage() {
           <div className="parts-page-facts">
             <div><strong>{historicalShopParts.length}</strong><span>historische Shop-Einträge</span></div>
             <div><strong>7</strong><span>Kategorien</span></div>
-            <div><strong>0</strong><span>aktuelle Verfügbarkeitszusagen</span></div>
+            <div><strong>{historicalShopParts.filter((part) => part.purchaseOptions?.length).length}</strong><span>Produkte mit Bezugslink</span></div>
           </div>
         </section>
 
