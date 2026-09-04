@@ -472,6 +472,10 @@ final class CommunityController
     #[Route('/api/community/activity', name: 'api_community_activity', methods: ['GET'])]
     public function communityActivity(Request $request): JsonResponse
     {
+        $sortMode = $request->query->get('sort', 'latest');
+        if (!is_string($sortMode) || !in_array($sortMode, ['latest', 'liked', 'discussed'], true)) {
+            return $this->error('Ungültige Feed-Sortierung.', Response::HTTP_BAD_REQUEST);
+        }
         $cursor = null;
         $rawCursor = $request->query->get('cursor');
         if ($rawCursor !== null) {
@@ -493,6 +497,17 @@ final class CommunityController
         $countryFilter = $request->query->get('country');
         $allComments = $this->storage->read()['comments'] ?? [];
         $byId = array_column($allComments, null, 'id');
+        $replyCounts = [];
+        foreach ($allComments as $reply) {
+            if (!in_array(($reply['kind'] ?? null), ['repair_answer', 'community_reply'], true)) {
+                continue;
+            }
+            $parentId = $reply['parentId'] ?? null;
+            if (!is_string($parentId) || !isset($byId[$parentId]) || !$this->isCommunityVisible($reply, $allComments)) {
+                continue;
+            }
+            $replyCounts[$parentId] = ($replyCounts[$parentId] ?? 0) + 1;
+        }
         $candidates = [];
         $activities = [];
         foreach ($allComments as $comment) {
@@ -516,16 +531,24 @@ final class CommunityController
             $parent = $byId[$comment['parentId'] ?? ''] ?? [];
             $isSolution = ($comment['kind'] ?? null) === 'repair_answer' && ($parent['solutionAnswerId'] ?? null) === ($comment['id'] ?? null);
             $date = $isSolution ? ($parent['solutionSelectedAt'] ?? $comment['createdAt']) : $comment['createdAt'];
-            $candidates[] = ['comment' => $comment, 'time' => strtotime($date) ?: 0, 'id' => $comment['id']];
+            $time = strtotime($date) ?: 0;
+            $likeCount = count($comment['communityLikes'] ?? []);
+            $discussionCount = $replyCounts[$comment['id']] ?? 0;
+            $rank = match ($sortMode) {
+                'liked' => $likeCount,
+                'discussed' => $discussionCount,
+                default => $time,
+            };
+            $candidates[] = ['comment' => $comment, 'time' => $time, 'rank' => $rank, 'id' => $comment['id']];
         }
-        usort($candidates, static fn (array $a, array $b): int => ($b['time'] <=> $a['time']) ?: strcmp($b['id'], $a['id']));
+        usort($candidates, static fn (array $a, array $b): int => ($b['rank'] <=> $a['rank']) ?: strcmp($b['id'], $a['id']));
         $totalCount = count($candidates);
         $remaining = $cursor === null ? $candidates : array_values(array_filter($candidates, static fn (array $item): bool =>
-            $item['time'] < $cursor[0] || ($item['time'] === $cursor[0] && strcmp($item['id'], $cursor[1]) < 0)));
+            $item['rank'] < $cursor[0] || ($item['rank'] === $cursor[0] && strcmp($item['id'], $cursor[1]) < 0)));
         $page = array_slice($remaining, 0, 10);
         $hasMore = count($remaining) > 10;
         $last = $page === [] ? null : $page[count($page) - 1];
-        $nextCursor = $hasMore && $last !== null ? rtrim(strtr(base64_encode(json_encode([$last['time'], $last['id']])), '+/', '-_'), '=') : null;
+        $nextCursor = $hasMore && $last !== null ? rtrim(strtr(base64_encode(json_encode([$last['rank'], $last['id']])), '+/', '-_'), '=') : null;
         // A notification can target an older post without downloading all preceding pages.
         $requestedPost = $request->query->get('post');
         $focusedId = null;
@@ -576,15 +599,13 @@ final class CommunityController
                 'actor' => $this->users->publicProfile($actor),
                 'likeCount' => count($comment['communityLikes'] ?? []),
                 'viewerLiked' => $viewer !== null && in_array($viewer['id'], $comment['communityLikes'] ?? [], true),
-                'replyCount' => ($kind === 'repair_request'
-                    ? count(array_filter($allComments, fn (array $reply): bool => in_array(($reply['kind'] ?? null), ['repair_answer', 'community_reply'], true) && ($reply['parentId'] ?? null) === $comment['id'] && $this->isCommunityVisible($reply, $allComments)))
-                    : count(array_filter($allComments, fn (array $reply): bool => ($reply['kind'] ?? null) === 'community_reply' && ($reply['parentId'] ?? null) === $comment['id'] && $this->isCommunityVisible($reply, $allComments)))),
+                'replyCount' => $replyCounts[$comment['id']] ?? 0,
                 'viewerReported' => $viewer !== null && in_array($viewer['id'], array_column($comment['communityReports'] ?? [], 'userId'), true),
             ];
             if ($activity['id'] === $focusedId) $focusedActivity = $activity;
             else $activities[] = $activity;
         }
-        $response = new JsonResponse(['activities' => $activities, 'focusedActivity' => $focusedActivity, 'nextCursor' => $nextCursor, 'hasMore' => $hasMore, 'totalCount' => $totalCount, 'memberCount' => count($activeUsers)]);
+        $response = new JsonResponse(['activities' => $activities, 'focusedActivity' => $focusedActivity, 'nextCursor' => $nextCursor, 'hasMore' => $hasMore, 'totalCount' => $totalCount, 'memberCount' => count($activeUsers), 'sort' => $sortMode]);
         $response->headers->set('Cache-Control', 'private, no-store');
         return $response;
     }

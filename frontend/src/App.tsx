@@ -6437,11 +6437,19 @@ function MentionTextarea(props: TextareaHTMLAttributes<HTMLTextAreaElement>) {
   </span><small className="mention-hint">Tippe @ und den Anfang eines Namens, um ein Mitglied zu erwähnen.</small></>;
 }
 
+type CommunityFeedSort = 'latest' | 'liked' | 'discussed';
+
+const communityFeedSortLabels: Record<CommunityFeedSort, string> = {
+  latest: 'Das Neueste',
+  liked: 'Am meisten gelikt',
+  discussed: 'Am meisten diskutiert',
+};
+
 function CommunitySocialSection() {
   const { user } = useAuth();
   const [activities, setActivities] = useState<CommunityActivity[]>([]);
   const [focusedActivity, setFocusedActivity] = useState<CommunityActivity | null>(null);
-  const [totalCount, setTotalCount] = useState(0);
+  const [feedSort, setFeedSort] = useState<CommunityFeedSort>('latest');
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
@@ -6464,7 +6472,7 @@ function CommunitySocialSection() {
     } else setLoadingMore(true);
     setError('');
     try {
-      const params = new URLSearchParams();
+      const params = new URLSearchParams({ sort: feedSort });
       const postId = reset ? window.location.hash.match(/^#beitrag-([a-f0-9]{32})$/)?.[1] : null;
       if (postId) params.set('post', postId);
       if (!reset && cursorRef.current) params.set('cursor', cursorRef.current);
@@ -6472,7 +6480,6 @@ function CommunitySocialSection() {
       if (activeRequest.current !== controller) return;
       setActivities((current) => [...new Map([...(reset ? [] : current), ...payload.activities].map((activity) => [activity.id, activity])).values()]);
       if (reset) setFocusedActivity(payload.focusedActivity ?? null);
-      setTotalCount(payload.totalCount);
       cursorRef.current = payload.nextCursor;
       setNextCursor(payload.nextCursor);
     } catch (loadError) {
@@ -6484,7 +6491,7 @@ function CommunitySocialSection() {
         setLoadingMore(false);
       }
     }
-  }, [user?.id]);
+  }, [feedSort, user?.id]);
 
   useEffect(() => {
     void loadActivity();
@@ -6512,8 +6519,13 @@ function CommunitySocialSection() {
       <div className="community-social-grid community-feed-only">
         <section className="community-feed-panel card-doodle" aria-labelledby="community-feed-title">
           {focusedActivity && <><div className="community-feed-heading"><h2>Verlinkter Beitrag</h2></div><CommunityActivityCard activity={focusedActivity} /></>}
-          <div className="community-feed-heading"><h2 id="community-feed-title">Das Neueste</h2><span className="comment-count">{loading ? 'lädt …' : `${totalCount} ${totalCount === 1 ? 'Beitrag' : 'Beiträge'}`}</span></div>
-          {loading ? <p className="no-comments" role="status">Die neuesten Beiträge werden geladen …</p> : activities.length ? <div className="community-feed-list">{activities.filter((activity) => activity.id !== focusedActivity?.id).map((activity) => <CommunityActivityCard activity={activity} key={activity.id} />)}</div> : !error && <p className="no-comments">Noch keine Beiträge. Teile als Erste:r deine Erfahrung.</p>}
+          <div className="community-feed-heading">
+            <div className="community-feed-title-group"><h2 id="community-feed-title">{communityFeedSortLabels[feedSort]}</h2></div>
+            <div className="community-feed-sort" role="group" aria-label="Community-Feed sortieren">
+              {(Object.keys(communityFeedSortLabels) as CommunityFeedSort[]).map((sort) => <button className={feedSort === sort ? 'is-active' : ''} type="button" key={sort} aria-pressed={feedSort === sort} onClick={() => setFeedSort(sort)}>{communityFeedSortLabels[sort]}</button>)}
+            </div>
+          </div>
+          {loading ? <p className="no-comments" role="status">{communityFeedSortLabels[feedSort]} werden geladen …</p> : activities.length ? <div className="community-feed-list">{activities.filter((activity) => activity.id !== focusedActivity?.id).map((activity) => <CommunityActivityCard activity={activity} key={activity.id} />)}</div> : !error && <p className="no-comments">Noch keine Beiträge in dieser Ansicht. Teile als Erste:r deine Erfahrung.</p>}
           <div className="community-feed-pagination" ref={sentinel}>
             {error && <p className="form-message form-message-error" role="alert">{error}</p>}
             {loadingMore && <p role="status">Die nächsten 10 Beiträge werden geladen …</p>}
@@ -6699,6 +6711,7 @@ function CommunityExperienceForm({ onSubmitted }: { onSubmitted: () => Promise<v
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
+  const [composerOpen, setComposerOpen] = useState(true);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -6723,26 +6736,27 @@ function CommunityExperienceForm({ onSubmitted }: { onSubmitted: () => Promise<v
   };
 
   return (
-    authLoading ? null : <section className={`community-experience-panel community-composer card-doodle${user ? ' is-composer' : ''}`} aria-labelledby="community-experience-title">
-      <div className="eyebrow handwritten">mitreden</div>
-      {user ? <>
-        <div className="community-composer-heading">
-          <a className="community-composer-avatar" href={`/profil/${user.id}`} aria-label={`Profil von ${formatUserHandle(user.name)}`}><AvatarBadge user={user} compact /></a>
-          <div><h3 id="community-experience-title">Was möchtest du teilen?</h3><p>Schreib der Community, was dich gerade beschäftigt.</p></div>
-        </div>
-        <form className="comment-form community-experience-form" onSubmit={handleSubmit}>
-          <MentionTextarea name="body" value={body} onChange={(event) => setBody(event.target.value)} minLength={10} maxLength={4000} rows={4} placeholder="Was beschäftigt dich gerade?" required />
-          <div className="community-composer-meta"><span>Mit @ kannst du andere Rider verlinken.</span><span>{body.length}/4000</span></div>
-          {error && <p className="form-message form-message-error" role="alert">{error}</p>}
-          {notice && <p className="form-message form-message-success" role="status">{notice}</p>}
-          <button className="button button-ink" type="submit" disabled={submitting || !body.trim()}>{submitting ? 'Wird veröffentlicht …' : 'Posten'} <span aria-hidden="true">↗</span></button>
-        </form>
-      </> : <>
-        <h3 id="community-experience-title">Was beschäftigt dich?</h3>
-        <p>Lies mit, entdecke, was andere Rider gerade bewegt, und misch dich ein.</p>
-        <p className="community-login-hint"><a href="/login">Einloggen</a>, um selbst zu posten, zu liken, zu kommentieren oder Beiträge zu melden.</p>
-      </>}
-    </section>
+    authLoading ? null : <details className={`community-experience-panel community-composer card-doodle${user ? ' is-composer' : ''}`} open={composerOpen} onToggle={(event) => setComposerOpen(event.currentTarget.open)}>
+      <summary className="community-composer-summary">
+        <span className="community-composer-summary-copy"><span className="eyebrow handwritten">mitreden</span><h3 id="community-experience-title">{user ? 'Was möchtest du teilen?' : 'Was beschäftigt dich?'}</h3><span>{user ? 'Teile mit der Community, was dich gerade beschäftigt.' : 'Lies mit, entdecke, was andere Rider gerade bewegt, und misch dich ein.'}</span></span>
+        <span className="community-composer-toggle" aria-hidden="true"><span className="when-closed">Aufklappen +</span><span className="when-open">Zuklappen −</span></span>
+      </summary>
+      <div className="community-composer-content">
+        {user ? <>
+          <div className="community-composer-heading">
+            <a className="community-composer-avatar" href={`/profil/${user.id}`} aria-label={`Profil von ${formatUserHandle(user.name)}`}><AvatarBadge user={user} compact /></a>
+            <div><p>Schreib der Community, was dich gerade beschäftigt.</p></div>
+          </div>
+          <form className="comment-form community-experience-form" onSubmit={handleSubmit}>
+            <MentionTextarea name="body" value={body} onChange={(event) => setBody(event.target.value)} minLength={10} maxLength={4000} rows={4} placeholder="Was beschäftigt dich gerade?" required />
+            <div className="community-composer-meta"><span>Mit @ kannst du andere Rider verlinken.</span><span>{body.length}/4000</span></div>
+            {error && <p className="form-message form-message-error" role="alert">{error}</p>}
+            {notice && <p className="form-message form-message-success" role="status">{notice}</p>}
+            <button className="button button-ink" type="submit" disabled={submitting || !body.trim()}>{submitting ? 'Wird veröffentlicht …' : 'Posten'} <span aria-hidden="true">↗</span></button>
+          </form>
+        </> : <p className="community-login-hint"><a href="/login">Einloggen</a>, um selbst zu posten, zu liken, zu kommentieren oder Beiträge zu melden.</p>}
+      </div>
+    </details>
   );
 }
 

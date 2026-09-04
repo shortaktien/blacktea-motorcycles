@@ -46,6 +46,32 @@ try {
     $assert($missing['focusedActivity'] === null, 'Missing focus target is not exposed');
     $status($controller->communityActivity($pageRequest(['cursor' => 'invalid'])), 400, 'Invalid cursor is rejected');
     $status($controller->communityActivity($pageRequest(['cursor' => base64_encode('[1,"bad-id"]')])), 400, 'Malformed cursor payload is rejected');
+    $status($controller->communityActivity($pageRequest(['sort' => 'unknown'])), 400, 'Invalid feed sort is rejected');
+
+    $seed();
+    $community->update(static function (array &$data) use ($fixture, $owner): void {
+        $data['comments'][0]['communityLikes'] = [$owner];
+        $data['comments'][1]['communityLikes'] = [$owner, 'second-user', 'third-user'];
+        $data['comments'][2]['communityLikes'] = [$owner, 'second-user'];
+        foreach (range(1, 2) as $index) {
+            $data['comments'][] = [
+                'id' => str_pad(dechex(900 + $index), 32, '0', STR_PAD_LEFT), 'guide' => 'community-erfahrungen',
+                'kind' => 'community_reply', 'status' => 'approved', 'userId' => $owner, 'name' => 'test0',
+                'email' => 'test0@example.invalid', 'body' => 'Eine Diskussion zum Beitrag.', 'parentId' => $fixture[3]['id'],
+                'createdAt' => '2026-01-01T12:00:00+00:00', 'imageFile' => null,
+            ];
+        }
+        $data['comments'][] = [
+            'id' => str_pad(dechex(903), 32, '0', STR_PAD_LEFT), 'guide' => 'community-erfahrungen',
+            'kind' => 'community_reply', 'status' => 'approved', 'userId' => $owner, 'name' => 'test0',
+            'email' => 'test0@example.invalid', 'body' => 'Noch eine Diskussion.', 'parentId' => $fixture[4]['id'],
+            'createdAt' => '2026-01-01T12:00:00+00:00', 'imageFile' => null,
+        ];
+    });
+    $liked = $json($controller->communityActivity($pageRequest(['sort' => 'liked'])));
+    $assert($liked['sort'] === 'liked' && $liked['activities'][0]['id'] === $fixture[1]['id'] && $liked['activities'][0]['likeCount'] === 3, 'Liked sort ranks posts by likes');
+    $discussed = $json($controller->communityActivity($pageRequest(['sort' => 'discussed'])));
+    $assert($discussed['sort'] === 'discussed' && $discussed['activities'][0]['id'] === $fixture[3]['id'] && $discussed['activities'][0]['replyCount'] === 2, 'Discussed sort ranks posts by replies');
 
     $community->update(static function (array &$data) use ($fixture): void {
         // Remove the boundary row and an unseen row, then insert a newer post.
