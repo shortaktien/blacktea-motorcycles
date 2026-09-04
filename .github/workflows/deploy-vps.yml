@@ -64,6 +64,17 @@ jobs:
       - name: Test WebMCP tool contract
         run: npm run check:webmcp
 
+      - name: Test backend image without embedded runtime data
+        working-directory: .
+        run: |
+          docker build -t btm-backend-check backend
+          docker run --rm \
+            -e APP_ENV=prod -e APP_DEBUG=0 -e APP_SECRET=isolated-runtime-check \
+            -e 'APP_RUNTIME_OPTIONS={"disable_dotenv":true}' \
+            -e REQUEST_URI=/api/health -e REQUEST_METHOD=GET \
+            btm-backend-check sh -c 'test ! -f .env && test ! -d var/data && php public/index.php'
+          docker run --rm btm-backend-check php tests/community-interactions.php
+
       - name: Stop static preview
         if: always()
         shell: bash

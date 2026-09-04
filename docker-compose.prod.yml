@@ -19,6 +19,8 @@ services:
       context: ./backend
     env_file:
       - ./backend/.env
+    environment:
+      APP_RUNTIME_OPTIONS: '{"disable_dotenv":true}'
     volumes:
       - type: bind
         source: /opt/btm-runtime/data
