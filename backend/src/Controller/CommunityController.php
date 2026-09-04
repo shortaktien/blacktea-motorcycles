@@ -22,6 +22,7 @@ final class CommunityController
     private const REPAIR_REQUEST_GUIDE = 'hilfe-anfragen';
     private const COMMUNITY_EXPERIENCE_GUIDE = 'community-erfahrungen';
     private const MAX_IMAGE_BYTES = 1048576;
+    private const MAX_REQUEST_IMAGES = 3;
     private const STAFF_CHAT_RETENTION_SECONDS = 20 * 86400;
     private const STAFF_CHAT_MAX_MESSAGES = 500;
     private const ALLOWED_IMAGES = [
@@ -59,11 +60,14 @@ final class CommunityController
         $viewerVoteKey = $this->answerVoteKey($viewer);
         $counts = $data['feedback'][$guide] ?? ['up' => 0, 'down' => 0];
         $expectedKinds = $this->expectedKinds($guide);
+        $commentsById = array_column($data['comments'], null, 'id');
         $comments = array_values(array_filter(
             $data['comments'],
-            fn (array $comment): bool => ($comment['guide'] ?? null) === $guide
-                && in_array(($comment['kind'] ?? 'comment'), $expectedKinds, true)
-                && ($comment['status'] ?? null) === 'approved'
+            fn (array $comment): bool => ($comment['status'] ?? null) === 'approved'
+                && ((($comment['guide'] ?? null) === $guide && in_array(($comment['kind'] ?? 'comment'), $expectedKinds, true))
+                    || ($guide === self::REPAIR_REQUEST_GUIDE
+                        && ($comment['kind'] ?? null) === 'community_reply'
+                        && (($commentsById[$comment['parentId'] ?? '']['kind'] ?? null) === 'repair_request')))
         ));
         usort($comments, static fn (array $a, array $b): int => strcmp((string) ($b['createdAt'] ?? ''), (string) ($a['createdAt'] ?? '')));
 
@@ -544,11 +548,14 @@ final class CommunityController
             $kind = (string) ($comment['kind'] ?? 'comment');
             $type = $isSolution
                 ? 'solution'
-                : ($kind === 'repair_answer'
-                    ? 'repair_answer'
-                    : ($kind === 'wiki_suggestion'
-                        ? 'wiki'
-                        : (($comment['guide'] ?? null) === self::COMMUNITY_EXPERIENCE_GUIDE ? 'experience' : 'community')));
+                : ($kind === 'repair_request'
+                    ? 'repair_request'
+                    : ($kind === 'repair_answer'
+                        ? 'repair_answer'
+                        : ($kind === 'wiki_suggestion'
+                            ? 'wiki'
+                            : (($comment['guide'] ?? null) === self::COMMUNITY_EXPERIENCE_GUIDE ? 'experience' : 'community'))));
+            $imageUrls = $this->publicCommentImageUrls($comment);
             $activity = [
                 'id' => (string) ($comment['id'] ?? ''),
                 'type' => $type,
@@ -559,7 +566,8 @@ final class CommunityController
                 'mentions' => $this->commentMentions($comment),
                 'href' => $this->publicContribution($comment, $allComments)['href'],
                 'createdAt' => $isSolution ? (string) ($parent['solutionSelectedAt'] ?? $comment['createdAt'] ?? '') : (string) ($comment['createdAt'] ?? ''),
-                'imageUrl' => !empty($comment['imageFile']) ? '/api/comments/' . rawurlencode((string) $comment['id']) . '/image' : null,
+                'imageUrl' => $imageUrls[0] ?? null,
+                'imageUrls' => $imageUrls,
                 'model' => $actorModel,
                 'country' => $actorCountry,
                 'isSolution' => $isSolution,
@@ -567,7 +575,9 @@ final class CommunityController
                 'actor' => $this->users->publicProfile($actor),
                 'likeCount' => count($comment['communityLikes'] ?? []),
                 'viewerLiked' => $viewer !== null && in_array($viewer['id'], $comment['communityLikes'] ?? [], true),
-                'replyCount' => count(array_filter($allComments, fn (array $reply): bool => ($reply['kind'] ?? null) === 'community_reply' && ($reply['parentId'] ?? null) === $comment['id'] && $this->isCommunityVisible($reply, $allComments))),
+                'replyCount' => ($kind === 'repair_request'
+                    ? count(array_filter($allComments, fn (array $reply): bool => in_array(($reply['kind'] ?? null), ['repair_answer', 'community_reply'], true) && ($reply['parentId'] ?? null) === $comment['id'] && $this->isCommunityVisible($reply, $allComments)))
+                    : count(array_filter($allComments, fn (array $reply): bool => ($reply['kind'] ?? null) === 'community_reply' && ($reply['parentId'] ?? null) === $comment['id'] && $this->isCommunityVisible($reply, $allComments)))),
                 'viewerReported' => $viewer !== null && in_array($viewer['id'], array_column($comment['communityReports'] ?? [], 'userId'), true),
             ];
             if ($activity['id'] === $focusedId) $focusedActivity = $activity;
@@ -720,7 +730,7 @@ final class CommunityController
         if (!is_string($body) || $this->length($body) < 10 || $this->length($body) > 4000) {
             return $this->error('Bitte einen Kommentar mit 10 bis 4.000 Zeichen angeben.', Response::HTTP_BAD_REQUEST);
         }
-        if (in_array($kind, ['wiki_suggestion', 'repair_request'], true) || ($guide === self::COMMUNITY_EXPERIENCE_GUIDE && $kind === 'comment')) {
+        if (in_array($kind, ['wiki_suggestion', 'repair_request'], true)) {
             if (!is_string($topic) || $this->length(trim($topic)) < 2 || $this->length(trim($topic)) > 120) {
             return $this->error('Bitte einen kurzen Titel mit 2 bis 120 Zeichen angeben.', Response::HTTP_BAD_REQUEST);
             }
@@ -762,16 +772,20 @@ final class CommunityController
         $confirmation = $authenticatedUser === null ? $this->emailConfirmation->createToken('/api/comments/confirm/') : null;
         $submissionStatus = $directCommunityPost ? 'approved' : ($authenticatedUser === null ? 'awaiting_confirmation' : 'pending');
 
-        $image = $request->files->get('image');
-        if ($image !== null && !$image instanceof UploadedFile) {
-            return $this->error('Das Bild konnte nicht verarbeitet werden.', Response::HTTP_BAD_REQUEST);
+        $uploadedImages = $request->files->get('image');
+        $images = $uploadedImages === null ? [] : (is_array($uploadedImages) ? array_values($uploadedImages) : [$uploadedImages]);
+        $maxImages = $kind === 'repair_request' ? self::MAX_REQUEST_IMAGES : 1;
+        if (count($images) > $maxImages) {
+            return $this->error($kind === 'repair_request' ? 'Eine Reparaturanfrage darf höchstens 3 Bilder enthalten.' : 'Es darf höchstens ein Bild angehängt werden.', Response::HTTP_BAD_REQUEST);
         }
 
-        $imageFilename = null;
-        $imageMime = null;
-        if ($image instanceof UploadedFile) {
+        $validatedImages = [];
+        foreach ($images as $image) {
+            if (!$image instanceof UploadedFile) {
+                return $this->error('Das Bild konnte nicht verarbeitet werden.', Response::HTTP_BAD_REQUEST);
+            }
             if (!$image->isValid() || ($image->getSize() ?? self::MAX_IMAGE_BYTES + 1) > self::MAX_IMAGE_BYTES) {
-                return $this->error('Das Bild darf höchstens 1 MB groß sein.', Response::HTTP_BAD_REQUEST);
+                return $this->error('Jedes Bild darf höchstens 1 MB groß sein.', Response::HTTP_BAD_REQUEST);
             }
 
             $imageMime = function_exists('mime_content_type') ? @mime_content_type($image->getPathname()) : null;
@@ -784,12 +798,21 @@ final class CommunityController
                 return $this->error('Das Bild hat kein unterstütztes Format oder ist zu groß aufgelöst.', Response::HTTP_BAD_REQUEST);
             }
 
-            $imageFilename = bin2hex(random_bytes(16)) . '.' . self::ALLOWED_IMAGES[$imageMime];
+            $validatedImages[] = ['upload' => $image, 'mime' => $imageMime, 'extension' => self::ALLOWED_IMAGES[$imageMime]];
+        }
+
+        $imageFiles = [];
+        $imageMimes = [];
+        foreach ($validatedImages as $validatedImage) {
+            $imageFilename = bin2hex(random_bytes(16)) . '.' . $validatedImage['extension'];
             try {
-                $image->move($this->storage->uploadsDir(), $imageFilename);
+                $validatedImage['upload']->move($this->storage->uploadsDir(), $imageFilename);
             } catch (\Throwable) {
+                foreach ($imageFiles as $movedImage) $this->storage->deleteImage($movedImage);
                 return $this->error('Das Bild konnte nicht gespeichert werden.', Response::HTTP_INTERNAL_SERVER_ERROR);
             }
+            $imageFiles[] = $imageFilename;
+            $imageMimes[] = $validatedImage['mime'];
         }
 
         $comment = [
@@ -799,19 +822,23 @@ final class CommunityController
             'name' => trim($name),
             'email' => $normalizedEmail,
             'body' => trim($body),
-            'topic' => in_array($kind, ['wiki_suggestion', 'repair_request'], true) || ($guide === self::COMMUNITY_EXPERIENCE_GUIDE && $kind === 'comment') ? trim((string) $topic) : null,
+            'topic' => in_array($kind, ['wiki_suggestion', 'repair_request'], true) || (is_string($topic) && trim($topic) !== '') ? trim((string) $topic) : null,
             'section' => is_string($section) && trim($section) !== '' ? trim($section) : null,
             'source' => is_string($source) && trim($source) !== '' ? trim($source) : null,
             'parentId' => $kind === 'repair_answer' ? trim((string) $parentId) : null,
             'userId' => $authenticatedUser['id'] ?? null,
-            'imageFile' => $imageFilename,
-            'imageMime' => $imageMime,
+            'imageFile' => $imageFiles[0] ?? null,
+            'imageMime' => $imageMimes[0] ?? null,
             'status' => $submissionStatus,
             'createdAt' => (new \DateTimeImmutable())->format(DATE_ATOM),
             'approvedAt' => $directCommunityPost ? (new \DateTimeImmutable())->format(DATE_ATOM) : null,
             'emailConfirmedAt' => $authenticatedUser !== null ? (new \DateTimeImmutable())->format(DATE_ATOM) : null,
             'subscriberUserIds' => $kind === 'repair_request' && $authenticatedUser !== null ? [(string) $authenticatedUser['id']] : [],
         ];
+        if ($kind === 'repair_request' && count($imageFiles) > 1) {
+            $comment['imageFiles'] = $imageFiles;
+            $comment['imageMimes'] = $imageMimes;
+        }
         if (is_array($confirmation)) {
             $comment['emailConfirmationTokenHash'] = $confirmation['tokenHash'];
             $comment['emailConfirmationExpiresAt'] = $confirmation['expiresAt'];
@@ -823,7 +850,7 @@ final class CommunityController
                 $data['comments'][] = $comment;
             });
         } catch (\Throwable) {
-            $this->storage->deleteImage($imageFilename);
+            foreach ($imageFiles as $imageFile) $this->storage->deleteImage($imageFile);
             return $this->error('Der Kommentar konnte nicht gespeichert werden.', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
@@ -837,7 +864,7 @@ final class CommunityController
                 );
             } catch (\Throwable $exception) {
                 $this->removeComment($comment['id']);
-                $this->storage->deleteImage($imageFilename);
+                foreach ($imageFiles as $imageFile) $this->storage->deleteImage($imageFile);
                 error_log('[email-confirmation] ' . $exception->getMessage());
                 return $this->error('Die Bestätigungs-E-Mail konnte gerade nicht versendet werden. Bitte später erneut versuchen.', Response::HTTP_SERVICE_UNAVAILABLE);
             }
@@ -919,7 +946,7 @@ final class CommunityController
     }
 
     #[Route('/api/comments/{id}/image', name: 'api_comment_image', methods: ['GET'])]
-    public function commentImage(string $id): Response
+    public function commentImage(string $id, Request $request): Response
     {
         $comment = $this->findComment($id);
         if ($comment === null) {
@@ -929,11 +956,14 @@ final class CommunityController
             return $this->error('Bild noch nicht freigegeben.', Response::HTTP_NOT_FOUND);
         }
 
-        $filename = $comment['imageFile'] ?? null;
-        $mime = $comment['imageMime'] ?? null;
-        if (!is_string($filename) || !is_string($mime) || !isset(self::ALLOWED_IMAGES[$mime])) {
+        $slot = $request->query->get('slot', '0');
+        if (!is_string($slot) || preg_match('/^\d+$/D', $slot) !== 1) {
             return $this->error('Bild nicht gefunden.', Response::HTTP_NOT_FOUND);
         }
+        $image = $this->commentImagePairs($comment)[(int) $slot] ?? null;
+        if (!is_array($image)) return $this->error('Bild nicht gefunden.', Response::HTTP_NOT_FOUND);
+        $filename = $image['filename'];
+        $mime = $image['mime'];
         $path = $this->storage->uploadsDir() . '/' . basename($filename);
         if (!is_file($path)) {
             return $this->error('Bild nicht gefunden.', Response::HTTP_NOT_FOUND);
@@ -1508,6 +1538,11 @@ final class CommunityController
                     if (isset($comment['imageFile']) && is_string($comment['imageFile'])) {
                         $deletedImages[] = $comment['imageFile'];
                     }
+                    if (is_array($comment['imageFiles'] ?? null)) {
+                        foreach ($comment['imageFiles'] as $imageFile) {
+                            if (is_string($imageFile) && !in_array($imageFile, $deletedImages, true)) $deletedImages[] = $imageFile;
+                        }
+                    }
                     return false;
                 }
                 return true;
@@ -1713,7 +1748,14 @@ final class CommunityController
         if (!is_array($deleted)) {
             return $this->error('Kommentar nicht gefunden.', Response::HTTP_NOT_FOUND);
         }
-        $this->storage->deleteImage($deleted['imageFile'] ?? null);
+        $deletedImages = [];
+        if (is_string($deleted['imageFile'] ?? null)) $deletedImages[] = $deleted['imageFile'];
+        if (is_array($deleted['imageFiles'] ?? null)) {
+            foreach ($deleted['imageFiles'] as $imageFile) {
+                if (is_string($imageFile) && !in_array($imageFile, $deletedImages, true)) $deletedImages[] = $imageFile;
+            }
+        }
+        foreach ($deletedImages as $imageFile) $this->storage->deleteImage($imageFile);
 
         return new JsonResponse(['deleted' => true]);
     }
@@ -1869,6 +1911,38 @@ final class CommunityController
         return $this->users->resolveMentions(implode("\n", [$comment['topic'] ?? '', $comment['body'] ?? '', $comment['section'] ?? '', $comment['source'] ?? '']), $comment['mentions'] ?? null);
     }
 
+    /** @return array<int, array{filename: string, mime: string}> */
+    private function commentImagePairs(array $comment): array
+    {
+        $pairs = [];
+        $add = static function (array &$pairs, mixed $filename, mixed $mime): void {
+            if (!is_string($filename) || $filename === '' || !is_string($mime) || !isset(self::ALLOWED_IMAGES[$mime])) return;
+            foreach ($pairs as $pair) {
+                if ($pair['filename'] === $filename) return;
+            }
+            $pairs[] = ['filename' => $filename, 'mime' => $mime];
+        };
+
+        $add($pairs, $comment['imageFile'] ?? null, $comment['imageMime'] ?? null);
+        $files = is_array($comment['imageFiles'] ?? null) ? $comment['imageFiles'] : [];
+        $mimes = is_array($comment['imageMimes'] ?? null) ? $comment['imageMimes'] : [];
+        foreach ($files as $index => $filename) {
+            $add($pairs, $filename, $mimes[$index] ?? null);
+        }
+
+        return $pairs;
+    }
+
+    /** @return list<string> */
+    private function publicCommentImageUrls(array $comment): array
+    {
+        $urls = [];
+        foreach (array_keys($this->commentImagePairs($comment)) as $slot) {
+            $urls[] = '/api/comments/' . rawurlencode((string) $comment['id']) . '/image?slot=' . $slot;
+        }
+        return $urls;
+    }
+
     private function notifyPublishedMentions(array $comment): void
     {
         $guide = $comment['guide'];
@@ -1902,6 +1976,7 @@ final class CommunityController
             }
         }
 
+        $imageUrls = $this->publicCommentImageUrls($comment);
         $public = [
             'id' => (string) $comment['id'],
             'kind' => (string) ($comment['kind'] ?? 'comment'),
@@ -1914,7 +1989,8 @@ final class CommunityController
             'source' => isset($comment['source']) && is_string($comment['source']) ? $comment['source'] : null,
             'parentId' => isset($comment['parentId']) && is_string($comment['parentId']) ? $comment['parentId'] : null,
             'createdAt' => (string) $comment['createdAt'],
-            'imageUrl' => !empty($comment['imageFile']) ? '/api/comments/' . rawurlencode((string) $comment['id']) . '/image' : null,
+            'imageUrl' => $imageUrls[0] ?? null,
+            'imageUrls' => $imageUrls,
             'avatarStyle' => $avatarStyle,
             'avatarUrl' => $avatarUrl,
             'profileId' => is_string($userId) && $userId !== '' && $user !== null && ($user['status'] ?? null) === 'active' ? $userId : null,

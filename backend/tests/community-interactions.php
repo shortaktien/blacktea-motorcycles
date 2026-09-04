@@ -67,7 +67,7 @@ $status = static function (JsonResponse $response, int $expected, string $label)
 
 try {
     $as($owner);
-    $create = Request::create('/api/comments', 'POST', ['guide' => 'community-erfahrungen', 'kind' => 'comment', 'topic' => 'Testbeitrag', 'body' => str_repeat('Vollständiger Inhalt. ', 30), 'section' => 'Wildfire'], [], [], ['HTTP_X_CSRF_TOKEN' => 'test-csrf']);
+    $create = Request::create('/api/comments', 'POST', ['guide' => 'community-erfahrungen', 'kind' => 'comment', 'body' => str_repeat('Vollständiger Inhalt. ', 30), 'section' => 'Wildfire'], [], [], ['HTTP_X_CSRF_TOKEN' => 'test-csrf']);
     $status($controller->createComment($create), 201, 'Publish immediately');
     $post = $community->read()['comments'][0];
     $id = $post['id'];
@@ -107,6 +107,7 @@ try {
     $assert(count($json($controller->communityReplies($id, $request('GET')))['replies']) === 1, 'Guests can read comments');
     $activity = $json($controller->communityActivity($request('GET')))['activities'];
     $assert(count($activity) === 1 && $activity[0]['replyCount'] === 1, 'Replies grouped, not separate feed posts');
+    $assert($activity[0]['title'] === 'Community-Beitrag', 'Community posts work without a separate title');
     $assert($activity[0]['body'] === $post['body'], 'Post body is not silently truncated');
     $assert($activity[0]['viewerLiked'] === false && $activity[0]['likeCount'] === 1, 'Guest counts are correct');
     $as($member);
@@ -164,6 +165,37 @@ try {
     require __DIR__ . '/self-review-checks.php';
     require __DIR__ . '/review-editing-checks.php';
     require __DIR__ . '/repair-request-membership-checks.php';
+
+    // Repair discussions have one canonical home. Legacy feed replies remain visible on the request,
+    // while the old community-reply write path is closed for new repair discussions.
+    $legacyRequestId = str_repeat('1', 32);
+    $legacyReplyId = str_repeat('2', 32);
+    $now = date(DATE_ATOM);
+    $community->update(static function (array &$data) use ($owner, $member, $legacyRequestId, $legacyReplyId, $now): void {
+        $data['comments'][] = [
+            'id' => $legacyRequestId, 'guide' => 'hilfe-anfragen', 'kind' => 'repair_request', 'status' => 'approved',
+            'userId' => $owner, 'name' => 'test0', 'email' => 'test0@example.invalid', 'topic' => 'Legacy-Reparaturfrage',
+            'body' => 'Eine alte Reparaturfrage mit einem Community-Kommentar.', 'section' => 'Bonfire',
+            'source' => null, 'parentId' => null, 'createdAt' => $now, 'approvedAt' => $now,
+            'imageFile' => null, 'imageMime' => null,
+        ];
+        $data['comments'][] = [
+            'id' => $legacyReplyId, 'guide' => 'community-erfahrungen', 'kind' => 'community_reply', 'status' => 'approved',
+            'userId' => $member, 'name' => 'test1', 'email' => 'test1@example.invalid', 'topic' => null,
+            'body' => 'Der alte Kommentar bleibt bei der Reparaturfrage sichtbar.', 'section' => 'Bonfire',
+            'source' => null, 'parentId' => $legacyRequestId, 'createdAt' => $now, 'approvedAt' => $now,
+            'imageFile' => null, 'imageMime' => null,
+        ];
+    });
+    $as(null);
+    $repairFeedback = $json($controller->readFeedback('hilfe-anfragen'));
+    $legacyComments = array_values(array_filter($repairFeedback['comments'], static fn (array $comment): bool => $comment['id'] === $legacyReplyId));
+    $assert(count($legacyComments) === 1 && $legacyComments[0]['kind'] === 'community_reply', 'Legacy repair comments appear on the repair request');
+    $repairFeed = $json($controller->communityActivity($request('GET')));
+    $legacyActivity = array_values(array_filter($repairFeed['activities'], static fn (array $activity): bool => $activity['id'] === $legacyRequestId));
+    $assert(count($legacyActivity) === 1 && $legacyActivity[0]['type'] === 'repair_request' && $legacyActivity[0]['replyCount'] === 1, 'Repair requests expose their unified answer count in the feed');
+    $as($member);
+    $status($controller->communityReplies($legacyRequestId, $request('POST', ['body' => 'Zweiter Antwortweg'])), 409, 'Community replies are closed for repair requests');
 } finally {
     if (session_status() === PHP_SESSION_ACTIVE) session_write_close();
     $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($root, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST);

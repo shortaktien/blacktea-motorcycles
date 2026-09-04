@@ -326,7 +326,14 @@ h3 { margin-bottom: 10px; color: var(--charcoal); font-size: 21px; line-height: 
 .repair-request-title-link { text-decoration: none; }
 .repair-request-title-link:hover { color: var(--ink); text-decoration: underline; text-decoration-color: var(--pink); text-decoration-thickness: 4px; text-underline-offset: 3px; }
 .repair-request-body { margin: 12px 0 0; color: #686771; font-size: 14px; line-height: 1.58; white-space: pre-line; }
+.repair-request-expand > p { margin: 0; }
+.repair-request-expand-toggle { display: inline; margin-left: 6px; padding: 0; border: 0; color: var(--ink); background: transparent; font: inherit; font-size: 12px; font-weight: 800; white-space: nowrap; cursor: pointer; }
+.repair-request-expand-toggle:hover { text-decoration: underline; text-decoration-color: var(--pink); text-decoration-thickness: 3px; text-underline-offset: 3px; }
+.repair-request-expand-toggle:focus-visible { outline: 3px solid var(--pink); outline-offset: 3px; }
 .repair-request-source { margin: 10px 0 0; color: #777580; font-size: 11px; line-height: 1.5; overflow-wrap: anywhere; }
+.repair-request-images { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 13px; }
+.repair-request-images a { display: block; flex: 1 1 180px; min-width: 0; }
+.repair-request-images img { display: block; width: 100%; max-height: 260px; border: 1px solid var(--line); border-radius: 7px; object-fit: contain; background: #fff; }
 .repair-answers { margin-top: 21px; padding-top: 16px; border-top: 1px dashed var(--line); }
 .repair-answers-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
 .repair-answer { padding: 13px 14px 12px; border-left: 3px solid var(--green); background: rgba(226,243,232,.52); }
@@ -408,6 +415,9 @@ h3 { margin-bottom: 10px; color: var(--charcoal); font-size: 21px; line-height: 
 .button:disabled, .vote-button:disabled { opacity: .55; cursor: wait; transform: none; }
 .admin-comment-body { max-width: 760px; margin: 18px 0 0; padding-top: 15px; border-top: 1px dashed var(--line); color: #5f5d68; font-size: 14px; line-height: 1.62; white-space: pre-line; }
 .admin-comment-image { display: block; max-width: min(100%, 520px); max-height: 360px; margin-top: 13px; border: 1px solid var(--line); border-radius: 7px; object-fit: contain; background: #fff; }
+.admin-comment-images { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 13px; }
+.admin-comment-images a { display: block; flex: 1 1 180px; min-width: 0; }
+.admin-comment-images .admin-comment-image { width: 100%; margin-top: 0; }
 .admin-empty { max-width: 600px; padding: 25px; }
 .admin-empty h2 { margin-bottom: 8px; font-size: 30px; }
 .admin-empty p { margin: 0; color: #6d6b76; font-size: 14px; }
@@ -471,23 +481,40 @@ h3 { margin-bottom: 10px; color: var(--charcoal); font-size: 21px; line-height: 
 .community-feed-content h3 a { text-decoration: none; }
 .community-feed-content h3 a:hover { color: var(--ink); text-decoration: underline; }
 .community-feed-content > p { margin: 0; color: var(--charcoal); font-size: 15px; line-height: 1.65; white-space: pre-line; overflow-wrap: anywhere; }
+.community-repair-link { display: inline-block; margin-top: 11px; color: var(--ink); font-size: 13px; font-weight: 850; text-decoration: none; }
+.community-repair-link:hover { text-decoration: underline; text-decoration-color: var(--pink); text-decoration-thickness: 3px; text-underline-offset: 3px; }
+.community-repair-link:focus-visible { outline: 2px solid var(--pink); outline-offset: 3px; }
 .community-feed-image-link { display: block; width: 100%; margin-top: 14px; overflow: hidden; border: 1px solid var(--line); border-radius: 14px; background: rgba(227,225,255,.28); }
 .community-feed-image { display: block; width: 100%; height: auto; max-height: 480px; object-fit: contain; }
+.community-feed-images { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+.community-feed-images .community-feed-image-link { flex: 1 1 220px; width: auto; margin-top: 0; }
 .community-feed-score { display: inline-block; margin-top: 12px; color: #2d7654; font-size: 12px; font-weight: 700; }
 .kind-chip.solution { color: #8d6410; background: #fff3be; border-color: #b28923; }
 .community-experience-panel { margin: 0 0 19px; background: rgba(255,240,207,.54); }
 .community-experience-panel.is-composer { background: rgba(251,250,247,.9); }
 .community-experience-panel.is-composer .community-experience-form { margin-top: 0; }
+.community-composer-heading { display: flex; align-items: center; gap: 12px; margin: 9px 0 14px; }
+.community-composer-heading h3 { margin: 0; font-size: 24px; }
+.community-composer-heading p { margin: 3px 0 0; color: #777580; font-size: 12px; }
+.community-composer-avatar { display: block; flex: 0 0 auto; border-radius: 50%; }
+.community-composer-avatar .avatar-badge { width: 42px; height: 42px; border-radius: 50%; transform: none; }
+.community-composer .community-experience-form { padding: 0; border: 0; background: transparent; }
+.community-composer .community-experience-form > textarea { min-height: 104px; border-radius: 12px 9px 13px 8px; }
+.community-composer-meta { display: flex; justify-content: space-between; gap: 12px; color: #898790; font-size: 11px; }
+.community-composer-meta span:last-child { white-space: nowrap; }
+.community-composer .community-experience-form .button { justify-self: end; }
 @media (max-width: 620px) {
   .community-feed-heading { padding: 17px 14px; }
   .community-feed-item { grid-template-columns: 36px minmax(0, 1fr); gap: 10px; padding: 18px 14px; }
   .community-feed-avatar .avatar-badge { width: 36px; height: 36px; }
   .community-feed-content > p { font-size: 14px; }
+  .community-composer-heading h3 { font-size: 21px; }
 }
 .community-experience-panel > p { max-width: 720px; margin-bottom: 15px; }
 .community-experience-form { margin-top: 19px; }
 .community-login-hint { padding: 10px 12px; border-left: 3px solid var(--pink); background: rgba(255,228,239,.44); }
 .community-login-hint a { color: var(--ink); font-weight: 800; }
+.community-login-hint a.button-ink { color: #fff; text-decoration: none; }
 
 .profile-page { padding-top: 64px; padding-bottom: 90px; }
 .profile-hero { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 25px; align-items: center; padding: 29px 30px; background: rgba(251,250,247,.9); }

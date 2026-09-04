@@ -154,6 +154,9 @@ trait CommunityInteractionTrait
         if ($parent === null || ($parent['kind'] ?? null) === 'community_reply' || !$this->isCommunityVisible($parent, $comments)) {
             return $this->error('Beitrag nicht gefunden.', Response::HTTP_NOT_FOUND);
         }
+        if (in_array($parent['kind'] ?? null, ['repair_request', 'repair_answer'], true)) {
+            return $this->error('Antworten auf Reparaturanfragen gehören direkt in die Reparaturanfrage. Bitte öffne „Zur Reparaturanfrage“.', Response::HTTP_CONFLICT);
+        }
         if ($request->isMethod('GET')) {
             $replies = array_values(array_filter($comments, fn (array $reply): bool =>
                 ($reply['kind'] ?? null) === 'community_reply' && ($reply['parentId'] ?? null) === $id

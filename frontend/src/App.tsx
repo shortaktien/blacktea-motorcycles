@@ -116,6 +116,7 @@ type PublicComment = {
   parentId?: string | null;
   createdAt: string;
   imageUrl: string | null;
+  imageUrls?: string[];
   avatarStyle?: number | null;
   avatarUrl?: string | null;
   profileId?: string | null;
@@ -325,12 +326,13 @@ type CommunityActivity = {
   viewerReported: boolean;
   replyCount: number;
   id: string;
-  type: 'solution' | 'repair_answer' | 'wiki' | 'experience' | 'community';
+  type: 'solution' | 'repair_request' | 'repair_answer' | 'wiki' | 'experience' | 'community';
   title: string;
   body: string;
   href: string;
   createdAt: string;
   imageUrl: string | null;
+  imageUrls?: string[];
   model: BikeModel | null;
   country: PostalCountry | null;
   isSolution: boolean;
@@ -356,6 +358,7 @@ const localPartArchiveHref = '/quellen#ersatzteil-archiv';
 const repairRequestGuideSlug = 'hilfe-anfragen';
 const repairRequestPath = '/hilfe/anfragen';
 const repairRequestDetailPrefix = `${repairRequestPath}/`;
+const repairRequestPreviewWordLimit = 50;
 const repairRequestDetailPath = (id: string) => `${repairRequestPath}/${id}`;
 const getRepairRequestId = (path: string) => {
   if (!path.startsWith(repairRequestDetailPrefix)) return null;
@@ -2092,7 +2095,7 @@ function SearchPage() {
       const entries = comments
         .filter((comment) => comment.kind === 'repair_request')
         .map((request) => {
-          const answers = comments.filter((comment) => comment.kind === 'repair_answer' && comment.parentId === request.id);
+          const answers = comments.filter((comment) => (comment.kind === 'repair_answer' || comment.kind === 'community_reply') && comment.parentId === request.id);
           const text = [request.topic ?? 'Reparaturanfrage', request.section ?? '', request.body, ...answers.map((answer) => answer.body)].join(' ');
           return {
             kind: 'repair' as const,
@@ -2784,6 +2787,37 @@ function PublicCommentAuthor({ comment }: { comment: Pick<PublicComment, 'name' 
     : <span className="approved-comment-author">{author}</span>}<EditCredit edit={comment.editAttribution} /></>;
 }
 
+function CommentImageGallery({
+  imageUrl,
+  imageUrls,
+  alt,
+  galleryClassName,
+  linkClassName,
+  imageClassName,
+}: {
+  imageUrl?: string | null;
+  imageUrls?: string[];
+  alt: string;
+  galleryClassName: string;
+  linkClassName?: string;
+  imageClassName?: string;
+}) {
+  const urls = imageUrls?.length ? imageUrls : imageUrl ? [imageUrl] : [];
+  if (!urls.length) return null;
+
+  return (
+    <div className={galleryClassName}>
+      {urls.map((url, index) => (
+        <CommentImageLink key={url} url={url} alt={`${alt}${urls.length > 1 ? ` (${index + 1})` : ''}`} linkClassName={linkClassName} imageClassName={imageClassName} />
+      ))}
+    </div>
+  );
+}
+
+function CommentImageLink({ url, alt, linkClassName, imageClassName }: { url: string; alt: string; linkClassName?: string; imageClassName?: string }) {
+  return <a className={linkClassName} href={url} target="_blank" rel="noreferrer"><img decoding="async" className={imageClassName} src={url} alt={alt} loading="lazy" /></a>;
+}
+
 function ReviewEditor({ comment, csrfToken, context, reported = false, disabled = false, onAccepted }: {
   comment: AdminComment; csrfToken: string; context: 'admin' | 'moderator'; reported?: boolean; disabled?: boolean; onAccepted: () => void | Promise<void>;
 }) {
@@ -3184,7 +3218,7 @@ function ModeratorDashboardPanel({ csrfToken }: { csrfToken: string }) {
             {comment.section && <p className="admin-comment-target"><strong>Modell / Bereich:</strong> „{comment.section}“</p>}
             <p className="account-moderation-body"><MentionText text={comment.body} mentions={comment.mentions} /></p>
             {comment.source && <p className="admin-comment-source"><strong>Quelle:</strong> <MentionText text={comment.source} mentions={comment.mentions} /></p>}
-            {comment.imageUrl && <a href={comment.imageUrl} target="_blank" rel="noreferrer"><img decoding="async" loading="lazy" className="admin-comment-image" src={comment.imageUrl} alt={`Anhang von ${comment.name}`} /></a>}
+            <CommentImageGallery imageUrl={comment.imageUrl} imageUrls={comment.imageUrls} alt={`Anhang von ${comment.name}`} galleryClassName="admin-comment-images" imageClassName="admin-comment-image" />
             {comment.canModerate !== true ? <p className="content-note">Dein eigener Beitrag wartet auf die Prüfung durch einen anderen Moderator oder Admin.</p> : <div className="account-moderation-actions">
               <ReviewEditor comment={comment} csrfToken={csrfToken} context="moderator" disabled={busyId !== null} onAccepted={loadOpenComments} />
               <button className="button button-ink" type="button" disabled={busyId !== null} onClick={() => void updateComment(comment, 'approved')}>Freigeben</button>
@@ -4274,7 +4308,7 @@ function WikiContributions({ guideSlug, editingHeading, onCloseEditor }: { guide
               {comment.section && <small className="wiki-contribution-section">Bezug: <MentionText text={comment.section} mentions={comment.mentions} /></small>}
               <p><MentionText text={comment.body} mentions={comment.mentions} /></p>
               {comment.source && <small className="wiki-contribution-source">Quelle: <MentionText text={comment.source} mentions={comment.mentions} /></small>}
-              {comment.imageUrl && <img decoding="async" src={comment.imageUrl} alt={`Bild von ${comment.name}`} loading="lazy" />}
+              <CommentImageGallery imageUrl={comment.imageUrl} imageUrls={comment.imageUrls} alt={`Bild von ${comment.name}`} galleryClassName="approved-comment-images" />
             </article>
           );
         }) : <p className="no-comments">Noch keine freigegebenen Ergänzungen.</p>}
@@ -4478,20 +4512,26 @@ function RepairRequestForm({ onSubmitted }: { onSubmitted: () => void }) {
   const { user, csrfToken, loading: authLoading } = useAuth();
   const [requestError, setRequestError] = useState('');
   const [requestNotice, setRequestNotice] = useState('');
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [submitting, setSubmitting] = useState(false);
 
   const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0] ?? null;
+    const files = Array.from(event.target.files ?? []);
     setRequestError('');
     setRequestNotice('');
-    if (file && file.size > 1048576) {
-      setSelectedFile(null);
+    if (files.length > 3) {
+      setSelectedFiles([]);
       event.target.value = '';
-      setRequestError('Das Bild darf höchstens 1 MB groß sein.');
+      setRequestError('Du kannst höchstens 3 Bilder hochladen.');
       return;
     }
-    setSelectedFile(file);
+    if (files.some((file) => file.size > 1048576)) {
+      setSelectedFiles([]);
+      event.target.value = '';
+      setRequestError('Jedes Bild darf höchstens 1 MB groß sein.');
+      return;
+    }
+    setSelectedFiles(files);
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -4504,12 +4544,13 @@ function RepairRequestForm({ onSubmitted }: { onSubmitted: () => void }) {
     formData.set('guide', repairRequestGuideSlug);
     formData.set('kind', 'repair_request');
     formData.delete('image');
-    if (selectedFile) formData.append('image', selectedFile);
+    formData.delete('image[]');
+    selectedFiles.forEach((file) => formData.append('image[]', file));
 
     try {
       await apiJson<{ message: string }>('/api/comments', { method: 'POST', headers: { 'X-CSRF-Token': csrfToken }, body: formData });
       form.reset();
-      setSelectedFile(null);
+      setSelectedFiles([]);
       setRequestNotice('Danke! Deine Reparaturanfrage ist bei uns zur redaktionellen Prüfung vorgemerkt.');
       onSubmitted();
     } catch (error) {
@@ -4543,7 +4584,7 @@ function RepairRequestForm({ onSubmitted }: { onSubmitted: () => void }) {
       </div>
       <label>Beschreibung<MentionTextarea name="body" required minLength={10} maxLength={4000} rows={7} placeholder="Modell, Baujahr, genaue Symptome, wann der Fehler auftritt und was bereits geprüft wurde …" /></label>
       <label>Quelle oder weitere Infos (optional)<input name="source" maxLength={500} placeholder="z. B. Handbuch Seite 12 oder https://…" /></label>
-      <label>Bild (optional, max. 1 MB)<input name="image" type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={handleImageChange} /><small>JPG, PNG, WEBP oder GIF</small></label>
+      <label>Bilder (optional, bis zu 3)<input name="image[]" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple onChange={handleImageChange} /><small>JPG, PNG, WEBP oder GIF · maximal 3 Bilder · je höchstens 1 MB</small></label>
       <label className="comment-honeypot" aria-hidden="true">Website<input name="website" tabIndex={-1} autoComplete="off" /></label>
       {requestError && <p className="form-message form-message-error" role="alert">{requestError}</p>}
       {requestNotice && <p className="form-message form-message-success" role="status">{requestNotice}</p>}
@@ -4628,7 +4669,7 @@ function RepairRequestDetailPage({ requestId }: { requestId: string }) {
   const comments = summary?.comments ?? [];
   const request = comments.find((comment) => comment.id === requestId && comment.kind === 'repair_request');
   const answers = useMemo(() => comments
-    .filter((comment) => comment.kind === 'repair_answer' && comment.parentId === requestId)
+    .filter((comment) => (comment.kind === 'repair_answer' || comment.kind === 'community_reply') && comment.parentId === requestId)
     .sort((left, right) => {
       const leftIsSolution = request?.solutionAnswerId === left.id;
       const rightIsSolution = request?.solutionAnswerId === right.id;
@@ -4698,8 +4739,9 @@ function RepairRequestDetailPage({ requestId }: { requestId: string }) {
                 {request.solutionAnswerId ? <div className="repair-solved-banner"><span className="repair-solved-badge">✓ Gelöst</span><span>Die beste Antwort wurde vom Ersteller gekürt.</span></div> : request.isRequestOwner && <p className="repair-owner-hint">Du bist der Ersteller dieser Anfrage. Wähle unten die Antwort aus, die dein Problem am besten löst.</p>}
                 <RepairRequestSubscription requestId={request.id} />
                 <h2>Fehlerbild und bisherige Angaben</h2>
-                <p className="repair-request-detail-body"><MentionText text={request.body} mentions={request.mentions} /></p>
+                <ExpandableRepairText text={request.body} mentions={request.mentions} className="repair-request-detail-body" />
                 {request.source && <p className="repair-request-source"><strong>Weitere Info:</strong> <MentionText text={request.source} mentions={request.mentions} /></p>}
+                <CommentImageGallery imageUrl={request.imageUrl} imageUrls={request.imageUrls} alt={`Bild von ${request.name}`} galleryClassName="repair-request-images" />
                 <div className="repair-answers repair-request-detail-answers">
                   <div className="repair-answers-heading"><span className="eyebrow handwritten">antworten und lösungen</span><span className="comment-count">{answers.length}</span></div>
                   {solutionError && <p className="form-message form-message-error" role="alert">{solutionError}</p>}
@@ -4708,7 +4750,7 @@ function RepairRequestDetailPage({ requestId }: { requestId: string }) {
                       key={answer.id}
                       answer={answer}
                       isSolution={request.solutionAnswerId === answer.id}
-                      canSelectSolution={request.isRequestOwner === true}
+                      canSelectSolution={request.isRequestOwner === true && answer.kind === 'repair_answer'}
                       solutionBusy={solutionBusy}
                       onVote={handleAnswerVoted}
                       onChooseSolution={chooseSolution}
@@ -4746,6 +4788,7 @@ function RepairAnswerCard({
   onVote: (answerId: string, vote: { upVotes: number; downVotes: number; score: number; viewerVote: 'up' | 'down' | null }) => void;
   onChooseSolution: (answerId: string) => Promise<void>;
 }) {
+  const canVote = answer.kind === 'repair_answer';
   const [upVotes, setUpVotes] = useState(answer.upVotes ?? 0);
   const [downVotes, setDownVotes] = useState(answer.downVotes ?? 0);
   const [viewerVote, setViewerVote] = useState<'up' | 'down' | null>(answer.viewerVote ?? null);
@@ -4781,18 +4824,18 @@ function RepairAnswerCard({
       <p><MentionText text={answer.body} mentions={answer.mentions} /></p>
       {answer.source && <small>Quelle: <MentionText text={answer.source} mentions={answer.mentions} /></small>}
       {answer.imageUrl && <img decoding="async" src={answer.imageUrl} alt={`Bild von ${answer.name}`} loading="lazy" />}
-      <div className="repair-answer-footer">
-        <div className="repair-answer-votes" aria-label="Antwort bewerten">
+      {(canVote || canSelectSolution) && <div className="repair-answer-footer">
+        {canVote && <div className="repair-answer-votes" aria-label="Antwort bewerten">
           <button className={`vote-button repair-answer-vote-button ${viewerVote === 'up' ? 'is-selected' : ''}`} type="button" onClick={() => { void handleVote('up'); }} disabled={voteBusy} aria-pressed={viewerVote === 'up'} title="Diese Antwort war hilfreich">
             <span aria-hidden="true">👍</span><span>Hilfreich</span><strong>{upVotes}</strong>
           </button>
           <button className={`vote-button repair-answer-vote-button ${viewerVote === 'down' ? 'is-selected' : ''}`} type="button" onClick={() => { void handleVote('down'); }} disabled={voteBusy} aria-pressed={viewerVote === 'down'} title="Diese Antwort war nicht hilfreich">
             <span aria-hidden="true">👎</span><span>Nicht hilfreich</span><strong>{downVotes}</strong>
           </button>
-        </div>
+        </div>}
         {canSelectSolution && !isSolution && <button className="button button-ghost repair-solution-button" type="button" onClick={() => { void onChooseSolution(answer.id); }} disabled={solutionBusy}>Als Lösung markieren</button>}
         {canSelectSolution && isSolution && <span className="repair-solution-owner-note">Von dir ausgewählt</span>}
-      </div>
+      </div>}
       {voteError && <small className="form-message-error repair-answer-error" role="alert">{voteError}</small>}
     </article>
   );
@@ -4846,14 +4889,31 @@ function RepairRequestCard({ request, answerCount, index }: { request: PublicCom
       <div className="repair-request-card-topline"><span className="kind-chip community">Frage</span>{request.solutionAnswerId ? <span className="repair-solved-badge">✓ Gelöst</span> : <span>{request.section ?? 'Modell noch offen'}</span>}</div>
       <h3><MentionText text={request.topic ?? 'Reparaturanfrage'} mentions={request.mentions} href={detailPath} /></h3>
       <div className="approved-comment-topline"><PublicCommentAuthor comment={request} /><time dateTime={request.createdAt}>{new Date(request.createdAt).toLocaleDateString('de-DE')}</time></div>
-      <p className="repair-request-body"><MentionText text={request.body} mentions={request.mentions} /></p>
+      <ExpandableRepairText text={request.body} mentions={request.mentions} className="repair-request-body" />
       {request.source && <p className="repair-request-source"><strong>Weitere Info:</strong> <MentionText text={request.source} mentions={request.mentions} /></p>}
+      <CommentImageGallery imageUrl={request.imageUrl} imageUrls={request.imageUrls} alt={`Bild von ${request.name}`} galleryClassName="repair-request-images" />
       <div className="repair-answers">
         <div className="repair-answers-heading"><span className="eyebrow handwritten">antworten und lösungen</span><span className="comment-count">{answerCount}</span></div>
         <p className="no-comments">{answerCount ? `${answerCount} geprüfte Antwort${answerCount === 1 ? '' : 'en'} auf der Anfrageseite.` : 'Noch keine Antwort. Teile den ersten Lösungsansatz auf der Anfrageseite.'}</p>
       </div>
       <a className="repair-request-open-link" href={detailPath}>Anfrage öffnen und kommentieren ↗</a>
     </article>
+  );
+}
+
+function ExpandableRepairText({ text, mentions, className }: { text: string; mentions?: UserMention[]; className: string }) {
+  const [expanded, setExpanded] = useState(false);
+  const words = text.trim().split(/\s+/).filter(Boolean);
+  if (words.length <= repairRequestPreviewWordLimit) return <p className={className}><MentionText text={text} mentions={mentions} /></p>;
+
+  return (
+    <div className={`repair-request-expand ${className}`}>
+      <p>
+        <MentionText text={expanded ? text : words.slice(0, repairRequestPreviewWordLimit).join(' ')} mentions={mentions} />
+        {!expanded && <> … <button className="repair-request-expand-toggle" type="button" aria-expanded="false" onClick={() => setExpanded(true)}>Weiterlesen +</button></>}
+        {expanded && <>{' '}<button className="repair-request-expand-toggle" type="button" aria-expanded="true" onClick={() => setExpanded(false)}>Weniger anzeigen −</button></>}
+      </p>
+    </div>
   );
 }
 
@@ -5131,7 +5191,7 @@ function RepairComments({ guideSlug, collapsible = false }: { guideSlug: string;
           <article className="approved-comment mention-target" id={`beitrag-${comment.id}`} key={comment.id}>
             <div className="approved-comment-topline"><PublicCommentAuthor comment={comment} /><time dateTime={comment.createdAt}>{new Date(comment.createdAt).toLocaleDateString('de-DE')}</time></div>
             <p><MentionText text={comment.body} mentions={comment.mentions} /></p>
-            {comment.imageUrl && <img decoding="async" src={comment.imageUrl} alt={`Bild von ${comment.name}`} loading="lazy" />}
+            <CommentImageGallery imageUrl={comment.imageUrl} imageUrls={comment.imageUrls} alt={`Bild von ${comment.name}`} galleryClassName="approved-comment-images" />
           </article>
         )) : <p className="no-comments">Noch keine freigegebenen Erfahrungsberichte.</p>}
       </div>
@@ -5404,7 +5464,7 @@ function AdminPage() {
                   <p className="admin-comment-body"><MentionText text={comment.body} mentions={comment.mentions} /></p>
                   <ReviewEditor comment={comment} csrfToken={csrfToken} context={adminRole === 'admin' ? 'admin' : 'moderator'} disabled={busy} onAccepted={loadComments} />
                   {comment.source && <p className="admin-comment-source"><strong>Quelle:</strong> <MentionText text={comment.source} mentions={comment.mentions} /></p>}
-                  {comment.imageUrl && <a href={comment.imageUrl} target="_blank" rel="noreferrer"><img decoding="async" loading="lazy" className="admin-comment-image" src={comment.imageUrl} alt={`Anhang von ${comment.name}`} /></a>}
+                  <CommentImageGallery imageUrl={comment.imageUrl} imageUrls={comment.imageUrls} alt={`Anhang von ${comment.name}`} galleryClassName="admin-comment-images" imageClassName="admin-comment-image" />
                 </article>
               )) : <div className="admin-empty card-doodle"><h2>{adminSearch.trim() ? 'Nichts gefunden.' : 'Alles ruhig.'}</h2><p>{adminSearch.trim() ? 'Versuch es mit einem anderen Suchbegriff.' : adminFilter === 'wiki' ? 'Aktuell liegen keine Wiki-Vorschläge zur Prüfung vor.' : adminFilter === 'comments' ? 'Aktuell liegen keine Erfahrungsberichte zur Prüfung vor.' : adminFilter === 'requests' ? 'Aktuell liegen keine Reparaturanfragen oder Antworten zur Prüfung vor.' : 'Aktuell liegen keine offenen Beiträge zur Prüfung vor.'}</p></div>}
             </div>
@@ -5881,11 +5941,13 @@ function CommunitySocialSection() {
 function CommunityActivityCard({ activity }: { activity: CommunityActivity }) {
   const labels: Record<CommunityActivity['type'], string> = {
     solution: 'Beste Lösung',
+    repair_request: 'Reparaturanfrage',
     repair_answer: 'Reparaturantwort',
     wiki: 'Wiki-Beitrag',
     experience: 'Erfahrungsbericht',
     community: 'Community',
   };
+  const isRepairDiscussion = activity.type === 'repair_request' || activity.type === 'repair_answer' || activity.type === 'solution';
   return (
     <article className="community-feed-item" id={`beitrag-${activity.id}`}>
       <a className="community-feed-avatar" href={`/profil/${activity.actor.id}`} aria-label={`Profil von ${formatUserHandle(activity.actor.name)}`}><AvatarBadge user={activity.actor} compact /></a>
@@ -5897,10 +5959,11 @@ function CommunityActivityCard({ activity }: { activity: CommunityActivity }) {
         {activity.type !== 'community' && <span className={`community-feed-kind ${activity.isSolution ? 'is-solution' : ''}`}>{labels[activity.type]}</span>}
         {activity.title !== 'Community-Beitrag' && <h3><MentionText text={activity.title} mentions={activity.mentions} href={activity.href === '/community' ? undefined : activity.href} /></h3>}
         <p><MentionText text={activity.body} mentions={activity.mentions} /></p>
+        {isRepairDiscussion && <a className="community-repair-link" href={activity.href}>Zur Reparaturanfrage ↗</a>}
         <EditCredit edit={activity.editAttribution} />
         {activity.source && <small>Quelle: <MentionText text={activity.source} mentions={activity.mentions} /></small>}
-        {activity.imageUrl && <a className="community-feed-image-link" href={activity.imageUrl} target="_blank" rel="noreferrer"><img decoding="async" className="community-feed-image" src={activity.imageUrl} alt={`Bild zu ${activity.title}`} loading="lazy" /></a>}
-        <CommunityPostActions post={activity} allowReplies />
+        <CommentImageGallery imageUrl={activity.imageUrl} imageUrls={activity.imageUrls} alt={`Bild zu ${activity.title}`} galleryClassName="community-feed-images" linkClassName="community-feed-image-link" imageClassName="community-feed-image" />
+        <CommunityPostActions post={activity} allowReplies={!isRepairDiscussion} />
       </div>
     </article>
   );
@@ -6034,7 +6097,7 @@ function CommunityReportsPanel({ csrfToken, context }: { csrfToken: string; cont
     {loading ? <p role="status">Meldungen werden geladen …</p> : posts.length ? posts.map((post) => <article className="account-moderation-item" key={post.id}>
       <h3>{post.topic ?? `Kommentar von ${post.profileId ? formatUserHandle(post.name) : post.name}`}</h3><p>{post.profileId ? formatUserHandle(post.name) : post.name} · {post.reports.length} {post.reports.length === 1 ? 'Meldung' : 'Meldungen'}</p>
       <p className="account-moderation-body"><MentionText text={post.body} mentions={post.mentions} /></p>
-      {post.imageUrl && <a href={post.imageUrl} target="_blank" rel="noreferrer"><img decoding="async" loading="lazy" className="admin-comment-image" src={post.imageUrl} alt={`Anhang von ${post.name}`} /></a>}
+      <CommentImageGallery imageUrl={post.imageUrl} imageUrls={post.imageUrls} alt={`Anhang von ${post.name}`} galleryClassName="admin-comment-images" imageClassName="admin-comment-image" />
       <ul>{post.reports.map((report, index) => <li key={index}>{report.reason} <time dateTime={report.createdAt}>({new Date(report.createdAt).toLocaleDateString('de-DE')})</time></li>)}</ul>
       <ReviewEditor comment={post} csrfToken={csrfToken} context={context} reported disabled={busy} onAccepted={load} />
       {post.canModerate !== true ? <p className="content-note">Meldungen zu deinem eigenen Beitrag prüft ein anderer Moderator oder Admin.</p> : <div className="account-moderation-actions"><button className="button button-ghost" type="button" disabled={busy} onClick={() => void resolve(post.id, false)}>Beitrag behalten</button>{post.canDelete === true ? <button className="button button-danger" type="button" disabled={busy} onClick={() => void resolve(post.id, true)}>Beitrag löschen</button> : <p className="content-note">Hier sind eigene gemeldete Kommentare betroffen. Das Löschen übernimmt ein anderer Moderator oder Admin.</p>}</div>}
@@ -6044,8 +6107,7 @@ function CommunityReportsPanel({ csrfToken, context }: { csrfToken: string; cont
 
 function CommunityExperienceForm({ onSubmitted }: { onSubmitted: () => Promise<void> | void }) {
   const { user, csrfToken, loading: authLoading } = useAuth();
-  const [model, setModel] = useState<BikeModel | ''>('');
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [body, setBody] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
@@ -6059,14 +6121,10 @@ function CommunityExperienceForm({ onSubmitted }: { onSubmitted: () => Promise<v
     const formData = new FormData(form);
     formData.set('guide', 'community-erfahrungen');
     formData.set('kind', 'comment');
-    formData.set('section', model);
-    formData.delete('image');
-    if (selectedFile) formData.append('image', selectedFile);
     try {
       const response = await apiJson<{ message: string }>('/api/comments', { method: 'POST', headers: { 'X-CSRF-Token': csrfToken }, body: formData });
       form.reset();
-      setSelectedFile(null);
-      setModel('');
+      setBody('');
       setNotice(response.message);
       await onSubmitted();
     } catch (submitError) {
@@ -6077,19 +6135,25 @@ function CommunityExperienceForm({ onSubmitted }: { onSubmitted: () => Promise<v
   };
 
   return (
-    authLoading ? null : <section className={`community-experience-panel card-doodle${user ? ' is-composer' : ''}`} aria-labelledby="community-experience-title">
-      {!user && <div className="eyebrow handwritten">deine erfahrung zählt</div>}
-      <h3 id="community-experience-title" className={user ? 'sr-only' : undefined}>Erfahrung teilen</h3>
-      {!user && <p>Was hast du an deiner BTM erlebt, umgebaut oder repariert? Teile es mit der Community – dein Beitrag erscheint direkt im Feed.</p>}
-      {!user ? <p className="community-login-hint"><a href="/login">Einloggen</a>, um eine Erfahrung zu teilen – dein Name und Avatar kommen dann automatisch aus deinem Profil.</p> : <form className="comment-form community-experience-form" onSubmit={handleSubmit}>
-        <div className="comment-form-grid"><label>Titel<input name="topic" required minLength={2} maxLength={120} placeholder="z. B. Mein Umbau auf LED-Blinker" /></label><label>Dein Modell<select value={model} onChange={(event) => setModel(event.target.value as BikeModel | '')} name="model" required><option value="">Bitte auswählen</option><option value="Bonfire X">Bonfire X</option><option value="Bonfire S">Bonfire S</option><option value="Bonfire E">Bonfire E</option><option value="Wildfire">Wildfire</option></select></label></div>
-        <label>Dein Beitrag<MentionTextarea name="body" minLength={10} maxLength={4000} rows={5} placeholder="Was war dein Ausgangspunkt, was hast du gemacht und was sollte die nächste Person wissen?" required /></label>
-        <label>Quelle oder Link (optional)<input name="source" maxLength={500} placeholder="z. B. Teilenummer, Handbuch oder https://…" /></label>
-        <label>Bild (optional, max. 1 MB)<input name="image" type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={(event) => { const file = event.target.files?.[0] ?? null; if (file && file.size > 1048576) { setSelectedFile(null); event.target.value = ''; setError('Das Bild darf höchstens 1 MB groß sein.'); return; } setSelectedFile(file); }} /></label>
-        {error && <p className="form-message form-message-error" role="alert">{error}</p>}
-        {notice && <p className="form-message form-message-success" role="status">{notice}</p>}
-        <button className="button button-ink" type="submit" disabled={submitting || !model}>{submitting ? 'Wird veröffentlicht …' : 'Erfahrung teilen'} <span aria-hidden="true">↗</span></button>
-      </form>}
+    authLoading ? null : <section className={`community-experience-panel community-composer card-doodle${user ? ' is-composer' : ''}`} aria-labelledby="community-experience-title">
+      <div className="eyebrow handwritten">mitreden</div>
+      {user ? <>
+        <div className="community-composer-heading">
+          <a className="community-composer-avatar" href={`/profil/${user.id}`} aria-label={`Profil von ${formatUserHandle(user.name)}`}><AvatarBadge user={user} compact /></a>
+          <div><h3 id="community-experience-title">Was möchtest du teilen?</h3><p>Schreib der Community, was dich gerade beschäftigt.</p></div>
+        </div>
+        <form className="comment-form community-experience-form" onSubmit={handleSubmit}>
+          <MentionTextarea name="body" value={body} onChange={(event) => setBody(event.target.value)} minLength={10} maxLength={4000} rows={4} placeholder="Was beschäftigt dich gerade?" required />
+          <div className="community-composer-meta"><span>Mit @ kannst du andere Rider verlinken.</span><span>{body.length}/4000</span></div>
+          {error && <p className="form-message form-message-error" role="alert">{error}</p>}
+          {notice && <p className="form-message form-message-success" role="status">{notice}</p>}
+          <button className="button button-ink" type="submit" disabled={submitting || !body.trim()}>{submitting ? 'Wird veröffentlicht …' : 'Posten'} <span aria-hidden="true">↗</span></button>
+        </form>
+      </> : <>
+        <h3 id="community-experience-title">Was beschäftigt dich?</h3>
+        <p>Lies mit, entdecke, was andere Rider gerade bewegt, und misch dich ein.</p>
+        <p className="community-login-hint"><a href="/login">Einloggen</a>, um selbst zu posten, zu liken, zu kommentieren oder Beiträge zu melden.</p>
+      </>}
     </section>
   );
 }
