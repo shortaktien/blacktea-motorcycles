@@ -19,6 +19,22 @@ services:
       context: ./backend
     env_file:
       - ./backend/.env
+    volumes:
+      - type: bind
+        source: /opt/btm-runtime/data
+        target: /app/var/data
+        bind:
+          create_host_path: false
+      - type: bind
+        source: /opt/btm-runtime/uploads
+        target: /app/var/uploads
+        bind:
+          create_host_path: false
+      - type: bind
+        source: /opt/btm-runtime/sessions
+        target: /app/var/sessions
+        bind:
+          create_host_path: false
     expose:
       - "8000"
     ports:

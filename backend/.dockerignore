@@ -1,4 +1,6 @@
 vendor
 .git
 .DS_Store
-var/cache
+var
+.env
+.env.*

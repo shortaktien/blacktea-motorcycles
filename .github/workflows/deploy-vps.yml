@@ -162,7 +162,7 @@ jobs:
 
           docker compose -f docker-compose.prod.yml version
           docker compose -f docker-compose.prod.yml config >/dev/null
-          docker compose -f docker-compose.prod.yml up -d --build --remove-orphans
+          bash deploy/restart-with-persistent-data.sh
 
           for attempt in $(seq 1 30); do
             if curl --fail --silent --show-error --max-time 5 http://127.0.0.1:5173/ >/dev/null \
@@ -179,6 +179,8 @@ jobs:
                 /login \
                 /registrieren \
                 /konto \
+                /karte \
+                /community \
                 '/passwort-zuruecksetzen?token=link-test'; do
                 curl --fail --silent --show-error --max-time 10 "http://127.0.0.1:5173$path" >/dev/null \
                   || { echo "Live-Linktest fehlgeschlagen: $path" >&2; exit 1; }

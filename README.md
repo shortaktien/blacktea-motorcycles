@@ -230,6 +230,10 @@ Das Repository ist öffentlich, der Produktionszugriff aber nicht. Beiträge wer
 
 Der interne Deploy-Workflow ist manuell und durch eine geschützte GitHub-Umgebung mit Required Reviewer abgesichert. Er akzeptiert ausschließlich den geprüften `main`-Stand. Forks und externe Pull Requests erhalten keinen Zugriff auf die Produktions-Secrets und können keinen Deploy auf den VPS auslösen.
 
+Produktive Konten, Beiträge, Uploads und Sitzungen liegen dauerhaft unter `/opt/btm-runtime/`, getrennt vom Repository und von den Docker-Images. Vor dem ersten Deployment müssen `/opt/btm-runtime` und `/opt/btm-backups` als private Verzeichnisse des Deploy-Benutzers angelegt werden. Der geschützte Workflow führt `deploy/restart-with-persistent-data.sh` aus: zuerst Images bauen, dann das Backend kurz stoppen, den aktuellen Laufzeitstand konsistent sichern und die Sicherung prüfen. Beim ersten Lauf werden die Daten aus dem alten Container übernommen; spätere Deployments behalten die bestehenden Daten-Mounts. Backups werden nicht automatisch gelöscht.
+
+Der Symfony-Cache wird nicht persistent eingebunden. Lokale Testdaten, Sessions und `.env`-Dateien werden nicht in das Backend-Image kopiert; Produktionskonfiguration kommt über `env_file`. Bei einer fehlgeschlagenen Vorbereitung wird der alte Container wieder gestartet. Falls erst der Austausch der Container fehlschlägt, muss die vorhandene Sicherung zusammen mit der vorherigen Code-Version zur Wiederherstellung geprüft werden. Backups enthalten private Daten und dürfen nicht veröffentlicht werden.
+
 Die öffentliche Website kann unabhängig davon lokal mit Docker gestartet werden. Für den VPS wird der Produktionsstack verwendet:
 
 ```bash
