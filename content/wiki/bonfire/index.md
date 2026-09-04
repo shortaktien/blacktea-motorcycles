@@ -1,5 +1,5 @@
 ---
-title: Bonfire
+title: Black Tea Bonfire
 model: Bonfire
 intro: Technische Grundlagen, Modellvarianten und belegte Wartungsspuren zur Black Tea Bonfire.
 status: Startartikel · offen für Ergänzungen

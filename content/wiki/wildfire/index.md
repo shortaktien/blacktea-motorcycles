@@ -1,5 +1,5 @@
 ---
-title: Wildfire
+title: Black Tea Wildfire
 model: Wildfire
 intro: Technische Dokumente, elektrische Systeme und belegte Diagnosehinweise zur Black Tea Wildfire.
 status: Startartikel · offen für Ergänzungen

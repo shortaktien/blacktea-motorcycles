@@ -23,8 +23,8 @@
 - [Impressum — Black Tea Motorbikes – Hilfe](https://btm.shortaktien.de/impressum): Anbieterinformationen und rechtliche Hinweise zu Black Tea Motorbikes – Hilfe.
 - [Datenschutz — Black Tea Motorbikes – Hilfe](https://btm.shortaktien.de/datenschutz): Datenschutzhinweise zu Kommentaren, Bildanhängen und dem Betrieb von Black Tea Motorbikes – Hilfe.
 - [Wiki — Black Tea Motorbikes – Hilfe](https://btm.shortaktien.de/wiki): Das BTM-Wiki enthält redaktionell geprüfte Artikel zu Bonfire und Wildfire und wird gemeinsam erweitert.
-- [Bonfire — Bikes — Black Tea Motorbikes – Hilfe](https://btm.shortaktien.de/bikes/bonfire): Technische Wiki-Seite zur Black Tea Bonfire mit Handbuchdaten, Modellvarianten und nachvollziehbaren Quellen.
-- [Wildfire — Bikes — Black Tea Motorbikes – Hilfe](https://btm.shortaktien.de/bikes/wildfire): Technische Wiki-Seite zur Black Tea Wildfire mit Handbuchdaten, Modellvarianten und nachvollziehbaren Quellen.
+- [Black Tea Bonfire – Technik, Probleme & Reparaturhilfe](https://btm.shortaktien.de/bikes/bonfire): Technische Wiki-Seite zur Black Tea Bonfire mit Handbuchdaten, Modellvarianten und nachvollziehbaren Quellen.
+- [Black Tea Wildfire – Technik, Probleme & Reparaturhilfe](https://btm.shortaktien.de/bikes/wildfire): Technische Wiki-Seite zur Black Tea Wildfire mit Handbuchdaten, Modellvarianten und nachvollziehbaren Quellen.
 
 ## Reparaturhilfen
 
@@ -667,7 +667,7 @@
 
 ## Bikes-Wiki
 
-### Bonfire
+### Black Tea Bonfire
 
 - [Wiki-Artikel öffnen](https://btm.shortaktien.de/bikes/bonfire)
 - Modellbezug: Bonfire
@@ -676,7 +676,7 @@
 - Lizenzstatus: Eigene redaktionelle Aufbereitung; Originalquellen bleiben bei ihren Rechteinhabern.
 - Quellenkette: Lokale Dokumente → redaktionelle Aufbereitung → geprüfte Community-Ergänzungen
 
-### Wildfire
+### Black Tea Wildfire
 
 - [Wiki-Artikel öffnen](https://btm.shortaktien.de/bikes/wildfire)
 - Modellbezug: Wildfire

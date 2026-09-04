@@ -18,8 +18,8 @@ Die Website richtet sich an Besitzerinnen und Besitzer von Bonfire- und Wildfire
 - [Impressum — Black Tea Motorbikes – Hilfe](https://btm.shortaktien.de/impressum): Anbieterinformationen und rechtliche Hinweise zu Black Tea Motorbikes – Hilfe.
 - [Datenschutz — Black Tea Motorbikes – Hilfe](https://btm.shortaktien.de/datenschutz): Datenschutzhinweise zu Kommentaren, Bildanhängen und dem Betrieb von Black Tea Motorbikes – Hilfe.
 - [Wiki — Black Tea Motorbikes – Hilfe](https://btm.shortaktien.de/wiki): Das BTM-Wiki enthält redaktionell geprüfte Artikel zu Bonfire und Wildfire und wird gemeinsam erweitert.
-- [Bonfire — Bikes — Black Tea Motorbikes – Hilfe](https://btm.shortaktien.de/bikes/bonfire): Technische Wiki-Seite zur Black Tea Bonfire mit Handbuchdaten, Modellvarianten und nachvollziehbaren Quellen.
-- [Wildfire — Bikes — Black Tea Motorbikes – Hilfe](https://btm.shortaktien.de/bikes/wildfire): Technische Wiki-Seite zur Black Tea Wildfire mit Handbuchdaten, Modellvarianten und nachvollziehbaren Quellen.
+- [Black Tea Bonfire – Technik, Probleme & Reparaturhilfe](https://btm.shortaktien.de/bikes/bonfire): Technische Wiki-Seite zur Black Tea Bonfire mit Handbuchdaten, Modellvarianten und nachvollziehbaren Quellen.
+- [Black Tea Wildfire – Technik, Probleme & Reparaturhilfe](https://btm.shortaktien.de/bikes/wildfire): Technische Wiki-Seite zur Black Tea Wildfire mit Handbuchdaten, Modellvarianten und nachvollziehbaren Quellen.
 
 ## Reparaturhilfen
 
@@ -49,8 +49,8 @@ Die Website richtet sich an Besitzerinnen und Besitzer von Bonfire- und Wildfire
 
 ## Bikes-Wiki
 
-- [Bonfire](https://btm.shortaktien.de/bikes/bonfire): Bonfire. Technische Grundlagen, Modellvarianten und belegte Wartungsspuren zur Black Tea Bonfire.
-- [Wildfire](https://btm.shortaktien.de/bikes/wildfire): Wildfire. Technische Dokumente, elektrische Systeme und belegte Diagnosehinweise zur Black Tea Wildfire.
+- [Black Tea Bonfire](https://btm.shortaktien.de/bikes/bonfire): Bonfire. Technische Grundlagen, Modellvarianten und belegte Wartungsspuren zur Black Tea Bonfire.
+- [Black Tea Wildfire](https://btm.shortaktien.de/bikes/wildfire): Wildfire. Technische Dokumente, elektrische Systeme und belegte Diagnosehinweise zur Black Tea Wildfire.
 
 ## Optional
 

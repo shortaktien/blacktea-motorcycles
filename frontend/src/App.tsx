@@ -2464,6 +2464,12 @@ const breadcrumbSchema = (items: Array<{ name: string; url: string }>) => ({
   })),
 });
 
+function getWikiSeoTitle(article: Pick<WikiArticle, 'path' | 'title' | 'model'>): string {
+  if (article.path === '/bikes/bonfire') return 'Black Tea Bonfire – Technik, Probleme & Reparaturhilfe';
+  if (article.path === '/bikes/wildfire') return 'Black Tea Wildfire – Technik, Probleme & Reparaturhilfe';
+  return `${article.title} — ${article.model} — Black Tea Motorbikes – Hilfe`;
+}
+
 function getSeoMetadata(path: string, guide?: RepairGuide, part?: HistoricalShopPart, bike?: BikeProfile, wikiArticle?: WikiArticle): SeoMetadata {
   if (path === '/admin' || path === '/login' || path === '/registrieren' || path === '/konto' || path === '/passwort-zuruecksetzen' || path === '/suche') {
     return {
@@ -2562,7 +2568,7 @@ function getSeoMetadata(path: string, guide?: RepairGuide, part?: HistoricalShop
 
   if (wikiArticle) {
     return {
-      title: `${wikiArticle.title} — ${wikiArticle.model} — Black Tea Motorbikes – Hilfe`,
+      title: getWikiSeoTitle(wikiArticle),
       description: wikiArticle.intro,
       canonicalPath: wikiArticle.path,
       robots: 'index,follow,max-image-preview:large',
@@ -4592,7 +4598,7 @@ function WikiPage() {
 function BikePage({ bike, article }: { bike: BikeProfile; article?: WikiArticle }) {
   useEffect(() => {
     document.title = article
-      ? `${article.title} — ${article.model} — Black Tea Motorbikes – Hilfe`
+      ? getWikiSeoTitle(article)
       : `${bike.name} — Bikes — Black Tea Motorbikes – Hilfe`;
     window.scrollTo(0, 0);
   }, [article?.model, article?.title, bike.name]);
@@ -4626,7 +4632,7 @@ function WikiArticlePage({ article }: { article: WikiArticle }) {
   const [query, setQuery] = useState('');
 
   useEffect(() => {
-    document.title = `${article.title} — ${article.model} — Black Tea Motorbikes – Hilfe`;
+    document.title = getWikiSeoTitle(article);
     window.scrollTo(0, 0);
   }, [article.model, article.title]);
 
