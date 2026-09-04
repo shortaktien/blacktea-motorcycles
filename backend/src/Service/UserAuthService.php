@@ -6,6 +6,7 @@ use DateTimeImmutable;
 
 final class UserAuthService
 {
+    use AdminProfileAuthTrait;
     public function __construct(
         private readonly UserStorage $users,
         private readonly CommunityStorage $community,
@@ -53,9 +54,12 @@ final class UserAuthService
             'id' => (string) $user['id'],
             'name' => (string) $user['name'],
             'email' => (string) $user['email'],
+            'isAdminProfile' => $this->isConfiguredAdminProfile($user),
             'role' => ($user['role'] ?? 'member') === 'moderator' ? 'moderator' : 'member',
             'model' => $user['model'] ?? null,
             'kilometers' => (int) ($user['kilometers'] ?? 0),
+            'bio' => (string) ($user['bio'] ?? ''),
+            'bioMentions' => $this->resolveMentions((string) ($user['bio'] ?? ''), $user['bioMentions'] ?? null),
             'country' => in_array($user['country'] ?? null, ['D', 'A', 'CH'], true) ? $user['country'] : 'D',
             'postalCode' => is_string($user['postalCode'] ?? null) ? $user['postalCode'] : '',
             'avatarStyle' => (int) ($user['avatarStyle'] ?? 0),
@@ -63,8 +67,34 @@ final class UserAuthService
                 ? '/api/auth/avatar/' . rawurlencode((string) $user['id']) . '?v=' . substr(hash('sha256', (string) $user['avatarFile']), 0, 16)
                 : '/images/avatars/avatar-' . str_pad((string) ((int) ($user['avatarStyle'] ?? 0) + 1), 2, '0', STR_PAD_LEFT) . '.webp',
             'notifyReplies' => ($user['notifyReplies'] ?? true) === true,
+            'notifyCommunity' => ($user['notifyCommunity'] ?? true) === true,
             'newsletterSubscribed' => ($user['newsletterSubscribed'] ?? false) === true,
             'notifications' => $notifications,
+        ];
+    }
+
+    public function publicProfile(array $user): array
+    {
+        $avatarStyle = max(0, min(19, (int) ($user['avatarStyle'] ?? 0)));
+        $avatarUrl = !empty($user['avatarFile'])
+            ? '/api/community/profiles/' . rawurlencode((string) $user['id']) . '/avatar?v=' . substr(hash('sha256', (string) $user['avatarFile']), 0, 16)
+            : '/images/avatars/avatar-' . str_pad((string) ($avatarStyle + 1), 2, '0', STR_PAD_LEFT) . '.webp';
+        $country = in_array($user['country'] ?? null, ['D', 'A', 'CH'], true) ? $user['country'] : null;
+        $countryLabels = ['D' => 'Deutschland', 'A' => 'Österreich', 'CH' => 'Schweiz'];
+
+        return [
+            'id' => (string) $user['id'],
+            'name' => (string) $user['name'],
+            'role' => ($user['role'] ?? 'member') === 'moderator' ? 'moderator' : 'member',
+            'model' => $user['model'] ?? null,
+            'kilometers' => (int) ($user['kilometers'] ?? 0),
+            'country' => $country,
+            'countryLabel' => $country !== null ? $countryLabels[$country] : null,
+            'bio' => (string) ($user['bio'] ?? ''),
+            'bioMentions' => $this->resolveMentions((string) ($user['bio'] ?? ''), $user['bioMentions'] ?? null),
+            'avatarStyle' => $avatarStyle,
+            'avatarUrl' => $avatarUrl,
+            'joinedAt' => (string) ($user['createdAt'] ?? ''),
         ];
     }
 
@@ -97,12 +127,13 @@ final class UserAuthService
     public function logout(): void
     {
         $this->startSession();
-        $_SESSION = [];
-        if (ini_get('session.use_cookies')) {
-            $params = session_get_cookie_params();
-            setcookie(session_name(), '', time() - 42000, $params['path'], $params['domain'] ?? '', (bool) $params['secure'], (bool) $params['httponly']);
+        $this->destroyProfileSession();
+        // Otherwise /auth/session would immediately sign the admin back in.
+        $adminId = $this->profileSessionCookie('blacktea_admin');
+        if ($adminId !== '') {
+            $this->switchProfileSession('blacktea_admin', $adminId);
+            $this->destroyProfileSession();
         }
-        session_destroy();
     }
 
     public function notifyReply(string $userId, array $answer, array $parent): void
@@ -168,6 +199,148 @@ final class UserAuthService
                 continue;
             }
         }
+    }
+
+    public function notifyReaction(string $userId, array $answer, string $value): void
+    {
+        $reactionId = bin2hex(random_bytes(8));
+        $this->pushCommunityNotification($userId, [
+            'type' => 'reaction',
+            'reactionId' => $reactionId,
+            'answerId' => (string) ($answer['id'] ?? ''),
+            'title' => 'Deine Antwort wurde bewertet',
+            'body' => 'Jemand findet deinen Lösungsansatz ' . ($value === 'up' ? 'hilfreich.' : 'nicht hilfreich.'),
+            'href' => '/hilfe/anfragen/' . (string) ($answer['parentId'] ?? ''),
+        ], 'reactionId', $reactionId);
+    }
+
+    public function notifySolution(string $userId, array $answer, array $parent): void
+    {
+        $this->pushCommunityNotification($userId, [
+            'type' => 'solution',
+            'answerId' => (string) ($answer['id'] ?? ''),
+            'title' => 'Deine Antwort wurde zur Lösung gekürt',
+            'body' => 'Der Ersteller hat deinen Lösungsansatz als beste Antwort ausgewählt.',
+            'href' => '/hilfe/anfragen/' . (string) ($parent['id'] ?? ''),
+        ], 'solutionAnswerId', (string) ($answer['id'] ?? ''));
+    }
+
+    /** @param list<string> $userIds */
+    public function notifyCommunityPost(array $userIds, array $comment): void
+    {
+        foreach (array_values(array_unique($userIds)) as $userId) {
+            if (!is_string($userId) || $userId === '') {
+                continue;
+            }
+            $this->pushCommunityNotification($userId, [
+                'type' => 'community',
+                'communityPostId' => (string) ($comment['id'] ?? ''),
+                'title' => 'Neuer Beitrag in deiner Modellgruppe',
+                'body' => (string) ($comment['topic'] ?? 'Ein neues Community-Erlebnis wurde geteilt.'),
+                'href' => '/community',
+            ], 'communityPostId', (string) ($comment['id'] ?? ''));
+        }
+    }
+
+    public function notifyCommunityInteraction(string $userId, array $actor, string $type, string $eventId, string $postId): void
+    {
+        if ($userId === ($actor['id'] ?? null)) {
+            return;
+        }
+        $this->pushCommunityNotification($userId, [
+            'type' => $type === 'like' ? 'community_like' : 'community_reply',
+            'communityEventId' => $eventId,
+            'title' => $type === 'like' ? 'Dein Beitrag gefällt jemandem' : 'Neuer Kommentar zu deinem Beitrag',
+            'body' => $actor['name'] . ($type === 'like' ? ' hat deinen Beitrag gelikt.' : ' hat auf deinen Beitrag geantwortet.'),
+            'href' => '/community#beitrag-' . $postId,
+        ], 'communityEventId', $eventId);
+    }
+
+    public function resolveMentions(string $text, ?array $saved = null): array
+    {
+        return MentionParser::resolve($text, $this->users->read()['users'], $saved);
+    }
+
+    public function notifyMentions(array $entry, string $href, bool $staffOnly = false): void
+    {
+        if (!$staffOnly && ($entry['status'] ?? null) !== 'approved') return;
+        $actorId = $entry['userId'] ?? $entry['authorId'] ?? null;
+        $actorName = $entry['name'] ?? $entry['authorName'] ?? 'Ein Mitglied';
+        $mentions = $this->resolveMentions(implode("\n", [$entry['topic'] ?? '', $entry['body'] ?? '', $entry['section'] ?? '', $entry['source'] ?? '']), $entry['mentions'] ?? null);
+        $recipients = [];
+        foreach ($mentions as $mention) {
+            $target = $this->users->findById($mention['id']);
+            if ($target === null || $mention['id'] === $actorId || ($target['notifyCommunity'] ?? true) !== true) continue;
+            // Private team messages never send notifications to ordinary members.
+            if ($staffOnly && ($target['role'] ?? null) !== 'moderator' && !$this->isConfiguredAdminProfile($target)) continue;
+            $recipients[] = $mention['id'];
+        }
+        if ($recipients === []) return;
+        $claimed = [];
+        $collection = $staffOnly ? 'staffChat' : 'comments';
+        $this->community->update(static function (array &$data) use ($entry, $collection, $recipients, &$claimed): void {
+            foreach ($data[$collection] as &$stored) {
+                if ($stored['id'] !== $entry['id']) continue;
+                if ($collection === 'comments' && ($stored['status'] ?? null) !== 'approved') break;
+                $previous = $stored['notifiedMentionIds'] ?? [];
+                $claimed = array_values(array_diff(array_unique($recipients), $previous));
+                $stored['notifiedMentionIds'] = array_values(array_unique([...$previous, ...$claimed]));
+                break;
+            }
+            unset($stored);
+        });
+        foreach ($claimed as $id) {
+            $target = $this->users->findById($id);
+            $this->pushCommunityNotification($id, [
+                'type' => 'mention', 'mentionEventId' => $entry['id'],
+                'title' => 'Du wurdest erwähnt',
+                'body' => $actorName . ($staffOnly ? ' hat dich im Team-Chat erwähnt.' : ' hat dich in einem Beitrag erwähnt.'),
+                'href' => $staffOnly && $target !== null && $this->isConfiguredAdminProfile($target) ? '/admin?bereich=chat' : $href,
+            ], 'mentionEventId', $entry['id']);
+        }
+    }
+
+    public function notifyProfileMentions(array $user, array $previousMentions): void
+    {
+        $previousIds = array_column($previousMentions, 'id');
+        foreach ($user['bioMentions'] ?? [] as $mention) {
+            if ($mention['id'] === $user['id'] || in_array($mention['id'], $previousIds, true)) continue;
+            $key = 'profile:' . $user['id'] . ':' . $mention['id'];
+            $this->pushCommunityNotification($mention['id'], [
+                'type' => 'mention', 'mentionEventId' => $key, 'title' => 'Du wurdest erwähnt',
+                'body' => $user['name'] . ' hat dich in der Profilvorstellung erwähnt.',
+                'href' => '/profil/' . $user['id'],
+            ], 'mentionEventId', $key);
+        }
+    }
+
+    private function pushCommunityNotification(string $userId, array $notification, string $dedupeField, string $dedupeValue): void
+    {
+        if ($userId === '' || $dedupeValue === '') {
+            return;
+        }
+        $user = $this->users->findById($userId);
+        if ($user === null || ($user['status'] ?? null) !== 'active' || ($user['notifyCommunity'] ?? true) !== true) {
+            return;
+        }
+        $notification['id'] = bin2hex(random_bytes(16));
+        $notification['createdAt'] = (new DateTimeImmutable())->format(DATE_ATOM);
+        $notification['readAt'] = null;
+        $this->users->update(static function (array &$data) use ($userId, $notification, $dedupeField, $dedupeValue): void {
+            foreach ($data['users'] as &$candidate) {
+                if (($candidate['id'] ?? null) !== $userId) {
+                    continue;
+                }
+                foreach (($candidate['notifications'] ?? []) as $existing) {
+                    if (($existing[$dedupeField] ?? null) === $dedupeValue) {
+                        return;
+                    }
+                }
+                $candidate['notifications'] = array_slice(array_merge([$notification], $candidate['notifications'] ?? []), 0, 30);
+                break;
+            }
+            unset($candidate);
+        });
     }
 
     private function notifyReplyForUser(string $userId, array $answer, array $parent, bool $subscribed): void
@@ -253,6 +426,11 @@ final class UserAuthService
         }
 
         session_save_path($this->community->sessionsDir());
+        if (session_name() !== 'blacktea_user') {
+            // PHP may retain the previous session ID when switching session names.
+            $userSession = $_COOKIE['blacktea_user'] ?? null;
+            session_id(is_string($userSession) && preg_match('/^[a-zA-Z0-9,-]{1,256}$/D', $userSession) === 1 ? $userSession : '');
+        }
         session_name('blacktea_user');
         $secure = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
         session_set_cookie_params([

@@ -1,4 +1,5 @@
-import { createContext, useContext, useEffect, useMemo, useState, type ChangeEvent, type FormEvent, type MouseEvent, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useId, useMemo, useRef, useState, type ChangeEvent, type FormEvent, type MouseEvent, type ReactNode, type TextareaHTMLAttributes } from 'react';
+import { formatUserHandle, getMentionQuery, insertMention, splitUserText, type MentionQuery, type UserMention } from './mentions';
 import faqContent from '../../content/faq.json';
 import partsCatalog from '../../research/parts.json';
 import partDetailsCatalog from '../../research/parts-details.json';
@@ -8,6 +9,7 @@ import { cleanWebMcpText, searchBtmKnowledge, webMcpExcerpt, type WebMcpKnowledg
 
 type CardKind = 'Dokument' | 'Ersatzteil' | 'Community';
 type Filter = 'Alle' | CardKind;
+type BikeModel = 'Bonfire' | 'Bonfire S' | 'Bonfire E' | 'Bonfire X' | 'Wildfire';
 
 type FaqItem = {
   question: string;
@@ -100,9 +102,12 @@ type FeedbackSummary = {
   comments: PublicComment[];
 };
 
+type EditAttribution = { name: string; profileId: string | null; editedAt: string };
 type PublicComment = {
+  editAttribution?: EditAttribution | null;
+  mentions?: UserMention[];
   id: string;
-  kind?: 'comment' | 'wiki_suggestion' | 'repair_request' | 'repair_answer';
+  kind?: 'comment' | 'wiki_suggestion' | 'repair_request' | 'repair_answer' | 'community_reply';
   name: string;
   body: string;
   topic?: string | null;
@@ -113,6 +118,7 @@ type PublicComment = {
   imageUrl: string | null;
   avatarStyle?: number | null;
   avatarUrl?: string | null;
+  profileId?: string | null;
   upVotes?: number;
   downVotes?: number;
   score?: number;
@@ -122,6 +128,9 @@ type PublicComment = {
 };
 
 type AdminComment = PublicComment & {
+  reviewVersion: string;
+  canModerate?: boolean;
+  canDelete?: boolean;
   guide: string;
   email: string;
   status: 'pending' | 'approved';
@@ -140,7 +149,7 @@ type AdminMember = {
   email: string;
   role: 'member' | 'moderator' | string;
   status: 'active' | 'awaiting_confirmation' | string;
-  model: 'Bonfire' | 'Wildfire' | null;
+  model: BikeModel | null;
   kilometers: number;
   createdAt: string;
   emailConfirmedAt: string | null;
@@ -241,14 +250,6 @@ type HistoricalShopPart = {
   historicalAvailability: string;
 };
 
-type CommunityKnowledge = {
-  title: string;
-  model: string;
-  intro: string;
-  points: string[];
-  sourceLabel: string;
-  sourceHref: string;
-};
 
 type AuthNotification = {
   id: string;
@@ -261,6 +262,7 @@ type AuthNotification = {
 };
 
 type StaffChatMessage = {
+  mentions?: UserMention[];
   id: string;
   authorName: string;
   authorRole: 'admin' | 'moderator' | string;
@@ -269,19 +271,69 @@ type StaffChatMessage = {
 };
 
 type AuthUser = {
+  isAdminProfile?: boolean;
   id: string;
   name: string;
   email: string;
   role: 'member' | 'moderator' | string;
-  model: 'Bonfire' | 'Wildfire' | null;
+  model: BikeModel | null;
   kilometers: number;
   country: PostalCountry;
   postalCode: string;
+  bio: string;
   avatarStyle: number;
   avatarUrl: string | null;
   notifyReplies: boolean;
+  notifyCommunity: boolean;
   newsletterSubscribed: boolean;
   notifications: AuthNotification[];
+};
+
+type PublicProfile = {
+  bioMentions?: UserMention[];
+  id: string;
+  name: string;
+  role: 'member' | 'moderator' | string;
+  model: BikeModel | null;
+  kilometers: number;
+  country: PostalCountry | null;
+  countryLabel: string | null;
+  bio: string;
+  avatarStyle: number;
+  avatarUrl: string;
+  joinedAt: string;
+  stats: {
+    contributions: number;
+    answers: number;
+    helpfulVotes: number;
+    solutions: number;
+    experiences: number;
+    wikiContributions: number;
+  };
+  achievements: Array<{ id: string; title: string; description: string; unlocked: boolean }>;
+  contributions: Array<{ id: string; kind: string; title: string; body: string; mentions?: UserMention[]; editAttribution?: EditAttribution | null; href: string; createdAt: string; isSolution: boolean }>;
+};
+
+type CommunityActivity = {
+  source?: string | null;
+  editAttribution?: EditAttribution | null;
+  mentions?: UserMention[];
+  likeCount: number;
+  viewerLiked: boolean;
+  viewerReported: boolean;
+  replyCount: number;
+  id: string;
+  type: 'solution' | 'repair_answer' | 'wiki' | 'experience' | 'community';
+  title: string;
+  body: string;
+  href: string;
+  createdAt: string;
+  imageUrl: string | null;
+  model: BikeModel | null;
+  country: PostalCountry | null;
+  isSolution: boolean;
+  score: number | null;
+  actor: PublicProfile;
 };
 
 type AuthContextValue = {
@@ -291,7 +343,7 @@ type AuthContextValue = {
   login: (email: string, password: string) => Promise<void>;
   register: (name: string, email: string, password: string, passwordConfirm: string) => Promise<string>;
   logout: () => Promise<void>;
-  updateProfile: (profile: Pick<AuthUser, 'name' | 'model' | 'kilometers' | 'country' | 'postalCode' | 'notifyReplies' | 'newsletterSubscribed'>) => Promise<void>;
+  updateProfile: (profile: Pick<AuthUser, 'name' | 'model' | 'kilometers' | 'bio' | 'country' | 'postalCode' | 'notifyReplies' | 'notifyCommunity' | 'newsletterSubscribed'>) => Promise<void>;
   uploadAvatar: (file: File) => Promise<void>;
   markNotificationRead: (id: string) => Promise<void>;
 };
@@ -306,6 +358,12 @@ const repairRequestDetailPath = (id: string) => `${repairRequestPath}/${id}`;
 const getRepairRequestId = (path: string) => {
   if (!path.startsWith(repairRequestDetailPrefix)) return null;
   const id = path.slice(repairRequestDetailPrefix.length);
+  return /^[a-f0-9]{32}$/.test(id) ? id : null;
+};
+const profilePathPrefix = '/profil/';
+const getProfileId = (path: string) => {
+  if (!path.startsWith(profilePathPrefix)) return null;
+  const id = path.slice(profilePathPrefix.length);
   return /^[a-f0-9]{32}$/.test(id) ? id : null;
 };
 
@@ -720,40 +778,6 @@ const historicalShopParts: HistoricalShopPart[] = partsCatalog.historical_produc
   };
 });
 
-const communityKnowledge: CommunityKnowledge[] = [
-  {
-    title: 'Bonfire: Modellstände sauber trennen',
-    model: 'Bonfire · S / E / X',
-    intro: 'Die Community-Aufbereitung macht klar: S, E und X teilen viele Chassis-Teile, sind elektrisch aber nicht automatisch identisch.',
-    points: ['Frühe Bonfire und Bonfire X unterscheiden sich unter anderem bei Spannung, Motor, Vorderradbremse und Bereifung.', 'Für die frühe X werden 265 mm vorne genannt; bei der normalen Bonfire 220 mm.', 'Controller, Akku und Stecker immer nach konkretem Modellstand beurteilen.'],
-    sourceLabel: 'BTM Community · Bonfire',
-    sourceHref: 'https://btm-community.org/bonfire/',
-  },
-  {
-    title: 'Bonfire: Wartung und Retrofits',
-    model: 'Bonfire · Wartung',
-    intro: 'Aus vielen einzelnen How-tos wird eine brauchbare Arbeitslandkarte für typische Wartungs- und Umbaufragen.',
-    points: ['Batterie laden, Hochstromstecker vollständig verbinden und Sitz, Tank sowie Seitenteile korrekt demontieren.', 'Gasgriff, Blinker, Spiegel, Fußrasten, Scheinwerfergitter und Keyless-System sind als eigene Arbeitsschritte dokumentiert.', 'Bremsen, Räder, Lenkkopflager, Federbeine und Korrosionsschutz bleiben sicherheits- bzw. versionsabhängig.'],
-    sourceLabel: 'BTM Community · Wartungsarbeiten',
-    sourceHref: 'https://btm-community.org/bonfire/wartungsarbeiten-bonfire/',
-  },
-  {
-    title: 'Wildfire: Serienstand und Fehlerbilder',
-    model: 'Wildfire · Serie 2025',
-    intro: 'Die stärkste Ergänzung für unsere Reparaturhilfe ist die Trennung zwischen ausgeliefertem Fahrzeug, Konfiguration und typischer Kinderkrankheit.',
-    points: ['Reifendruck, Drehmomente und Wartungshinweise stammen aus dem dokumentierten Serienfahrzeug.', '5-V-DC/DC-Wandler, falsche Controllerwerte, BMS-Neustart und Ladeabbrüche bei einer Batterie sind als Fehlerbilder beschrieben.', 'Controller- und BMS-Daten werden getrennt betrachtet; FarDriver-Werte sind keine universellen Standardwerte.'],
-    sourceLabel: 'BTM Community · Wildfire',
-    sourceHref: 'https://btm-community.org/wildfire/',
-  },
-  {
-    title: 'Historie: Generationenwechsel verstehen',
-    model: 'Bonfire & Wildfire · Historie',
-    intro: 'Die Historie ist besonders wertvoll, weil sie Prototypen, Serienfahrzeuge und spätere Retrofits nicht in einen Topf wirft.',
-    points: ['Bonfire Y und frühe Wildfire-Prototypen werden als Entwicklung, nicht als Serienreferenz geführt.', '2025 markiert bei der Wildfire die wichtige Grenze zum tatsächlich ausgelieferten Serienstand.', '2026 ändern sich unter anderem Akku, CAN-Kommunikation, Ladeintegration, Fahrwerk und Bremsvarianten.'],
-    sourceLabel: 'BTM Community · Historie',
-    sourceHref: 'https://btm-community.org/historie/',
-  },
-];
 
 const resources: Resource[] = [
   {
@@ -910,19 +934,11 @@ const resources: Resource[] = [
   },
   {
     kind: 'Community',
-    title: 'BTM Community-Wissen',
-    description: 'Redaktionell geordnete Modell-, Wartungs- und Technikhinweise mit Quellenangabe.',
-    label: 'Aufbereitung',
+    title: 'Die BTM-Community',
+    description: 'Erfahrungen, Umbauten und Reparaturtipps von BTM-Ridern – entdecke die neuesten Beiträge und teile deine Geschichte.',
+    label: 'Austausch',
     href: '/community',
-    tags: ['Bonfire', 'Wildfire', 'Quelle'],
-  },
-  {
-    kind: 'Community',
-    title: 'BTM Community: Wissen übernommen',
-    description: 'Redaktionell aufbereitete Modell-, Wartungs-, Wildfire- und Historienhinweise — kurz lesbar und jeweils mit Originalquelle.',
-    label: 'Lokale Aufbereitung',
-    href: '/community',
-    tags: ['Bonfire', 'Wildfire', 'Quelle'],
+    tags: ['Bonfire', 'Wildfire', 'Erfahrungen'],
   },
 ];
 
@@ -2173,24 +2189,29 @@ function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let active = true;
+    let refreshVersion = 0;
     const refreshSession = async () => {
+      const version = ++refreshVersion;
       try {
         const session = await apiJson<{ authenticated: boolean; user: AuthUser | null; csrfToken: string | null }>('/api/auth/session');
-        if (!active) return;
+        if (!active || version !== refreshVersion) return;
         setUser(session.authenticated ? session.user : null);
         setCsrfToken(session.csrfToken ?? '');
       } catch {
-        if (!active) return;
+        if (!active || version !== refreshVersion) return;
         setUser(null);
         setCsrfToken('');
       } finally {
         if (active) setLoading(false);
       }
     };
+    const onSessionChanged = () => { void refreshSession(); };
+    window.addEventListener('auth-session-changed', onSessionChanged);
     void refreshSession();
     const refreshTimer = window.setInterval(() => { void refreshSession(); }, 60000);
     return () => {
       active = false;
+      window.removeEventListener('auth-session-changed', onSessionChanged);
       window.clearInterval(refreshTimer);
     };
   }, []);
@@ -2218,9 +2239,10 @@ function AuthProvider({ children }: { children: ReactNode }) {
     await apiJson('/api/auth/logout', { method: 'POST', headers: { 'X-CSRF-Token': csrfToken } });
     setUser(null);
     setCsrfToken('');
+    window.dispatchEvent(new Event('auth-session-changed'));
   };
 
-  const updateProfile = async (profile: Pick<AuthUser, 'name' | 'model' | 'kilometers' | 'country' | 'postalCode' | 'notifyReplies' | 'newsletterSubscribed'>) => {
+  const updateProfile = async (profile: Pick<AuthUser, 'name' | 'model' | 'kilometers' | 'bio' | 'country' | 'postalCode' | 'notifyReplies' | 'notifyCommunity' | 'newsletterSubscribed'>) => {
     const response = await apiJson<{ user: AuthUser }>('/api/auth/profile', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
@@ -2290,6 +2312,16 @@ function getSeoMetadata(path: string, guide?: RepairGuide, part?: HistoricalShop
       description: path === '/suche' ? 'Zentrale Suche über FAQ, Wiki, gesicherte PDFs und Reparaturhilfen für Black Tea Motorbikes.' : 'Persönlicher Bereich von Black Tea Motorbikes – Hilfe.',
       canonicalPath: path,
       robots: 'noindex,nofollow,noarchive',
+      jsonLd: {},
+    };
+  }
+
+  if (getProfileId(path)) {
+    return {
+      title: 'Fahrerprofil — Black Tea Motorbikes – Hilfe',
+      description: 'Öffentliches Fahrerprofil der BTM-Community mit freiwilligen Angaben und Community-Beiträgen.',
+      canonicalPath: path,
+      robots: 'noindex,follow,noarchive',
       jsonLd: {},
     };
   }
@@ -2482,8 +2514,8 @@ function getSeoMetadata(path: string, guide?: RepairGuide, part?: HistoricalShop
       description: 'Historischer BTM-Ersatzteilkatalog mit Modellbezug, Teilenamen und Quellen. Bestand und Preise vor dem Kauf prüfen.',
     },
     '/community': {
-      title: 'BTM Community-Wissen — Black Tea Motorbikes – Hilfe',
-      description: 'Technische Hinweise aus der Black Tea Community verständlich zusammengefasst, mit lokalen PDFs und Originalquellen.',
+      title: 'BTM Community — Black Tea Motorbikes – Hilfe',
+      description: 'Erfahrungen, Umbauten und Reparaturtipps von BTM-Ridern teilen und die neuesten Beiträge der Community entdecken.',
     },
     '/karte': {
       title: 'Community-Karte — Black Tea Motorbikes – Hilfe',
@@ -2520,9 +2552,7 @@ function getSeoMetadata(path: string, guide?: RepairGuide, part?: HistoricalShop
     ? repairGuides.map((item) => ({ name: item.title, url: `${siteOrigin}${item.path}` }))
     : path === '/ersatzteile'
       ? historicalShopParts.map((item) => ({ name: item.title, url: `${siteOrigin}${item.path}` }))
-      : path === '/community'
-        ? communityKnowledge.map((item) => ({ name: item.title, url: `${siteOrigin}/community#${slugify(item.title)}` }))
-        : [];
+      : [];
   const jsonLd = collectionItems.length ? {
     '@context': 'https://schema.org',
     '@graph': [
@@ -2614,6 +2644,7 @@ function AppContent({ initialPath }: { initialPath?: string } = {}) {
   const bike = bikeProfiles.find((candidate) => candidate.path === path);
   const wikiArticle = wikiArticles.find((candidate) => candidate.path === path);
   const repairRequestId = getRepairRequestId(path);
+  const profileId = getProfileId(path);
   const seoMetadata = getSeoMetadata(path, guide, part, bike, wikiArticle);
   const isKnownPath = path === '/'
     || path === '/admin'
@@ -2624,6 +2655,7 @@ function AppContent({ initialPath }: { initialPath?: string } = {}) {
     || path === '/hilfe'
     || path === repairRequestPath
     || Boolean(repairRequestId)
+    || Boolean(profileId)
     || path === '/ersatzteile'
     || path === '/community'
     || path === '/karte'
@@ -2648,6 +2680,7 @@ function AppContent({ initialPath }: { initialPath?: string } = {}) {
   if (path === '/registrieren') return <RegisterPage />;
   if (path === '/passwort-zuruecksetzen') return <PasswordResetPage />;
   if (path === '/konto') return <AccountPage />;
+  if (profileId) return <ProfilePage profileId={profileId} />;
   if (repairRequestId) return <RepairRequestDetailPage requestId={repairRequestId} />;
   if (path === repairRequestPath) return <RepairRequestPage />;
   if (path === '/hilfe') return <RepairGuideIndexPage />;
@@ -2726,8 +2759,8 @@ function NotFoundPage({ path }: { path: string }) {
 function AvatarBadge({ user, compact = false }: { user: Pick<AuthUser, 'name' | 'avatarStyle' | 'avatarUrl'>; compact?: boolean }) {
   const style = Math.max(0, Math.min(19, user.avatarStyle));
   return (
-    <span className={`avatar-badge avatar-style-${style} ${compact ? 'avatar-badge-compact' : ''}`} aria-label={`Avatar von ${user.name}`}>
-      {user.avatarUrl ? <img src={user.avatarUrl} alt="" /> : <span className="avatar-fallback" aria-hidden="true">BTM</span>}
+    <span className={`avatar-badge avatar-style-${style} ${compact ? 'avatar-badge-compact' : ''}`} aria-label={`Avatar von ${formatUserHandle(user.name)}`}>
+      {user.avatarUrl ? <img decoding="async" loading="lazy" src={user.avatarUrl} alt="" /> : <span className="avatar-fallback" aria-hidden="true">BTM</span>}
     </span>
   );
 }
@@ -2737,18 +2770,59 @@ function PublicCommentAvatar({ comment }: { comment: Pick<PublicComment, 'name' 
   const style = Math.max(0, Math.min(19, comment.avatarStyle ?? 0));
   return (
     <span className={`public-comment-avatar avatar-style-${style}`} aria-label={`Avatar von ${comment.name}`}>
-      <img src={comment.avatarUrl} alt="" loading="lazy" />
+      <img decoding="async" src={comment.avatarUrl} alt="" loading="lazy" />
     </span>
   );
 }
 
-function PublicCommentAuthor({ comment }: { comment: Pick<PublicComment, 'name' | 'avatarStyle' | 'avatarUrl'> }) {
-  return (
-    <span className="approved-comment-author">
+function EditCredit({ edit }: { edit?: EditAttribution | null }) {
+  if (!edit) return null;
+  return <small className="review-edit-credit">Bearbeitet von {edit.profileId ? <a href={`/profil/${edit.profileId}`}>{formatUserHandle(edit.name)}</a> : edit.name} · <time dateTime={edit.editedAt}>{new Date(edit.editedAt).toLocaleDateString('de-DE')}</time></small>;
+}
+
+function PublicCommentAuthor({ comment }: { comment: Pick<PublicComment, 'name' | 'avatarStyle' | 'avatarUrl' | 'profileId' | 'editAttribution'> }) {
+  const author = (
+    <>
       <PublicCommentAvatar comment={comment} />
-      <strong>{comment.name}</strong>
-    </span>
+      <strong>{comment.profileId ? formatUserHandle(comment.name) : comment.name}</strong>
+    </>
   );
+  return <>{comment.profileId
+    ? <a className="approved-comment-author public-profile-author-link" href={`/profil/${comment.profileId}`}>{author}</a>
+    : <span className="approved-comment-author">{author}</span>}<EditCredit edit={comment.editAttribution} /></>;
+}
+
+function ReviewEditor({ comment, csrfToken, context, reported = false, disabled = false, onAccepted }: {
+  comment: AdminComment; csrfToken: string; context: 'admin' | 'moderator'; reported?: boolean; disabled?: boolean; onAccepted: () => void | Promise<void>;
+}) {
+  const [open, setOpen] = useState(false);
+  const [draft, setDraft] = useState({ body: comment.body, topic: comment.topic ?? '', source: comment.source ?? '', reviewVersion: comment.reviewVersion });
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  if (comment.canModerate !== true) return null;
+  if (!open) return <button className="button button-ghost" type="button" disabled={disabled} onClick={() => {
+    setDraft({ body: comment.body, topic: comment.topic ?? '', source: comment.source ?? '', reviewVersion: comment.reviewVersion }); setError(''); setOpen(true);
+  }}>Text bearbeiten</button>;
+  return <form className="comment-form review-editor" onSubmit={async (event) => {
+    event.preventDefault(); setBusy(true); setError('');
+    try {
+      await apiJson(reported ? `/api/admin/community-reports/${comment.id}` : `/api/admin/comments/${comment.id}`, {
+        method: reported ? 'POST' : 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken, 'X-Staff-Context': context },
+        body: JSON.stringify({ ...(reported ? { action: 'keep' } : { status: 'approved' }), reviewVersion: draft.reviewVersion, edits: { body: draft.body, topic: draft.topic, source: draft.source } }),
+      });
+      setOpen(false); await onAccepted();
+    } catch (err) { setError(err instanceof Error ? err.message : 'Änderungen konnten nicht übernommen werden.'); }
+    finally { setBusy(false); }
+  }}>
+    <p className="content-note">Du bearbeitest den Beitrag von {comment.profileId ? formatUserHandle(comment.name) : comment.name}. Änderungen erscheinen erst mit deiner Bestätigung – mit dem Hinweis „Bearbeitet von …“.</p>
+    {comment.topic != null && <label>Titel<input value={draft.topic} onChange={(event) => setDraft({ ...draft, topic: event.target.value })} minLength={2} maxLength={120} required /></label>}
+    <label>Beitrag<MentionTextarea value={draft.body} onChange={(event) => setDraft({ ...draft, body: event.target.value })} minLength={comment.kind === 'community_reply' ? 2 : 10} maxLength={4000} rows={6} required /></label>
+    <label>Quelle / weiterführender Link<input value={draft.source} onChange={(event) => setDraft({ ...draft, source: event.target.value })} maxLength={500} /></label>
+    <small>Interne Links werden anklickbar. Externe URLs bleiben Text.</small>
+    {error && <p className="form-message form-message-error" role="alert">{error}</p>}
+    <div className="account-moderation-actions"><button className="button button-ink" type="submit" disabled={busy || disabled}>{busy ? 'Wird übernommen …' : reported ? 'Übernehmen und Beitrag behalten' : 'Übernehmen und freigeben'}</button><button className="button button-ghost" type="button" disabled={busy} onClick={() => setOpen(false)}>Abbrechen</button></div>
+  </form>;
 }
 
 function LoginPage() {
@@ -2903,17 +2977,19 @@ function RegisterPage() {
 function AccountPage() {
   const { user, loading, csrfToken, updateProfile, uploadAvatar, markNotificationRead } = useAuth();
   const [name, setName] = useState('');
-  const [model, setModel] = useState<'Bonfire' | 'Wildfire' | ''>('');
+  const [model, setModel] = useState<BikeModel | ''>('');
   const [kilometers, setKilometers] = useState(0);
+  const [bio, setBio] = useState('');
   const [country, setCountry] = useState<PostalCountry>('D');
   const [postalCode, setPostalCode] = useState('');
   const [notifyReplies, setNotifyReplies] = useState(true);
+  const [notifyCommunity, setNotifyCommunity] = useState(true);
   const [newsletterSubscribed, setNewsletterSubscribed] = useState(false);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [accountSection, setAccountSection] = useState<'overview' | 'moderation' | 'chat'>('overview');
+  const [accountSection, setAccountSection] = useState<'overview' | 'moderation' | 'chat'>(() => typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('bereich') === 'chat' ? 'chat' : 'overview');
 
   useEffect(() => {
     document.title = 'Mein Bereich — Black Tea Motorbikes – Hilfe';
@@ -2925,9 +3001,11 @@ function AccountPage() {
     setName(normaliseDisplayName(user.name));
     setModel(user.model ?? '');
     setKilometers(user.kilometers);
+    setBio(user.bio ?? '');
     setCountry(user.country ?? 'D');
     setPostalCode(user.postalCode ?? '');
     setNotifyReplies(user.notifyReplies);
+    setNotifyCommunity(user.notifyCommunity ?? true);
     setNewsletterSubscribed(user.newsletterSubscribed);
   }, [user]);
 
@@ -2940,7 +3018,7 @@ function AccountPage() {
     setError('');
     setNotice('');
     try {
-      await updateProfile({ name, model: model || null, kilometers: Number(kilometers), country, postalCode, notifyReplies, newsletterSubscribed });
+      await updateProfile({ name, model: model || null, kilometers: Number(kilometers), bio, country, postalCode, notifyReplies, notifyCommunity, newsletterSubscribed });
       setNotice('Gespeichert. Dein BTM-Bereich ist auf dem aktuellen Stand.');
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : 'Die Einstellungen konnten nicht gespeichert werden.');
@@ -2981,7 +3059,7 @@ function AccountPage() {
         <section className="account-hero">
           <div>
             <div className="eyebrow handwritten">dein persönlicher bereich</div>
-            <h1>Hallo, {user.name}.</h1>
+            <h1>Hallo, {formatUserHandle(user.name)}.</h1>
             <p>Ein bisschen Bike-Profil, ein bisschen Community. Name und E-Mail werden bei deinen Beiträgen automatisch aus deinem bestätigten Konto übernommen.</p>
           </div>
           <div className="account-hero-avatar"><AvatarBadge user={previewUser} /></div>
@@ -2999,12 +3077,14 @@ function AccountPage() {
             <h2>Deine Einstellungen</h2>
             <form className="auth-form" onSubmit={saveProfile}>
               <label>Anzeigename<input value={name} onChange={(event) => setName(normaliseDisplayName(event.target.value))} minLength={2} maxLength={80} autoCapitalize="none" autoCorrect="off" spellCheck={false} pattern="[a-z0-9äöüß]+" title="Nur Kleinbuchstaben und Zahlen, ohne Leerzeichen, Sonderzeichen oder Emojis." required /><small>Nur Kleinbuchstaben und Zahlen, ohne Leerzeichen oder Emojis.</small></label>
-              <label>Dein Modell<select value={model} onChange={(event) => setModel(event.target.value as 'Bonfire' | 'Wildfire' | '')}><option value="">Noch nicht festgelegt</option><option value="Bonfire">Bonfire</option><option value="Wildfire">Wildfire</option></select></label>
-              <label>Kilometerstand<input value={kilometers} onChange={(event) => setKilometers(Number(event.target.value))} type="number" min="0" max="999999" step="1" /><small>Nur für deinen persönlichen Bereich – keine öffentliche Statistik.</small></label>
+              <label>Dein Modell<select value={model} onChange={(event) => setModel(event.target.value as BikeModel | '')}><option value="">Noch nicht festgelegt</option><option value="Bonfire X">Bonfire X</option><option value="Bonfire S">Bonfire S</option><option value="Bonfire E">Bonfire E</option><option value="Wildfire">Wildfire</option></select></label>
+              <label>Kilometerstand (freiwillig)<input value={kilometers} onChange={(event) => setKilometers(Number(event.target.value))} type="number" min="0" max="999999" step="1" /><small>Wird auf deinem öffentlichen Profil angezeigt, wenn du einen Wert einträgst.</small></label>
+              <label>Kurzvorstellung (freiwillig)<MentionTextarea value={bio} onChange={(event) => setBio(event.target.value.slice(0, 280))} maxLength={280} rows={3} placeholder="Was fährst du? Was schraubst du gern?" /><small>{bio.length}/280 Zeichen · Diese Vorstellung erscheint auf deinem öffentlichen Profil.</small></label>
               <div className="account-location-note"><strong>Für die Community-Karte (freiwillig)</strong><span>Land und Postleitzahl werden ausschließlich für die grobe Darstellung auf der Karte verwendet und für keinen anderen Zweck.</span></div>
               <label>Land (freiwillig)<select value={country} onChange={(event) => { const nextCountry = event.target.value as PostalCountry; setCountry(nextCountry); setPostalCode((current) => current.slice(0, nextCountry === 'D' ? 5 : 4)); }}><option value="D">D — Deutschland</option><option value="A">A — Österreich</option><option value="CH">CH — Schweiz</option></select></label>
               <label>Postleitzahl (freiwillig)<input value={postalCode} onChange={(event) => setPostalCode(event.target.value.replace(/\D/g, '').slice(0, postalCodeLength))} type="text" inputMode="numeric" autoComplete="postal-code" maxLength={postalCodeLength} pattern={country === 'D' ? '[0-9]{5}' : '[1-9][0-9]{3}'} placeholder={postalCodePlaceholder} /><small>{country === 'D' ? 'Fünf Ziffern, zum Beispiel 01219.' : 'Vier Ziffern; die erste Ziffer beginnt nicht mit 0.'}</small></label>
               <label className="account-check"><input checked={notifyReplies} onChange={(event) => setNotifyReplies(event.target.checked)} type="checkbox" /> Benachrichtigungen bei Antworten aktivieren</label>
+              <label className="account-check"><input checked={notifyCommunity} onChange={(event) => setNotifyCommunity(event.target.checked)} type="checkbox" /> Benachrichtigungen bei Community-Interaktionen und @Erwähnungen aktivieren</label>
               <div className="account-consent-setting"><label className="account-check"><input checked={newsletterSubscribed} onChange={(event) => setNewsletterSubscribed(event.target.checked)} type="checkbox" /> Newsletter erhalten</label><small>Neuigkeiten und wichtige Updates per E-Mail. Du kannst ihn hier jederzeit abbestellen.</small></div>
               <div className="avatar-upload"><label>Eigenes Bild (optional)<input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleAvatarUpload} disabled={uploading} /><small>{uploading ? 'Bild wird gespeichert …' : 'JPG, PNG oder WEBP · maximal 2 MB. Dein eigenes Bild ersetzt den zugewiesenen Avatar.'}</small></label></div>
               {error && <p className="form-message form-message-error" role="alert">{error}</p>}
@@ -3036,7 +3116,7 @@ function ModeratorDashboardPanel({ csrfToken }: { csrfToken: string }) {
     setLoading(true);
     setError('');
     try {
-      const payload = await apiJson<{ comments: AdminComment[] }>('/api/admin/comments');
+      const payload = await apiJson<{ comments: AdminComment[] }>('/api/admin/comments', { headers: { 'X-Staff-Context': 'moderator' } });
       setComments(payload.comments.filter((comment) => comment.status === 'pending'));
     } catch (loadError) {
       setError(loadError instanceof Error ? loadError.message : 'Offene Beiträge konnten nicht geladen werden.');
@@ -3056,7 +3136,7 @@ function ModeratorDashboardPanel({ csrfToken }: { csrfToken: string }) {
     try {
       await apiJson<{ comment: AdminComment }>(`/api/admin/comments/${comment.id}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken, 'X-Staff-Context': 'moderator' },
         body: JSON.stringify({ status }),
       });
       setComments((current) => current.filter((item) => item.id !== comment.id));
@@ -3076,7 +3156,7 @@ function ModeratorDashboardPanel({ csrfToken }: { csrfToken: string }) {
     try {
       await apiJson<{ deleted: boolean }>(`/api/admin/comments/${comment.id}`, {
         method: 'DELETE',
-        headers: { 'X-CSRF-Token': csrfToken },
+        headers: { 'X-CSRF-Token': csrfToken, 'X-Staff-Context': 'moderator' },
       });
       setComments((current) => current.filter((item) => item.id !== comment.id));
       setNotice('Beitrag gelöscht.');
@@ -3088,7 +3168,7 @@ function ModeratorDashboardPanel({ csrfToken }: { csrfToken: string }) {
   };
 
   return (
-    <section className="account-moderation-panel account-card card-doodle">
+    <><CommunityReportsPanel csrfToken={csrfToken} context="moderator" /><section className="account-moderation-panel account-card card-doodle">
       <div className="account-moderation-heading">
         <div>
           <div className="eyebrow handwritten">moderation · intern</div>
@@ -3107,20 +3187,21 @@ function ModeratorDashboardPanel({ csrfToken }: { csrfToken: string }) {
               <span className="admin-status pending">wartet auf Prüfung</span>
               <span className="admin-kind">{comment.kind === 'wiki_suggestion' ? 'Wiki-Vorschlag' : comment.kind === 'repair_request' ? 'Reparaturanfrage' : comment.kind === 'repair_answer' ? 'Antwort auf Reparaturanfrage' : 'Erfahrungsbericht'}</span>
             </div>
-            <h3>{comment.topic ?? comment.name}</h3>
-            <p className="account-moderation-meta">{comment.topic ? `${comment.name} · ` : ''}{comment.guide} · {new Date(comment.createdAt).toLocaleString('de-DE')}</p>
+            <h3>{comment.topic ?? (comment.profileId ? formatUserHandle(comment.name) : comment.name)}</h3>
+            <p className="account-moderation-meta">{comment.topic ? `${comment.profileId ? formatUserHandle(comment.name) : comment.name} · ` : ''}{comment.guide} · {new Date(comment.createdAt).toLocaleString('de-DE')}</p>
             {comment.section && <p className="admin-comment-target"><strong>Modell / Bereich:</strong> „{comment.section}“</p>}
-            <p className="account-moderation-body">{comment.body}</p>
-            {comment.source && <p className="admin-comment-source"><strong>Quelle:</strong> {comment.source}</p>}
-            {comment.imageUrl && <a href={comment.imageUrl} target="_blank" rel="noreferrer"><img className="admin-comment-image" src={comment.imageUrl} alt={`Anhang von ${comment.name}`} /></a>}
-            <div className="account-moderation-actions">
+            <p className="account-moderation-body"><MentionText text={comment.body} mentions={comment.mentions} /></p>
+            {comment.source && <p className="admin-comment-source"><strong>Quelle:</strong> <MentionText text={comment.source} mentions={comment.mentions} /></p>}
+            {comment.imageUrl && <a href={comment.imageUrl} target="_blank" rel="noreferrer"><img decoding="async" loading="lazy" className="admin-comment-image" src={comment.imageUrl} alt={`Anhang von ${comment.name}`} /></a>}
+            {comment.canModerate !== true ? <p className="content-note">Dein eigener Beitrag wartet auf die Prüfung durch einen anderen Moderator oder Admin.</p> : <div className="account-moderation-actions">
+              <ReviewEditor comment={comment} csrfToken={csrfToken} context="moderator" disabled={busyId !== null} onAccepted={loadOpenComments} />
               <button className="button button-ink" type="button" disabled={busyId !== null} onClick={() => void updateComment(comment, 'approved')}>Freigeben</button>
               <button className="button button-danger" type="button" disabled={busyId !== null} onClick={() => void deleteComment(comment)}>Löschen</button>
-            </div>
+            </div>}
           </article>
         )) : <div className="admin-empty card-doodle"><h3>Alles ruhig.</h3><p>Aktuell liegt nichts zur Prüfung vor.</p></div>}
       </div>
-    </section>
+    </section></>
   );
 }
 
@@ -3189,13 +3270,13 @@ function StaffChatPanel({ csrfToken, context }: { csrfToken: string; context: 'a
       <div className="staff-chat-messages" aria-live="polite">
         {loading ? <p className="no-comments">Chat wird geladen …</p> : messages.length ? messages.map((message) => (
           <article className="staff-chat-message" key={message.id}>
-            <div className="staff-chat-message-topline"><strong>{message.authorName}</strong><span>{message.authorRole === 'admin' ? 'Admin' : 'Moderator'}</span><time dateTime={message.createdAt}>{new Date(message.createdAt).toLocaleString('de-DE')}</time></div>
-            <p>{message.body}</p>
+            <div className="staff-chat-message-topline"><strong>{formatUserHandle(message.authorName)}</strong><span>{message.authorRole === 'admin' ? 'Admin' : 'Moderator'}</span><time dateTime={message.createdAt}>{new Date(message.createdAt).toLocaleString('de-DE')}</time></div>
+            <p><MentionText text={message.body} mentions={message.mentions} /></p>
           </article>
         )) : <p className="no-comments">Noch keine Nachrichten im Team-Chat.</p>}
       </div>
       <form className="staff-chat-form comment-form" onSubmit={handleSubmit}>
-        <label>Nachricht<textarea value={body} onChange={(event) => setBody(event.target.value)} maxLength={2000} rows={4} placeholder="Was sollten Admins und Moderatoren wissen?" required /></label>
+        <label>Nachricht<MentionTextarea value={body} onChange={(event) => setBody(event.target.value)} maxLength={2000} rows={4} placeholder="Was sollten Admins und Moderatoren wissen?" required /></label>
         <button className="button button-ink" type="submit" disabled={submitting}>{submitting ? 'Wird gesendet …' : 'Nachricht senden'} <span aria-hidden="true">↗</span></button>
       </form>
     </section>
@@ -3236,6 +3317,7 @@ function HomePage() {
         <nav className="main-nav" aria-label="Hauptnavigation">
           <a href="#status">Status</a>
           <a href="/karte">Karte</a>
+          <a href="/community">Community</a>
           <a href="#wissen">PDFs</a>
           <RepairMenu />
           <a href="/ersatzteile">Ersatzteile</a>
@@ -3457,9 +3539,9 @@ function CommunityMapPage() {
     let active = true;
     const loadMap = async () => {
       try {
-        const response = await apiJson<{ regions: CommunityMapRegion[] }>('/api/community/map');
+        const mapPayload = await apiJson<{ regions: CommunityMapRegion[] }>('/api/community/map');
         if (!active) return;
-        setRegions(response.regions ?? []);
+        setRegions(mapPayload.regions ?? []);
         setError('');
       } catch (reason) {
         if (active) setError(reason instanceof Error ? reason.message : 'Die Community-Karte konnte gerade nicht geladen werden.');
@@ -3509,8 +3591,10 @@ function CommunityMapPage() {
       <GuideHeader />
       <main className="community-map-page-main">
         <section className="community-map-hero section-pad">
-          <a className="repair-back" href="/">← Zur Sammelmappe</a>
-          <div className="eyebrow handwritten">community · ungefähr verortet</div>
+          <div className="wiki-breadcrumb">
+            <a className="repair-back" href="/">← Zur Sammelmappe</a>
+            <div className="eyebrow handwritten">community · ungefähr verortet</div>
+          </div>
           <h1>Die BTM-Karte.</h1>
           <p>Du bist nicht allein. Entdecke, wie viele BTM-Rider bereits in deiner Region unterwegs sind, und finde heraus, wo sich unsere Community in Deutschland, Österreich und der Schweiz verteilt. Jeder Punkt steht für einen groben PLZ-Bereich und zeigt dir, wie viele Fahrer dort zusammenkommen.</p>
         </section>
@@ -3520,7 +3604,7 @@ function CommunityMapPage() {
             <div className="eyebrow handwritten">ansicht eingrenzen</div>
             <div className="community-map-filter-grid">
               <label>Land<select value={countryFilter} onChange={(event) => { setCountryFilter(event.target.value as 'all' | PostalCountry); setPrefixFilter('all'); }}><option value="all">Alle Länder</option><option value="D">Deutschland</option><option value="A">Österreich</option><option value="CH">Schweiz</option></select></label>
-              <label>Modell<select value={modelFilter} onChange={(event) => setModelFilter(event.target.value as 'all' | CommunityMapModel)}><option value="all">Alle Modelle</option><option value="Bonfire">Bonfire</option><option value="Wildfire">Wildfire</option></select></label>
+              <label>Modell<select value={modelFilter} onChange={(event) => setModelFilter(event.target.value as 'all' | CommunityMapModel)}><option value="all">Alle Modelle</option><option value="Bonfire">Bonfire gesamt</option><option value="Bonfire X">Bonfire X</option><option value="Bonfire S">Bonfire S</option><option value="Bonfire E">Bonfire E</option><option value="Wildfire">Wildfire</option></select></label>
               <label>PLZ-Bereich<select value={prefixFilter} onChange={(event) => setPrefixFilter(event.target.value)}><option value="all">Alle Bereiche</option>{prefixOptions.map((prefix) => <option key={prefix} value={prefix}>PLZ-Bereich {prefix}</option>)}</select></label>
               {(countryFilter !== 'all' || modelFilter !== 'all' || prefixFilter !== 'all') && <button className="button button-ghost community-map-filter-reset" type="button" onClick={() => { setCountryFilter('all'); setModelFilter('all'); setPrefixFilter('all'); }}>Filter zurücksetzen</button>}
             </div>
@@ -3624,9 +3708,9 @@ function FaqPage() {
 
         <section className="faq-section section-pad">
           <div className="faq-intro card-doodle">
-            <div className="eyebrow handwritten">keine copy-paste-antworten</div>
-            <h2>Was du wirklich wissen willst.</h2>
-            <p>Wir haben die Suchbegriffe aus deinem Google-Screenshot im offenen Browser geprüft und ausschließlich die dort angezeigten Fragen aus „Weitere Fragen“ übernommen. Doppelte Fragen aus mehreren Suchen erscheinen hier nur einmal. Die Antworten sind eigenständig formuliert; technische Werte und Sicherheitsangaben bitte immer mit der konkreten Variante und dem Handbuch gegenprüfen.</p>
+            <div className="eyebrow handwritten">wichtiges kurz erklärt</div>
+            <h2>Die wichtigsten Fragen.</h2>
+            <p>Hier findest du verständliche Antworten auf die wichtigsten Fragen zu Black Tea Motorbikes, Bonfire und Wildfire – von Reichweite und Kosten über Akku, Reparaturen und Ersatzteile bis zum weiteren Weg.</p>
           </div>
 
           <div className="faq-search card-doodle">
@@ -3708,7 +3792,7 @@ function LegalPage({ kind }: { kind: 'impressum' | 'datenschutz' }) {
                 <h3>Optionale Dienste und Cookie-Wahl</h3>
                 <p>Aktuell werden keine Analyse-, Werbe- oder Marketing-Cookies und keine eingebetteten Drittanbieter-Dienste geladen. Die Auswahl im Hinweisbanner wird nur lokal im Browser gespeichert. Technisch notwendige Sitzungsfunktionen für Anmeldung und Community bleiben davon unberührt. Bei „Ablehnen“ werden optionale Inhalte nicht nachgeladen; externe Seiten öffnen sich erst nach einem bewussten Klick auf einen externen Link.</p>
                 <h3>Nutzerkonto, Kommentare und Bildanhänge</h3>
-                <p>Bei der Registrierung werden Name, E-Mail-Adresse und ein Passwort-Hash gespeichert. Die E-Mail-Adresse wird über Mailjet bestätigt; erst danach wird das Konto aktiviert. Im persönlichen Bereich können freiwillig Modell, Kilometerstand, Avatarbild, Avatar-Stil, die Benachrichtigung bei Antworten und der Newsletter-Empfang gespeichert werden. Das Avatarbild bleibt zugriffsgeschützt und wird nicht öffentlich ausgestellt. Der Newsletter wird ausschließlich an bestätigte Nutzer mit aktivierter Einstellung über Mailjet versendet und kann im persönlichen Bereich jederzeit abbestellt werden.</p>
+                <p>Bei der Registrierung werden Name, E-Mail-Adresse und ein Passwort-Hash gespeichert. Die E-Mail-Adresse wird über Mailjet bestätigt; erst danach wird das Konto aktiviert. Im persönlichen Bereich können freiwillig Modell, Kilometerstand, Kurzvorstellung, Land/Region, Avatarbild, Avatar-Stil sowie Einstellungen für Interaktions-Benachrichtigungen und den Newsletter gespeichert werden. Anzeigename, Modell, Land, freiwillige Kilometerangabe, Kurzvorstellung, Avatar und freigegebene Community-Beiträge können auf dem öffentlichen Profil und an Beiträgen erscheinen; E-Mail-Adresse und vollständige Postleitzahl bleiben intern. Der Newsletter wird ausschließlich an bestätigte Nutzer mit aktivierter Einstellung über Mailjet versendet und kann im persönlichen Bereich jederzeit abbestellt werden.</p>
                 <p>Wenn du eingeloggt einen Kommentar, eine Reparaturanfrage oder einen Wiki-Vorschlag abgibst, übernimmt die Website Name und E-Mail-Adresse aus deinem bestätigten Konto. Beitragstext, optional eine Quellenangabe und optional ein Bild werden intern zur redaktionellen Prüfung gespeichert. Erst nach Freigabe erscheint der Beitrag öffentlich; die E-Mail-Adresse bleibt intern. Anonyme Einsendungen erhalten weiterhin eine einzelne Bestätigungs-E-Mail über Mailjet, bevor sie bei uns zur Prüfung landen.</p>
                 <p>Bei einer Bugmeldung werden Titel, Fundstellen-URL und Fehlerbeschreibung gespeichert. Eingeloggte Nutzer werden über ihr bestätigtes Konto zugeordnet; anonyme Meldungen werden zunächst per Mailjet bestätigt. Erst danach wird die Meldung als GitHub-Issue angelegt. Die E-Mail-Adresse wird nicht in das öffentliche Issue übernommen.</p>
                 <p>Beim Aufruf können technisch notwendige Zugriffsdaten wie aufgerufene Seite, Datum und Uhrzeit, übertragene Datenmenge, Browser-/Betriebssysteminformationen, Referrer-URL und IP-Adresse in Server-Logs des Hostings verarbeitet werden. Das dient dem sicheren und stabilen Betrieb.</p>
@@ -3764,6 +3848,7 @@ function GuideHeader() {
         <nav className="main-nav" aria-label="Hauptnavigation">
           <a href="/#status">Status</a>
           <a href="/karte">Karte</a>
+          <a href="/community">Community</a>
           <RepairMenu />
           <a href="/ersatzteile">Ersatzteile</a>
           <BikeMenu />
@@ -3789,12 +3874,14 @@ function AccountMenu() {
     <div className="nav-dropdown account-menu">
       <button className="nav-dropdown-trigger account-menu-trigger" type="button" aria-haspopup="menu">
         <AvatarBadge user={user} compact />
-        <span className="account-menu-name">{user.name}</span>
+        <span className="account-menu-name">{formatUserHandle(user.name)}</span>
         {unreadCount > 0 && <span className="account-unread-count" aria-label={`${unreadCount} ungelesene Benachrichtigungen`}>{unreadCount}</span>}
         <span className="nav-dropdown-caret" aria-hidden="true" />
       </button>
       <div className="nav-dropdown-menu account-menu-dropdown" role="menu">
         <a className="nav-dropdown-item" href="/konto" role="menuitem"><strong>Mein Bereich{unreadCount > 0 ? ` · ${unreadCount} neu` : ''}</strong><span>Bike, Kilometer &amp; Benachrichtigungen</span></a>
+        <a className="nav-dropdown-item" href={`/profil/${user.id}`} role="menuitem"><strong>Mein Profil</strong><span>Vorstellung und Community-Beiträge</span></a>
+        {user.isAdminProfile && <a className="nav-dropdown-item" href="/admin" role="menuitem"><strong>Admin-Bereich</strong><span>Meldungen und Verwaltung</span></a>}
         <button className="account-logout" type="button" onClick={() => { void logout(); }}>Ausloggen</button>
       </div>
     </div>
@@ -4188,15 +4275,14 @@ function WikiContributions({ guideSlug, editingHeading, onCloseEditor }: { guide
       </details>
       <div className="approved-comments wiki-approved-contributions">
         {summary?.comments.length ? summary.comments.map((comment) => {
-          const sourceIsExternal = /^https?:\/\//i.test(comment.source ?? '');
           return (
-            <article className="approved-comment wiki-approved-contribution" key={comment.id}>
+            <article className="approved-comment wiki-approved-contribution mention-target" id={`beitrag-${comment.id}`} key={comment.id}>
               <div className="approved-comment-topline"><PublicCommentAuthor comment={comment} /><time dateTime={comment.createdAt}>{new Date(comment.createdAt).toLocaleDateString('de-DE')}</time></div>
-              {comment.topic && <h4>{comment.topic}</h4>}
-              {comment.section && <small className="wiki-contribution-section">Bezug: {comment.section}</small>}
-              <p>{comment.body}</p>
-              {comment.source && (sourceIsExternal ? <a className="wiki-contribution-source" href={comment.source} target="_blank" rel="nofollow noreferrer">Quelle prüfen ↗</a> : <small className="wiki-contribution-source">Quelle: {comment.source}</small>)}
-              {comment.imageUrl && <img src={comment.imageUrl} alt={`Bild von ${comment.name}`} loading="lazy" />}
+              {comment.topic && <h4><MentionText text={comment.topic} mentions={comment.mentions} /></h4>}
+              {comment.section && <small className="wiki-contribution-section">Bezug: <MentionText text={comment.section} mentions={comment.mentions} /></small>}
+              <p><MentionText text={comment.body} mentions={comment.mentions} /></p>
+              {comment.source && <small className="wiki-contribution-source">Quelle: <MentionText text={comment.source} mentions={comment.mentions} /></small>}
+              {comment.imageUrl && <img decoding="async" src={comment.imageUrl} alt={`Bild von ${comment.name}`} loading="lazy" />}
             </article>
           );
         }) : <p className="no-comments">Noch keine freigegebenen Ergänzungen.</p>}
@@ -4268,7 +4354,7 @@ function WikiContributionForm({ guideSlug, heading, onSubmitted }: { guideSlug: 
         <label>Name<input name="name" required minLength={2} maxLength={80} autoComplete="name" /></label>
         <label>E-Mail<input name="email" type="email" required maxLength={180} autoComplete="email" /><small>Bestätigungslink per Mail; danach beginnt die redaktionelle Prüfung.</small></label>
       </div>}
-      <label>Dein Vorschlag<textarea name="body" required minLength={10} maxLength={4000} rows={5} placeholder="Was sollte ergänzt, geändert oder belegt werden?" /></label>
+      <label>Dein Vorschlag<MentionTextarea name="body" required minLength={10} maxLength={4000} rows={5} placeholder="Was sollte ergänzt, geändert oder belegt werden?" /></label>
       <label>Quelle (optional)<input name="source" maxLength={500} placeholder="z. B. Bonfire-Handbuch, S. 12 oder https://…" /><small>Eine Seitenzahl, PDF oder Webadresse hilft bei der Prüfung.</small></label>
       <label>Bild (optional, max. 1 MB)<input name="image" type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={handleImageChange} /><small>JPG, PNG, WEBP oder GIF</small></label>
       <label className="comment-honeypot" aria-hidden="true">Website<input name="website" tabIndex={-1} autoComplete="off" /></label>
@@ -4397,7 +4483,7 @@ function RepairRequestPage() {
 }
 
 function RepairRequestForm({ onSubmitted }: { onSubmitted: () => void }) {
-  const { user } = useAuth();
+  const { user, csrfToken, loading: authLoading } = useAuth();
   const [requestError, setRequestError] = useState('');
   const [requestNotice, setRequestNotice] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -4429,10 +4515,10 @@ function RepairRequestForm({ onSubmitted }: { onSubmitted: () => void }) {
     if (selectedFile) formData.append('image', selectedFile);
 
     try {
-      await apiJson<{ message: string }>('/api/comments', { method: 'POST', body: formData });
+      await apiJson<{ message: string }>('/api/comments', { method: 'POST', headers: { 'X-CSRF-Token': csrfToken }, body: formData });
       form.reset();
       setSelectedFile(null);
-      setRequestNotice(user ? 'Danke! Deine Reparaturanfrage ist bei uns zur redaktionellen Prüfung vorgemerkt.' : 'Fast geschafft! Bestätige jetzt deine E-Mail-Adresse. Erst danach landet deine Reparaturanfrage bei uns zur redaktionellen Prüfung.');
+      setRequestNotice('Danke! Deine Reparaturanfrage ist bei uns zur redaktionellen Prüfung vorgemerkt.');
       onSubmitted();
     } catch (error) {
       setRequestError(error instanceof Error ? error.message : 'Die Anfrage konnte nicht gesendet werden.');
@@ -4441,8 +4527,12 @@ function RepairRequestForm({ onSubmitted }: { onSubmitted: () => void }) {
     }
   };
 
+  if (authLoading) return <p role="status">Anmeldung wird geprüft …</p>;
+  if (!user) return <div className="community-login-hint"><p>Neue Reparaturanfragen können nur eingeloggte Mitglieder stellen. Alle veröffentlichten Fragen und Lösungen kannst du auch ohne Konto lesen.</p><div className="account-moderation-actions"><a className="button button-ink" href="/login">Einloggen</a><a className="button button-ghost" href="/registrieren">Konto erstellen</a></div></div>;
+
   return (
     <form className="comment-form repair-request-form" onSubmit={handleSubmit}>
+      <p className="content-note">Du stellst diese Anfrage als <a href={`/profil/${user.id}`}>{formatUserHandle(user.name)}</a>.</p>
       <label>Thema oder Fehlerbild<input name="topic" required minLength={2} maxLength={120} placeholder="z. B. Wildfire startet nach dem Laden nicht" /></label>
       <div className="comment-form-grid">
         <label>Modell / Bereich
@@ -4458,10 +4548,8 @@ function RepairRequestForm({ onSubmitted }: { onSubmitted: () => void }) {
             <option>Sonstiges</option>
           </select>
         </label>
-        {user ? <><input type="hidden" name="name" value={user.name} /><input type="hidden" name="email" value={user.email} /></> : <label>Name<input name="name" required minLength={2} maxLength={80} autoComplete="name" /></label>}
       </div>
-      {!user && <label>E-Mail<input name="email" type="email" required maxLength={180} autoComplete="email" /><small>Bestätigungslink per Mail; danach beginnt die redaktionelle Prüfung.</small></label>}
-      <label>Beschreibung<textarea name="body" required minLength={10} maxLength={4000} rows={7} placeholder="Modell, Baujahr, genaue Symptome, wann der Fehler auftritt und was bereits geprüft wurde …" /></label>
+      <label>Beschreibung<MentionTextarea name="body" required minLength={10} maxLength={4000} rows={7} placeholder="Modell, Baujahr, genaue Symptome, wann der Fehler auftritt und was bereits geprüft wurde …" /></label>
       <label>Quelle oder weitere Infos (optional)<input name="source" maxLength={500} placeholder="z. B. Handbuch Seite 12 oder https://…" /></label>
       <label>Bild (optional, max. 1 MB)<input name="image" type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={handleImageChange} /><small>JPG, PNG, WEBP oder GIF</small></label>
       <label className="comment-honeypot" aria-hidden="true">Website<input name="website" tabIndex={-1} autoComplete="off" /></label>
@@ -4603,7 +4691,7 @@ function RepairRequestDetailPage({ requestId }: { requestId: string }) {
         <section className="repair-page-hero section-pad">
           <a className="repair-back" href={repairRequestPath}>← Alle offenen Fragen</a>
           <div className="eyebrow handwritten">{request?.section ?? 'reparaturanfrage'}</div>
-          <h1>{request?.topic ?? 'Reparaturanfrage wird geladen …'}</h1>
+          <h1><MentionText text={request?.topic ?? 'Reparaturanfrage wird geladen …'} mentions={request?.mentions} /></h1>
           <p>{request ? 'Hier kannst du das Fehlerbild in Ruhe nachvollziehen und eine eigene Antwort oder Lösung teilen.' : 'Die freigegebene Anfrage und ihre Antworten werden geladen.'}</p>
           <RepairTabs active="requests" />
         </section>
@@ -4612,14 +4700,14 @@ function RepairRequestDetailPage({ requestId }: { requestId: string }) {
           {!summary && !detailError && <div className="empty-state card-doodle repair-request-empty"><h2>Anfrage wird geladen …</h2><p>Einen Moment bitte.</p></div>}
           {request && (
             <div className="repair-request-detail-layout">
-              <article className="repair-request-detail-card card-doodle">
+              <article className="repair-request-detail-card card-doodle mention-target" id={`beitrag-${request.id}`}>
                 <div className="repair-request-card-topline"><span className="kind-chip community">Frage</span><time dateTime={request.createdAt}>{new Date(request.createdAt).toLocaleDateString('de-DE')}</time></div>
                 <div className="approved-comment-topline"><PublicCommentAuthor comment={request} /><span>{request.section ?? 'Modell noch offen'}</span></div>
                 {request.solutionAnswerId ? <div className="repair-solved-banner"><span className="repair-solved-badge">✓ Gelöst</span><span>Die beste Antwort wurde vom Ersteller gekürt.</span></div> : request.isRequestOwner && <p className="repair-owner-hint">Du bist der Ersteller dieser Anfrage. Wähle unten die Antwort aus, die dein Problem am besten löst.</p>}
                 <RepairRequestSubscription requestId={request.id} />
                 <h2>Fehlerbild und bisherige Angaben</h2>
-                <p className="repair-request-detail-body">{request.body}</p>
-                {request.source && <p className="repair-request-source"><strong>Weitere Info:</strong> {request.source}</p>}
+                <p className="repair-request-detail-body"><MentionText text={request.body} mentions={request.mentions} /></p>
+                {request.source && <p className="repair-request-source"><strong>Weitere Info:</strong> <MentionText text={request.source} mentions={request.mentions} /></p>}
                 <div className="repair-answers repair-request-detail-answers">
                   <div className="repair-answers-heading"><span className="eyebrow handwritten">antworten und lösungen</span><span className="comment-count">{answers.length}</span></div>
                   {solutionError && <p className="form-message form-message-error" role="alert">{solutionError}</p>}
@@ -4693,14 +4781,14 @@ function RepairAnswerCard({
   };
 
   return (
-    <article className={`repair-answer ${isSolution ? 'is-solution' : ''}`}>
+    <article className={`repair-answer mention-target ${isSolution ? 'is-solution' : ''}`} id={`beitrag-${answer.id}`}>
       <div className="repair-answer-topline">
         <div className="approved-comment-topline"><PublicCommentAuthor comment={answer} /><time dateTime={answer.createdAt}>{new Date(answer.createdAt).toLocaleDateString('de-DE')}</time></div>
         {isSolution && <span className="repair-solved-badge">✓ Beste Lösung</span>}
       </div>
-      <p>{answer.body}</p>
-      {answer.source && <small>Quelle: {answer.source}</small>}
-      {answer.imageUrl && <img src={answer.imageUrl} alt={`Bild von ${answer.name}`} loading="lazy" />}
+      <p><MentionText text={answer.body} mentions={answer.mentions} /></p>
+      {answer.source && <small>Quelle: <MentionText text={answer.source} mentions={answer.mentions} /></small>}
+      {answer.imageUrl && <img decoding="async" src={answer.imageUrl} alt={`Bild von ${answer.name}`} loading="lazy" />}
       <div className="repair-answer-footer">
         <div className="repair-answer-votes" aria-label="Antwort bewerten">
           <button className={`vote-button repair-answer-vote-button ${viewerVote === 'up' ? 'is-selected' : ''}`} type="button" onClick={() => { void handleVote('up'); }} disabled={voteBusy} aria-pressed={viewerVote === 'up'} title="Diese Antwort war hilfreich">
@@ -4764,10 +4852,10 @@ function RepairRequestCard({ request, answerCount, index }: { request: PublicCom
   return (
     <article className={`repair-request-card card-doodle ${index % 2 ? 'repair-request-card-tilt-right' : 'repair-request-card-tilt-left'}`}>
       <div className="repair-request-card-topline"><span className="kind-chip community">Frage</span>{request.solutionAnswerId ? <span className="repair-solved-badge">✓ Gelöst</span> : <span>{request.section ?? 'Modell noch offen'}</span>}</div>
-      <h3><a className="repair-request-title-link" href={detailPath}>{request.topic ?? 'Reparaturanfrage'} ↗</a></h3>
+      <h3><MentionText text={request.topic ?? 'Reparaturanfrage'} mentions={request.mentions} href={detailPath} /></h3>
       <div className="approved-comment-topline"><PublicCommentAuthor comment={request} /><time dateTime={request.createdAt}>{new Date(request.createdAt).toLocaleDateString('de-DE')}</time></div>
-      <p className="repair-request-body">{request.body}</p>
-      {request.source && <p className="repair-request-source"><strong>Weitere Info:</strong> {request.source}</p>}
+      <p className="repair-request-body"><MentionText text={request.body} mentions={request.mentions} /></p>
+      {request.source && <p className="repair-request-source"><strong>Weitere Info:</strong> <MentionText text={request.source} mentions={request.mentions} /></p>}
       <div className="repair-answers">
         <div className="repair-answers-heading"><span className="eyebrow handwritten">antworten und lösungen</span><span className="comment-count">{answerCount}</span></div>
         <p className="no-comments">{answerCount ? `${answerCount} geprüfte Antwort${answerCount === 1 ? '' : 'en'} auf der Anfrageseite.` : 'Noch keine Antwort. Teile den ersten Lösungsansatz auf der Anfrageseite.'}</p>
@@ -4778,7 +4866,7 @@ function RepairRequestCard({ request, answerCount, index }: { request: PublicCom
 }
 
 function RepairAnswerForm({ parentId, onSubmitted }: { parentId: string; onSubmitted: () => Promise<void> | void }) {
-  const { user } = useAuth();
+  const { user, csrfToken, loading: authLoading } = useAuth();
   const [answerError, setAnswerError] = useState('');
   const [answerNotice, setAnswerNotice] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -4811,10 +4899,10 @@ function RepairAnswerForm({ parentId, onSubmitted }: { parentId: string; onSubmi
     if (selectedFile) formData.append('image', selectedFile);
 
     try {
-      await apiJson<{ message: string }>('/api/comments', { method: 'POST', body: formData });
+      await apiJson<{ message: string }>('/api/comments', { method: 'POST', headers: { 'X-CSRF-Token': csrfToken }, body: formData });
       form.reset();
       setSelectedFile(null);
-      setAnswerNotice(user ? 'Danke! Deine Antwort ist bei uns zur redaktionellen Prüfung vorgemerkt.' : 'Fast geschafft! Bestätige jetzt deine E-Mail-Adresse. Erst danach landet deine Antwort bei uns zur redaktionellen Prüfung.');
+      setAnswerNotice('Danke! Deine Antwort ist bei uns zur redaktionellen Prüfung vorgemerkt.');
       await onSubmitted();
     } catch (error) {
       setAnswerError(error instanceof Error ? error.message : 'Die Antwort konnte nicht gesendet werden.');
@@ -4823,13 +4911,13 @@ function RepairAnswerForm({ parentId, onSubmitted }: { parentId: string; onSubmi
     }
   };
 
+  if (authLoading) return <p role="status">Anmeldung wird geprüft …</p>;
+  if (!user) return <div className="community-login-hint"><p>Antworten und Lösungen können nur eingeloggte Mitglieder teilen. Bestehende Antworten kannst du auch ohne Konto lesen.</p><div className="account-moderation-actions"><a className="button button-ink" href="/login">Einloggen</a><a className="button button-ghost" href="/registrieren">Konto erstellen</a></div></div>;
+
   return (
     <form className="comment-form repair-answer-form" onSubmit={handleSubmit}>
-      {user ? <><input type="hidden" name="name" value={user.name} /><input type="hidden" name="email" value={user.email} /></> : <div className="comment-form-grid">
-        <label>Name<input name="name" required minLength={2} maxLength={80} autoComplete="name" /></label>
-        <label>E-Mail<input name="email" type="email" required maxLength={180} autoComplete="email" /><small>Bestätigungslink per Mail; danach beginnt die redaktionelle Prüfung.</small></label>
-      </div>}
-      <label>Dein Lösungsansatz<textarea name="body" required minLength={10} maxLength={4000} rows={5} placeholder="Was hast du geprüft, gemessen oder erfolgreich repariert?" /></label>
+      <p className="content-note">Du antwortest als <a href={`/profil/${user.id}`}>{formatUserHandle(user.name)}</a>.</p>
+      <label>Dein Lösungsansatz<MentionTextarea name="body" required minLength={10} maxLength={4000} rows={5} placeholder="Was hast du geprüft, gemessen oder erfolgreich repariert?" /></label>
       <label>Quelle (optional)<input name="source" maxLength={500} placeholder="z. B. Handbuch, Teilenummer oder https://…" /></label>
       <label>Bild (optional, max. 1 MB)<input name="image" type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={handleImageChange} /></label>
       <label className="comment-honeypot" aria-hidden="true">Website<input name="website" tabIndex={-1} autoComplete="off" /></label>
@@ -5033,7 +5121,7 @@ function RepairComments({ guideSlug }: { guideSlug: string }) {
           <label>Name<input name="name" required minLength={2} maxLength={80} autoComplete="name" /></label>
           <label>E-Mail<input name="email" type="email" required maxLength={180} autoComplete="email" /><small>Bestätigungslink per Mail; danach beginnt die redaktionelle Prüfung.</small></label>
         </div>}
-        <label>Kommentar<textarea name="body" required minLength={10} maxLength={4000} rows={5} placeholder="Was hast du geprüft oder repariert?" /></label>
+        <label>Kommentar<MentionTextarea name="body" required minLength={10} maxLength={4000} rows={5} placeholder="Was hast du geprüft oder repariert?" /></label>
         <label>Bild (optional, max. 1 MB)<input name="image" type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={handleImageChange} /><small>JPG, PNG, WEBP oder GIF</small></label>
         <label className="comment-honeypot" aria-hidden="true">Website<input name="website" tabIndex={-1} autoComplete="off" /></label>
         {commentError && <p className="form-message form-message-error" role="alert">{commentError}</p>}
@@ -5042,10 +5130,10 @@ function RepairComments({ guideSlug }: { guideSlug: string }) {
       </form>
       <div className="approved-comments">
         {summary?.comments.length ? summary.comments.map((comment) => (
-          <article className="approved-comment" key={comment.id}>
+          <article className="approved-comment mention-target" id={`beitrag-${comment.id}`} key={comment.id}>
             <div className="approved-comment-topline"><PublicCommentAuthor comment={comment} /><time dateTime={comment.createdAt}>{new Date(comment.createdAt).toLocaleDateString('de-DE')}</time></div>
-            <p>{comment.body}</p>
-            {comment.imageUrl && <img src={comment.imageUrl} alt={`Bild von ${comment.name}`} loading="lazy" />}
+            <p><MentionText text={comment.body} mentions={comment.mentions} /></p>
+            {comment.imageUrl && <img decoding="async" src={comment.imageUrl} alt={`Bild von ${comment.name}`} loading="lazy" />}
           </article>
         )) : <p className="no-comments">Noch keine freigegebenen Erfahrungsberichte.</p>}
       </div>
@@ -5054,7 +5142,7 @@ function RepairComments({ guideSlug }: { guideSlug: string }) {
 }
 
 function AdminPage() {
-  const { logout: logoutUser } = useAuth();
+  const { user, logout: logoutUser } = useAuth();
   const [checked, setChecked] = useState(false);
   const [authenticated, setAuthenticated] = useState(false);
   const [csrfToken, setCsrfToken] = useState('');
@@ -5065,7 +5153,7 @@ function AdminPage() {
   const [password, setPassword] = useState('');
   const [comments, setComments] = useState<AdminComment[]>([]);
   const [members, setMembers] = useState<AdminMember[]>([]);
-  const [adminSection, setAdminSection] = useState<'comments' | 'members' | 'newsletter' | 'notifications' | 'chat'>('comments');
+  const [adminSection, setAdminSection] = useState<'comments' | 'members' | 'newsletter' | 'notifications' | 'chat'>(() => typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('bereich') === 'chat' ? 'chat' : 'comments');
   const [adminFilter, setAdminFilter] = useState<'all' | 'wiki' | 'comments' | 'requests'>('all');
   const [adminSearch, setAdminSearch] = useState('');
   const [busy, setBusy] = useState(false);
@@ -5076,6 +5164,9 @@ function AdminPage() {
     document.title = 'Admin — Black Tea Motorbikes – Hilfe';
     window.scrollTo(0, 0);
     void checkSession();
+    const onSessionChanged = () => { void checkSession(); };
+    window.addEventListener('auth-session-changed', onSessionChanged);
+    return () => window.removeEventListener('auth-session-changed', onSessionChanged);
   }, []);
 
   const loadComments = async () => {
@@ -5140,6 +5231,7 @@ function AdminPage() {
       setCanManageMembers(payload.canManageMembers);
       setCsrfToken(payload.csrfToken);
       setPassword('');
+      window.dispatchEvent(new Event('auth-session-changed'));
       await loadComments();
       await loadMembers();
     } catch (loginError) {
@@ -5230,6 +5322,7 @@ function AdminPage() {
     setAdminEmail('');
     setAdminRole(null);
     setCanManageMembers(false);
+    window.dispatchEvent(new Event('auth-session-changed'));
   };
 
   const wikiSuggestions = comments.filter((comment) => comment.kind === 'wiki_suggestion');
@@ -5270,6 +5363,7 @@ function AdminPage() {
           <section className="admin-comments-section section-pad">
             <div className="admin-toolbar card-doodle">
               <div><span className="eyebrow handwritten">eingeloggt als</span><strong>{adminEmail} · {adminRole === 'moderator' ? 'Moderator' : 'Admin'}</strong></div>
+              {user?.isAdminProfile && <a className="button button-ghost" href={`/profil/${user.id}`}>Mein Profil · {formatUserHandle(user.name)}</a>}
               <button className="button button-ghost" type="button" onClick={() => void handleLogout()}>Abmelden</button>
             </div>
             {error && <p className="form-message form-message-error" role="alert">{error}</p>}
@@ -5282,6 +5376,7 @@ function AdminPage() {
               <button className={adminSection === 'chat' ? 'active' : ''} type="button" role="tab" aria-selected={adminSection === 'chat'} onClick={() => setAdminSection('chat')}>Team-Chat</button>
             </div>
             {adminSection === 'chat' ? <StaffChatPanel csrfToken={csrfToken} context="admin" /> : adminSection === 'notifications' ? <AdminNotificationPanel csrfToken={csrfToken} canManageRegistration={adminRole === 'admin'} onNotice={setNotice} onError={setError} /> : adminSection === 'members' && canManageMembers ? <AdminMembersPanel members={members} csrfToken={csrfToken} onMembersChange={(updater) => setMembers(updater)} onNotice={setNotice} onError={setError} /> : adminSection === 'newsletter' && canManageMembers ? <AdminNewsletterPanel members={members} csrfToken={csrfToken} onNotice={setNotice} onError={setError} /> : <>
+            <CommunityReportsPanel csrfToken={csrfToken} context={adminRole === 'moderator' ? 'moderator' : 'admin'} />
             <div className="admin-filter-tabs" role="tablist" aria-label="Beiträge filtern">
               <button className={adminFilter === 'all' ? 'active' : ''} type="button" role="tab" aria-selected={adminFilter === 'all'} onClick={() => setAdminFilter('all')}>Alle <strong>{openComments.length}</strong></button>
               <button className={adminFilter === 'wiki' ? 'active' : ''} type="button" role="tab" aria-selected={adminFilter === 'wiki'} onClick={() => setAdminFilter('wiki')}>Wiki <strong>{wikiSuggestions.length}</strong></button>
@@ -5300,16 +5395,17 @@ function AdminPage() {
               {filteredComments.length ? filteredComments.map((comment) => (
                 <article className={`admin-comment card-doodle ${comment.status === 'pending' ? 'admin-comment-pending' : ''}`} key={comment.id}>
                   <div className="admin-comment-header">
-                    <div><span className={`admin-status ${comment.status}`}>{comment.status === 'pending' ? 'wartet auf Prüfung' : 'freigegeben'}</span><span className="admin-kind">{comment.kind === 'wiki_suggestion' ? 'Wiki-Vorschlag' : comment.kind === 'repair_request' ? 'Reparaturanfrage' : comment.kind === 'repair_answer' ? 'Antwort auf Reparaturanfrage' : 'Erfahrungsbericht'}</span><h2>{comment.topic ?? comment.name}</h2><p>{comment.topic ? `${comment.name} · ` : ''}{comment.email} · {comment.guide} · {new Date(comment.createdAt).toLocaleString('de-DE')}</p>{comment.section && <p className="admin-comment-target"><strong>Modell / Bereich:</strong> „{comment.section}“</p>}{comment.kind === 'repair_answer' && comment.parentId && <p className="admin-comment-target"><strong>Antwort auf Anfrage:</strong> {comment.parentId}</p>}</div>
-                    <div className="admin-comment-actions">
+                    <div><span className={`admin-status ${comment.status}`}>{comment.status === 'pending' ? 'wartet auf Prüfung' : 'freigegeben'}</span><span className="admin-kind">{comment.kind === 'wiki_suggestion' ? 'Wiki-Vorschlag' : comment.kind === 'repair_request' ? 'Reparaturanfrage' : comment.kind === 'repair_answer' ? 'Antwort auf Reparaturanfrage' : 'Erfahrungsbericht'}</span><h2>{comment.topic ?? (comment.profileId ? formatUserHandle(comment.name) : comment.name)}</h2><p>{comment.topic ? `${comment.profileId ? formatUserHandle(comment.name) : comment.name} · ` : ''}{comment.email} · {comment.guide} · {new Date(comment.createdAt).toLocaleString('de-DE')}</p>{comment.section && <p className="admin-comment-target"><strong>Modell / Bereich:</strong> „{comment.section}“</p>}{comment.kind === 'repair_answer' && comment.parentId && <p className="admin-comment-target"><strong>Antwort auf Anfrage:</strong> {comment.parentId}</p>}</div>
+                    {comment.canModerate !== true ? <p className="content-note">Eigene Beiträge prüft ein anderer Moderator oder Admin.</p> : <div className="admin-comment-actions">
                       {comment.status === 'pending' ? <button className="button button-ink" type="button" disabled={busy} onClick={() => void handleStatus(comment, 'approved')}>Freigeben</button> : <button className="button button-ghost" type="button" disabled={busy} onClick={() => void handleStatus(comment, 'pending')}>Zurückstellen</button>}
                       {comment.kind === 'repair_request' && <button className="button button-ghost" type="button" onClick={() => handleRepairDraftDownload(comment)}>Als neue Hilfe vorbereiten</button>}
                       <button className="button button-danger" type="button" disabled={busy} onClick={() => void handleDelete(comment)}>Löschen</button>
-                    </div>
+                    </div>}
                   </div>
-                  <p className="admin-comment-body">{comment.body}</p>
-                  {comment.source && <p className="admin-comment-source"><strong>Quelle:</strong> {comment.source}</p>}
-                  {comment.imageUrl && <a href={comment.imageUrl} target="_blank" rel="noreferrer"><img className="admin-comment-image" src={comment.imageUrl} alt={`Anhang von ${comment.name}`} /></a>}
+                  <p className="admin-comment-body"><MentionText text={comment.body} mentions={comment.mentions} /></p>
+                  <ReviewEditor comment={comment} csrfToken={csrfToken} context={adminRole === 'admin' ? 'admin' : 'moderator'} disabled={busy} onAccepted={loadComments} />
+                  {comment.source && <p className="admin-comment-source"><strong>Quelle:</strong> <MentionText text={comment.source} mentions={comment.mentions} /></p>}
+                  {comment.imageUrl && <a href={comment.imageUrl} target="_blank" rel="noreferrer"><img decoding="async" loading="lazy" className="admin-comment-image" src={comment.imageUrl} alt={`Anhang von ${comment.name}`} /></a>}
                 </article>
               )) : <div className="admin-empty card-doodle"><h2>{adminSearch.trim() ? 'Nichts gefunden.' : 'Alles ruhig.'}</h2><p>{adminSearch.trim() ? 'Versuch es mit einem anderen Suchbegriff.' : adminFilter === 'wiki' ? 'Aktuell liegen keine Wiki-Vorschläge zur Prüfung vor.' : adminFilter === 'comments' ? 'Aktuell liegen keine Erfahrungsberichte zur Prüfung vor.' : adminFilter === 'requests' ? 'Aktuell liegen keine Reparaturanfragen oder Antworten zur Prüfung vor.' : 'Aktuell liegen keine offenen Beiträge zur Prüfung vor.'}</p></div>}
             </div>
@@ -5419,7 +5515,7 @@ function AdminMembersPanel({ members, csrfToken, onMembersChange, onNotice, onEr
   const filteredMembers = useMemo(() => {
     const normalizedQuery = memberSearch.trim().toLocaleLowerCase('de');
     if (!normalizedQuery) return members;
-    return members.filter((member) => `${member.name} ${member.email} ${member.role} ${member.status} ${member.model ?? ''} ${member.newsletterSubscribed ? 'newsletter abonniert' : ''}`.toLocaleLowerCase('de').includes(normalizedQuery));
+    return members.filter((member) => `${formatUserHandle(member.name)} ${member.email} ${member.role} ${member.status} ${member.model ?? ''} ${member.newsletterSubscribed ? 'newsletter abonniert' : ''}`.toLocaleLowerCase('de').includes(normalizedQuery));
   }, [memberSearch, members]);
 
   const openMessageDialog = (member: AdminMember) => {
@@ -5474,7 +5570,7 @@ function AdminMembersPanel({ members, csrfToken, onMembersChange, onNotice, onEr
   };
 
   const handleDelete = async (member: AdminMember) => {
-    if (!window.confirm(`Konto von ${member.name} samt persönlichen Beiträgen wirklich löschen?`)) return;
+    if (!window.confirm(`Konto von ${formatUserHandle(member.name)} samt persönlichen Beiträgen wirklich löschen?`)) return;
     setBusy(true);
     try {
       await apiJson<{ deleted: boolean }>(`/api/admin/users/${member.id}`, {
@@ -5482,7 +5578,7 @@ function AdminMembersPanel({ members, csrfToken, onMembersChange, onNotice, onEr
         headers: { 'X-CSRF-Token': csrfToken },
       });
       onMembersChange((current) => current.filter((item) => item.id !== member.id));
-      onNotice(`Konto von ${member.name} wurde gelöscht.`);
+      onNotice(`Konto von ${formatUserHandle(member.name)} wurde gelöscht.`);
     } catch (actionError) {
       onError(actionError instanceof Error ? actionError.message : 'Das Mitglied konnte nicht gelöscht werden.');
     } finally {
@@ -5528,7 +5624,7 @@ function AdminMembersPanel({ members, csrfToken, onMembersChange, onNotice, onEr
         {filteredMembers.length ? filteredMembers.map((member) => (
           <article className={`admin-member card-doodle ${member.communicationBlocked ? 'admin-member-blocked' : ''}`} key={member.id}>
             <div className="admin-member-topline">
-              <div><span className={`admin-status ${member.communicationBlocked ? 'blocked' : member.status === 'active' ? 'approved' : 'pending'}`}>{member.communicationBlocked ? 'Kommunikation gesperrt' : member.status === 'active' ? 'aktiv' : 'E-Mail offen'}</span>{member.role === 'moderator' && <span className="admin-role">Moderator</span>}<h3>{member.name}</h3><p>{member.email}</p></div>
+              <div><span className={`admin-status ${member.communicationBlocked ? 'blocked' : member.status === 'active' ? 'approved' : 'pending'}`}>{member.communicationBlocked ? 'Kommunikation gesperrt' : member.status === 'active' ? 'aktiv' : 'E-Mail offen'}</span>{member.role === 'moderator' && <span className="admin-role">Moderator</span>}<h3>{formatUserHandle(member.name)}</h3><p>{member.email}</p></div>
               <span className="admin-warning-count">{member.warningCount}/3 Verwarnungen</span>
             </div>
             <dl className="admin-member-facts"><div><dt>Modell</dt><dd>{member.model ?? 'nicht festgelegt'}</dd></div><div><dt>Registriert</dt><dd>{member.createdAt ? new Date(member.createdAt).toLocaleDateString('de-DE') : '—'}</dd></div><div><dt>Newsletter</dt><dd>{member.newsletterSubscribed ? 'abonniert' : 'nein'}</dd></div></dl>
@@ -5537,7 +5633,7 @@ function AdminMembersPanel({ members, csrfToken, onMembersChange, onNotice, onEr
           </article>
         )) : <div className="admin-empty card-doodle"><h2>{memberSearch.trim() ? 'Nichts gefunden.' : 'Noch keine Mitglieder.'}</h2><p>{memberSearch.trim() ? 'Versuch es mit einem anderen Suchbegriff.' : 'Sobald ein Konto bestätigt wurde, erscheint es hier.'}</p></div>}
       </div>
-      {dialog && <div className="admin-user-overlay" onMouseDown={(event) => { if (event.target === event.currentTarget) setDialog(null); }}><section className="admin-user-dialog card-doodle" role="dialog" aria-modal="true" aria-labelledby="admin-user-dialog-title"><div className="admin-user-dialog-header"><div><div className="eyebrow handwritten">{dialog.type === 'message' ? 'direkter draht' : 'moderation'}</div><h3 id="admin-user-dialog-title">{dialog.type === 'message' ? `Mail an ${dialog.member.name}` : `Verwarnung für ${dialog.member.name}`}</h3></div><button className="bug-report-close" type="button" aria-label="Dialog schließen" onClick={() => setDialog(null)}>×</button></div>{dialog.type === 'message' ? <form className="comment-form" onSubmit={handleDialogSubmit}><label>Betreff<input value={subject} onChange={(event) => setSubject(event.target.value)} minLength={2} maxLength={160} required /></label><label>Nachricht<textarea value={body} onChange={(event) => setBody(event.target.value)} minLength={2} maxLength={5000} rows={8} required /></label><button className="button button-ink" type="submit" disabled={busy}>{busy ? 'Wird versendet …' : 'Mail senden'} <span aria-hidden="true">↗</span></button></form> : <form className="comment-form" onSubmit={handleDialogSubmit}><p className="admin-user-dialog-warning">Aktueller Stand: {dialog.member.warningCount}/3. Mit der dritten Verwarnung wird die Kommunikation automatisch gesperrt.</p><label>Grund der Verwarnung<textarea value={reason} onChange={(event) => setReason(event.target.value)} minLength={5} maxLength={1000} rows={7} placeholder="Was wurde moderiert?" required /></label><button className="button button-ink" type="submit" disabled={busy}>{busy ? 'Wird gespeichert …' : 'Verwarnung speichern'} <span aria-hidden="true">↗</span></button></form>}</section></div>}
+      {dialog && <div className="admin-user-overlay" onMouseDown={(event) => { if (event.target === event.currentTarget) setDialog(null); }}><section className="admin-user-dialog card-doodle" role="dialog" aria-modal="true" aria-labelledby="admin-user-dialog-title"><div className="admin-user-dialog-header"><div><div className="eyebrow handwritten">{dialog.type === 'message' ? 'direkter draht' : 'moderation'}</div><h3 id="admin-user-dialog-title">{dialog.type === 'message' ? `Mail an ${formatUserHandle(dialog.member.name)}` : `Verwarnung für ${formatUserHandle(dialog.member.name)}`}</h3></div><button className="bug-report-close" type="button" aria-label="Dialog schließen" onClick={() => setDialog(null)}>×</button></div>{dialog.type === 'message' ? <form className="comment-form" onSubmit={handleDialogSubmit}><label>Betreff<input value={subject} onChange={(event) => setSubject(event.target.value)} minLength={2} maxLength={160} required /></label><label>Nachricht<textarea value={body} onChange={(event) => setBody(event.target.value)} minLength={2} maxLength={5000} rows={8} required /></label><button className="button button-ink" type="submit" disabled={busy}>{busy ? 'Wird versendet …' : 'Mail senden'} <span aria-hidden="true">↗</span></button></form> : <form className="comment-form" onSubmit={handleDialogSubmit}><p className="admin-user-dialog-warning">Aktueller Stand: {dialog.member.warningCount}/3. Mit der dritten Verwarnung wird die Kommunikation automatisch gesperrt.</p><label>Grund der Verwarnung<textarea value={reason} onChange={(event) => setReason(event.target.value)} minLength={5} maxLength={1000} rows={7} placeholder="Was wurde moderiert?" required /></label><button className="button button-ink" type="submit" disabled={busy}>{busy ? 'Wird gespeichert …' : 'Verwarnung speichern'} <span aria-hidden="true">↗</span></button></form>}</section></div>}
     </section>
   );
 }
@@ -5597,18 +5693,440 @@ function AdminNewsletterPanel({ members, csrfToken, onNotice, onError }: {
   );
 }
 
+function MentionText({ text, mentions, href }: { text: string; mentions?: UserMention[]; href?: string }) {
+  useEffect(() => {
+    if (!/^#beitrag-[a-f0-9]{32}$/.test(window.location.hash)) return;
+    const target = document.getElementById(window.location.hash.slice(1));
+    if (target && !target.dataset.mentionScrolled) {
+      target.dataset.mentionScrolled = 'true';
+      target.scrollIntoView({ block: 'start' });
+    }
+  }, []);
+  const origins = [siteOrigin, ...(import.meta.env.DEV ? ['http://localhost:5173', 'http://127.0.0.1:5173'] : [])];
+  return <>{splitUserText(text, mentions, origins).map((part, index) => part.profileId
+    ? <a className="user-mention" title={`Profil von ${part.text}`} href={`/profil/${part.profileId}`} key={index}>{part.text}</a>
+    : part.href ? <a className="user-internal-link" href={part.href} key={index}>{part.text}</a>
+    : href && !part.isUrl ? <a href={href} key={index}>{part.text}</a> : <span key={index}>{part.text}</span>)}</>;
+}
+
+function MentionTextarea(props: TextareaHTMLAttributes<HTMLTextAreaElement>) {
+  const input = useRef<HTMLTextAreaElement>(null);
+  const dismissedQuery = useRef<string | null>(null);
+  const listId = useId();
+  const [query, setQuery] = useState<MentionQuery | null>(null);
+  const [suggestions, setSuggestions] = useState<UserMention[]>([]);
+  const [active, setActive] = useState(0);
+  const [status, setStatus] = useState('');
+  const search = query?.query;
+  const updateQuery = (element: HTMLTextAreaElement) => {
+    if (dismissedQuery.current === `${element.value}:${element.selectionStart}`) return;
+    setQuery(element.selectionStart === element.selectionEnd ? getMentionQuery(element.value, element.selectionStart) : null);
+  };
+  useEffect(() => {
+    setSuggestions([]);
+    setActive(0);
+    setStatus(search ? 'Namen werden gesucht …' : '');
+    if (!search) return;
+    const controller = new AbortController();
+    const timer = window.setTimeout(() => {
+      void apiJson<{ users: UserMention[] }>(`/api/community/mention-suggestions?q=${encodeURIComponent(search)}`, { signal: controller.signal })
+        .then((result) => {
+          if (controller.signal.aborted) return;
+          setSuggestions(result.users);
+          setStatus(result.users.length ? '' : 'Kein passender Name gefunden.');
+        }).catch(() => {
+          if (!controller.signal.aborted) setStatus('Namen gerade nicht verfügbar. Du kannst weiter schreiben.');
+        });
+    }, 180);
+    return () => { window.clearTimeout(timer); controller.abort(); };
+  }, [search]);
+  const choose = (user: UserMention) => {
+    const element = input.current;
+    if (!element || !query) return;
+    const current = getMentionQuery(element.value, element.selectionStart);
+    if (!current || current.query !== query.query) return;
+    const next = insertMention(element.value, current, user.name);
+    if (props.maxLength && next.text.length > props.maxLength) {
+      setStatus('Für diesen Namen reicht die verbleibende Zeichenzahl nicht.');
+      return;
+    }
+    // A native input event updates both ordinary forms and React-controlled fields.
+    Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value')?.set?.call(element, next.text);
+    element.dispatchEvent(new Event('input', { bubbles: true }));
+    element.focus();
+    element.setSelectionRange(next.caret, next.caret);
+    setQuery(null);
+    setSuggestions([]);
+  };
+  const open = Boolean(query) && !props.disabled && !props.readOnly;
+  return <><span className="mention-input-wrap">
+    <textarea {...props} ref={input} aria-autocomplete="list" aria-controls={open ? listId : undefined}
+      aria-activedescendant={open && suggestions[active] ? `${listId}-${active}` : undefined}
+      onChange={(event) => { dismissedQuery.current = null; props.onChange?.(event); updateQuery(event.currentTarget); }}
+      onSelect={(event) => { props.onSelect?.(event); if (document.activeElement === event.currentTarget) updateQuery(event.currentTarget); }}
+      onBlur={(event) => { props.onBlur?.(event); setQuery(null); }}
+      onKeyDown={(event) => {
+        props.onKeyDown?.(event);
+        if (event.defaultPrevented || event.nativeEvent.isComposing || !open) return;
+        if (event.key === 'Escape') { event.preventDefault(); dismissedQuery.current = `${event.currentTarget.value}:${event.currentTarget.selectionStart}`; setQuery(null); }
+        else if (suggestions.length && (event.key === 'ArrowDown' || event.key === 'ArrowUp')) {
+          event.preventDefault();
+          setActive((index) => (index + (event.key === 'ArrowDown' ? 1 : suggestions.length - 1)) % suggestions.length);
+        } else if (event.key === 'Enter' && suggestions[active]) { event.preventDefault(); choose(suggestions[active]); }
+        else if (event.key === 'Tab') setQuery(null);
+      }} />
+    {open && <span className="mention-picker">
+      <span className="mention-picker-heading">Mitglied erwähnen</span>
+      <span id={listId} role="listbox" aria-label="Passende Mitglieder">
+        {suggestions.map((user, index) => <span role="option" id={`${listId}-${index}`} aria-selected={index === active}
+          className={`mention-option${index === active ? ' is-active' : ''}`} key={user.id}
+          onMouseDown={(event) => event.preventDefault()} onClick={() => choose(user)} onMouseEnter={() => setActive(index)}>
+          <strong>{formatUserHandle(user.name)}</strong><small>Profil</small>
+        </span>)}
+      </span>
+      {status && <span className="mention-picker-status" role="status">{status}</span>}
+      {suggestions.length > 0 && <span className="mention-picker-help">↑ ↓ auswählen · Enter übernehmen · Esc schließen</span>}
+    </span>}
+  </span><small className="mention-hint">Tippe @ und den Anfang eines Namens, um ein Mitglied zu erwähnen.</small></>;
+}
+
+function CommunitySocialSection() {
+  const { user } = useAuth();
+  const [activities, setActivities] = useState<CommunityActivity[]>([]);
+  const [focusedActivity, setFocusedActivity] = useState<CommunityActivity | null>(null);
+  const [totalCount, setTotalCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const [error, setError] = useState('');
+  const sentinel = useRef<HTMLDivElement>(null);
+  const cursorRef = useRef<string | null>(null);
+  const activeRequest = useRef<AbortController | null>(null);
+
+  const loadActivity = useCallback(async (reset = true) => {
+    if (!reset && (activeRequest.current || !cursorRef.current)) return;
+    activeRequest.current?.abort();
+    const controller = new AbortController();
+    activeRequest.current = controller;
+    if (reset) {
+      setLoading(true);
+      setActivities([]);
+      setFocusedActivity(null);
+      setNextCursor(null);
+      cursorRef.current = null;
+    } else setLoadingMore(true);
+    setError('');
+    try {
+      const params = new URLSearchParams();
+      const postId = reset ? window.location.hash.match(/^#beitrag-([a-f0-9]{32})$/)?.[1] : null;
+      if (postId) params.set('post', postId);
+      if (!reset && cursorRef.current) params.set('cursor', cursorRef.current);
+      const payload = await apiJson<{ activities: CommunityActivity[]; focusedActivity: CommunityActivity | null; nextCursor: string | null; totalCount: number }>(`/api/community/activity?${params}`, { signal: controller.signal });
+      if (activeRequest.current !== controller) return;
+      setActivities((current) => [...new Map([...(reset ? [] : current), ...payload.activities].map((activity) => [activity.id, activity])).values()]);
+      if (reset) setFocusedActivity(payload.focusedActivity ?? null);
+      setTotalCount(payload.totalCount);
+      cursorRef.current = payload.nextCursor;
+      setNextCursor(payload.nextCursor);
+    } catch (loadError) {
+      if (activeRequest.current === controller && !controller.signal.aborted) setError(loadError instanceof Error ? loadError.message : 'Die Community konnte gerade nicht geladen werden.');
+    } finally {
+      if (activeRequest.current === controller) {
+        activeRequest.current = null;
+        setLoading(false);
+        setLoadingMore(false);
+      }
+    }
+  }, [user?.id]);
+
+  useEffect(() => {
+    void loadActivity();
+    return () => { activeRequest.current?.abort(); activeRequest.current = null; };
+  }, [loadActivity]);
+
+  useEffect(() => {
+    if (loading || loadingMore || error || !nextCursor || !sentinel.current || typeof IntersectionObserver === 'undefined') return;
+    const observer = new IntersectionObserver((entries) => {
+      if (entries.some((entry) => entry.isIntersecting)) void loadActivity(false);
+    }, { rootMargin: '0px 0px 400px 0px' });
+    observer.observe(sentinel.current);
+    return () => observer.disconnect();
+  }, [loading, loadingMore, error, nextCursor, loadActivity]);
+
+  useEffect(() => {
+    if (!loading && window.location.hash.startsWith('#beitrag-')) {
+      document.getElementById(window.location.hash.slice(1))?.scrollIntoView({ block: 'start' });
+    }
+  }, [loading]);
+
+  return (
+    <section className="community-social-section section-pad">
+      <CommunityExperienceForm onSubmitted={loadActivity} />
+      <div className="community-social-grid community-feed-only">
+        <section className="community-feed-panel card-doodle" aria-labelledby="community-feed-title">
+          {focusedActivity && <><div className="community-feed-heading"><h2>Verlinkter Beitrag</h2></div><CommunityActivityCard activity={focusedActivity} /></>}
+          <div className="community-feed-heading"><h2 id="community-feed-title">Das Neueste</h2><span className="comment-count">{loading ? 'lädt …' : `${totalCount} ${totalCount === 1 ? 'Beitrag' : 'Beiträge'}`}</span></div>
+          {loading ? <p className="no-comments" role="status">Die neuesten Beiträge werden geladen …</p> : activities.length ? <div className="community-feed-list">{activities.filter((activity) => activity.id !== focusedActivity?.id).map((activity) => <CommunityActivityCard activity={activity} key={activity.id} />)}</div> : !error && <p className="no-comments">Noch keine Beiträge. Teile als Erste:r deine Erfahrung.</p>}
+          <div className="community-feed-pagination" ref={sentinel}>
+            {error && <p className="form-message form-message-error" role="alert">{error}</p>}
+            {loadingMore && <p role="status">Die nächsten 10 Beiträge werden geladen …</p>}
+            {!loading && (nextCursor || error) && <button className="button button-ghost" type="button" disabled={loadingMore} onClick={() => void loadActivity(activities.length === 0)}>{error ? 'Erneut versuchen' : 'Weitere 10 Beiträge laden'}</button>}
+            {!loading && !loadingMore && !error && !nextCursor && activities.length > 0 && <p className="content-note">Du hast alle bisherigen Beiträge gesehen.</p>}
+          </div>
+        </section>
+      </div>
+    </section>
+  );
+}
+
+function CommunityActivityCard({ activity }: { activity: CommunityActivity }) {
+  const labels: Record<CommunityActivity['type'], string> = {
+    solution: 'Beste Lösung',
+    repair_answer: 'Reparaturantwort',
+    wiki: 'Wiki-Beitrag',
+    experience: 'Erfahrungsbericht',
+    community: 'Community',
+  };
+  return (
+    <article className="community-feed-item" id={`beitrag-${activity.id}`}>
+      <a className="community-feed-avatar" href={`/profil/${activity.actor.id}`} aria-label={`Profil von ${formatUserHandle(activity.actor.name)}`}><AvatarBadge user={activity.actor} compact /></a>
+      <div className="community-feed-content">
+        <header className="community-feed-author">
+          <div className="community-feed-author-line"><a href={`/profil/${activity.actor.id}`}>{formatUserHandle(activity.actor.name)}</a><time dateTime={activity.createdAt}>{new Date(activity.createdAt).toLocaleDateString('de-DE', { day: 'numeric', month: 'short', year: 'numeric' })}</time></div>
+          <span>{activity.model ?? 'Modell offen'}{activity.country ? ` · ${activity.country}` : ''}</span>
+        </header>
+        {activity.type !== 'community' && <span className={`community-feed-kind ${activity.isSolution ? 'is-solution' : ''}`}>{labels[activity.type]}</span>}
+        {activity.title !== 'Community-Beitrag' && <h3><MentionText text={activity.title} mentions={activity.mentions} href={activity.href === '/community' ? undefined : activity.href} /></h3>}
+        <p><MentionText text={activity.body} mentions={activity.mentions} /></p>
+        <EditCredit edit={activity.editAttribution} />
+        {activity.source && <small>Quelle: <MentionText text={activity.source} mentions={activity.mentions} /></small>}
+        {activity.imageUrl && <a className="community-feed-image-link" href={activity.imageUrl} target="_blank" rel="noreferrer"><img decoding="async" className="community-feed-image" src={activity.imageUrl} alt={`Bild zu ${activity.title}`} loading="lazy" /></a>}
+        <CommunityPostActions post={activity} allowReplies />
+      </div>
+    </article>
+  );
+}
+
+type CommunityReply = PublicComment & { likeCount: number; viewerLiked: boolean; viewerReported: boolean };
+
+function CommunityPostActions({ post, allowReplies = false }: {
+  post: { id: string; likeCount: number; viewerLiked: boolean; viewerReported: boolean; replyCount?: number };
+  allowReplies?: boolean;
+}) {
+  const { user, csrfToken } = useAuth();
+  const [liked, setLiked] = useState(post.viewerLiked);
+  const [likes, setLikes] = useState(post.likeCount);
+  const [reported, setReported] = useState(post.viewerReported);
+  const [reportOpen, setReportOpen] = useState(false);
+  const [reason, setReason] = useState('');
+  const [repliesOpen, setRepliesOpen] = useState(() => allowReplies && typeof window !== 'undefined' && window.location.hash === `#beitrag-${post.id}`);
+  const [replies, setReplies] = useState<CommunityReply[]>([]);
+  const [replyCount, setReplyCount] = useState(post.replyCount ?? 0);
+  const [body, setBody] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [loadingReplies, setLoadingReplies] = useState(false);
+  const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
+  const [loginHint, setLoginHint] = useState(false);
+  const endpoint = `/api/community/posts/${post.id}`;
+  const headers = { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken };
+
+  useEffect(() => {
+    setLiked(post.viewerLiked);
+    setLikes(post.likeCount);
+    setReported(post.viewerReported);
+    setReplyCount(post.replyCount ?? 0);
+  }, [post.viewerLiked, post.likeCount, post.viewerReported, post.replyCount]);
+
+  useEffect(() => {
+    if (!repliesOpen) return;
+    let active = true;
+    setLoadingReplies(true);
+    setError('');
+    void apiJson<{ replies: CommunityReply[] }>(`${endpoint}/replies`).then((result) => {
+      if (active) { setReplies(result.replies); setReplyCount(result.replies.length); }
+    }).catch((err) => {
+      if (active) setError(err instanceof Error ? err.message : 'Kommentare konnten nicht geladen werden.');
+    }).finally(() => { if (active) setLoadingReplies(false); });
+    return () => { active = false; };
+  }, [repliesOpen, endpoint, user?.id]);
+
+  const act = async (action: () => Promise<void>) => {
+    if (!user) { setLoginHint(true); return; }
+    setBusy(true); setError(''); setNotice('');
+    try { await action(); }
+    catch (err) { setError(err instanceof Error ? err.message : 'Das hat leider nicht geklappt. Bitte versuche es erneut.'); }
+    finally { setBusy(false); }
+  };
+
+  return <div className="community-interactions">
+    <div className="community-action-bar">
+      <button type="button" aria-label={liked ? 'Like zurücknehmen' : 'Gefällt mir'} aria-pressed={liked} disabled={busy} onClick={() => void act(async () => {
+        const result = await apiJson<{ likeCount: number; viewerLiked: boolean }>(`${endpoint}/like`, { method: liked ? 'DELETE' : 'PUT', headers });
+        setLikes(result.likeCount); setLiked(result.viewerLiked);
+      })}><span aria-hidden="true">{liked ? '♥' : '♡'}</span> {likes} {likes === 1 ? 'Like' : 'Likes'}</button>
+      {allowReplies && <button type="button" aria-expanded={repliesOpen} aria-controls={`kommentare-${post.id}`} onClick={() => setRepliesOpen(!repliesOpen)}><span aria-hidden="true">↩</span> {replyCount} {replyCount === 1 ? 'Kommentar' : 'Kommentare'}</button>}
+      <button className="community-report-button" type="button" disabled={busy || reported} aria-expanded={reportOpen} onClick={() => { if (!user) setLoginHint(true); else setReportOpen(!reportOpen); }}>{reported ? 'Gemeldet' : 'Melden'}</button>
+    </div>
+    {loginHint && !user && <p className="community-login-hint"><a href="/login">Einloggen</a>, um Likes zu vergeben, zu kommentieren oder Beiträge zu melden.</p>}
+    {error && <p className="form-message form-message-error" role="alert">{error}</p>}
+    {notice && <p className="form-message form-message-success" role="status">{notice}</p>}
+    {reportOpen && user && <form className="comment-form community-report-form" onSubmit={(event) => {
+      event.preventDefault();
+      void act(async () => {
+        const result = await apiJson<{ message: string }>(`${endpoint}/report`, { method: 'POST', headers, body: JSON.stringify({ reason }) });
+        setReported(true); setReportOpen(false); setReason(''); setNotice(result.message);
+      });
+    }}>
+      <label>Warum möchtest du diesen Beitrag melden?<textarea value={reason} onChange={(event) => setReason(event.target.value)} minLength={3} maxLength={1000} rows={3} required /></label>
+      <p className="content-note">Deine Meldung ist nur für Admins und Moderatoren sichtbar. Sie prüfen, ob der Beitrag entfernt werden muss.</p>
+      <div className="community-action-bar"><button className="button button-ink" type="submit" disabled={busy || reason.trim().length < 3}>Meldung senden</button><button type="button" disabled={busy} onClick={() => setReportOpen(false)}>Abbrechen</button></div>
+    </form>}
+    {allowReplies && repliesOpen && <section className="community-replies" id={`kommentare-${post.id}`} aria-label="Kommentare">
+      {loadingReplies ? <p role="status">Kommentare werden geladen …</p> : replies.length ? replies.map((reply) => <article className="community-reply" key={reply.id}>
+        <header><PublicCommentAuthor comment={reply} /><time dateTime={reply.createdAt}>{new Date(reply.createdAt).toLocaleString('de-DE', { dateStyle: 'short', timeStyle: 'short' })}</time></header>
+        <p><MentionText text={reply.body} mentions={reply.mentions} /></p>
+        {reply.source && <small>Quelle: <MentionText text={reply.source} mentions={reply.mentions} /></small>}
+        <CommunityPostActions post={reply} />
+      </article>) : <p className="no-comments">Noch keine Kommentare. Was meinst du dazu?</p>}
+      {user ? <form className="comment-form" onSubmit={(event) => {
+        event.preventDefault();
+        void act(async () => {
+          const result = await apiJson<{ reply: CommunityReply }>(`${endpoint}/replies`, { method: 'POST', headers, body: JSON.stringify({ body }) });
+          setReplies((current) => [...current, result.reply]); setReplyCount((count) => count + 1); setBody('');
+        });
+      }}><label>Dein Kommentar<MentionTextarea value={body} onChange={(event) => setBody(event.target.value)} required maxLength={4000} rows={3} placeholder="Schreib mit …" /></label><button className="button button-ink" type="submit" disabled={busy || loadingReplies || !body.trim()}>{busy ? 'Wird gesendet …' : 'Kommentieren'}</button></form> : <p className="community-login-hint"><a href="/login">Einloggen</a>, um mitzureden.</p>}
+    </section>}
+  </div>;
+}
+
+function CommunityReportsPanel({ csrfToken, context }: { csrfToken: string; context: 'admin' | 'moderator' }) {
+  const [posts, setPosts] = useState<Array<AdminComment & { reports: Array<{ reason: string; createdAt: string }> }>>([]);
+  const [loading, setLoading] = useState(true);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
+  const load = async () => {
+    setLoading(true); setError('');
+    try {
+      const result = await apiJson<{ posts: typeof posts }>('/api/admin/community-reports', { headers: { 'X-Staff-Context': context } });
+      setPosts(result.posts);
+    } catch (err) { setError(err instanceof Error ? err.message : 'Meldungen konnten nicht geladen werden.'); }
+    finally { setLoading(false); }
+  };
+  useEffect(() => { void load(); }, []);
+  const resolve = async (id: string, remove: boolean) => {
+    if (remove && !window.confirm('Diesen Beitrag einschließlich seiner Community-Kommentare endgültig löschen?')) return;
+    setBusy(true); setError(''); setNotice('');
+    try {
+      const result = await apiJson<{ message: string }>(`/api/admin/community-reports/${id}`, {
+        method: remove ? 'DELETE' : 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken, 'X-Staff-Context': context },
+        ...(remove ? {} : { body: JSON.stringify({ action: 'keep' }) }),
+      });
+      setPosts((current) => current.filter((post) => post.id !== id)); setNotice(result.message);
+    } catch (err) { setError(err instanceof Error ? err.message : 'Die Meldung konnte nicht bearbeitet werden.'); }
+    finally { setBusy(false); }
+  };
+  return <section className="account-card card-doodle community-reports-panel" aria-labelledby="community-reports-title">
+    <div className="account-moderation-heading"><div><div className="eyebrow handwritten">community · gemeldete inhalte</div><h2 id="community-reports-title">Meldungen prüfen</h2><p>Community-Beiträge erscheinen sofort. Hier prüfst du nur Inhalte, die Mitglieder gemeldet haben.</p></div><button className="button button-ghost" type="button" disabled={loading || busy} onClick={() => void load()}>Aktualisieren ↻</button></div>
+    {error && <p className="form-message form-message-error" role="alert">{error}</p>}
+    {notice && <p className="form-message form-message-success" role="status">{notice}</p>}
+    {loading ? <p role="status">Meldungen werden geladen …</p> : posts.length ? posts.map((post) => <article className="account-moderation-item" key={post.id}>
+      <h3>{post.topic ?? `Kommentar von ${post.profileId ? formatUserHandle(post.name) : post.name}`}</h3><p>{post.profileId ? formatUserHandle(post.name) : post.name} · {post.reports.length} {post.reports.length === 1 ? 'Meldung' : 'Meldungen'}</p>
+      <p className="account-moderation-body"><MentionText text={post.body} mentions={post.mentions} /></p>
+      {post.imageUrl && <a href={post.imageUrl} target="_blank" rel="noreferrer"><img decoding="async" loading="lazy" className="admin-comment-image" src={post.imageUrl} alt={`Anhang von ${post.name}`} /></a>}
+      <ul>{post.reports.map((report, index) => <li key={index}>{report.reason} <time dateTime={report.createdAt}>({new Date(report.createdAt).toLocaleDateString('de-DE')})</time></li>)}</ul>
+      <ReviewEditor comment={post} csrfToken={csrfToken} context={context} reported disabled={busy} onAccepted={load} />
+      {post.canModerate !== true ? <p className="content-note">Meldungen zu deinem eigenen Beitrag prüft ein anderer Moderator oder Admin.</p> : <div className="account-moderation-actions"><button className="button button-ghost" type="button" disabled={busy} onClick={() => void resolve(post.id, false)}>Beitrag behalten</button>{post.canDelete === true ? <button className="button button-danger" type="button" disabled={busy} onClick={() => void resolve(post.id, true)}>Beitrag löschen</button> : <p className="content-note">Hier sind eigene gemeldete Kommentare betroffen. Das Löschen übernimmt ein anderer Moderator oder Admin.</p>}</div>}
+    </article>) : <p className="no-comments">Keine offenen Meldungen.</p>}
+  </section>;
+}
+
+function CommunityExperienceForm({ onSubmitted }: { onSubmitted: () => Promise<void> | void }) {
+  const { user, csrfToken, loading: authLoading } = useAuth();
+  const [model, setModel] = useState<BikeModel | ''>('');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSubmitting(true);
+    setError('');
+    setNotice('');
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    formData.set('guide', 'community-erfahrungen');
+    formData.set('kind', 'comment');
+    formData.set('section', model);
+    formData.delete('image');
+    if (selectedFile) formData.append('image', selectedFile);
+    try {
+      const response = await apiJson<{ message: string }>('/api/comments', { method: 'POST', headers: { 'X-CSRF-Token': csrfToken }, body: formData });
+      form.reset();
+      setSelectedFile(null);
+      setModel('');
+      setNotice(response.message);
+      await onSubmitted();
+    } catch (submitError) {
+      setError(submitError instanceof Error ? submitError.message : 'Der Erfahrungsbericht konnte nicht gesendet werden.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    authLoading ? null : <section className={`community-experience-panel card-doodle${user ? ' is-composer' : ''}`} aria-labelledby="community-experience-title">
+      {!user && <div className="eyebrow handwritten">deine erfahrung zählt</div>}
+      <h3 id="community-experience-title" className={user ? 'sr-only' : undefined}>Erfahrung teilen</h3>
+      {!user && <p>Was hast du an deiner BTM erlebt, umgebaut oder repariert? Teile es mit der Community – dein Beitrag erscheint direkt im Feed.</p>}
+      {!user ? <p className="community-login-hint"><a href="/login">Einloggen</a>, um eine Erfahrung zu teilen – dein Name und Avatar kommen dann automatisch aus deinem Profil.</p> : <form className="comment-form community-experience-form" onSubmit={handleSubmit}>
+        <div className="comment-form-grid"><label>Titel<input name="topic" required minLength={2} maxLength={120} placeholder="z. B. Mein Umbau auf LED-Blinker" /></label><label>Dein Modell<select value={model} onChange={(event) => setModel(event.target.value as BikeModel | '')} name="model" required><option value="">Bitte auswählen</option><option value="Bonfire X">Bonfire X</option><option value="Bonfire S">Bonfire S</option><option value="Bonfire E">Bonfire E</option><option value="Wildfire">Wildfire</option></select></label></div>
+        <label>Dein Beitrag<MentionTextarea name="body" minLength={10} maxLength={4000} rows={5} placeholder="Was war dein Ausgangspunkt, was hast du gemacht und was sollte die nächste Person wissen?" required /></label>
+        <label>Quelle oder Link (optional)<input name="source" maxLength={500} placeholder="z. B. Teilenummer, Handbuch oder https://…" /></label>
+        <label>Bild (optional, max. 1 MB)<input name="image" type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={(event) => { const file = event.target.files?.[0] ?? null; if (file && file.size > 1048576) { setSelectedFile(null); event.target.value = ''; setError('Das Bild darf höchstens 1 MB groß sein.'); return; } setSelectedFile(file); }} /></label>
+        {error && <p className="form-message form-message-error" role="alert">{error}</p>}
+        {notice && <p className="form-message form-message-success" role="status">{notice}</p>}
+        <button className="button button-ink" type="submit" disabled={submitting || !model}>{submitting ? 'Wird veröffentlicht …' : 'Erfahrung teilen'} <span aria-hidden="true">↗</span></button>
+      </form>}
+    </section>
+  );
+}
+
+function ProfilePage({ profileId }: { profileId: string }) {
+  const [profile, setProfile] = useState<PublicProfile | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    let active = true;
+    void apiJson<{ profile: PublicProfile }>(`/api/community/profiles/${encodeURIComponent(profileId)}`).then((payload) => {
+      if (!active) return;
+      setProfile(payload.profile);
+      document.title = `${formatUserHandle(payload.profile.name)} — BTM-Profil`;
+    }).catch((reason) => {
+      if (active) setError(reason instanceof Error ? reason.message : 'Das Profil konnte nicht geladen werden.');
+    }).finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, [profileId]);
+
+  return (
+    <div className="site-shell"><GuideHeader /><main className="profile-page section-pad"><a className="repair-back" href="/community">← Zur Community</a>{loading ? <div className="empty-state card-doodle"><h1>Profil wird geladen …</h1><p>Einen Moment bitte.</p></div> : error || !profile ? <div className="empty-state card-doodle"><h1>Profil nicht gefunden.</h1><p>{error || 'Dieses Profil ist nicht öffentlich verfügbar.'}</p></div> : <>
+      <section className="profile-hero card-doodle"><AvatarBadge user={profile} /><div><div className="eyebrow handwritten">öffentliches btm-profil</div><h1>{formatUserHandle(profile.name)}</h1><p><MentionText text={profile.bio || 'Noch keine Kurzvorstellung – vielleicht kommt sie bald dazu.'} mentions={profile.bioMentions} /></p><div className="profile-meta"><span>{profile.model ?? 'Modell noch offen'}</span>{profile.countryLabel && <span>{profile.countryLabel}</span>}{profile.kilometers > 0 && <span>ca. {new Intl.NumberFormat('de-DE').format(profile.kilometers)} km</span>}</div></div></section>
+      <section className="profile-stats" aria-label="Community-Statistik"><div><strong>{profile.stats.contributions}</strong><span>Beiträge</span></div><div><strong>{profile.stats.answers}</strong><span>Antworten</span></div><div><strong>{profile.stats.helpfulVotes}</strong><span>hilfreiche Stimmen</span></div><div><strong>{profile.stats.solutions}</strong><span>gekürte Lösungen</span></div></section>
+      <div className="profile-columns"><section className="profile-achievements card-doodle"><div className="eyebrow handwritten">gesammelt, nicht überwacht</div><h2>Achievements</h2><p>Aus freigegebenen Community-Beiträgen entstehen kleine Anerkennungen – ohne Rangliste und ohne Leistungsdruck.</p><div className="achievement-list">{profile.achievements.filter((achievement) => achievement.unlocked).map((achievement) => <article className="achievement is-unlocked" key={achievement.id}><span aria-hidden="true">★</span><div><strong>{achievement.title}</strong><small>{achievement.description}</small></div></article>)}{profile.achievements.every((achievement) => !achievement.unlocked) && <p className="no-comments">Noch kein Achievement – der erste Beitrag zählt.</p>}</div></section><section className="profile-contributions card-doodle"><div className="eyebrow handwritten">öffentliche spuren</div><h2>Beiträge von {formatUserHandle(profile.name)}</h2><div className="profile-contribution-list">{profile.contributions.length ? profile.contributions.map((contribution) => <article className="profile-contribution" key={contribution.id}><span><strong>{contribution.isSolution ? 'Beste Lösung · ' : ''}<MentionText text={contribution.title} mentions={contribution.mentions} href={contribution.href} /></strong><small><MentionText text={contribution.body} mentions={contribution.mentions} /></small><EditCredit edit={contribution.editAttribution} /></span><time dateTime={contribution.createdAt}>{new Date(contribution.createdAt).toLocaleDateString('de-DE')}</time></article>) : <p className="no-comments">Noch keine öffentlichen Beiträge.</p>}</div></section></div>
+    </>}</main><GuideFooter /></div>
+  );
+}
+
 function CommunityPage() {
   useEffect(() => {
-    document.title = 'BTM Community-Wissen — Black Tea Motorbikes – Hilfe';
+    document.title = 'BTM Community — Black Tea Motorbikes – Hilfe';
     window.scrollTo(0, 0);
   }, []);
-
-  const communityPdfs = [
-    { title: 'Wildfire-Handbuch', detail: '28 Seiten · Bedienung, Sicherheit und Wartung', href: '/pdfs/19-wildfire-handbuch-community.pdf' },
-    { title: 'Wildfire-Wartungszusammenfassung', detail: '4 Seiten · Laden und Wartung', href: '/pdfs/20-wildfire-wartung-community.pdf' },
-    { title: 'Gabelabdichtung', detail: '6 Seiten · Fehlerspur an der Wildfire-Gabel', href: '/pdfs/21-gabelabdichtung-community.pdf' },
-    { title: 'Wildfire FarDriver-Settings', detail: '2 Seiten · Controller-Einstellungen', href: '/pdfs/22-wildfire-fardriver-settings-community.pdf' },
-  ];
 
   return (
     <div className="site-shell">
@@ -5616,55 +6134,14 @@ function CommunityPage() {
       <main className="community-page-main">
         <section className="community-page-hero section-pad">
           <a className="repair-back" href="/">← Zur Sammelmappe</a>
-          <div className="eyebrow handwritten">community-wissen · redaktionell geordnet</div>
-          <h1>BTM Community-Wissen</h1>
-          <p>Die nützlichen technischen Spuren aus der Community — verständlich zusammengefasst, ohne lange Forenverläufe und mit Originalquelle zum Gegenprüfen.</p>
-          <div className="community-source-banner card-doodle">
-            <span className="kind-chip community">Quelle</span>
-            <p>Die Inhalte sind unabhängige Community-Aufbereitungen. Angaben zu Bremsen, Fahrwerk, Akku, Hochvolt und Controller bitte immer am eigenen Modellstand prüfen.</p>
-            <a className="button button-ghost" href="https://btm-community.org/" target="_blank" rel="nofollow noreferrer">BTM Community öffnen ↗</a>
-          </div>
+          <div className="eyebrow handwritten">menschen · erfahrungen · austausch</div>
+          <h1>Die BTM-Community.</h1>
+          <p>Was beschäftigt die BTM-Community gerade? Lies mit, entdecke Geschichten von anderen Ridern und erzähl, was bei dir los ist. Hier kommt die Community ins Gespräch.</p>
         </section>
 
-        <section className="community-knowledge-section section-pad">
-          <div className="section-heading">
-            <div>
-              <div className="eyebrow handwritten">was wir daraus nutzen</div>
-              <h2>Die wichtigen Spuren.</h2>
-            </div>
-            <span className="section-arrow handwritten">kurz erklärt,<br />Quelle dabei →</span>
-          </div>
-          <div className="community-knowledge-grid">
-            {communityKnowledge.map((entry, index) => (
-              <article id={slugify(entry.title)} className={`community-knowledge-card card-doodle ${index % 2 === 1 ? 'community-card-tilt-right' : 'community-card-tilt-left'}`} key={entry.title}>
-                <div className="community-card-topline"><span className="kind-chip community">{entry.model}</span><span>Zusammenfassung</span></div>
-                <h2>{entry.title}</h2>
-                <p>{entry.intro}</p>
-                <ul>{entry.points.map((point) => <li key={point}>{point}</li>)}</ul>
-                <a className="community-source-link" href={entry.sourceHref} target="_blank" rel="nofollow noreferrer">Quelle: {entry.sourceLabel} ↗</a>
-              </article>
-            ))}
-          </div>
-        </section>
+        <CommunitySocialSection />
 
-        <section className="community-pdf-section section-pad">
-          <div className="section-heading compact">
-            <div>
-              <div className="eyebrow handwritten">lokal gesichert</div>
-              <h2>Die vier Community-PDFs.</h2>
-            </div>
-            <a className="button button-ghost" href="/pdfs/index.html">Alle PDFs ↗</a>
-          </div>
-          <div className="community-pdf-list card-doodle">
-            {communityPdfs.map((pdf) => (
-              <div className="community-pdf-row" key={pdf.href}>
-                <span><strong>{pdf.title}</strong><small>{pdf.detail}</small></span>
-                <span className="community-pdf-actions"><a href={pdf.href}>PDF öffnen ↗</a><a href="https://btm-community.org/wildfire/dokumente-wildfire/" target="_blank" rel="nofollow noreferrer">Quelle ↗</a></span>
-              </div>
-            ))}
-          </div>
-          <p className="content-note handwritten">Lokale Kopien werden angeboten, damit keine toten Original-Links nötig sind. Rechte und Version vor öffentlicher Weitergabe prüfen.</p>
-        </section>
+
       </main>
       <GuideFooter />
     </div>

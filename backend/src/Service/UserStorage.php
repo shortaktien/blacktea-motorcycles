@@ -167,14 +167,17 @@ final class UserStorage
             $user['role'] = in_array(($user['role'] ?? 'member'), ['member', 'moderator'], true)
                 ? $user['role']
                 : 'member';
-            $user['model'] = isset($user['model']) && is_string($user['model']) && in_array($user['model'], ['Bonfire', 'Wildfire'], true)
+            $user['model'] = isset($user['model']) && is_string($user['model']) && in_array($user['model'], ['Bonfire', 'Bonfire S', 'Bonfire E', 'Bonfire X', 'Wildfire'], true)
                 ? $user['model']
                 : null;
             $user['kilometers'] = max(0, min(999999, (int) ($user['kilometers'] ?? 0)));
+            $rawBio = isset($user['bio']) && is_string($user['bio']) ? trim($user['bio']) : '';
+            $user['bio'] = function_exists('mb_substr') ? mb_substr($rawBio, 0, 280) : substr($rawBio, 0, 280);
             $user['avatarStyle'] = max(0, min(19, (int) ($user['avatarStyle'] ?? 0)));
             $user['avatarFile'] = isset($user['avatarFile']) && is_string($user['avatarFile']) ? $user['avatarFile'] : null;
             $user['avatarMime'] = isset($user['avatarMime']) && is_string($user['avatarMime']) ? $user['avatarMime'] : null;
             $user['notifyReplies'] = ($user['notifyReplies'] ?? true) === true;
+            $user['notifyCommunity'] = ($user['notifyCommunity'] ?? true) === true;
             $user['newsletterSubscribed'] = ($user['newsletterSubscribed'] ?? false) === true;
             $rawWarnings = is_array($user['warnings'] ?? null) ? $user['warnings'] : [];
             $user['warnings'] = array_values(array_filter(

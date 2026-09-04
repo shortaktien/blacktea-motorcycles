@@ -2,7 +2,7 @@ import mapData from './community-map-data.json';
 import subdivisionData from './community-map-subdivisions.json';
 
 export type PostalCountry = 'D' | 'A' | 'CH';
-export type CommunityMapModel = 'Bonfire' | 'Wildfire';
+export type CommunityMapModel = 'Bonfire' | 'Bonfire S' | 'Bonfire E' | 'Bonfire X' | 'Wildfire';
 export type CommunityMapRegion = {
   country: PostalCountry;
   prefix: string;

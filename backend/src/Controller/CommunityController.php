@@ -16,7 +16,11 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class CommunityController
 {
+    use CommunityInteractionTrait;
+    use ReviewEditingTrait;
+
     private const REPAIR_REQUEST_GUIDE = 'hilfe-anfragen';
+    private const COMMUNITY_EXPERIENCE_GUIDE = 'community-erfahrungen';
     private const MAX_IMAGE_BYTES = 1048576;
     private const STAFF_CHAT_RETENTION_SECONDS = 20 * 86400;
     private const STAFF_CHAT_MAX_MESSAGES = 500;
@@ -176,7 +180,8 @@ final class CommunityController
 
         $voteKey = $this->answerVoteKey($user);
         $updated = null;
-        $this->storage->update(static function (array &$data) use ($id, $value, $voteKey, &$updated): void {
+        $voteChanged = false;
+        $this->storage->update(static function (array &$data) use ($id, $value, $voteKey, &$updated, &$voteChanged): void {
             foreach ($data['comments'] as &$comment) {
                 if (($comment['id'] ?? null) !== $id || ($comment['kind'] ?? null) !== 'repair_answer') {
                     continue;
@@ -193,6 +198,7 @@ final class CommunityController
                 ];
 
                 if ($previous !== $value) {
+                    $voteChanged = true;
                     if ($previous !== null) {
                         $counts[$previous] = max(0, $counts[$previous] - 1);
                     }
@@ -218,6 +224,16 @@ final class CommunityController
 
         if (!is_array($updated)) {
             return $this->error('Die Antwort wurde nicht gefunden.', Response::HTTP_NOT_FOUND);
+        }
+
+        $answerUserId = is_string($answer['userId'] ?? null) ? $answer['userId'] : '';
+        $viewerUserId = is_array($user) && is_string($user['id'] ?? null) ? $user['id'] : '';
+        if ($voteChanged && $answerUserId !== '' && $answerUserId !== $viewerUserId) {
+            try {
+                $this->users->notifyReaction($answerUserId, $answer, (string) $value);
+            } catch (\Throwable $exception) {
+                error_log('[reaction-notification] ' . $exception->getMessage());
+            }
         }
 
         return new JsonResponse($updated);
@@ -276,6 +292,7 @@ final class CommunityController
                     continue;
                 }
                 $comment['solutionAnswerId'] = $answerId;
+                $comment['solutionSelectedAt'] = (new \DateTimeImmutable())->format(DATE_ATOM);
                 $updated = $comment;
                 break;
             }
@@ -286,11 +303,279 @@ final class CommunityController
             return $this->error('Die Reparaturanfrage wurde nicht gefunden.', Response::HTTP_NOT_FOUND);
         }
 
+        $answerUserId = is_string($answer['userId'] ?? null) ? $answer['userId'] : '';
+        $requestUserId = is_string($parent['userId'] ?? null) ? $parent['userId'] : '';
+        if ($answerUserId !== '' && $answerUserId !== $requestUserId) {
+            try {
+                $this->users->notifySolution($answerUserId, $answer, $updated);
+            } catch (\Throwable $exception) {
+                error_log('[solution-notification] ' . $exception->getMessage());
+            }
+        }
+
         return new JsonResponse([
             'requestId' => $id,
             'solutionAnswerId' => $answerId,
             'resolved' => true,
         ]);
+    }
+
+    #[Route('/api/community/mention-suggestions', name: 'api_community_mention_suggestions', methods: ['GET'])]
+    public function mentionSuggestions(Request $request): JsonResponse
+    {
+        if ($response = $this->rateLimited($request, 'mention-suggestions', 120, 60)) {
+            return $response;
+        }
+        $query = mb_strtolower(trim($request->query->getString('q')), 'UTF-8');
+        $matches = [];
+        if (preg_match('/^[a-z0-9äöüß]{1,80}$/u', $query) === 1) {
+            foreach ($this->userStorage->read()['users'] as $user) {
+                if (($user['status'] ?? null) !== 'active' || ($user['communicationBlocked'] ?? false)) continue;
+                if (!str_starts_with(mb_strtolower($user['name'], 'UTF-8'), $query)) continue;
+                // Deliberately expose only public handles and profile IDs, never contact/location data.
+                $matches[] = ['id' => $user['id'], 'name' => $user['name']];
+            }
+            usort($matches, static fn (array $a, array $b): int => strnatcasecmp($a['name'], $b['name']));
+        }
+        $response = new JsonResponse(['users' => array_slice($matches, 0, 8)]);
+        $response->headers->set('Cache-Control', 'private, no-store');
+        return $response;
+    }
+
+    #[Route('/api/community/profiles/{id}', name: 'api_community_profile', methods: ['GET'])]
+    public function publicProfile(string $id): JsonResponse
+    {
+        if (preg_match('/^[a-f0-9]{32}$/', $id) !== 1) {
+            return $this->error('Profil nicht gefunden.', Response::HTTP_NOT_FOUND);
+        }
+
+        $user = $this->userStorage->findById($id);
+        if ($user === null || ($user['status'] ?? null) !== 'active') {
+            return $this->error('Profil nicht gefunden.', Response::HTTP_NOT_FOUND);
+        }
+
+        $allComments = $this->storage->read()['comments'] ?? [];
+        $approvedComments = array_values(array_filter($allComments, fn (array $comment): bool => ($comment['userId'] ?? null) === $id && $this->isCommunityVisible($comment, $allComments)));
+        usort($approvedComments, static fn (array $left, array $right): int => strcmp((string) ($right['createdAt'] ?? ''), (string) ($left['createdAt'] ?? '')));
+
+        $answerIds = [];
+        $helpfulVotes = 0;
+        $answerCount = 0;
+        $wikiCount = 0;
+        $experienceCount = 0;
+        foreach ($approvedComments as $comment) {
+            $kind = (string) ($comment['kind'] ?? 'comment');
+            if ($kind === 'repair_answer') {
+                $answerIds[] = (string) ($comment['id'] ?? '');
+                $answerCount++;
+                $votes = is_array($comment['votes'] ?? null) ? $comment['votes'] : [];
+                $helpfulVotes += max(0, (int) ($votes['up'] ?? 0));
+            }
+            if (str_starts_with((string) ($comment['guide'] ?? ''), 'wiki-')) {
+                $wikiCount++;
+            }
+            if (($comment['guide'] ?? null) === self::COMMUNITY_EXPERIENCE_GUIDE && $kind === 'comment') {
+                $experienceCount++;
+            }
+        }
+
+        $solutions = 0;
+        foreach ($allComments as $comment) {
+            if (($comment['kind'] ?? null) === 'repair_request'
+                && ($comment['status'] ?? null) === 'approved'
+                && in_array((string) ($comment['solutionAnswerId'] ?? ''), $answerIds, true)
+            ) {
+                $solutions++;
+            }
+        }
+
+        $contributionCount = count($approvedComments);
+        $profile = $this->users->publicProfile($user);
+        $profile['stats'] = [
+            'contributions' => $contributionCount,
+            'answers' => $answerCount,
+            'helpfulVotes' => $helpfulVotes,
+            'solutions' => $solutions,
+            'experiences' => $experienceCount,
+            'wikiContributions' => $wikiCount,
+        ];
+        $profile['achievements'] = [
+            ['id' => 'first-contribution', 'title' => 'Erste Wortmeldung', 'description' => 'Hat den ersten Beitrag mit der Community geteilt.', 'unlocked' => $contributionCount >= 1],
+            ['id' => 'helpful-mechanic', 'title' => 'Hilfreicher Schrauber', 'description' => 'Antworten wurden mindestens dreimal als hilfreich bewertet.', 'unlocked' => $helpfulVotes >= 3],
+            ['id' => 'solution-finder', 'title' => 'Lösungsfinder', 'description' => 'Mindestens eine Antwort wurde zur besten Lösung gekürt.', 'unlocked' => $solutions >= 1],
+            ['id' => 'wiki-contributor', 'title' => 'Wiki-Beitrag', 'description' => 'Hat Wissen für das Bike-Wiki beigesteuert.', 'unlocked' => $wikiCount >= 1],
+            ['id' => 'community-regular', 'title' => 'Community-Kenner', 'description' => 'Hat mindestens fünf freigegebene Beiträge geteilt.', 'unlocked' => $contributionCount >= 5],
+        ];
+        $profile['contributions'] = array_map(fn (array $comment): array => $this->publicContribution($comment, $allComments), array_slice($approvedComments, 0, 12));
+
+        $response = new JsonResponse(['profile' => $profile]);
+        $response->headers->set('Cache-Control', 'no-store');
+        return $response;
+    }
+
+    #[Route('/api/community/profiles/{id}/avatar', name: 'api_community_profile_avatar', methods: ['GET'])]
+    public function publicProfileAvatar(string $id): Response
+    {
+        if (preg_match('/^[a-f0-9]{32}$/', $id) !== 1) {
+            return $this->error('Bild nicht gefunden.', Response::HTTP_NOT_FOUND);
+        }
+        $user = $this->userStorage->findById($id);
+        if ($user === null || ($user['status'] ?? null) !== 'active') {
+            return $this->error('Bild nicht gefunden.', Response::HTTP_NOT_FOUND);
+        }
+        $filename = $user['avatarFile'] ?? null;
+        $mime = $user['avatarMime'] ?? null;
+        if (!is_string($filename) || !is_string($mime) || !isset(self::ALLOWED_AVATARS[$mime])) {
+            return $this->error('Bild nicht gefunden.', Response::HTTP_NOT_FOUND);
+        }
+        $path = $this->userStorage->uploadsDir() . '/' . basename($filename);
+        if (!is_file($path)) {
+            return $this->error('Bild nicht gefunden.', Response::HTTP_NOT_FOUND);
+        }
+
+        $response = new BinaryFileResponse($path);
+        $response->headers->set('Content-Type', $mime);
+        $response->headers->set('Content-Disposition', 'inline; filename="' . basename($filename) . '"');
+        $response->headers->set('Cache-Control', 'public, max-age=300, stale-while-revalidate=60');
+        return $response;
+    }
+
+    #[Route('/api/community/groups', name: 'api_community_groups', methods: ['GET'])]
+    public function communityGroups(): JsonResponse
+    {
+        $activeUsers = array_values(array_filter($this->userStorage->read()['users'] ?? [], static fn (array $user): bool => ($user['status'] ?? null) === 'active'));
+        $countModel = static function (array $models) use ($activeUsers): int {
+            return count(array_filter($activeUsers, static fn (array $user): bool => in_array($user['model'] ?? null, $models, true)));
+        };
+        $countCountry = static function (string $country) use ($activeUsers): int {
+            return count(array_filter($activeUsers, static fn (array $user): bool => ($user['country'] ?? null) === $country));
+        };
+        $groups = [
+            ['slug' => 'bonfire', 'type' => 'model', 'label' => 'Bonfire · S / E / X', 'description' => 'Alle Bonfire-Fahrer, egal welche Variante.', 'model' => 'Bonfire', 'memberCount' => $countModel(['Bonfire', 'Bonfire S', 'Bonfire E', 'Bonfire X'])],
+            ['slug' => 'bonfire-x', 'type' => 'model', 'label' => 'Bonfire X', 'description' => 'Austausch rund um die X.', 'model' => 'Bonfire X', 'memberCount' => $countModel(['Bonfire X'])],
+            ['slug' => 'bonfire-s', 'type' => 'model', 'label' => 'Bonfire S', 'description' => 'Austausch rund um die S.', 'model' => 'Bonfire S', 'memberCount' => $countModel(['Bonfire S'])],
+            ['slug' => 'bonfire-e', 'type' => 'model', 'label' => 'Bonfire E', 'description' => 'Austausch rund um die E.', 'model' => 'Bonfire E', 'memberCount' => $countModel(['Bonfire E'])],
+            ['slug' => 'wildfire', 'type' => 'model', 'label' => 'Wildfire', 'description' => 'Erfahrungen, Umbauten und Hilfe zur Wildfire.', 'model' => 'Wildfire', 'memberCount' => $countModel(['Wildfire'])],
+            ['slug' => 'deutschland', 'type' => 'country', 'label' => 'Deutschland', 'description' => 'BTM-Rider in Deutschland.', 'country' => 'D', 'memberCount' => $countCountry('D')],
+            ['slug' => 'oesterreich', 'type' => 'country', 'label' => 'Österreich', 'description' => 'BTM-Rider in Österreich.', 'country' => 'A', 'memberCount' => $countCountry('A')],
+            ['slug' => 'schweiz', 'type' => 'country', 'label' => 'Schweiz', 'description' => 'BTM-Rider in der Schweiz.', 'country' => 'CH', 'memberCount' => $countCountry('CH')],
+        ];
+
+        return new JsonResponse(['groups' => $groups, 'memberCount' => count($activeUsers)]);
+    }
+
+    #[Route('/api/community/activity', name: 'api_community_activity', methods: ['GET'])]
+    public function communityActivity(Request $request): JsonResponse
+    {
+        $cursor = null;
+        $rawCursor = $request->query->get('cursor');
+        if ($rawCursor !== null) {
+            if (!is_string($rawCursor) || strlen($rawCursor) > 512) return $this->error('Ungültige Feed-Seite.', Response::HTTP_BAD_REQUEST);
+            $decoded = base64_decode(strtr($rawCursor, '-_', '+/'), true);
+            $cursor = $decoded === false ? null : json_decode($decoded, true);
+            if (!is_array($cursor) || count($cursor) !== 2 || !is_int($cursor[0] ?? null) || $cursor[0] < 0 || !is_string($cursor[1] ?? null) || preg_match('/^[a-f0-9]{32}$/D', $cursor[1]) !== 1) {
+                return $this->error('Ungültige Feed-Seite.', Response::HTTP_BAD_REQUEST);
+            }
+        }
+        $viewer = $this->users->currentUser();
+        $activeUsers = [];
+        foreach ($this->userStorage->read()['users'] ?? [] as $user) {
+            if (($user['status'] ?? null) === 'active' && is_string($user['id'] ?? null)) {
+                $activeUsers[$user['id']] = $user;
+            }
+        }
+        $modelFilter = $request->query->get('model');
+        $countryFilter = $request->query->get('country');
+        $allComments = $this->storage->read()['comments'] ?? [];
+        $byId = array_column($allComments, null, 'id');
+        $candidates = [];
+        $activities = [];
+        foreach ($allComments as $comment) {
+            if (($comment['kind'] ?? null) === 'community_reply' || !$this->isCommunityVisible($comment, $allComments) || !is_string($comment['userId'] ?? null) || !isset($activeUsers[$comment['userId']])) {
+                continue;
+            }
+            $actor = $activeUsers[$comment['userId']];
+            $actorModel = is_string($actor['model'] ?? null) ? $actor['model'] : null;
+            $actorCountry = in_array($actor['country'] ?? null, ['D', 'A', 'CH'], true) ? $actor['country'] : null;
+            if (is_string($countryFilter) && $countryFilter !== '' && $actorCountry !== $countryFilter) {
+                continue;
+            }
+            if (is_string($modelFilter) && $modelFilter !== '') {
+                $matchesModel = $modelFilter === 'Bonfire'
+                    ? is_string($actorModel) && str_starts_with($actorModel, 'Bonfire')
+                    : $actorModel === $modelFilter;
+                if (!$matchesModel) {
+                    continue;
+                }
+            }
+            $parent = $byId[$comment['parentId'] ?? ''] ?? [];
+            $isSolution = ($comment['kind'] ?? null) === 'repair_answer' && ($parent['solutionAnswerId'] ?? null) === ($comment['id'] ?? null);
+            $date = $isSolution ? ($parent['solutionSelectedAt'] ?? $comment['createdAt']) : $comment['createdAt'];
+            $candidates[] = ['comment' => $comment, 'time' => strtotime($date) ?: 0, 'id' => $comment['id']];
+        }
+        usort($candidates, static fn (array $a, array $b): int => ($b['time'] <=> $a['time']) ?: strcmp($b['id'], $a['id']));
+        $totalCount = count($candidates);
+        $remaining = $cursor === null ? $candidates : array_values(array_filter($candidates, static fn (array $item): bool =>
+            $item['time'] < $cursor[0] || ($item['time'] === $cursor[0] && strcmp($item['id'], $cursor[1]) < 0)));
+        $page = array_slice($remaining, 0, 10);
+        $hasMore = count($remaining) > 10;
+        $last = $page === [] ? null : $page[count($page) - 1];
+        $nextCursor = $hasMore && $last !== null ? rtrim(strtr(base64_encode(json_encode([$last['time'], $last['id']])), '+/', '-_'), '=') : null;
+        // A notification can target an older post without downloading all preceding pages.
+        $requestedPost = $request->query->get('post');
+        $focusedId = null;
+        if ($cursor === null && is_string($requestedPost) && !in_array($requestedPost, array_column($page, 'id'), true)) {
+            foreach ($candidates as $candidate) {
+                if ($candidate['id'] === $requestedPost) {
+                    $focusedId = $requestedPost;
+                    $page[] = $candidate;
+                    break;
+                }
+            }
+        }
+        $focusedActivity = null;
+        foreach ($page as $item) {
+            $comment = $item['comment'];
+            $actor = $activeUsers[$comment['userId']];
+            $actorModel = $actor['model'] ?? null;
+            $actorCountry = in_array($actor['country'] ?? null, ['D', 'A', 'CH'], true) ? $actor['country'] : null;
+            $parent = $byId[$comment['parentId'] ?? ''] ?? [];
+            $isSolution = ($comment['kind'] ?? null) === 'repair_answer' && ($parent['solutionAnswerId'] ?? null) === ($comment['id'] ?? null);
+            $kind = (string) ($comment['kind'] ?? 'comment');
+            $type = $isSolution
+                ? 'solution'
+                : ($kind === 'repair_answer'
+                    ? 'repair_answer'
+                    : ($kind === 'wiki_suggestion'
+                        ? 'wiki'
+                        : (($comment['guide'] ?? null) === self::COMMUNITY_EXPERIENCE_GUIDE ? 'experience' : 'community')));
+            $activity = [
+                'id' => (string) ($comment['id'] ?? ''),
+                'type' => $type,
+                'title' => $isSolution ? 'Beste Lösung für „' . (string) ($parent['topic'] ?? 'Reparaturanfrage') . '“' : $this->publicContribution($comment, $allComments)['title'],
+                'body' => (string) ($comment['body'] ?? ''),
+                'editAttribution' => $this->publicEditAttribution($comment),
+                'source' => $comment['source'] ?? null,
+                'mentions' => $this->commentMentions($comment),
+                'href' => $this->publicContribution($comment, $allComments)['href'],
+                'createdAt' => $isSolution ? (string) ($parent['solutionSelectedAt'] ?? $comment['createdAt'] ?? '') : (string) ($comment['createdAt'] ?? ''),
+                'imageUrl' => !empty($comment['imageFile']) ? '/api/comments/' . rawurlencode((string) $comment['id']) . '/image' : null,
+                'model' => $actorModel,
+                'country' => $actorCountry,
+                'isSolution' => $isSolution,
+                'score' => $kind === 'repair_answer' ? max(0, (int) (($comment['votes']['up'] ?? 0))) - max(0, (int) (($comment['votes']['down'] ?? 0))) : null,
+                'actor' => $this->users->publicProfile($actor),
+                'likeCount' => count($comment['communityLikes'] ?? []),
+                'viewerLiked' => $viewer !== null && in_array($viewer['id'], $comment['communityLikes'] ?? [], true),
+                'replyCount' => count(array_filter($allComments, fn (array $reply): bool => ($reply['kind'] ?? null) === 'community_reply' && ($reply['parentId'] ?? null) === $comment['id'] && $this->isCommunityVisible($reply, $allComments))),
+                'viewerReported' => $viewer !== null && in_array($viewer['id'], array_column($comment['communityReports'] ?? [], 'userId'), true),
+            ];
+            if ($activity['id'] === $focusedId) $focusedActivity = $activity;
+            else $activities[] = $activity;
+        }
+        $response = new JsonResponse(['activities' => $activities, 'focusedActivity' => $focusedActivity, 'nextCursor' => $nextCursor, 'hasMore' => $hasMore, 'totalCount' => $totalCount, 'memberCount' => count($activeUsers)]);
+        $response->headers->set('Cache-Control', 'private, no-store');
+        return $response;
     }
 
     #[Route('/api/community/map', name: 'api_community_map', methods: ['GET'])]
@@ -312,7 +597,9 @@ final class CommunityController
 
             $kilometers = filter_var($user['kilometers'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 0, 'max_range' => 999999]]);
             $kilometers = $kilometers === false ? 0 : $kilometers;
-            $model = in_array($user['model'] ?? null, ['Bonfire', 'Wildfire'], true) ? $user['model'] : null;
+            $rawModel = $user['model'] ?? null;
+            $model = is_string($rawModel) && str_starts_with($rawModel, 'Bonfire') ? 'Bonfire' : ($rawModel === 'Wildfire' ? 'Wildfire' : null);
+            $modelVariant = is_string($rawModel) && in_array($rawModel, ['Bonfire S', 'Bonfire E', 'Bonfire X'], true) ? $rawModel : null;
             $prefix = substr($postalCode, 0, 2);
             $key = $country . ':' . $prefix;
             if (!isset($regions[$key])) {
@@ -320,9 +607,9 @@ final class CommunityController
                     'country' => $country,
                     'prefix' => $prefix,
                     'memberCount' => 0,
-                    'modelCounts' => ['Bonfire' => 0, 'Wildfire' => 0],
+                    'modelCounts' => ['Bonfire' => 0, 'Bonfire S' => 0, 'Bonfire E' => 0, 'Bonfire X' => 0, 'Wildfire' => 0],
                     'totalKilometers' => 0,
-                    'kilometersByModel' => ['Bonfire' => 0, 'Wildfire' => 0],
+                    'kilometersByModel' => ['Bonfire' => 0, 'Bonfire S' => 0, 'Bonfire E' => 0, 'Bonfire X' => 0, 'Wildfire' => 0],
                 ];
             }
             $regions[$key]['memberCount']++;
@@ -331,6 +618,10 @@ final class CommunityController
             if ($model !== null) {
                 $regions[$key]['modelCounts'][$model]++;
                 $regions[$key]['kilometersByModel'][$model] += $kilometers;
+            }
+            if ($modelVariant !== null) {
+                $regions[$key]['modelCounts'][$modelVariant]++;
+                $regions[$key]['kilometersByModel'][$modelVariant] += $kilometers;
             }
         }
 
@@ -407,6 +698,10 @@ final class CommunityController
         if (!is_string($guide) || !$this->validGuide($guide)) {
             return $this->error('Ungültiger Beitrag.', Response::HTTP_BAD_REQUEST);
         }
+        $directCommunityPost = $guide === self::COMMUNITY_EXPERIENCE_GUIDE;
+        if (($directCommunityPost || in_array($kind, ['repair_request', 'repair_answer'], true)) && ($response = $this->communityWriteGuard($request))) {
+            return $response;
+        }
         if (!is_string($kind) || !in_array($kind, ['comment', 'wiki_suggestion', 'repair_request', 'repair_answer'], true)) {
             return $this->error('Ungültiger Beitragstyp.', Response::HTTP_BAD_REQUEST);
         }
@@ -425,8 +720,10 @@ final class CommunityController
         if (!is_string($body) || $this->length($body) < 10 || $this->length($body) > 4000) {
             return $this->error('Bitte einen Kommentar mit 10 bis 4.000 Zeichen angeben.', Response::HTTP_BAD_REQUEST);
         }
-        if (in_array($kind, ['wiki_suggestion', 'repair_request'], true) && (!is_string($topic) || $this->length(trim($topic)) < 2 || $this->length(trim($topic)) > 120)) {
+        if (in_array($kind, ['wiki_suggestion', 'repair_request'], true) || ($guide === self::COMMUNITY_EXPERIENCE_GUIDE && $kind === 'comment')) {
+            if (!is_string($topic) || $this->length(trim($topic)) < 2 || $this->length(trim($topic)) > 120) {
             return $this->error('Bitte einen kurzen Titel mit 2 bis 120 Zeichen angeben.', Response::HTTP_BAD_REQUEST);
+            }
         }
         if ($kind === 'repair_request' && $parentId !== null && $parentId !== '') {
             return $this->error('Eine neue Reparaturanfrage darf keine Antwort als übergeordneten Beitrag haben.', Response::HTTP_BAD_REQUEST);
@@ -463,7 +760,7 @@ final class CommunityController
             return $response;
         }
         $confirmation = $authenticatedUser === null ? $this->emailConfirmation->createToken('/api/comments/confirm/') : null;
-        $submissionStatus = $authenticatedUser === null ? 'awaiting_confirmation' : 'pending';
+        $submissionStatus = $directCommunityPost ? 'approved' : ($authenticatedUser === null ? 'awaiting_confirmation' : 'pending');
 
         $image = $request->files->get('image');
         if ($image !== null && !$image instanceof UploadedFile) {
@@ -502,7 +799,7 @@ final class CommunityController
             'name' => trim($name),
             'email' => $normalizedEmail,
             'body' => trim($body),
-            'topic' => in_array($kind, ['wiki_suggestion', 'repair_request'], true) ? trim((string) $topic) : null,
+            'topic' => in_array($kind, ['wiki_suggestion', 'repair_request'], true) || ($guide === self::COMMUNITY_EXPERIENCE_GUIDE && $kind === 'comment') ? trim((string) $topic) : null,
             'section' => is_string($section) && trim($section) !== '' ? trim($section) : null,
             'source' => is_string($source) && trim($source) !== '' ? trim($source) : null,
             'parentId' => $kind === 'repair_answer' ? trim((string) $parentId) : null,
@@ -511,7 +808,7 @@ final class CommunityController
             'imageMime' => $imageMime,
             'status' => $submissionStatus,
             'createdAt' => (new \DateTimeImmutable())->format(DATE_ATOM),
-            'approvedAt' => null,
+            'approvedAt' => $directCommunityPost ? (new \DateTimeImmutable())->format(DATE_ATOM) : null,
             'emailConfirmedAt' => $authenticatedUser !== null ? (new \DateTimeImmutable())->format(DATE_ATOM) : null,
             'subscriberUserIds' => $kind === 'repair_request' && $authenticatedUser !== null ? [(string) $authenticatedUser['id']] : [],
         ];
@@ -519,6 +816,7 @@ final class CommunityController
             $comment['emailConfirmationTokenHash'] = $confirmation['tokenHash'];
             $comment['emailConfirmationExpiresAt'] = $confirmation['expiresAt'];
         }
+        $comment['mentions'] = $this->commentMentions($comment);
 
         try {
             $this->storage->update(static function (array &$data) use ($comment): void {
@@ -546,9 +844,10 @@ final class CommunityController
         } else {
             $this->notifyAdminAboutComment($comment);
         }
+        if ($directCommunityPost) $this->notifyPublishedMentions($comment);
 
         return new JsonResponse([
-            'message' => $authenticatedUser !== null
+            'message' => $directCommunityPost ? 'Dein Beitrag ist jetzt veröffentlicht.' : ($authenticatedUser !== null
                 ? match ($kind) {
                     'wiki_suggestion' => 'Danke! Dein Wiki-Vorschlag ist bei uns zur redaktionellen Prüfung vorgemerkt.',
                     'repair_request' => 'Danke! Deine Reparaturanfrage ist bei uns zur redaktionellen Prüfung vorgemerkt.',
@@ -560,8 +859,8 @@ final class CommunityController
                     'repair_request' => 'Fast geschafft! Bestätige jetzt deine E-Mail-Adresse. Erst danach landet deine Reparaturanfrage bei uns zur redaktionellen Prüfung.',
                     'repair_answer' => 'Fast geschafft! Bestätige jetzt deine E-Mail-Adresse. Erst danach landet deine Antwort bei uns zur redaktionellen Prüfung.',
                     default => 'Fast geschafft! Bestätige jetzt deine E-Mail-Adresse. Erst danach landet dein Kommentar bei uns zur redaktionellen Prüfung.',
-                },
-        ], Response::HTTP_ACCEPTED);
+                }),
+        ], $directCommunityPost ? Response::HTTP_CREATED : Response::HTTP_ACCEPTED);
     }
 
     #[Route('/api/comments/confirm/{token}', name: 'api_comment_confirm', methods: ['GET'])]
@@ -701,17 +1000,22 @@ final class CommunityController
             return $this->error('E-Mail oder Passwort ist nicht korrekt.', Response::HTTP_UNAUTHORIZED);
         }
 
+        if (session_status() === PHP_SESSION_ACTIVE && session_name() !== 'blacktea_admin') session_write_close();
         $this->startAdminSession();
         session_regenerate_id(true);
         $_SESSION['admin_email'] = strtolower(trim($email));
         $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-
+        $_COOKIE['blacktea_admin'] = session_id();
+        $adminEmail = $_SESSION['admin_email'];
+        $adminCsrf = $_SESSION['csrf_token'];
+        $profile = $this->users->connectAdminProfile(true);
         return new JsonResponse([
             'authenticated' => true,
-            'email' => $_SESSION['admin_email'],
+            'email' => $adminEmail,
             'role' => 'admin',
             'canManageMembers' => true,
-            'csrfToken' => $_SESSION['csrf_token'],
+            'csrfToken' => $adminCsrf,
+            'profileId' => $profile['id'] ?? null,
         ]);
     }
 
@@ -858,6 +1162,7 @@ final class CommunityController
             'body' => $body,
             'createdAt' => (new \DateTimeImmutable())->format(DATE_ATOM),
         ];
+        $message['mentions'] = $this->users->resolveMentions($body);
         $cutoff = time() - self::STAFF_CHAT_RETENTION_SECONDS;
         $this->storage->update(static function (array &$data) use ($cutoff, $message): void {
             $messages = array_values(array_filter(
@@ -868,16 +1173,20 @@ final class CommunityController
             $data['staffChat'] = array_slice($messages, -self::STAFF_CHAT_MAX_MESSAGES);
         });
 
+        try {
+            $this->users->notifyMentions($message, '/konto?bereich=chat', true);
+        } catch (\Throwable $exception) { error_log('[mention-notification] ' . $exception->getMessage()); }
         return new JsonResponse(['message' => $this->staffChatMessage($message)], Response::HTTP_CREATED);
     }
 
     #[Route('/api/admin/comments', name: 'api_admin_comments', methods: ['GET'])]
-    public function adminComments(): JsonResponse
+    public function adminComments(Request $request): JsonResponse
     {
-        $adminAuthenticated = $this->isAdminAuthenticated();
-        if (!$adminAuthenticated && $this->moderatorUser() === null) {
+        $reviewer = $this->moderationReviewer($request);
+        if ($reviewer === null) {
             return $this->unauthorized();
         }
+        $adminAuthenticated = $reviewer['role'] === 'admin';
 
         $comments = array_values(array_filter(
             $this->storage->read()['comments'],
@@ -885,7 +1194,7 @@ final class CommunityController
                 || ($adminAuthenticated && ($comment['status'] ?? null) === 'approved'),
         ));
         usort($comments, static fn (array $a, array $b): int => strcmp((string) ($b['createdAt'] ?? ''), (string) ($a['createdAt'] ?? '')));
-        $response = new JsonResponse(['comments' => array_map(fn (array $comment): array => $this->adminComment($comment), $comments)]);
+        $response = new JsonResponse(['comments' => array_map(fn (array $comment): array => $this->adminComment($comment) + ['canModerate' => !$this->isOwnModeratorContent($comment, $reviewer)], $comments)]);
         $response->headers->set('Cache-Control', 'no-store');
         return $response;
     }
@@ -1219,10 +1528,11 @@ final class CommunityController
     #[Route('/api/admin/comments/{id}', name: 'api_admin_comment_update', methods: ['PATCH'])]
     public function updateComment(string $id, Request $request): JsonResponse
     {
-        $adminAuthenticated = $this->isAdminAuthenticated();
-        if (!$adminAuthenticated && $this->moderatorUser() === null) {
+        $reviewer = $this->moderationReviewer($request);
+        if ($reviewer === null) {
             return $this->unauthorized();
         }
+        $adminAuthenticated = $reviewer['role'] === 'admin';
         if (!$this->validModeratorCsrfToken($request)) {
             return $this->error('Ungültige Admin-Sitzung.', Response::HTTP_FORBIDDEN);
         }
@@ -1232,14 +1542,24 @@ final class CommunityController
         if (!in_array($status, ['pending', 'approved'], true)) {
             return $this->error('Ungültiger Veröffentlichungsstatus.', Response::HTTP_BAD_REQUEST);
         }
+        if (array_key_exists('edits', $payload) && $status !== 'approved') {
+            return $this->error('Textänderungen werden nur zusammen mit der Freigabe gespeichert.', Response::HTTP_BAD_REQUEST);
+        }
 
         $updated = null;
         $awaitingConfirmation = false;
         $newlyApproved = false;
         $moderatorScopeViolation = false;
-        $this->storage->update(static function (array &$data) use ($id, $status, $adminAuthenticated, &$updated, &$awaitingConfirmation, &$newlyApproved, &$moderatorScopeViolation): void {
+        $selfReview = false;
+        $editError = null;
+        $contentEdited = false;
+        $this->storage->update(function (array &$data) use ($id, $status, $payload, $adminAuthenticated, $reviewer, &$contentEdited, &$editError, &$selfReview, &$updated, &$awaitingConfirmation, &$newlyApproved, &$moderatorScopeViolation): void {
             foreach ($data['comments'] as &$comment) {
                 if (($comment['id'] ?? null) === $id) {
+                    if ($this->isOwnModeratorContent($comment, $reviewer)) {
+                        $selfReview = true;
+                        break;
+                    }
                     if (!$adminAuthenticated && ($comment['status'] ?? null) !== 'pending') {
                         $moderatorScopeViolation = true;
                         break;
@@ -1249,6 +1569,10 @@ final class CommunityController
                         break;
                     }
                     $wasApproved = ($comment['status'] ?? null) === 'approved';
+                    $previousVersion = $this->reviewVersion($comment);
+                    $editError = $this->applyReviewEdits($comment, $payload, $reviewer);
+                    if ($editError !== null) break;
+                    $contentEdited = $previousVersion !== $this->reviewVersion($comment);
                     $comment['status'] = $status;
                     $comment['approvedAt'] = $status === 'approved' ? (new \DateTimeImmutable())->format(DATE_ATOM) : null;
                     if ($status !== 'approved' && ($comment['kind'] ?? null) === 'repair_answer' && is_string($comment['parentId'] ?? null)) {
@@ -1268,6 +1592,10 @@ final class CommunityController
             unset($comment);
         });
 
+        if ($editError !== null) return $editError;
+        if ($selfReview) {
+            return $this->error('Eigene Beiträge müssen von einem anderen Moderator oder Admin geprüft werden.', Response::HTTP_FORBIDDEN);
+        }
         if ($moderatorScopeViolation) {
             return $this->error('Moderatoren können nur offene Beiträge bearbeiten.', Response::HTTP_FORBIDDEN);
         }
@@ -1279,6 +1607,8 @@ final class CommunityController
         if (!is_array($updated)) {
             return $this->error('Kommentar nicht gefunden.', Response::HTTP_NOT_FOUND);
         }
+
+        if ($newlyApproved || $contentEdited) $this->notifyPublishedMentions($updated);
 
         if ($newlyApproved && ($updated['kind'] ?? null) === 'repair_answer' && is_string($updated['parentId'] ?? null)) {
             $parent = $this->findComment($updated['parentId']);
@@ -1305,26 +1635,54 @@ final class CommunityController
             }
         }
 
-        return new JsonResponse(['comment' => $this->adminComment($updated)]);
+        if ($newlyApproved && ($updated['guide'] ?? null) === self::COMMUNITY_EXPERIENCE_GUIDE && ($updated['kind'] ?? null) === 'comment') {
+            $authorId = is_string($updated['userId'] ?? null) ? $updated['userId'] : '';
+            $postedModel = is_string($updated['section'] ?? null) ? $updated['section'] : '';
+            $recipientIds = [];
+            foreach ($this->userStorage->read()['users'] ?? [] as $candidate) {
+                $candidateId = is_string($candidate['id'] ?? null) ? $candidate['id'] : '';
+                if ($candidateId === '' || $candidateId === $authorId || ($candidate['status'] ?? null) !== 'active' || ($candidate['notifyCommunity'] ?? true) !== true) {
+                    continue;
+                }
+                $candidateModel = is_string($candidate['model'] ?? null) ? $candidate['model'] : '';
+                if ($postedModel !== '' && $candidateModel !== '' && !$this->sameModelGroup($postedModel, $candidateModel)) {
+                    continue;
+                }
+                $recipientIds[] = $candidateId;
+            }
+            try {
+                $this->users->notifyCommunityPost($recipientIds, $updated);
+            } catch (\Throwable $exception) {
+                error_log('[community-notification] ' . $exception->getMessage());
+            }
+        }
+
+        return new JsonResponse(['comment' => $this->adminComment($updated) + ['canModerate' => !$this->isOwnModeratorContent($updated, $reviewer)]]);
     }
 
     #[Route('/api/admin/comments/{id}', name: 'api_admin_comment_delete', methods: ['DELETE'])]
     public function deleteComment(string $id, Request $request): JsonResponse
     {
-        $adminAuthenticated = $this->isAdminAuthenticated();
-        if (!$adminAuthenticated && $this->moderatorUser() === null) {
+        $reviewer = $this->moderationReviewer($request);
+        if ($reviewer === null) {
             return $this->unauthorized();
         }
+        $adminAuthenticated = $reviewer['role'] === 'admin';
         if (!$this->validModeratorCsrfToken($request)) {
             return $this->error('Ungültige Admin-Sitzung.', Response::HTTP_FORBIDDEN);
         }
 
         $deleted = null;
         $moderatorScopeViolation = false;
-        $this->storage->update(static function (array &$data) use ($id, $adminAuthenticated, &$deleted, &$moderatorScopeViolation): void {
+        $selfReview = false;
+        $this->storage->update(function (array &$data) use ($id, $adminAuthenticated, $reviewer, &$selfReview, &$deleted, &$moderatorScopeViolation): void {
             $remaining = [];
             foreach ($data['comments'] as $comment) {
                 if (($comment['id'] ?? null) === $id) {
+                    if ($this->isOwnModeratorContent($comment, $reviewer)) {
+                        $selfReview = true;
+                        return;
+                    }
                     if (!$adminAuthenticated && ($comment['status'] ?? null) !== 'pending') {
                         $moderatorScopeViolation = true;
                         $remaining[] = $comment;
@@ -1335,6 +1693,7 @@ final class CommunityController
                 }
                 $remaining[] = $comment;
             }
+            if ($deleted === null) return;
             $data['comments'] = $remaining;
             foreach ($data['comments'] as &$comment) {
                 if (($comment['kind'] ?? null) === 'repair_request' && ($comment['solutionAnswerId'] ?? null) === $id) {
@@ -1344,6 +1703,9 @@ final class CommunityController
             unset($comment);
         });
 
+        if ($selfReview) {
+            return $this->error('Eigene Beiträge müssen von einem anderen Moderator oder Admin geprüft werden.', Response::HTTP_FORBIDDEN);
+        }
         if ($moderatorScopeViolation) {
             return $this->error('Moderatoren können nur offene Beiträge löschen.', Response::HTTP_FORBIDDEN);
         }
@@ -1364,6 +1726,7 @@ final class CommunityController
                 return $this->error('Ungültige Admin-Sitzung.', Response::HTTP_FORBIDDEN);
             }
 
+            $this->users->disconnectAdminProfile();
             $_SESSION = [];
             session_destroy();
             $this->clearAdminSessionCookie();
@@ -1383,7 +1746,7 @@ final class CommunityController
 
     private function validGuide(string $guide): bool
     {
-        return preg_match('/^(hilfe|ersatzteil|wiki)-[a-z0-9-]{1,90}$/', $guide) === 1;
+        return $guide === self::COMMUNITY_EXPERIENCE_GUIDE || preg_match('/^(hilfe|ersatzteil|wiki)-[a-z0-9-]{1,90}$/', $guide) === 1;
     }
 
     /** @return list<string> */
@@ -1393,12 +1756,87 @@ final class CommunityController
             return ['repair_request', 'repair_answer'];
         }
 
+        if ($guide === self::COMMUNITY_EXPERIENCE_GUIDE) {
+            return ['comment'];
+        }
+
         return [$this->isWikiGuide($guide) ? 'wiki_suggestion' : 'comment'];
     }
 
     private function isWikiGuide(string $guide): bool
     {
         return str_starts_with($guide, 'wiki-');
+    }
+
+    private function sameModelGroup(string $left, string $right): bool
+    {
+        if ($left === 'Bonfire' && str_starts_with($right, 'Bonfire')) {
+            return true;
+        }
+        if ($right === 'Bonfire' && str_starts_with($left, 'Bonfire')) {
+            return true;
+        }
+
+        return $left === $right;
+    }
+
+    /** @param list<array<string, mixed>> $allComments */
+    private function publicContribution(array $comment, array $allComments): array
+    {
+        $kind = (string) ($comment['kind'] ?? 'comment');
+        $parent = [];
+        if (is_string($comment['parentId'] ?? null)) {
+            foreach ($allComments as $candidate) {
+                if (($candidate['id'] ?? null) === $comment['parentId']) {
+                    $parent = $candidate;
+                    break;
+                }
+            }
+        }
+        if (is_string($comment['topic'] ?? null) && trim($comment['topic']) !== '') {
+            $title = trim($comment['topic']);
+        } elseif ($kind === 'repair_answer') {
+            $title = 'Antwort auf „' . (string) ($parent['topic'] ?? 'Reparaturanfrage') . '“';
+        } elseif ($kind === 'community_reply') {
+            $title = 'Kommentar zu „' . (string) ($parent['topic'] ?? 'Community-Beitrag') . '“';
+        } elseif ($kind === 'wiki_suggestion') {
+            $title = 'Wiki-Beitrag';
+        } else {
+            $title = 'Community-Beitrag';
+        }
+        if ($kind === 'repair_answer' && is_string($comment['parentId'] ?? null)) {
+            $href = '/hilfe/anfragen/' . $comment['parentId'];
+        } elseif ($kind === 'repair_request') {
+            $href = '/hilfe/anfragen/' . (string) ($comment['id'] ?? '');
+        } elseif ($kind === 'community_reply') {
+            $href = '/community#beitrag-' . (string) $comment['parentId'];
+        } else {
+            $href = '/community';
+        }
+
+        return [
+            'id' => (string) ($comment['id'] ?? ''),
+            'kind' => $kind,
+            'title' => $title,
+            'body' => $this->excerpt((string) ($comment['body'] ?? ''), 220),
+            'editAttribution' => $this->publicEditAttribution($comment),
+            'mentions' => $this->commentMentions($comment),
+            'href' => $href,
+            'createdAt' => (string) ($comment['createdAt'] ?? ''),
+            'isSolution' => $kind === 'repair_answer' && ($parent['solutionAnswerId'] ?? null) === ($comment['id'] ?? null),
+        ];
+    }
+
+    private function excerpt(string $value, int $limit): string
+    {
+        $value = trim(preg_replace('/\s+/u', ' ', $value) ?? $value);
+        if (function_exists('mb_strlen') && mb_strlen($value, 'UTF-8') > $limit) {
+            return rtrim(mb_substr($value, 0, $limit - 1, 'UTF-8')) . '…';
+        }
+        if (!function_exists('mb_strlen') && strlen($value) > $limit) {
+            return rtrim(substr($value, 0, $limit - 1)) . '…';
+        }
+        return $value;
     }
 
     private function jsonPayload(Request $request): array
@@ -1426,11 +1864,34 @@ final class CommunityController
         return hash('sha256', $identity);
     }
 
+    private function commentMentions(array $comment): array
+    {
+        return $this->users->resolveMentions(implode("\n", [$comment['topic'] ?? '', $comment['body'] ?? '', $comment['section'] ?? '', $comment['source'] ?? '']), $comment['mentions'] ?? null);
+    }
+
+    private function notifyPublishedMentions(array $comment): void
+    {
+        $guide = $comment['guide'];
+        $kind = $comment['kind'] ?? 'comment';
+        if ($kind === 'repair_answer' || $kind === 'repair_request') {
+            $href = '/hilfe/anfragen/' . ($kind === 'repair_answer' ? $comment['parentId'] : $comment['id']) . '#beitrag-' . $comment['id'];
+        } elseif (str_starts_with($guide, 'wiki-')) {
+            $href = '/bikes/' . substr($guide, 5) . '#beitrag-' . $comment['id'];
+        } elseif (str_starts_with($guide, 'hilfe-') || str_starts_with($guide, 'ersatzteil-')) {
+            $href = (str_starts_with($guide, 'hilfe-') ? '/hilfe/' . substr($guide, 6) : '/ersatzteile/' . substr($guide, 10)) . '#beitrag-' . $comment['id'];
+        } else {
+            $href = '/community#beitrag-' . ($kind === 'community_reply' ? $comment['parentId'] : $comment['id']);
+        }
+        try { $this->users->notifyMentions($comment, $href); }
+        catch (\Throwable $exception) { error_log('[mention-notification] ' . $exception->getMessage()); }
+    }
+
     private function publicComment(array $comment, ?string $viewerUserId = null, ?string $viewerVoteKey = null): array
     {
         $avatarStyle = null;
         $avatarUrl = null;
         $userId = $comment['userId'] ?? null;
+        $user = null;
         if (is_string($userId) && $userId !== '') {
             $user = $this->userStorage->findById($userId);
             if ($user !== null && ($user['status'] ?? null) === 'active') {
@@ -1446,6 +1907,8 @@ final class CommunityController
             'kind' => (string) ($comment['kind'] ?? 'comment'),
             'name' => (string) $comment['name'],
             'body' => (string) $comment['body'],
+            'editAttribution' => $this->publicEditAttribution($comment),
+            'mentions' => $this->commentMentions($comment),
             'topic' => isset($comment['topic']) && is_string($comment['topic']) ? $comment['topic'] : null,
             'section' => isset($comment['section']) && is_string($comment['section']) ? $comment['section'] : null,
             'source' => isset($comment['source']) && is_string($comment['source']) ? $comment['source'] : null,
@@ -1454,6 +1917,7 @@ final class CommunityController
             'imageUrl' => !empty($comment['imageFile']) ? '/api/comments/' . rawurlencode((string) $comment['id']) . '/image' : null,
             'avatarStyle' => $avatarStyle,
             'avatarUrl' => $avatarUrl,
+            'profileId' => is_string($userId) && $userId !== '' && $user !== null && ($user['status'] ?? null) === 'active' ? $userId : null,
         ];
 
         if (($comment['kind'] ?? null) === 'repair_answer') {
@@ -1484,6 +1948,7 @@ final class CommunityController
             'email' => (string) $comment['email'],
             'status' => (string) $comment['status'],
             'approvedAt' => $comment['approvedAt'] ?? null,
+            'reviewVersion' => $this->reviewVersion($comment),
         ];
     }
 
@@ -1715,6 +2180,10 @@ final class CommunityController
         }
 
         session_save_path($this->storage->sessionsDir());
+        if (session_name() !== 'blacktea_admin') {
+            $cookie = $_COOKIE['blacktea_admin'] ?? null;
+            session_id(is_string($cookie) && preg_match('/^[a-zA-Z0-9,-]{1,256}$/D', $cookie) === 1 ? $cookie : '');
+        }
         session_name('blacktea_admin');
         $secure = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
         session_set_cookie_params([
@@ -1788,9 +2257,10 @@ final class CommunityController
     {
         $context = $request ? $this->requestedStaffContext($request) : null;
         if ($context !== 'moderator' && $this->isAdminAuthenticated()) {
+            $profile = $this->userStorage->findByEmail((string) ($_SESSION['admin_email'] ?? ''));
             return [
-                'id' => (string) ($_SESSION['admin_email'] ?? 'admin'),
-                'name' => 'Admin',
+                'id' => (string) ($profile['id'] ?? $_SESSION['admin_email'] ?? 'admin'),
+                'name' => (string) ($profile['name'] ?? 'Admin'),
                 'role' => 'admin',
             ];
         }
@@ -1815,6 +2285,7 @@ final class CommunityController
             'authorName' => (string) $message['authorName'],
             'authorRole' => (string) $message['authorRole'],
             'body' => (string) $message['body'],
+            'mentions' => $this->users->resolveMentions($message['body'], $message['mentions'] ?? null),
             'createdAt' => (string) $message['createdAt'],
         ];
     }

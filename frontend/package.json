@@ -10,6 +10,8 @@
   "scripts": {
     "seo:generate": "node scripts/generate-seo.mjs",
     "check:seo": "node scripts/check-seo-links.mjs",
+    "check:mentions": "node --experimental-strip-types scripts/check-mentions.mjs",
+    "check:images": "node scripts/check-image-loading.mjs",
     "check:webmcp": "node --experimental-strip-types scripts/check-webmcp.mjs",
     "prebuild": "npm run seo:generate",
     "dev": "vite",

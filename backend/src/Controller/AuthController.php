@@ -86,12 +86,14 @@ final class AuthController
             'emailConfirmationExpiresAt' => $confirmation['expiresAt'],
             'model' => null,
             'kilometers' => 0,
+            'bio' => '',
             'country' => 'D',
             'postalCode' => '',
             'avatarStyle' => 0,
             'avatarFile' => null,
             'avatarMime' => null,
             'notifyReplies' => true,
+            'notifyCommunity' => true,
             'newsletterSubscribed' => false,
             'notifications' => [],
         ];
@@ -340,7 +342,7 @@ final class AuthController
     #[Route('/api/auth/session', name: 'api_auth_session', methods: ['GET'])]
     public function session(): JsonResponse
     {
-        $user = $this->auth->currentUser();
+        $user = $this->auth->connectAdminProfile();
         $response = new JsonResponse([
             'authenticated' => $user !== null,
             'user' => $user !== null ? $this->auth->publicUser($user) : null,
@@ -379,9 +381,11 @@ final class AuthController
         $name = $payload['name'] ?? $user['name'];
         $model = $payload['model'] ?? $user['model'];
         $kilometers = $payload['kilometers'] ?? $user['kilometers'];
+        $bio = $payload['bio'] ?? ($user['bio'] ?? '');
         $country = $payload['country'] ?? ($user['country'] ?? 'D');
         $postalCode = $payload['postalCode'] ?? ($user['postalCode'] ?? '');
         $notifyReplies = $payload['notifyReplies'] ?? $user['notifyReplies'];
+        $notifyCommunity = $payload['notifyCommunity'] ?? ($user['notifyCommunity'] ?? true);
         $newsletterSubscribed = $payload['newsletterSubscribed'] ?? ($user['newsletterSubscribed'] ?? false);
         if (!is_string($name) || $this->length(trim($name)) < 2 || $this->length(trim($name)) > 80) {
             return $this->error('Bitte einen Namen mit 2 bis 80 Zeichen angeben.', Response::HTTP_BAD_REQUEST);
@@ -389,11 +393,14 @@ final class AuthController
         if (preg_match(self::DISPLAY_NAME_PATTERN, trim($name)) !== 1) {
             return $this->error('Der Anzeigename darf nur Kleinbuchstaben und Zahlen enthalten – ohne Leerzeichen, Sonderzeichen oder Emojis.', Response::HTTP_BAD_REQUEST);
         }
-        if ($model !== null && (!is_string($model) || !in_array($model, ['Bonfire', 'Wildfire'], true))) {
+        if ($model !== null && (!is_string($model) || !in_array($model, ['Bonfire', 'Bonfire S', 'Bonfire E', 'Bonfire X', 'Wildfire'], true))) {
             return $this->error('Bitte ein gültiges Modell auswählen.', Response::HTTP_BAD_REQUEST);
         }
         if (filter_var($kilometers, FILTER_VALIDATE_INT) === false || (int) $kilometers < 0 || (int) $kilometers > 999999) {
             return $this->error('Bitte einen Kilometerstand zwischen 0 und 999.999 angeben.', Response::HTTP_BAD_REQUEST);
+        }
+        if (!is_string($bio) || $this->length(trim($bio)) > 280) {
+            return $this->error('Die Kurzvorstellung darf höchstens 280 Zeichen lang sein.', Response::HTTP_BAD_REQUEST);
         }
         if (!is_string($country) || !in_array($country, ['D', 'A', 'CH'], true)) {
             return $this->error('Bitte ein gültiges Land auswählen.', Response::HTTP_BAD_REQUEST);
@@ -411,6 +418,9 @@ final class AuthController
         if (!is_bool($notifyReplies)) {
             return $this->error('Die Profileinstellungen sind nicht gültig.', Response::HTTP_BAD_REQUEST);
         }
+        if (!is_bool($notifyCommunity)) {
+            return $this->error('Die Community-Benachrichtigung ist nicht gültig.', Response::HTTP_BAD_REQUEST);
+        }
         if (!is_bool($newsletterSubscribed)) {
             return $this->error('Die Newsletter-Einstellung ist nicht gültig.', Response::HTTP_BAD_REQUEST);
         }
@@ -420,7 +430,11 @@ final class AuthController
 
         $updated = null;
         $duplicateName = false;
-        $this->users->update(static function (array &$data) use ($user, $name, $model, $kilometers, $country, $postalCode, $notifyReplies, $newsletterSubscribed, &$updated, &$duplicateName): void {
+        $previousMentions = $this->auth->resolveMentions($user['bio'] ?? '', $user['bioMentions'] ?? null);
+        $bioMentions = $this->auth->resolveMentions(trim($bio), [...$this->auth->resolveMentions(trim($bio)), ...$previousMentions]);
+        // Keep existing links stable when only unrelated profile settings change.
+        if (trim($bio) === ($user['bio'] ?? '')) $bioMentions = $previousMentions;
+        $this->users->update(static function (array &$data) use ($user, $name, $model, $kilometers, $bio, $bioMentions, $country, $postalCode, $notifyReplies, $notifyCommunity, $newsletterSubscribed, &$updated, &$duplicateName): void {
             foreach ($data['users'] as $candidate) {
                 if (($candidate['id'] ?? null) !== $user['id'] && self::normaliseName((string) ($candidate['name'] ?? '')) === self::normaliseName($name)) {
                     $duplicateName = true;
@@ -434,9 +448,12 @@ final class AuthController
                 $candidate['name'] = trim($name);
                 $candidate['model'] = $model;
                 $candidate['kilometers'] = (int) $kilometers;
+                $candidate['bio'] = trim($bio);
+                $candidate['bioMentions'] = $bioMentions;
                 $candidate['country'] = $country;
                 $candidate['postalCode'] = $postalCode;
                 $candidate['notifyReplies'] = $notifyReplies;
+                $candidate['notifyCommunity'] = $notifyCommunity;
                 $candidate['newsletterSubscribed'] = $newsletterSubscribed;
                 $updated = $candidate;
                 break;
@@ -446,6 +463,11 @@ final class AuthController
 
         if ($duplicateName) {
             return $this->error('Dieser Anzeigename ist bereits vergeben. Bitte wähle einen anderen.', Response::HTTP_CONFLICT);
+        }
+
+        if (is_array($updated)) {
+            try { $this->auth->notifyProfileMentions($updated, $previousMentions); }
+            catch (\Throwable $exception) { error_log('[mention-notification] ' . $exception->getMessage()); }
         }
 
         return is_array($updated)
