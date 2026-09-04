@@ -3565,7 +3565,7 @@ function HomePage() {
               { href: '/hilfe/anfragen', label: 'Fragen & Lösungen', title: 'Zusammen weiterkommen.', text: 'Beschreibe dein Problem mit bis zu drei Bildern, tausche Lösungsansätze aus und markiere die Antwort, die dir geholfen hat. Neue Antworten kannst du abonnieren.', action: 'Zu den Reparaturanfragen' },
               { href: '/wiki', label: 'Bonfire & Wildfire', title: 'Wissen, das weiterhilft.', text: 'Lerne dein Modell kennen: Im Wiki findest du Technik, Bedienung und Reparaturwissen. Mit eigenen Ergänzungen hilfst du auch den nächsten Ridern.', action: 'Im Wiki stöbern' },
               { href: '/ersatzteile', label: 'Teile & Bezugslinks', title: 'Das passende Teil finden.', text: 'Durchsuche den Ersatzteilkatalog mit Modellhinweisen und bereits gefundenen Bezugslinks. Teile deine Erfahrungen mit Passform und Einbau.', action: 'Ersatzteile entdecken' },
-              { href: '/suche', label: 'Eine Suche für alles', title: 'Weniger suchen. Mehr finden.', text: 'Suche zentral nach Themen aus Wiki, PDF-Unterlagen, FAQ und Reparaturfällen — vom Schaltplan bis zum passenden Lösungsansatz.', action: 'Wissen durchsuchen' },
+              { href: '/werkstaetten', label: 'Werkstätten', title: 'Hilfe vor Ort finden.', text: 'Entdecke Werkstätten, die die Community für Bonfire und Wildfire empfiehlt, und schlage selbst einen Betrieb aus deiner Region vor.', action: 'Werkstätten entdecken' },
             ].map((feature) => (
               <a className="home-feature-card card-doodle" href={feature.href} key={feature.href}>
                 <span className="eyebrow handwritten">{feature.label}</span>
