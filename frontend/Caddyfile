@@ -38,6 +38,15 @@
         file_server
     }
 
+    # Public profiles are loaded by React from the API. Serve a dedicated HTML
+    # shell, independent of login state, only for valid profile URL shapes.
+    @profileDetail path_regexp profile_detail ^/profil/[a-f0-9]{32}/?$
+    handle @profileDetail {
+        header X-Robots-Tag "noindex, follow, noarchive"
+        rewrite * /profil/index.html
+        file_server
+    }
+
     # Keep the API on the same origin while the frontend remains a static site.
     handle /api/* {
         reverse_proxy backend:8000

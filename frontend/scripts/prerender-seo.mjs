@@ -75,6 +75,9 @@ if (guides.length === 0 || !readFileSync(indexPath, 'utf8')) {
 }
 
 const staticPages = [
+  // No profile ID or member data belongs in the static build. An empty root
+  // makes main.tsx mount the actual URL instead of hydrating another page.
+  { path: '/profil', title: 'Fahrerprofil — Black Tea Motorbikes – Hilfe', description: 'Öffentliches Fahrerprofil der BTM-Community.', robots: 'noindex,follow,noarchive', clientOnly: true },
   { path: '/', title: 'Black Tea Motorbikes – Hilfe — Dokumente, Ersatzteile & Updates', description: 'Unabhängige Sammelstelle für Black Tea Motorbikes: lokale PDFs, Ersatzteile, Reparaturhilfen und nachvollziehbare Quellen.' },
   { path: '/hilfe', title: 'Reparaturhilfe — Black Tea Motorbikes – Hilfe', description: 'Redaktionell geordnete Reparaturhilfen für typische Bonfire- und Wildfire-Fehlerbilder — mit Kurzablauf, ausführlicher Prüfung, Sicherheit und Quelle.' },
   { path: '/hilfe/anfragen', title: 'Reparatur anfragen — Black Tea Motorbikes – Hilfe', description: 'Reparaturanfragen zu Black Tea Bonfire und Wildfire stellen, Erfahrungen teilen und gemeinsam nachvollziehbare Lösungen dokumentieren.' },
@@ -202,7 +205,7 @@ const replaceTag = (html, pattern, replacement) => html.replace(pattern, replace
 
 for (const page of pages) {
   let html = source;
-  const renderedBody = render(page.path);
+  const renderedBody = page.clientOnly ? '' : render(page.path);
   const robots = page.robots || 'index,follow,max-image-preview:large';
   const canonical = absoluteUrl(page.path);
   html = replaceTag(html, /<title>[\s\S]*?<\/title>/, `<title>${escapeAttribute(page.title)}</title>`);
@@ -215,6 +218,10 @@ for (const page of pages) {
   html = replaceTag(html, /<meta name="twitter:title"[^>]*>/, `<meta name="twitter:title" content="${escapeAttribute(page.title)}" />`);
   html = replaceTag(html, /<meta name="twitter:description"[^>]*>/, `<meta name="twitter:description" content="${escapeAttribute(page.description)}" />`);
   html = replaceTag(html, /<link rel="canonical"[^>]*>/, `<link rel="canonical" href="${canonical}" />`);
+  if (page.clientOnly) {
+    // The client sets the URL-specific metadata once the actual route is known.
+    html = html.replace(/<link rel="canonical"[^>]*>/, '').replace(/<meta property="og:url"[^>]*>/, '');
+  }
 
   const schema = schemaFor(page);
   const schemaTag = schema ? `<script id="site-jsonld" type="application/ld+json">${JSON.stringify(schema, null, 2).replace(/</g, '\\u003c')}</script>` : '';

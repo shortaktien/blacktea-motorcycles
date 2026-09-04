@@ -64,6 +64,9 @@ jobs:
       - name: Test WebMCP tool contract
         run: npm run check:webmcp
 
+      - name: Test profile routes with production Caddy
+        run: npm run check:production-routing
+
       - name: Test backend image without embedded runtime data
         working-directory: .
         run: |
