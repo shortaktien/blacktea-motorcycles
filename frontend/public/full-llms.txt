@@ -189,7 +189,7 @@
 - [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/bremsscheibe)
 - Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.
 
-### Bremszylinder
+### Bremssattel
 
 - [Ersatzteilseite öffnen](https://btm.shortaktien.de/ersatzteile/bremszylinder)
 - Lokal gesicherte historische BTM-Shop-Daten und Bezugsstatus: Amazon oder Fachhandel werden nur bei belegter Teilenummer und Passform verlinkt.

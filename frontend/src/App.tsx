@@ -182,6 +182,7 @@ type PartsFilter = 'Alle' | PartCategory;
 
 type PartResearchEntry = {
   id?: string;
+  checked_at?: string;
   part_name?: string;
   category?: string;
   model_family?: string[];
@@ -223,6 +224,7 @@ type ArchivedPartDetail = {
 
 type HistoricalShopPart = {
   id: string;
+  checkedAt: string;
   path: string;
   title: string;
   category: PartCategory;
@@ -416,6 +418,7 @@ const sourceLinks = [
 ];
 
 const partTitleOverrides: Record<string, string> = {
+  bremszylinder: 'Bremssattel',
   'alu-topcase': 'Alu-Topcase',
   'bar-end-mirrors': 'Lenkerendenspiegel',
   bearings: 'Lager',
@@ -518,6 +521,9 @@ const partWordOverrides: Record<string, string> = {
 };
 
 const historicalPartDetails: Record<string, { model: string; price?: number; variants?: string[] }> = {
+  'dcdc-converter': { model: 'Bonfire / Wildfire, unterschiedliche Spannungen' },
+  'hub-motor': { model: 'Bonfire / Wildfire, unterschiedliche Ausführungen' },
+  'speiche-mit-nippel': { model: 'Bonfire / Wildfire, nach Rad und Maß' },
   bremszylinder: { model: 'Bonfire', price: 59, variants: ['Rear Brake', 'Front Brake (220 mm)', 'CBS Front Brake (265 mm)'] },
   'copy-of-beifahrerfussrasten': { model: 'Bonfire', price: 15, variants: ['Paar', 'Links', 'Rechts'] },
   tank: { model: 'Bonfire', price: 99, variants: ['Black Matt', 'Silver', 'Orange', 'Grau', 'Olive', 'Blau', 'Halter mit/ohne'] },
@@ -547,6 +553,8 @@ const inferPartCategory = (slug: string): PartCategory => {
 const partResearchEntries = ((partsCatalog as unknown as { entries?: PartResearchEntry[] }).entries ?? []);
 const archivedPartDetails = ((partDetailsCatalog as unknown as { entries?: ArchivedPartDetail[] }).entries ?? []);
 const researchEntryBySlug: Record<string, PartResearchEntry | undefined> = {
+  'hub-motor': partResearchEntries.find((entry) => entry.id === 'wildfire-qsmotor-controller-lead'),
+  'speiche-mit-nippel': partResearchEntries.find((entry) => entry.id === 'wildfire-spokes-suppliers'),
   bremsbelage: partResearchEntries.find((entry) => entry.id === 'bonfire-mcb833-amazon-candidate'),
   bremszylinder: partResearchEntries.find((entry) => entry.id === 'btm-bremszylinder'),
   'copy-of-beifahrerfussrasten': partResearchEntries.find((entry) => entry.id === 'btm-beifahrerfussrasten'),
@@ -570,18 +578,8 @@ const partTechnicalEvidence: Record<string, { text: string; href: string; label:
     href: '/pdfs/15-bonfire-handbuch-lokal.pdf',
     label: 'Bonfire-Handbuch öffnen',
   },
-  bremsbelage: {
-    text: 'Das lokale Bonfire-Handbuch nennt Bremsbeläge als Wartungsteil und unterscheidet die Fahrzeug-/Bremsscheibenvarianten. MCB833 wird zusätzlich als Community-Spur genannt; Belagform, Dicke, Halterung und Fahrzeugvariante müssen am Fahrzeug bestätigt werden.',
-    href: '/pdfs/15-bonfire-handbuch-lokal.pdf',
-    label: 'Bonfire-Handbuch öffnen',
-  },
   bearings: {
     text: 'Der lokale Bonfire-Eintrag bezeichnet das Teil nur als Lenkkopflager. Im Handbuch und im Archiv fehlen Lagermaße, Norm, Teilenummer und Dichtungsangaben. Deshalb wird kein allgemeines Amazon-Lager als passend ausgegeben.',
-    href: '/pdfs/15-bonfire-handbuch-lokal.pdf',
-    label: 'Bonfire-Handbuch öffnen',
-  },
-  bremsscheibe: {
-    text: 'Das lokale Handbuch nennt je nach Fahrzeugstand unterschiedliche Scheibengrößen. Ohne Lochkreis, Offset, Stärke und Befestigung darf daraus kein beliebiger Marktplatzartikel abgeleitet werden.',
     href: '/pdfs/15-bonfire-handbuch-lokal.pdf',
     label: 'Bonfire-Handbuch öffnen',
   },
@@ -595,16 +593,6 @@ const partTechnicalEvidence: Record<string, { text: string; href: string; label:
     href: '/quellen#ersatzteil-archiv',
     label: 'Lokales Ersatzteil-Archiv öffnen',
     eyebrow: 'Abgleich mit lokalem Archiv',
-  },
-  'speiche-mit-nippel': {
-    text: 'Die lokale Community-PDF weist darauf hin, dass Speichen nach Länge, Biegung und Durchmesser bestellt werden müssen. Ein allgemeiner Speichenlink wäre deshalb keine bestätigte Passform.',
-    href: '/pdfs/12-wildfire-handbuch-1-4-community.pdf',
-    label: 'Community-PDF öffnen',
-  },
-  'dcdc-converter': {
-    text: 'Die lokale Datenblatt-Sammlung identifiziert den historischen IPS-DTD110S1210. Ein Mean-Well-Ersatz ist ausdrücklich keine Drop-in-Lösung; ein bestätigter Austausch ist nicht hinterlegt.',
-    href: '/pdfs/17-ips-dtd110s1210-datasheet.pdf',
-    label: 'IPS-Datenblatt öffnen',
   },
   display: {
     text: 'Das CT-22-Dashboard-Handbuch beschreibt die frühe Wildfire-Anzeige mit ADJ-/SET-Tasten, km/h-/mph-Umschaltung, Tageskilometer-Reset und einem passwortgeschützten Kalibriermenü. Anzeigeversion, Stecker und Fahrzeugstand vor dem Ersatz vergleichen.',
@@ -637,23 +625,26 @@ const partSummaryOverrides: Record<string, string> = {
   'alu-topcase': 'Aluminium-Topcase mit rund 40 Litern Stauraum. Vor dem Kauf die Trägerplatte, Befestigung und Verriegelung am eigenen Fahrzeug vergleichen.',
   'bar-end-mirrors': 'Lenkerendenspiegel für die Bonfire. Archiviert sind die Varianten Normal und Upgrade; vor dem Kauf Lenkeraufnahme, Abmessungen, Gewinde und E-Prüfzeichen vergleichen.',
   bearings: 'Lenkkopflager für die Steuerrohr-/Lenkkopflagerung. Innen- und Außendurchmesser, Bauhöhe, Dichtung und Lagernorm sind lokal nicht belegt und müssen am Fahrzeug vermessen werden.',
-  'bluetooth-dongle': 'Bluetooth-Dongle für die Kommunikation mit bestimmten Wildfire- und Bonfire-Controllern. Modellstand, Steckverbindung und unterstützte Controller-Version vor dem Kauf prüfen.',
+  'bluetooth-dongle': 'Bluetooth-Adapter für die Verbindung zum Motorcontroller. Beim FarDriver ND96680 kann er separat oder als Teil eines Controller-Sets angeboten werden. Kein gewöhnlicher USB-Bluetooth-Stick: Controller-Version, Steckerbelegung und App-Unterstützung müssen übereinstimmen. Vor einer Einzelbestellung den Lieferumfang des Controllers prüfen.',
+  bremsbelage: 'Bremsbeläge immer dem konkreten Bremssattel und der Radposition zuordnen. TRW Lucas MCB833 ist ein möglicher Vergleichstyp, aber für die Wildfire mit CBS noch nicht als passend bestätigt. Vorder- und Hinterrad können andere Belagformen haben; Umriss, Dicke und Sicherungsbohrungen mit dem ausgebauten Belag vergleichen.',
+  bremsscheibe: 'Bremsscheiben für Bonfire und Wildfire sind nicht automatisch austauschbar. Die Bonfire-Angaben 220 und 265 mm belegen keine Wildfire-Passform. Benötigt werden Außendurchmesser, Dicke, Zentrierung, Lochzahl, Lochkreis und seitlicher Versatz; bei ABS zusätzlich die Aufnahme des Sensorrings. Ein ähnliches Produktfoto genügt dafür nicht.',
+  bremszylinder: 'Bremssattel am Rad – im früheren Shop als „Bremszylinder“ bezeichnet. Die Varianten hinten, vorn für 220-mm-Scheiben und CBS vorn für 265-mm-Scheiben sind getrennte Ausführungen. Bei Ersatz auch die Halterplatte vergleichen: Ein ähnlicher 125er-Sattel kann andere Aufnahmen haben. Bei beschädigtem Haltergewinde klären, ob Halterplatte oder kompletter Sattel ersetzt werden muss.',
   bremsen: 'Sammel- und Konfigurationseintrag für die Bremsanlage. Bremssattel, Scheibe, Belagform, Leitungen und Fahrzeugvariante müssen getrennt geprüft werden.',
   bremslichtkabel: 'Kabel- und Schaltereinheit für die Bremslichtansteuerung. Kabellänge, Stecker und Schaltlogik müssen zur Fahrzeugvariante passen.',
-  'bremszylinder-und-hebel': 'Bremszylinder und Hebel als kombinierte oder getrennte Variante. Seite, Kolbendurchmesser, Anschluss und Hebelgeometrie vor dem Kauf vergleichen.',
+  'bremszylinder-und-hebel': 'Hauptbremszylinder am Lenker mit Bremshebel – nicht mit dem Bremssattel am Rad verwechseln. Links/rechts, Kolbendurchmesser, Leitungsanschluss, Bremslichtschalter und Hebelgeometrie vergleichen. Bei CBS oder ABS muss die Ausführung zur vorhandenen Hydraulik passen.',
   'change-the-color-of-my-off-road-protection': 'Farbvariante für den Offroad-Schutz der Wildfire. Dieses Angebot beschreibt eine Konfiguration, kein universelles Schutzteil.',
   'charger-upgrade': '10-A-Ladegerät als archivierte Upgrade-Option. Ausgangsspannung, Stecker, Ladekennlinie und Akku-Freigabe vor dem Ersatz prüfen.',
   'charging-bundle': 'Lade- und USB-Bundle mit XLR-Ladeanschluss und USB-Port. Modellvariante, Adapter, Kabelweg, Sicherung und Zulassung vor dem Einbau prüfen.',
   'classic-indicator': 'Satz aus vier klassischen Halogenblinkern. Stecker, Relais, Befestigung und E-Prüfzeichen müssen mit dem vorhandenen Fahrzeug übereinstimmen.',
   'classic-mirrors': 'Satz aus zwei klassischen Spiegeln. Gewinde, Adapter, Sichtfeld und E-Prüfzeichen vor dem Kauf mit dem vorhandenen Fahrzeug abgleichen.',
-  'copy-of-52-v-batterie': '52-V-Akkuvarianten mit 1,8 kWh oder 3,1 kWh. Zellaufbau, BMS, Gehäuse, Steckverbindungen, Ladegerät und Fahrzeugrevision müssen exakt zusammenpassen.',
+  'copy-of-52-v-batterie': '52-V-Akkuvarianten mit 1,8 kWh oder 3,1 kWh für die Bonfire; kein Ersatz für den höher gespannten Wildfire-Akku. Ein individuell gefertigter Pack muss auch bei Gehäuse, Steckern, Zellverschaltung, BMS-Kommunikation und Ladegerät zum Fahrzeug passen. Die gleiche Kapazität oder ein ähnlicher Kasten allein reicht nicht.',
   'copy-of-achse': 'Beifahrerfußrasten in den archivierten Varianten Paar, links oder rechts. Aufnahme, Gewinde, Klappmechanik und Fahrzeugseite vor dem Kauf vergleichen.',
   'copy-of-beifahrerfussrasten': 'Schwinge mit oder ohne Beifahrerfußrasten. Achsaufnahme, Breite, Lagerung und Rahmenvariante müssen vor dem Ersatz abgeglichen werden.',
   'copy-of-federbeine': 'Achsen für Vorderrad und Schwinge. Durchmesser, Länge, Gewinde, Distanzhülsen und Fahrzeugvariante vor dem Kauf messen.',
   'copy-of-gabelbruckenset': 'Motorhalterungs-Set mit archivierten M16-Muttern, Kontermuttern und Distanzhülsen. Gewinde, Abstände und Rahmenaufnahme vor dem Ersatz prüfen.',
   'copy-of-motorhalterung-set': 'Mutterabdeckungen für M16-, M12-, M10- und M8-Gewinde. Gewinde, Bundmaß und benötigte Stückzahl vor dem Kauf prüfen.',
   'copy-of-off-road-schutz': 'Dual-Sport-Lenker mit Mittelstrebe und 28-mm-Konifizierung im angegebenen Bereich. Klemmmaß, Biegung und Bedienelemente müssen zur Wildfire passen.',
-  'dcdc-converter': 'DC/DC-Wandler für die Fahrzeug-Elektrik. Eingang, Ausgang, Strom, Pinout, Stecker und Einbauraum müssen vor einem Ersatz abgeglichen werden.',
+  'dcdc-converter': 'Der DC/DC-Wandler versorgt das 12-V-Bordnetz aus dem Fahrakku. Für die Wildfire ist der Idealplusing IPS-DTD110S1210 mit 12 V / 10 A als verbautes Teil benannt. Die Amazon-Alternative RVBLRDSE bietet 75–150 V Eingang, liefert jedoch 13,8 V. Die unten verlinkte AliExpress-Ausführung ist mit 20–120 V Eingang und 12 V / 10 A beschrieben. Diese Varianten sind elektrisch nicht gleichwertig und nicht als steckerfertiger Austausch bestätigt.',
   'dual-sport-reifen-upgrade': 'Heidenau K60/K36 in den lokal dokumentierten Größen 90/90-18 vorn, 3.50-18 vorn/offroad und 110/80-18 hinten. Traglast, Index, Felge und Zulassung prüfen.',
   display: 'Tachometer-/Anzeigeeinheit für Bonfire oder frühe Wildfire. CT-22 und andere Anzeigeversionen unterscheiden sich bei Tasten, Protokoll, Kalibrierung, Stecker und Halterung; vor dem Ersatz den konkreten Fahrzeugstand vergleichen.',
   'enduro-fender': 'Enduro-Kotflügel für Bonfire oder Wildfire. Länge, Befestigung, Reifenfreiheit und Fahrzeugvariante vor dem Kauf prüfen.',
@@ -662,14 +653,14 @@ const partSummaryOverrides: Record<string, string> = {
   'gabelbrucke-mit-lenkerklemmen': 'Gabelbrückenset mit möglichen Varianten für komplette, obere oder untere Brücke sowie Lenkerklemmen und Muttern. Gabelmaß, Lager und Klemmung müssen passen.',
   gabelset: 'Gabelset für die Vorderradführung. Standrohrmaß, Achsaufnahme, Bremssattelhalterung, Lager und Fahrzeugvariante vor dem Ersatz prüfen.',
   'gasdruck-federbeine': 'Verstellbare Gasdruck-Federbeine mit archivierter Länge von 330 bis 360 mm. Auge, Buchsenbreite, Bolzendurchmesser und Belastbarkeit vor dem Kauf messen.',
-  'goldene-usd-gabel': 'USD-Gabel in goldener Ausführung für die Wildfire. Standrohrmaß, Achsaufnahme, Bremse, Gabelbrücke und Fahrzeugrevision vergleichen.',
+  'goldene-usd-gabel': 'Goldene USD-Gabel für die Wildfire. Für einen Ersatz Gesamtlänge, Klemmrohrdurchmesser, Achsaufnahme und Bremssattelbefestigung aufnehmen. Die diskutierten 12- und 15-mm-Vorderachsen sind keiner Variante zuverlässig zugeordnet: Am eigenen Rad messen, statt den Durchmesser aus Farbe oder Modellnamen abzuleiten.',
   handguards: 'Aluminium-Handprotektoren für Schutz vor Fahrtwind und leichten Stößen. Lenkeraufnahme, Freigängigkeit und Bedienelemente vor dem Kauf prüfen.',
   'handlebar-crash-bars': 'Lenker-Sturzbügel in Schwarz oder Silber. Archiviert als nicht kompatibel mit Lenkerendenspiegeln; Lenkeraufnahme und Befestigung vor dem Kauf prüfen.',
   headlight: 'Scheinwerfer für die Bonfire. Gehäuse, Halterung, Spannung, Stecker und Leuchtmittel müssen zur Fahrzeugvariante passen.',
   'headlight-grill': 'Schutzgitter für den Scheinwerfer. Außenmaß, Befestigung und Abstand zum Scheinwerfer vor dem Kauf abgleichen.',
   'hintere-stossdampfer': 'Hintere Federbeine für die Bonfire. Länge, Auge, Buchsenbreite, Bolzendurchmesser und Belastbarkeit vor dem Ersatz messen.',
   'hinterer-radschutz': 'Hinterer Radschutz in einer archivierten neueren Ausführung. Länge, Halterung, Reifenfreiheit und Fahrzeugrevision vor dem Kauf prüfen.',
-  'hub-motor': 'Radnabenmotor mit schwarzer 2.15-18-Felge, 36 Speichen und Nippeln, eingespeicht und zentriert. Nabe, Achse, Leistung, Kabel und Controller müssen zur Variante passen.',
+  'hub-motor': 'Archiviert ist ein eingespeichter Radnabenmotor mit schwarzer 2.15-18-Felge und 36 Speichen samt Nippeln. Für die Wildfire gibt es zusätzlich einen Beschaffungshinweis auf einen QS-8-kW-Speichenmotor zusammen mit FarDriver ND96680 und separatem Bluetooth-Modul. Die genaue Motorwicklung und Achsausführung sind dabei nicht festgelegt. Ein 17-Zoll-Gussradmotor ist kein gleichwertiger Ersatz für das 18-Zoll-Speichenrad.',
   'key-set': 'Schloss-Set mit Lenkradschloss, Zündschloss, Tankkappe und zwei Schlüsseln. Schlosskörper, Stecker und Befestigung vor dem Kauf vergleichen.',
   'keyless-go': 'Keyless-Go-System mit zwei Fernbedienungen für die Bonfire. Steuergerät, Kabelsatz, Frequenz und Fahrzeugvariante müssen übereinstimmen.',
   'keyless-go-retro-fit': 'Keyless-Go-Nachrüstset für die Bonfire S mit Steuergerät, Zusatzkabel, zwei 5-A-Sicherungen und zwei Fernbedienungen. Fahrzeug- und Zündschlossvariante prüfen.',
@@ -706,17 +697,17 @@ const partSummaryOverrides: Record<string, string> = {
   'side-stand': 'Seitenständer für die Bonfire. Ständerfuß, Gelenk, Feder und Sicherheitsschalter müssen zur konkreten Rahmen- und Kabelvariante passen.',
   'side-stand-spring-set': 'Doppelfeder-Set für den Seitenständer der Bonfire. Federlänge, Hakenform und Montageposition vor dem Kauf vergleichen.',
   'sitz-b-ware-gebraucht': 'Sitz als B-Ware beziehungsweise Gebrauchtteil, archiviert mit 50 cm Länge und veganem Leder. Zustand, Befestigung und Fahrzeugvariante prüfen.',
-  'speiche-mit-nippel': 'Speiche mit Nippel für Vorder- oder Hinterrad. Länge, Kröpfung, Durchmesser, Gewinde, Nippeltyp und Radseite vor der Bestellung messen.',
+  'speiche-mit-nippel': 'Speichen samt passenden Nippeln lassen sich nach Muster fertigen. Benötigt werden Länge, Drahtdurchmesser, Kröpfungswinkel und Halslänge sowie Gewinde und Nippelsitz. Vorder- und Hinterrad beziehungsweise unterschiedliche Radseiten getrennt aufnehmen. Bei abweichendem Gewinde müssen die Nippel mitgetauscht werden; gleicher Drahtdurchmesser bedeutet nicht dasselbe Gewinde.',
   'stander-copy': 'Spezielle Bundschraube mit passender Mutter für den Ständer. Gewinde, Länge, Bundmaß und Festigkeit vor dem Einbau vergleichen.',
   'sticker-set': 'Sticker-Set mit archiviertem Inhalt aus Ride-Tastefully-, Blacktea-, Hell- und B/T-Aufklebern. Oberfläche, Maße und gewünschte Position prüfen.',
   'surf-rack': 'Surf-Rack für die Bonfire. Rahmenaufnahme, Traglast, Abmessungen und Freigängigkeit vor dem Kauf prüfen.',
   'tall-rider-bundle': 'Bundle aus Lenkererhöhung und unteren Fußrastenadaptern für größere Fahrer ab etwa 185 cm. Einbauhöhe, Leitungsreserve und Fußrastenposition prüfen.',
-  tank: 'Bonfire-Tank in mehreren Farbvarianten; je nach Variante mit oder ohne Tankdeckel. Befestigung, Tankdeckel und Fahrzeugrevision vor dem Kauf abgleichen.',
+  tank: 'Bonfire-Tankverkleidung in mehreren Farben, je nach Variante mit oder ohne Deckel. Die frühe Wildfire hat eine andere Form; für ihren Nachbau wurde ein etwa 55 cm langes 3D-Modell beschrieben. Eine auf 50 cm verkürzte Druckversion ist eine individuelle Änderung, kein maßgleicher Ersatz. Vor einem Nachbau Halter, Deckel und Platz für die darunterliegenden Komponenten abgleichen.',
   'tank-b-ware': 'Bonfire-Tank als B-Ware; archiviert mit leichten Kratzern, aber ohne Dellen sowie mit Varianten mit oder ohne Tankdeckel. Befestigung und Fahrzeugrevision prüfen.',
   'tft-touch-display-retrofit': 'TFT-Touch-Display als Nachrüstkomponente für bestimmte Bonfire- und Wildfire-Varianten. Stecker, Protokoll, Halterung und Softwarestand müssen passen.',
   'typ-2-kabel': 'Typ-2-Ladekabel mit archivierter Länge von 3 m. Steckerstandard, Stromstärke, Ladegerät und Fahrzeugseite vor dem Kauf prüfen.',
   'usb-charging-port': 'USB-Ladeanschluss mit wasserdichter Kappe und Ein-/Aus-Schalter. Spannung, Sicherung, Kabelweg und Befestigung müssen zur Bonfire passen.',
-  'usd-gabelset': 'USD-Gabel-Set für bestimmte Wildfire-Varianten. Standrohrmaß, Achsaufnahme, Bremse, Gabelbrücke und Zulassung vor dem Kauf prüfen.',
+  'usd-gabelset': 'USD-Gabel-Set für die Wildfire. Gabelbrücken-Klemmmaß, Länge, Achsdurchmesser, Distanzhülsen und Bremssattelaufnahme müssen gemeinsam passen. Für 12- oder 15-mm-Vorderachsen gibt es noch keine verlässliche Modellzuordnung; den verbauten Durchmesser direkt messen. CBS-/ABS-Ausführung und Sensorringaufnahme bei der Auswahl berücksichtigen.',
   wildfire: 'Dual-Sport-Lenker mit Mittelstrebe und 28-mm-Konifizierung im angegebenen Bereich. Klemmmaß, Biegung und Bedienelemente müssen zur Wildfire passen.',
   'wildfire-abs': 'Konfigurationsvariante für eine Wildfire mit ABS-Bezug. Bremsanlage, Sensorik, Halterung und Fahrzeugrevision vor dem Ersatz prüfen.',
   'wildfire-gabelbruckenset': 'Gabelbrückenset für die Wildfire. Gabelmaß, Lager, Klemmung, Lenkeraufnahme und Fahrzeugrevision vor dem Kauf vergleichen.',
@@ -736,9 +727,9 @@ const historicalShopParts: HistoricalShopPart[] = partsCatalog.historical_produc
   const archivedVariants = archived?.variants?.map((variant) => variant.title ?? variant.name ?? '').filter(Boolean) as string[] | undefined;
   const archivedVariantDetails = archived?.variants?.map((variant) => ({ label: variant.title ?? variant.name ?? '', price: variant.price_eur, available: variant.available })).filter((variant) => variant.label);
   const confirmedPurchase = research?.purchase_status === 'confirmed' && Boolean(research.amazon_url || research.fallbacks?.length || research.supplier_link);
-  const candidatePurchase = research?.purchase_status === 'candidate' && Boolean(research.amazon_url);
+  const candidatePurchase = research?.purchase_status === 'candidate' && Boolean(research.amazon_url || research.purchase_options?.length);
   const confirmedFallback = confirmedPurchase ? research?.fallbacks?.[0] ?? (research?.supplier_link ? { name: 'Hersteller-/Fachquelle', url: research.supplier_link } : undefined) : undefined;
-  const purchaseOptions = research?.purchase_status === 'manual-match'
+  const purchaseOptions = research?.purchase_status === 'manual-match' || ((confirmedPurchase || candidatePurchase) && research?.purchase_options?.length)
     ? research.purchase_options?.map((option) => ({ label: option.name, href: option.url, fitStatus: option.fit_status }))
     : confirmedPurchase || candidatePurchase
       ? [
@@ -750,6 +741,7 @@ const historicalShopParts: HistoricalShopPart[] = partsCatalog.historical_produc
   const technicalEvidence = partTechnicalEvidence[slug];
   return {
     id: slug,
+    checkedAt: research?.checked_at ?? '2026-09-02',
     path: `/ersatzteile/${slug}`,
     title,
     category,
@@ -6246,7 +6238,7 @@ function PartCard({ part, index }: { part: HistoricalShopPart; index: number }) 
 function PartAvailabilityBadge({ part }: { part: HistoricalShopPart }) {
   if (!part.purchaseOptions?.length) return null;
 
-  return <span className="part-availability-badge" title="Eine Bezugsquelle ist hinterlegt. Passform und technische Daten bitte vor dem Kauf prüfen.">✓ Vorhanden</span>;
+  return <span className="part-availability-badge" title="Ein Bezugslink ist hinterlegt. Das bestätigt weder Lieferbarkeit noch Fahrzeugpassform.">↗ Bezugslink</span>;
 }
 
 function PartDetailPage({ part }: { part: HistoricalShopPart }) {
@@ -6273,12 +6265,11 @@ function PartDetailPage({ part }: { part: HistoricalShopPart }) {
 
         <section className="parts-detail-section section-pad">
           <article className="parts-detail-card card-doodle">
-            <div className="part-detail-topline"><span className="kind-chip part">Ersatzteil</span><div className="part-detail-topline-status"><PartAvailabilityBadge part={part} /><span>Recherche-Stand: 02.09.2026</span></div></div>
+            <div className="part-detail-topline"><span className="kind-chip part">Ersatzteil</span><div className="part-detail-topline-status"><PartAvailabilityBadge part={part} /><span>Recherche-Stand: {part.checkedAt.split('-').reverse().join('.')}</span></div></div>
 
             <div className="part-detail-columns">
               <section>
-                <h2>Archivdaten</h2>
-                <p>{part.historicalSummary}</p>
+                <h2>Historischer Shop-Eintrag</h2>
                 {part.price !== undefined && <div className="part-detail-fact"><strong>{part.priceMax && part.priceMax !== part.price ? `${part.price}–${part.priceMax}` : part.price} €</strong><span>Alter Originalpreis — nicht aktuell</span></div>}
                 <p className="part-archive-status"><strong>Archivstatus:</strong> {part.historicalAvailability}{part.archiveTimestamp ? ` · Aufnahme ${part.archiveTimestamp.slice(0, 4)}-${part.archiveTimestamp.slice(4, 6)}-${part.archiveTimestamp.slice(6, 8)}` : ''}</p>
                 {part.variants && <div className="part-detail-variants"><strong>{part.variantDetails?.some((variant) => variant.price !== undefined) ? 'Alte Originalpreise' : 'Originalvarianten'}</strong><ul>{part.variantDetails?.length ? part.variantDetails.map((variant) => <li key={variant.label}>{variant.label}{variant.price !== undefined ? ` · ${variant.price} €` : ''}</li>) : part.variants.map((variant) => <li key={variant}>{variant}</li>)}</ul></div>}
@@ -6299,12 +6290,12 @@ function PartDetailPage({ part }: { part: HistoricalShopPart }) {
             </div>
 
               <section className="part-buy-section">
-              <div className="eyebrow handwritten">Amazon-Link</div>
+              <div className="eyebrow handwritten">Bezugsoptionen</div>
               <h2>{part.purchaseOptions?.length ? (part.purchaseHeading ?? `Bezugsquellen für ${part.title}`) : 'Aktuell nichts Passendes gefunden'}</h2>
               {(part.purchaseStatus === 'manual-match' || part.purchaseStatus === 'candidate') && <p className="part-buy-note">{part.purchaseNote}</p>}
               {part.purchaseOptions?.length ? <div className="part-buy-grid">
-                {part.purchaseOptions.map((option, optionIndex) => <a key={option.href} className={`part-buy-card ${part.purchaseStatus === 'manual-match' || optionIndex === 0 ? 'amazon' : 'fallback'}`} href={option.href} target="_blank" rel="nofollow noreferrer">
-                  <span className="part-buy-label">{part.purchaseStatus === 'manual-match' ? 'Amazon · Handbuchabgleich' : part.purchaseStatus === 'candidate' ? 'Amazon-Link · Passform prüfen' : optionIndex === 0 ? 'Amazon zuerst' : 'Alternative Bezugsquelle'}</span>
+                {part.purchaseOptions.map((option) => <a key={option.href} className={`part-buy-card ${new URL(option.href).hostname === 'www.amazon.de' ? 'amazon' : 'fallback'}`} href={option.href} target="_blank" rel="nofollow noreferrer">
+                  <span className="part-buy-label">{new URL(option.href).hostname === 'www.amazon.de' ? 'Amazon' : new URL(option.href).hostname.endsWith('.aliexpress.com') ? 'AliExpress' : 'Hersteller / Fachhandel'}{part.purchaseStatus === 'manual-match' ? ' · Handbuchabgleich' : part.purchaseStatus === 'candidate' ? ' · Ausführung prüfen' : ''}</span>
                   <strong>{option.label} ↗</strong>
                   <small>{option.fitStatus ?? part.confidence}</small>
                 </a>)}
@@ -6314,10 +6305,6 @@ function PartDetailPage({ part }: { part: HistoricalShopPart }) {
             <RepairFeedback guideSlug={`ersatzteil-${part.id}`} />
             <RepairComments guideSlug={`ersatzteil-${part.id}`} />
 
-            <div className="parts-detail-source">
-              <span className="repair-subhead">Quellenangabe</span>
-              <p>Historischer Produktname und die gegebenenfalls übernommenen Varianten stammen aus lokal gesicherten öffentlichen Archivdaten. Die Kaufoptionen sind davon getrennt und müssen vor der Bestellung neu geprüft werden.</p>
-            </div>
           </article>
         </section>
       </main>

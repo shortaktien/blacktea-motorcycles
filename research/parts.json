@@ -4,16 +4,16 @@
   "scope": ["Bonfire", "Bonfire 45", "Bonfire X", "Wildfire"],
   "sourcing_policy": {
     "primary": "Amazon.de",
-    "fallback": ["German/EU specialist retailers", "qualified repair services", "manufacturer/OEM"],
+    "fallback": ["AliExpress (specific variant, compatibility assessed separately)", "German/EU specialist retailers", "qualified repair services", "manufacturer/OEM"],
     "excluded": ["Alibaba", "unverified marketplace offers"],
-    "checked_at": "2026-09-02",
+    "checked_at": "2026-09-04",
     "note": "Amazon prices, stock and delivery dates are volatile. A marketplace hit is not proof of BTM compatibility."
   },
   "disclaimer": "Historical and community research only. Verify compatibility, safety, legal approval and availability before publication or installation.",
   "entries": [
     {
       "id": "btm-bremszylinder",
-      "part_name": "Bremszylinder",
+      "part_name": "Bremssattel (historischer Shopname: Bremszylinder)",
       "category": "brakes",
       "model_family": ["Bonfire"],
       "variants": ["Rear Brake", "Front Brake (220 mm Disc)", "CBS Front Brake (265 mm)"],
@@ -23,6 +23,7 @@
       "archive_lookup": "https://web.archive.org/web/*/https://www.blackteamotorbikes.com/products/bremszylinder",
       "amazon_search_url": "https://www.amazon.de/s?k=Black+Tea+Bonfire+Bremszylinder",
       "amazon_status": "no_exact_btm_match_confirmed",
+      "compatibility_note": "Gemeint ist der Bremssattel am Rad, nicht der Hauptbremszylinder am Lenker. Ein äußerlich ähnlicher 125er-Sattel kann eine andere Halterplatte haben. Lochabstände, Plattenversatz, Scheibenmaß, Leitungsanschluss und CBS-/ABS-Ausführung vergleichen; eine Bonfire-Erfahrung bestätigt keine Wildfire-Passform.",
       "confidence": "high_for_historical_listing_low_for_current_availability",
       "safety_class": "critical",
       "rights_status": "link_only_until_cleared"
@@ -75,13 +76,31 @@
       "part_name": "DC/DC-Wandler IPS-DTD110S1210",
       "category": "electronics",
       "model_family": ["Wildfire"],
-      "specification_lead": "110 VDC to 12 VDC, 10 A",
+      "specification_lead": "IPS-DTD110S1210: 12 V / 10 A für das Bordnetz. Ersatzwandler nach tatsächlichem Eingangsspannungsbereich und Ausgangsspannung auswählen, nicht allein nach der Bezeichnung 110 V.",
+      "checked_at": "2026-09-04",
+      "compatibility_note": "Die Eingangsspannung muss auch den vollgeladenen Akku abdecken. Die Idealplusing-Produktseite nennt 30–110 V; bei rund 117 V Akkuspannung reicht diese Angabe nicht aus. Typenschild und konkrete Revision klären. Zusätzlich Ausgangsspannung, Dauerstrom, Isolation, Pinbelegung, Absicherung und Befestigung vergleichen.",
       "source_type": "community_report",
       "source_url": "https://www.elektroroller-forum.de/viewtopic.php?t=48272",
       "manufacturer_reference": "https://www.idealplusing.com/index/product/detail/id/47",
       "manufacturer_datasheet": "https://www.idealplusing.com/storage/uploads/files/product/IPS-DTD110S12%20DC%20DC%20Converter.pdf",
       "amazon_search_url": "https://www.amazon.de/s?k=IPS-DTD110S1210",
-      "amazon_status": "no_exact_match_found",
+      "amazon_status": "alternative_listing_verified_not_original_part_or_confirmed_fit",
+      "amazon_url": "https://www.amazon.de/dp/B0DK94C25L",
+      "purchase_status": "candidate",
+      "purchase_heading": "DC/DC-Wandler: zwei unterschiedliche Varianten",
+      "purchase_note": "Der Amazon-Wandler liefert 13,8 V statt 12 V und ist kein identischer Ersatz. Vor dem Umbau muss geklärt sein, ob alle angeschlossenen Verbraucher diese Spannung vertragen. Bei AliExpress ist die Auswahl der Eingangs- und Ausgangsvariante entscheidend.",
+      "purchase_options": [
+        {
+          "name": "RVBLRDSE · 75–150 V auf 13,8 V / 10 A",
+          "url": "https://www.amazon.de/dp/B0DK94C25L",
+          "fit_status": "Auswahl: 75-150V_13.8V und 13.8V 10A. Abweichende Ausgangsspannung; Anschlüsse, Einbau und Verbraucherverträglichkeit sind nicht als Wildfire-Direktersatz bestätigt."
+        },
+        {
+          "name": "DC/DC-Wandler · 20–120 V auf 12 V / 10 A",
+          "url": "https://de.aliexpress.com/item/1005006630139887.html",
+          "fit_status": "Im Angebotsbild ausgewählt: DC 84V 96V (20-120V) und DC 12V 10A. Aktuelle Auswahl und Lieferbarkeit nicht live verifiziert. Spannungsreserve, Pinout und Einbau müssen geprüft werden; keine bestätigte Wildfire-Passform."
+        }
+      ],
       "fallbacks": [
         {
           "name": "Mean Well DDR-120D-12",
@@ -101,6 +120,7 @@
     },
     {
       "id": "bonfire-mcb833-amazon-candidate",
+      "checked_at": "2026-09-04",
       "part_name": "TRW Lucas MCB833 Organic Allround",
       "category": "brakes",
       "model_family": ["Bonfire"],
@@ -108,10 +128,10 @@
       "amazon_url": "https://www.amazon.de/TRW-Lucas-MCB833-Scheibenbremsbelag-Organisch/dp/B0068NSX98",
       "observed_price_eur": 21.73,
       "purchase_status": "candidate",
-      "purchase_heading": "TRW Lucas MCB833 Bremsbelag für die Black Tea Bonfire",
-      "purchase_note": "Die Teilenummer MCB833 ist auf Amazon auffindbar und wird im Forum als mögliche Spur genannt. Das ist keine bestätigte BTM-Freigabe: Belagform, Dicke, Halterung und Bonfire-Variante vor dem Kauf am Fahrzeug vergleichen.",
+      "purchase_heading": "TRW Lucas MCB833 · Belagform vergleichen",
+      "purchase_note": "MCB833 ist ein Suchkandidat, keine pauschale Freigabe für Bonfire oder Wildfire. Vorder- und Hinterrad können unterschiedliche Beläge benötigen; für die Wildfire-CBS-Bremse ist die Zuordnung noch offen.",
       "amazon_status": "exact_part_number_found_fit_unverified",
-      "compatibility_note": "Amazon listing names Kymco applications; compare actual pad shape, thickness, retaining hardware and BTM variant before purchase.",
+      "compatibility_note": "Den ausgebauten Belag mit Umriss, Dicke, Haltenasen und Sicherungsbohrungen abgleichen. Ein passender Vorderachsbelag ist nicht automatisch hinten verwendbar. CBS- und ABS-Bremssättel getrennt prüfen.",
       "source_type": "amazon_candidate_plus_community_lead",
       "source_url": "https://www.elektroroller-forum.de/viewtopic.php?t=48272",
       "confidence": "medium_for_part_number_low_for_btm_fit",
@@ -152,6 +172,7 @@
     },
     {
       "id": "wildfire-qsmotor-controller-lead",
+      "checked_at": "2026-09-04",
       "part_name": "QS-Motor / ND96680 Controller (community lead)",
       "category": "drive_and_controller",
       "model_family": ["Wildfire"],
@@ -159,17 +180,33 @@
       "source_type": "community_report",
       "source_url": "https://www.elektroroller-forum.de/viewtopic.php?t=48272",
       "supplier_link": "https://www.qsmotor.com/",
+      "compatibility_note": "Die Bezeichnung 8-kW-Speichenmotor legt Wicklung, Achse, Einbaubreite oder Kabelbelegung noch nicht fest. Beim ND96680 nennt die QS-Produktseite 115 V Spitzenspannung: Das liegt unter rund 117 V bei vollem Wildfire-Akku. Ohne bestätigte passende Revision kein Direktersatz.",
+      "purchase_status": "candidate",
+      "purchase_heading": "QS-Motor und FarDriver gezielt anfragen",
+      "purchase_note": "Für den konkret passenden Motor wurde kein belastbarer Amazon- oder AliExpress-Treffer bestätigt. QS bietet einen Herstellerkontakt für die genaue Ausführung; ein fertiger Wildfire-Austauschsatz ist damit nicht belegt.",
+      "purchase_options": [
+        { "name": "QS Motor · Speichenmotor nach Ausführung anfragen", "url": "https://www.qsmotor.com/", "fit_status": "8 kW allein genügen nicht: Wicklung, Radgröße, Achsmaße, Bremsscheibenaufnahme und Hall-/Phasenkabel festlegen." },
+        { "name": "FarDriver ND96680 · Varianten und Bluetooth", "url": "https://www.cnqsmotor.com/product/fardriver-nd72680-nd84680-nd96680-sine-wave-controller/", "fit_status": "Herstellerangebot mit mehreren Controllern. ND96680: angegebene 115-V-Grenze vor Einsatz an der Wildfire klären; Firmware, Stecker und Bluetooth-Lieferumfang ebenfalls abgleichen." }
+      ],
       "confidence": "low_for_exact_vehicle_compatibility",
       "safety_class": "critical",
       "rights_status": "not_applicable"
     },
     {
       "id": "wildfire-spokes-suppliers",
+      "checked_at": "2026-09-04",
       "part_name": "Speichen und Nippel",
       "category": "wheels",
       "model_family": ["Wildfire", "Bonfire"],
       "supplier_leads": ["https://www.walmotec.de/", "https://www.wws-speichen.de/"],
-      "compatibility_note": "Forum reports include wrong thread and mismatched nipples; capture exact length, bend, diameter, thread, nipple type, wheel side and model year.",
+      "compatibility_note": "Speiche und Nippel als zusammenpassendes Paar bestellen. Ein 4-mm-Speichendraht bedeutet nicht automatisch M4-Gewinde. Gewindeprofil und Steigung müssen stimmen; vorhandene Nippel lassen sich deshalb nicht immer weiterverwenden.",
+      "purchase_status": "candidate",
+      "purchase_heading": "Speichen nach Maß",
+      "purchase_note": "Kein eindeutig passender Standardsatz auf Amazon oder AliExpress bestätigt. Für eine Maßanfertigung möglichst eine unbeschädigte Speiche samt Nippel als Muster bereitstellen.",
+      "purchase_options": [
+        { "name": "Walmotec · Speichen und Nippel", "url": "https://www.walmotec.de/", "fit_status": "Länge, Drahtdurchmesser, Kröpfungswinkel und Halslänge angeben; passendes Nippelgewinde mitbestellen." },
+        { "name": "WWS · Speichen nach Maß", "url": "https://www.wws-speichen.de/", "fit_status": "Vorder-/Hinterrad und Radseite unterscheiden. Nippelsitz und Felgenbohrung zusätzlich mit dem Muster abgleichen." }
+      ],
       "source_type": "community_report",
       "source_url": "https://www.elektroroller-forum.de/viewtopic.php?t=48272",
       "confidence": "high_for_supplier_leads_low_for_part_fit",
