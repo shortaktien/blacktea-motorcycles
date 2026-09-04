@@ -204,6 +204,7 @@ jobs:
                 /login \
                 /registrieren \
                 /konto \
+                /suche \
                 /karte \
                 /community \
                 '/passwort-zuruecksetzen?token=link-test'; do

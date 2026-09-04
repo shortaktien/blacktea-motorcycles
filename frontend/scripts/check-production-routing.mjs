@@ -44,7 +44,7 @@ try {
     }
   }
 
-  for (const path of ['/konto', '/login', '/community', '/ersatzteile', '/hilfe/anfragen', '/hilfe/anfragen/6c34f725fb1e9bb5a063ba060a2355e8']) {
+  for (const path of ['/konto', '/login', '/suche', '/community', '/ersatzteile', '/hilfe/anfragen', '/hilfe/anfragen/6c34f725fb1e9bb5a063ba060a2355e8']) {
     const response = await fetch(`${base}${path}`, { redirect: 'manual' });
     assert.equal(response.status, 200, path);
     assert.match(response.headers.get('content-type') ?? '', /^text\/html\b/, path);
