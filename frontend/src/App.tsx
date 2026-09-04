@@ -175,6 +175,27 @@ type AdminMember = {
   communicationBlockedAt: string | null;
 };
 
+type Workshop = {
+  id: string;
+  name: string;
+  website: string;
+  street: string;
+  postalCode: string;
+  city: string;
+  country: PostalCountry;
+  countryLabel: string;
+  prefix: string;
+};
+
+type AdminWorkshop = Workshop & {
+  status: 'pending' | 'approved' | 'rejected';
+  createdAt: string;
+  reviewedAt: string | null;
+  reviewedBy: string | null;
+  submittedByName: string;
+  canModerate: boolean;
+};
+
 type AdminNotificationSettings = {
   comments: boolean;
   wiki: boolean;
@@ -2659,6 +2680,10 @@ function getSeoMetadata(path: string, guide?: RepairGuide, part?: HistoricalShop
       title: 'Community-Karte — Black Tea Motorbikes – Hilfe',
       description: 'Ungefähre PLZ-Regionen der BTM-Community in Deutschland, Österreich und der Schweiz.',
     },
+    '/werkstaetten': {
+      title: 'Werkstätten für BTM-Bikes — Black Tea Motorbikes – Hilfe',
+      description: 'Werkstätten in Deutschland, Österreich und der Schweiz finden, die BTM-Bikes reparieren können, oder einen geprüften Tipp aus der Community eintragen.',
+    },
     '/quellen': {
       title: 'Quellen — Black Tea Motorbikes – Hilfe',
       description: 'Nachvollziehbare Quellen zu Insolvenzstatus, Handbüchern, lokalen PDFs, Ersatzteilspuren und Community-Wissen.',
@@ -2797,6 +2822,7 @@ function AppContent({ initialPath }: { initialPath?: string } = {}) {
     || path === '/ersatzteile'
     || path === '/community'
     || path === '/karte'
+    || path === '/werkstaetten'
     || path === '/faq'
     || path === '/suche'
     || path === '/quellen'
@@ -2826,6 +2852,7 @@ function AppContent({ initialPath }: { initialPath?: string } = {}) {
   if (path === '/ersatzteile' || (path === '/' && hash === 'teile')) return <PartsPage />;
   if (path === '/community') return <CommunityPage />;
   if (path === '/karte') return <CommunityMapPage />;
+  if (path === '/werkstaetten') return <WorkshopsPage />;
   if (path === '/faq') return <FaqPage />;
   if (path === '/suche') return <SearchPage />;
   if (path === '/quellen' || (path === '/' && hash === 'quellen')) return <SourcesPage />;
@@ -3485,7 +3512,7 @@ function HomePage() {
         </a>
         <nav className="main-nav" aria-label="Hauptnavigation">
           <a href="#status">Status</a>
-          <a href="/karte">Karte</a>
+          <MapMenu />
           <a href="/community">Community</a>
           <RepairMenu />
           <a href="/ersatzteile">Ersatzteile</a>
@@ -3721,9 +3748,11 @@ function SourcesPage() {
 
 function CommunityMapPage() {
   const [regions, setRegions] = useState<CommunityMapRegion[]>([]);
+  const [workshops, setWorkshops] = useState<Workshop[]>([]);
   const [countryFilter, setCountryFilter] = useState<'all' | PostalCountry>('all');
   const [modelFilter, setModelFilter] = useState<'all' | CommunityMapModel>('all');
   const [prefixFilter, setPrefixFilter] = useState('all');
+  const [mapLayer, setMapLayer] = useState<'all' | 'riders' | 'workshops'>('all');
   const [activeKey, setActiveKey] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -3731,12 +3760,18 @@ function CommunityMapPage() {
   useEffect(() => {
     document.title = 'Community-Karte — Black Tea Motorbikes – Hilfe';
     window.scrollTo(0, 0);
+    const workshopId = new URLSearchParams(window.location.search).get('werkstatt');
+    if (workshopId) setActiveKey(`workshop:${workshopId}`);
     let active = true;
     const loadMap = async () => {
       try {
-        const mapPayload = await apiJson<{ regions: CommunityMapRegion[] }>('/api/community/map');
+        const [mapPayload, workshopPayload] = await Promise.all([
+          apiJson<{ regions: CommunityMapRegion[] }>('/api/community/map'),
+          apiJson<{ workshops: Workshop[] }>('/api/community/workshops'),
+        ]);
         if (!active) return;
         setRegions(mapPayload.regions ?? []);
+        setWorkshops(workshopPayload.workshops ?? []);
         setError('');
       } catch (reason) {
         if (active) setError(reason instanceof Error ? reason.message : 'Die Community-Karte konnte gerade nicht geladen werden.');
@@ -3755,7 +3790,10 @@ function CommunityMapPage() {
   const prefixOptions = useMemo(() => Array.from(new Set(regions
     .filter((region) => countryFilter === 'all' || region.country === countryFilter)
     .filter((region) => modelFilter === 'all' || (region.modelCounts?.[modelFilter] ?? 0) > 0)
-    .map((region) => region.prefix))).sort(), [regions, countryFilter, modelFilter]);
+    .map((region) => region.prefix)
+    .concat(workshops
+      .filter((workshop) => countryFilter === 'all' || workshop.country === countryFilter)
+      .map((workshop) => workshop.prefix)))).sort(), [regions, workshops, countryFilter, modelFilter]);
 
   const filteredRegions = useMemo(() => regions.flatMap((region) => {
     if (countryFilter !== 'all' && region.country !== countryFilter) return [];
@@ -3773,7 +3811,29 @@ function CommunityMapPage() {
     const point = getCommunityMapPoint(region);
     return point ? [{ region, point, key: `${region.country}:${region.prefix}` }] : [];
   }), [filteredRegions]);
+  const filteredWorkshops = useMemo(() => workshops.filter((workshop) => {
+    if (countryFilter !== 'all' && workshop.country !== countryFilter) return false;
+    return prefixFilter === 'all' || workshop.prefix === prefixFilter;
+  }), [countryFilter, prefixFilter, workshops]);
+  const workshopPoints = useMemo(() => {
+    const occurrences = new Map<string, number>();
+    return filteredWorkshops.flatMap((workshop) => {
+      const mapPoint = getCommunityMapPoint({ country: workshop.country, prefix: workshop.prefix, memberCount: 1 });
+      if (!mapPoint) return [];
+      const prefixKey = `${workshop.country}:${workshop.prefix}`;
+      const occurrence = occurrences.get(prefixKey) ?? 0;
+      occurrences.set(prefixKey, occurrence + 1);
+      const offsetX = ((occurrence % 3) - 1) * 13;
+      const offsetY = Math.floor(occurrence / 3) * 13;
+      return [{
+        workshop,
+        point: { ...mapPoint, x: mapPoint.x + offsetX, y: mapPoint.y + offsetY },
+        key: `workshop:${workshop.id}`,
+      }];
+    });
+  }, [filteredWorkshops]);
   const activePoint = points.find((entry) => entry.key === activeKey) ?? null;
+  const activeWorkshopPoint = workshopPoints.find((entry) => entry.key === activeKey) ?? null;
   const memberCount = filteredRegions.reduce((total, region) => total + region.memberCount, 0);
   const totalKilometers = filteredRegions.reduce((total, region) => total + (region.totalKilometers ?? 0), 0);
   const membersByCountry = filteredRegions.reduce<Record<PostalCountry, number>>((counts, region) => {
@@ -3801,7 +3861,8 @@ function CommunityMapPage() {
               <label>Land<select value={countryFilter} onChange={(event) => { setCountryFilter(event.target.value as 'all' | PostalCountry); setPrefixFilter('all'); }}><option value="all">Alle Länder</option><option value="D">Deutschland</option><option value="A">Österreich</option><option value="CH">Schweiz</option></select></label>
               <label>Modell<select value={modelFilter} onChange={(event) => setModelFilter(event.target.value as 'all' | CommunityMapModel)}><option value="all">Alle Modelle</option><option value="Bonfire">Bonfire gesamt</option><option value="Bonfire X">Bonfire X</option><option value="Bonfire S">Bonfire S</option><option value="Bonfire E">Bonfire E</option><option value="Wildfire">Wildfire</option></select></label>
               <label>PLZ-Bereich<select value={prefixFilter} onChange={(event) => setPrefixFilter(event.target.value)}><option value="all">Alle Bereiche</option>{prefixOptions.map((prefix) => <option key={prefix} value={prefix}>PLZ-Bereich {prefix}</option>)}</select></label>
-              {(countryFilter !== 'all' || modelFilter !== 'all' || prefixFilter !== 'all') && <button className="button button-ghost community-map-filter-reset" type="button" onClick={() => { setCountryFilter('all'); setModelFilter('all'); setPrefixFilter('all'); }}>Filter zurücksetzen</button>}
+              <label>Kartenebene<select value={mapLayer} onChange={(event) => setMapLayer(event.target.value as 'all' | 'riders' | 'workshops')}><option value="all">Fahrer &amp; Werkstätten</option><option value="riders">Nur Fahrer</option><option value="workshops">Nur Werkstätten</option></select></label>
+              {(countryFilter !== 'all' || modelFilter !== 'all' || prefixFilter !== 'all' || mapLayer !== 'all') && <button className="button button-ghost community-map-filter-reset" type="button" onClick={() => { setCountryFilter('all'); setModelFilter('all'); setPrefixFilter('all'); setMapLayer('all'); }}>Filter zurücksetzen</button>}
             </div>
           </div>
           <div className="community-map-stats" aria-label="Zusammenfassung der Community-Karte">
@@ -3814,10 +3875,10 @@ function CommunityMapPage() {
           <div className="community-map-card card-doodle" aria-busy={loading}>
             <div className="community-map-card-heading">
               <div>
-                <div className="eyebrow handwritten">live aus den Profileinstellungen</div>
-                <h2>Unsere Fahrer</h2>
+                <div className="eyebrow handwritten">{mapLayer === 'workshops' ? 'geprüfte Empfehlungen aus der Community' : 'live aus den Profileinstellungen'}</div>
+                <h2>{mapLayer === 'workshops' ? 'Unsere Werkstätten' : mapLayer === 'riders' ? 'Unsere Fahrer' : 'Fahrer & Werkstätten'}</h2>
               </div>
-              <span className="community-map-legend"><i aria-hidden="true" /> ein Punkt = ein PLZ-Bereich</span>
+              <span className="community-map-legend"><i className={mapLayer === 'workshops' ? 'is-workshop' : undefined} aria-hidden="true" /> {mapLayer === 'workshops' ? 'W = Werkstatt' : mapLayer === 'riders' ? 'ein Punkt = ein PLZ-Bereich' : 'Punkt = PLZ-Bereich · W = Werkstatt'}</span>
             </div>
             {error && <p className="form-message form-message-error" role="alert">{error}</p>}
             <div className="community-map-canvas">
@@ -3831,7 +3892,7 @@ function CommunityMapPage() {
                 {communityMapCountries.map(country => (
                   <text key={country.code} className="community-map-country-label" x={country.labelPoint.x} y={country.labelPoint.y}>{country.label}</text>
                 ))}
-                {points.map(({ region, point, key }) => {
+                {mapLayer !== 'workshops' && points.map(({ region, point, key }) => {
                   const isActive = key === activeKey;
                   const radius = Math.min(22, 8 + Math.sqrt(region.memberCount) * 3);
                   return (
@@ -3852,10 +3913,35 @@ function CommunityMapPage() {
                     </g>
                   );
                 })}
+                {mapLayer !== 'riders' && workshopPoints.map(({ workshop, point, key }) => {
+                  const isActive = key === activeKey;
+                  return (
+                    <g
+                      className={`community-map-workshop-point ${isActive ? 'is-active' : ''}`}
+                      key={key}
+                      role="button"
+                      tabIndex={0}
+                      aria-label={`${workshop.name}, ${workshop.postalCode} ${workshop.city}`}
+                      onClick={() => setActiveKey(key)}
+                      onFocus={() => setActiveKey(key)}
+                      onMouseEnter={() => setActiveKey(key)}
+                      onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); setActiveKey(key); } }}
+                    >
+                      <circle className="community-map-workshop-halo" cx={point.x} cy={point.y} r={isActive ? 22 : 18} />
+                      <circle className="community-map-workshop-circle" cx={point.x} cy={point.y} r={isActive ? 14 : 11} />
+                      <text className="community-map-workshop-label" x={point.x} y={point.y + 4}>W</text>
+                    </g>
+                  );
+                })}
               </svg>
             </div>
-            {!loading && filteredRegions.length === 0 ? (
-              <p className="community-map-hint">Für diese Filter sind aktuell keine Fahrer eingetragen.</p>
+            {!loading && ((mapLayer === 'workshops' && filteredWorkshops.length === 0) || (mapLayer !== 'workshops' && filteredRegions.length === 0 && (mapLayer === 'riders' || workshopPoints.length === 0))) ? (
+              <p className="community-map-hint">Für diese Filter sind aktuell keine {mapLayer === 'workshops' ? 'Werkstätten' : 'Fahrer'} eingetragen.</p>
+            ) : activeWorkshopPoint ? (
+              <div className="community-map-selection" role="status">
+                <strong>{activeWorkshopPoint.workshop.name}</strong>
+                <span>{activeWorkshopPoint.workshop.street} · {activeWorkshopPoint.workshop.postalCode} {activeWorkshopPoint.workshop.city} · <a href="/werkstaetten">Zum Werkstätten-Verzeichnis ↗</a></span>
+              </div>
             ) : activePoint ? (
               <div className="community-map-selection" role="status">
                 <strong>{activePoint.point.countryLabel} · {activePoint.point.label}</strong>
@@ -3866,8 +3952,116 @@ function CommunityMapPage() {
             )}
           </div>
           <p className="community-map-note"><strong>Privatsphäre zuerst:</strong> Es werden nur aktive Konten mit freiwillig eingetragener Land-/PLZ-Kombination gezählt. Namen, E-Mail-Adressen und die vollständige PLZ bleiben verborgen; die Darstellung fasst jeweils die ersten beiden PLZ-Ziffern zusammen.</p>
+          <p className="community-map-note"><strong>Werkstätten:</strong> Werkstatt-Adressen sind öffentliche Geschäftsdaten. Vorschläge werden vor der Veröffentlichung geprüft und können über den Werkstätten-Bereich ergänzt werden.</p>
           {!loading && filteredRegions.length > points.length && <p className="community-map-note">{filteredRegions.length - points.length} PLZ-Bereiche konnten noch nicht geografisch zugeordnet werden.</p>}
           <p className="community-map-note">Kartendaten: <a href="https://www.naturalearthdata.com/" target="_blank" rel="noreferrer">Natural Earth</a> · PLZ-Regionen: <a href="https://www.geonames.org/" target="_blank" rel="noreferrer">GeoNames</a> (<a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">CC BY 4.0</a>), zu regionalen Übersichtspunkten zusammengefasst.</p>
+        </section>
+      </main>
+      <GuideFooter />
+    </div>
+  );
+}
+
+function WorkshopsPage() {
+  const { user, csrfToken, loading: authLoading } = useAuth();
+  const [workshops, setWorkshops] = useState<Workshop[]>([]);
+  const [query, setQuery] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
+  const [form, setForm] = useState({ name: '', website: '', street: '', postalCode: '', city: '', country: 'D' as PostalCountry });
+
+  useEffect(() => {
+    document.title = 'Werkstätten für BTM-Bikes — Black Tea Motorbikes – Hilfe';
+    window.scrollTo(0, 0);
+    let active = true;
+    void apiJson<{ workshops: Workshop[] }>('/api/community/workshops')
+      .then((payload) => { if (active) setWorkshops(payload.workshops ?? []); })
+      .catch((reason) => { if (active) setError(reason instanceof Error ? reason.message : 'Werkstätten konnten nicht geladen werden.'); })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, []);
+
+  const filteredWorkshops = useMemo(() => {
+    const normalizedQuery = query.trim().toLocaleLowerCase('de');
+    if (!normalizedQuery) return workshops;
+    return workshops.filter((workshop) => [workshop.name, workshop.website, workshop.street, workshop.postalCode, workshop.city, workshop.countryLabel]
+      .join(' ').toLocaleLowerCase('de').includes(normalizedQuery));
+  }, [query, workshops]);
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!user) return;
+    setSubmitting(true);
+    setError('');
+    setNotice('');
+    try {
+      const response = await apiJson<{ message: string }>('/api/community/workshops', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
+        body: JSON.stringify(form),
+      });
+      setForm({ name: '', website: '', street: '', postalCode: '', city: '', country: form.country });
+      setNotice(response.message);
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : 'Werkstatt konnte nicht vorgeschlagen werden.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="site-shell">
+      <GuideHeader />
+      <main className="workshops-page-main">
+        <section className="workshops-page-hero section-pad">
+          <a className="repair-back" href="/karte">← Zur Karte</a>
+          <div className="eyebrow handwritten">community · gemeinsam weiterfahren</div>
+          <h1>Werkstätten für BTM-Bikes.</h1>
+          <p>BTM ist nicht mehr überall selbst für Durchsichten und Reparaturen erreichbar. Hier findest du Werkstätten, die unsere Community für Bonfire und Wildfire empfiehlt – und kannst selbst einen Betrieb aus deiner Region vorschlagen.</p>
+        </section>
+
+        <section className="workshops-section section-pad">
+          <div className="workshops-toolbar card-doodle">
+            <label className="search-box">
+              <span aria-hidden="true">⌕</span>
+              <span className="sr-only">Werkstätten durchsuchen</span>
+              <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Werkstatt, Ort oder PLZ suchen …" />
+            </label>
+            <span className="workshops-count">{loading ? 'lädt …' : `${filteredWorkshops.length} ${filteredWorkshops.length === 1 ? 'Werkstatt' : 'Werkstätten'}`}</span>
+          </div>
+
+          <div className="workshops-directory">
+            {loading ? <p className="empty-state card-doodle">Werkstätten werden geladen …</p> : filteredWorkshops.length ? filteredWorkshops.map((workshop) => (
+              <article className="workshop-card card-doodle" key={workshop.id}>
+                <div className="workshop-card-topline"><span className="kind-chip community">Werkstatt</span><span>{workshop.countryLabel}</span></div>
+                <h2>{workshop.name}</h2>
+                <address><span>{workshop.street}</span><span>{workshop.postalCode} {workshop.city}</span></address>
+                {workshop.website && <a className="workshop-website" href={workshop.website} target="_blank" rel="noopener noreferrer">Webseite öffnen ↗</a>}
+                <a className="workshop-map-link" href={`/karte?werkstatt=${encodeURIComponent(workshop.id)}`}>Auf der Karte zeigen ↗</a>
+              </article>
+            )) : <div className="empty-state card-doodle"><h2>{query.trim() ? 'Keine passende Werkstatt.' : 'Noch keine Werkstätten eingetragen.'}</h2><p>{query.trim() ? 'Versuch es mit einem anderen Ort, Namen oder einer PLZ.' : 'Kennst du einen Betrieb, der BTM-Bikes reparieren kann? Trag ihn unten für die Community ein.'}</p></div>}
+          </div>
+
+          <section className="workshops-submit card-doodle" aria-labelledby="workshops-submit-title">
+            <div className="eyebrow handwritten">dein tipp für die community</div>
+            <h2 id="workshops-submit-title">Werkstatt vorschlagen</h2>
+            <p>Trag nur öffentliche Geschäftsdaten ein. Jeder Vorschlag wird vor der Veröffentlichung geprüft.</p>
+            {authLoading ? <p className="content-note">Konto wird geladen …</p> : user ? <form className="comment-form workshop-form" onSubmit={handleSubmit}>
+              <div className="workshop-form-grid">
+                <label>Name der Werkstatt<input value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} minLength={2} maxLength={120} required /></label>
+                <label>Webseite (optional)<input value={form.website} onChange={(event) => setForm({ ...form, website: event.target.value })} type="url" maxLength={500} placeholder="https://…" /></label>
+                <label>Straße und Hausnummer<input value={form.street} onChange={(event) => setForm({ ...form, street: event.target.value })} minLength={2} maxLength={160} required /></label>
+                <label>Land<select value={form.country} onChange={(event) => setForm({ ...form, country: event.target.value as PostalCountry, postalCode: '' })}><option value="D">Deutschland</option><option value="A">Österreich</option><option value="CH">Schweiz</option></select></label>
+                <label>Postleitzahl<input value={form.postalCode} onChange={(event) => setForm({ ...form, postalCode: event.target.value.replace(/\D/g, '').slice(0, form.country === 'D' ? 5 : 4) })} inputMode="numeric" pattern={form.country === 'D' ? '\\d{5}' : '[1-9]\\d{3}'} maxLength={form.country === 'D' ? 5 : 4} required /></label>
+                <label>Ort<input value={form.city} onChange={(event) => setForm({ ...form, city: event.target.value })} minLength={2} maxLength={100} required /></label>
+              </div>
+              {error && <p className="form-message form-message-error" role="alert">{error}</p>}
+              {notice && <p className="form-message form-message-success" role="status">{notice}</p>}
+              <button className="button button-ink" type="submit" disabled={submitting}>{submitting ? 'Wird geprüft …' : 'Werkstatt vorschlagen'} <span aria-hidden="true">↗</span></button>
+            </form> : <p className="community-login-hint"><a href="/login">Einloggen</a>, um einen Werkstatt-Tipp einzureichen. Nach der Anmeldung erscheint das Formular automatisch.</p>}
+          </section>
         </section>
       </main>
       <GuideFooter />
@@ -4128,7 +4322,7 @@ function GuideHeader() {
         </a>
         <nav className="main-nav" aria-label="Hauptnavigation">
           <a href="/#status">Status</a>
-          <a href="/karte">Karte</a>
+          <MapMenu />
           <a href="/community">Community</a>
           <RepairMenu />
           <a href="/ersatzteile">Ersatzteile</a>
@@ -4141,6 +4335,26 @@ function GuideHeader() {
       </header>
       <BugReportWidget />
     </>
+  );
+}
+
+function MapMenu() {
+  return (
+    <div className="nav-dropdown">
+      <button className="nav-dropdown-trigger" type="button" aria-haspopup="menu">
+        Karte <span className="nav-dropdown-caret" aria-hidden="true" />
+      </button>
+      <div className="nav-dropdown-menu" role="menu">
+        <a className="nav-dropdown-item" href="/karte" role="menuitem">
+          <strong>Community-Karte</strong>
+          <span>Rider und Werkstätten entdecken</span>
+        </a>
+        <a className="nav-dropdown-item" href="/werkstaetten" role="menuitem">
+          <strong>Werkstätten</strong>
+          <span>Reparaturbetriebe finden und vorschlagen</span>
+        </a>
+      </div>
+    </div>
   );
 }
 
@@ -5489,7 +5703,8 @@ function AdminPage() {
   const [password, setPassword] = useState('');
   const [comments, setComments] = useState<AdminComment[]>([]);
   const [members, setMembers] = useState<AdminMember[]>([]);
-  const [adminSection, setAdminSection] = useState<'comments' | 'members' | 'newsletter' | 'notifications' | 'chat'>(() => typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('bereich') === 'chat' ? 'chat' : 'comments');
+  const [workshops, setWorkshops] = useState<AdminWorkshop[]>([]);
+  const [adminSection, setAdminSection] = useState<'comments' | 'members' | 'workshops' | 'newsletter' | 'notifications' | 'chat'>(() => typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('bereich') === 'chat' ? 'chat' : 'comments');
   const [adminFilter, setAdminFilter] = useState<'all' | 'wiki' | 'comments' | 'requests'>('all');
   const [adminSearch, setAdminSearch] = useState('');
   const [busy, setBusy] = useState(false);
@@ -5531,6 +5746,19 @@ function AdminPage() {
     }
   };
 
+  const loadWorkshops = async () => {
+    try {
+      const payload = await apiJson<{ workshops: AdminWorkshop[] }>('/api/admin/workshops');
+      setWorkshops(payload.workshops);
+    } catch (loadError) {
+      if (loadError instanceof Error && loadError.message === 'Nicht autorisiert.') {
+        setAuthenticated(false);
+      } else {
+        setError(loadError instanceof Error ? loadError.message : 'Werkstattvorschläge konnten nicht geladen werden.');
+      }
+    }
+  };
+
   const checkSession = async () => {
     try {
       const payload = await apiJson<{ authenticated: boolean; email: string | null; role: 'admin' | 'moderator' | null; canManageMembers: boolean; csrfToken: string | null }>('/api/admin/session');
@@ -5541,6 +5769,7 @@ function AdminPage() {
       setCsrfToken(payload.csrfToken ?? '');
       if (payload.authenticated) {
         await loadComments();
+        await loadWorkshops();
         if (payload.canManageMembers) await loadMembers();
       }
     } catch (sessionError) {
@@ -5569,6 +5798,7 @@ function AdminPage() {
       setPassword('');
       window.dispatchEvent(new Event('auth-session-changed'));
       await loadComments();
+      await loadWorkshops();
       await loadMembers();
     } catch (loginError) {
       setError(loginError instanceof Error ? loginError.message : 'Anmeldung fehlgeschlagen.');
@@ -5655,6 +5885,7 @@ function AdminPage() {
     setCsrfToken('');
     setComments([]);
     setMembers([]);
+    setWorkshops([]);
     setAdminEmail('');
     setAdminRole(null);
     setCanManageMembers(false);
@@ -5665,6 +5896,7 @@ function AdminPage() {
   const repairRequests = comments.filter((comment) => comment.kind === 'repair_request' || comment.kind === 'repair_answer');
   const experienceComments = comments.filter((comment) => comment.kind === 'comment');
   const openComments = comments.filter((comment) => comment.status === 'pending');
+  const openWorkshops = workshops.filter((workshop) => workshop.status === 'pending');
   const visibleComments = adminFilter === 'wiki' ? wikiSuggestions : adminFilter === 'comments' ? experienceComments : adminFilter === 'requests' ? repairRequests : openComments;
   const filteredComments = useMemo(() => {
     const normalizedQuery = adminSearch.trim().toLocaleLowerCase('de');
@@ -5708,10 +5940,11 @@ function AdminPage() {
               <button className={adminSection === 'comments' ? 'active' : ''} type="button" role="tab" aria-selected={adminSection === 'comments'} onClick={() => setAdminSection('comments')}>Beiträge prüfen <strong>{openComments.length}</strong></button>
               {canManageMembers && <button className={adminSection === 'members' ? 'active' : ''} type="button" role="tab" aria-selected={adminSection === 'members'} onClick={() => { setAdminSection('members'); if (members.length === 0) void loadMembers(); }}>Mitgliederverwaltung <strong>{members.length}</strong></button>}
               {canManageMembers && <button className={adminSection === 'newsletter' ? 'active' : ''} type="button" role="tab" aria-selected={adminSection === 'newsletter'} onClick={() => setAdminSection('newsletter')}>Newsletter <strong>{members.filter((member) => member.newsletterSubscribed).length}</strong></button>}
+              <button className={adminSection === 'workshops' ? 'active' : ''} type="button" role="tab" aria-selected={adminSection === 'workshops'} onClick={() => { setAdminSection('workshops'); if (workshops.length === 0) void loadWorkshops(); }}>Werkstätten <strong>{openWorkshops.length}</strong></button>
               <button className={adminSection === 'notifications' ? 'active' : ''} type="button" role="tab" aria-selected={adminSection === 'notifications'} onClick={() => setAdminSection('notifications')}>E-Mail-Einstellungen</button>
               <button className={adminSection === 'chat' ? 'active' : ''} type="button" role="tab" aria-selected={adminSection === 'chat'} onClick={() => setAdminSection('chat')}>Team-Chat</button>
             </div>
-            {adminSection === 'chat' ? <StaffChatPanel csrfToken={csrfToken} context="admin" /> : adminSection === 'notifications' ? <AdminNotificationPanel csrfToken={csrfToken} canManageRegistration={adminRole === 'admin'} onNotice={setNotice} onError={setError} /> : adminSection === 'members' && canManageMembers ? <AdminMembersPanel members={members} csrfToken={csrfToken} onMembersChange={(updater) => setMembers(updater)} onNotice={setNotice} onError={setError} /> : adminSection === 'newsletter' && canManageMembers ? <AdminNewsletterPanel members={members} csrfToken={csrfToken} onNotice={setNotice} onError={setError} /> : <>
+            {adminSection === 'chat' ? <StaffChatPanel csrfToken={csrfToken} context="admin" /> : adminSection === 'notifications' ? <AdminNotificationPanel csrfToken={csrfToken} canManageRegistration={adminRole === 'admin'} onNotice={setNotice} onError={setError} /> : adminSection === 'workshops' ? <AdminWorkshopsPanel workshops={workshops} csrfToken={csrfToken} onWorkshopsChange={(updater) => setWorkshops(updater)} onNotice={setNotice} onError={setError} /> : adminSection === 'members' && canManageMembers ? <AdminMembersPanel members={members} csrfToken={csrfToken} canConfirmMembers={adminRole === 'admin'} onMembersChange={(updater) => setMembers(updater)} onNotice={setNotice} onError={setError} /> : adminSection === 'newsletter' && canManageMembers ? <AdminNewsletterPanel members={members} csrfToken={csrfToken} onNotice={setNotice} onError={setError} /> : <>
             <CommunityReportsPanel csrfToken={csrfToken} context={adminRole === 'moderator' ? 'moderator' : 'admin'} />
             <div className="admin-filter-tabs" role="tablist" aria-label="Beiträge filtern">
               <button className={adminFilter === 'all' ? 'active' : ''} type="button" role="tab" aria-selected={adminFilter === 'all'} onClick={() => setAdminFilter('all')}>Alle <strong>{openComments.length}</strong></button>
@@ -5834,9 +6067,10 @@ function AdminNotificationPanel({ csrfToken, canManageRegistration, onNotice, on
   );
 }
 
-function AdminMembersPanel({ members, csrfToken, onMembersChange, onNotice, onError }: {
+function AdminMembersPanel({ members, csrfToken, canConfirmMembers, onMembersChange, onNotice, onError }: {
   members: AdminMember[];
   csrfToken: string;
+  canConfirmMembers: boolean;
   onMembersChange: (updater: (current: AdminMember[]) => AdminMember[]) => void;
   onNotice: (message: string) => void;
   onError: (message: string) => void;
@@ -5905,6 +6139,24 @@ function AdminMembersPanel({ members, csrfToken, onMembersChange, onNotice, onEr
     }
   };
 
+  const handleManualConfirmation = async (member: AdminMember) => {
+    if (member.status === 'active') return;
+    if (!window.confirm(`E-Mail-Adresse von ${formatUserHandle(member.name)} manuell bestätigen und den Account freischalten?`)) return;
+    setBusy(true);
+    try {
+      const response = await apiJson<{ message: string; member: AdminMember }>(`/api/admin/users/${member.id}/confirm-email`, {
+        method: 'PATCH',
+        headers: { 'X-CSRF-Token': csrfToken },
+      });
+      onMembersChange((current) => current.map((item) => item.id === response.member.id ? response.member : item));
+      onNotice(response.message);
+    } catch (confirmationError) {
+      onError(confirmationError instanceof Error ? confirmationError.message : 'Das Mitglied konnte nicht freigeschaltet werden.');
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const handleDelete = async (member: AdminMember) => {
     if (!window.confirm(`Konto von ${formatUserHandle(member.name)} samt persönlichen Beiträgen wirklich löschen?`)) return;
     setBusy(true);
@@ -5965,11 +6217,70 @@ function AdminMembersPanel({ members, csrfToken, onMembersChange, onNotice, onEr
             </div>
             <dl className="admin-member-facts"><div><dt>Modell</dt><dd>{member.model ?? 'nicht festgelegt'}</dd></div><div><dt>Registriert</dt><dd>{member.createdAt ? new Date(member.createdAt).toLocaleDateString('de-DE') : '—'}</dd></div><div><dt>Newsletter</dt><dd>{member.newsletterSubscribed ? 'abonniert' : 'nein'}</dd></div></dl>
             {member.warnings.length > 0 && <details className="admin-member-warnings"><summary>Verwarnungen ansehen</summary><ol>{member.warnings.map((warning) => <li key={warning.id}><strong>{new Date(warning.createdAt).toLocaleDateString('de-DE')}</strong> · {warning.reason}</li>)}</ol></details>}
-            <div className="admin-member-actions"><button className="button button-ink" type="button" disabled={busy} onClick={() => openMessageDialog(member)}>Mail schreiben</button><button className="button button-ghost" type="button" disabled={busy} onClick={() => void handlePasswordReset(member)}>Reset-Mail senden</button><button className="button button-ghost" type="button" disabled={busy} onClick={() => void handleRoleChange(member)}>{member.role === 'moderator' ? 'Moderator entziehen' : 'Zum Moderator machen'}</button>{!member.communicationBlocked && <button className="button button-ghost" type="button" disabled={busy} onClick={() => openWarningDialog(member)}>Verwarnen</button>}<button className="button button-danger" type="button" disabled={busy} onClick={() => void handleDelete(member)}>Löschen</button></div>
+            <div className="admin-member-actions">{canConfirmMembers && member.status !== 'active' && <button className="button button-ink" type="button" disabled={busy} onClick={() => void handleManualConfirmation(member)}>Manuell freischalten</button>}<button className="button button-ink" type="button" disabled={busy} onClick={() => openMessageDialog(member)}>Mail schreiben</button><button className="button button-ghost" type="button" disabled={busy} onClick={() => void handlePasswordReset(member)}>Reset-Mail senden</button><button className="button button-ghost" type="button" disabled={busy} onClick={() => void handleRoleChange(member)}>{member.role === 'moderator' ? 'Moderator entziehen' : 'Zum Moderator machen'}</button>{!member.communicationBlocked && <button className="button button-ghost" type="button" disabled={busy} onClick={() => openWarningDialog(member)}>Verwarnen</button>}<button className="button button-danger" type="button" disabled={busy} onClick={() => void handleDelete(member)}>Löschen</button></div>
           </article>
         )) : <div className="admin-empty card-doodle"><h2>{memberSearch.trim() ? 'Nichts gefunden.' : 'Noch keine Mitglieder.'}</h2><p>{memberSearch.trim() ? 'Versuch es mit einem anderen Suchbegriff.' : 'Sobald ein Konto bestätigt wurde, erscheint es hier.'}</p></div>}
       </div>
       {dialog && <div className="admin-user-overlay" onMouseDown={(event) => { if (event.target === event.currentTarget) setDialog(null); }}><section className="admin-user-dialog card-doodle" role="dialog" aria-modal="true" aria-labelledby="admin-user-dialog-title"><div className="admin-user-dialog-header"><div><div className="eyebrow handwritten">{dialog.type === 'message' ? 'direkter draht' : 'moderation'}</div><h3 id="admin-user-dialog-title">{dialog.type === 'message' ? `Mail an ${formatUserHandle(dialog.member.name)}` : `Verwarnung für ${formatUserHandle(dialog.member.name)}`}</h3></div><button className="bug-report-close" type="button" aria-label="Dialog schließen" onClick={() => setDialog(null)}>×</button></div>{dialog.type === 'message' ? <form className="comment-form" onSubmit={handleDialogSubmit}><label>Betreff<input value={subject} onChange={(event) => setSubject(event.target.value)} minLength={2} maxLength={160} required /></label><label>Nachricht<textarea value={body} onChange={(event) => setBody(event.target.value)} minLength={2} maxLength={5000} rows={8} required /></label><button className="button button-ink" type="submit" disabled={busy}>{busy ? 'Wird versendet …' : 'Mail senden'} <span aria-hidden="true">↗</span></button></form> : <form className="comment-form" onSubmit={handleDialogSubmit}><p className="admin-user-dialog-warning">Aktueller Stand: {dialog.member.warningCount}/3. Mit der dritten Verwarnung wird die Kommunikation automatisch gesperrt.</p><label>Grund der Verwarnung<textarea value={reason} onChange={(event) => setReason(event.target.value)} minLength={5} maxLength={1000} rows={7} placeholder="Was wurde moderiert?" required /></label><button className="button button-ink" type="submit" disabled={busy}>{busy ? 'Wird gespeichert …' : 'Verwarnung speichern'} <span aria-hidden="true">↗</span></button></form>}</section></div>}
+    </section>
+  );
+}
+
+function AdminWorkshopsPanel({ workshops, csrfToken, onWorkshopsChange, onNotice, onError }: {
+  workshops: AdminWorkshop[];
+  csrfToken: string;
+  onWorkshopsChange: (updater: (current: AdminWorkshop[]) => AdminWorkshop[]) => void;
+  onNotice: (message: string) => void;
+  onError: (message: string) => void;
+}) {
+  const [busy, setBusy] = useState(false);
+  const [query, setQuery] = useState('');
+  const pendingCount = workshops.filter((workshop) => workshop.status === 'pending').length;
+  const filteredWorkshops = useMemo(() => {
+    const normalizedQuery = query.trim().toLocaleLowerCase('de');
+    if (!normalizedQuery) return workshops;
+    return workshops.filter((workshop) => `${workshop.name} ${workshop.street} ${workshop.postalCode} ${workshop.city} ${workshop.countryLabel} ${workshop.submittedByName}`.toLocaleLowerCase('de').includes(normalizedQuery));
+  }, [query, workshops]);
+
+  const handleStatus = async (workshop: AdminWorkshop, status: 'approved' | 'rejected') => {
+    setBusy(true);
+    try {
+      const response = await apiJson<{ workshop: AdminWorkshop; message: string }>(`/api/admin/workshops/${workshop.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
+        body: JSON.stringify({ status }),
+      });
+      onWorkshopsChange((current) => status === 'rejected'
+        ? current.filter((item) => item.id !== workshop.id)
+        : current.map((item) => item.id === workshop.id ? response.workshop : item));
+      onNotice(response.message);
+    } catch (actionError) {
+      onError(actionError instanceof Error ? actionError.message : 'Der Werkstattstatus konnte nicht geändert werden.');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <section className="admin-workshops-section">
+      <div className="admin-members-heading">
+        <div><div className="eyebrow handwritten">öffentliche adressen</div><h2>Werkstätten prüfen</h2><p>Hier werden Werkstatt-Tipps aus der Community veröffentlicht oder abgelehnt. Es werden nur öffentliche Geschäftsdaten angezeigt.</p></div>
+        <span className="admin-member-count">{pendingCount} offen · {workshops.length} gesamt</span>
+      </div>
+      <div className="admin-search card-doodle">
+        <label className="search-box"><span aria-hidden="true">⌕</span><span className="sr-only">Werkstätten durchsuchen</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="z. B. Werkstatt, Ort oder PLZ …" /></label>
+        <span className="admin-search-count">{query.trim() ? `${filteredWorkshops.length} Treffer` : `${workshops.length} Werkstätten`}</span>
+      </div>
+      <div className="admin-workshop-list">
+        {filteredWorkshops.length ? filteredWorkshops.map((workshop) => (
+          <article className={`admin-workshop card-doodle ${workshop.status === 'pending' ? 'admin-workshop-pending' : ''}`} key={workshop.id}>
+            <div className="admin-workshop-content">
+              <div><span className={`admin-status ${workshop.status === 'pending' ? 'pending' : 'approved'}`}>{workshop.status === 'pending' ? 'wartet auf Prüfung' : 'veröffentlicht'}</span><h3>{workshop.name}</h3><p>{workshop.street} · {workshop.postalCode} {workshop.city} · {workshop.countryLabel}</p><p>Vorgeschlagen von {formatUserHandle(workshop.submittedByName)} · {new Date(workshop.createdAt).toLocaleString('de-DE')}</p>{workshop.website && <a href={workshop.website} target="_blank" rel="noopener noreferrer">Webseite prüfen ↗</a>}</div>
+              {workshop.canModerate ? <div className="admin-member-actions">{workshop.status === 'pending' ? <><button className="button button-ink" type="button" disabled={busy} onClick={() => void handleStatus(workshop, 'approved')}>Veröffentlichen</button><button className="button button-danger" type="button" disabled={busy} onClick={() => void handleStatus(workshop, 'rejected')}>Ablehnen</button></> : <button className="button button-danger" type="button" disabled={busy} onClick={() => void handleStatus(workshop, 'rejected')}>Aus Verzeichnis entfernen</button>}</div> : <p className="content-note">Eigene Vorschläge prüft ein anderer Moderator oder Admin.</p>}
+            </div>
+          </article>
+        )) : <div className="admin-empty card-doodle"><h2>{query.trim() ? 'Nichts gefunden.' : 'Keine Werkstattvorschläge.'}</h2><p>{query.trim() ? 'Versuch es mit einem anderen Suchbegriff.' : 'Sobald ein Mitglied eine Werkstatt vorschlägt, erscheint sie hier.'}</p></div>}
+      </div>
     </section>
   );
 }

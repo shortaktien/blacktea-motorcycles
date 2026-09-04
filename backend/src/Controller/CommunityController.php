@@ -648,6 +648,192 @@ final class CommunityController
         return $response;
     }
 
+    #[Route('/api/community/workshops', name: 'api_community_workshops', methods: ['GET'])]
+    public function communityWorkshops(Request $request): JsonResponse
+    {
+        $query = mb_strtolower(trim((string) $request->query->get('q', '')), 'UTF-8');
+        $workshops = array_values(array_filter(
+            $this->storage->read()['workshops'] ?? [],
+            function (array $workshop) use ($query): bool {
+                if (($workshop['status'] ?? null) !== 'approved') {
+                    return false;
+                }
+                if ($query === '') {
+                    return true;
+                }
+                $searchable = mb_strtolower(implode(' ', [
+                    (string) ($workshop['name'] ?? ''),
+                    (string) ($workshop['website'] ?? ''),
+                    (string) ($workshop['street'] ?? ''),
+                    (string) ($workshop['postalCode'] ?? ''),
+                    (string) ($workshop['city'] ?? ''),
+                    $this->workshopCountryLabel((string) ($workshop['country'] ?? '')),
+                ]), 'UTF-8');
+                return str_contains($searchable, $query);
+            },
+        ));
+        usort($workshops, static fn (array $left, array $right): int => strcasecmp((string) ($left['name'] ?? ''), (string) ($right['name'] ?? '')));
+
+        $response = new JsonResponse([
+            'workshops' => array_map(fn (array $workshop): array => $this->publicWorkshop($workshop), $workshops),
+            'totalCount' => count($workshops),
+        ]);
+        $response->headers->set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
+        return $response;
+    }
+
+    #[Route('/api/community/workshops', name: 'api_community_workshop_create', methods: ['POST'])]
+    public function createWorkshop(Request $request): JsonResponse
+    {
+        if ($response = $this->communityWriteGuard($request)) {
+            return $response;
+        }
+
+        $user = $this->users->currentUser();
+        if (!$this->storage->allowRate('workshop-create', $user['id'], 5, 86400)) {
+            return $this->error('Du kannst höchstens fünf Werkstätten pro Tag vorschlagen.', Response::HTTP_TOO_MANY_REQUESTS);
+        }
+
+        $payload = $this->jsonPayload($request);
+        $name = trim((string) ($payload['name'] ?? ''));
+        $website = trim((string) ($payload['website'] ?? ''));
+        $street = trim((string) ($payload['street'] ?? ''));
+        $postalCode = trim((string) ($payload['postalCode'] ?? ''));
+        $city = trim((string) ($payload['city'] ?? ''));
+        $country = strtoupper(trim((string) ($payload['country'] ?? '')));
+
+        if ($this->length($name) < 2 || $this->length($name) > 120) {
+            return $this->error('Bitte einen Werkstattnamen mit 2 bis 120 Zeichen angeben.', Response::HTTP_BAD_REQUEST);
+        }
+        if ($website !== '') {
+            $parsedWebsite = filter_var($website, FILTER_VALIDATE_URL);
+            $scheme = is_string($parsedWebsite) ? strtolower((string) parse_url($parsedWebsite, PHP_URL_SCHEME)) : '';
+            $host = is_string($parsedWebsite) ? (string) parse_url($parsedWebsite, PHP_URL_HOST) : '';
+            if ($parsedWebsite === false || !in_array($scheme, ['http', 'https'], true) || $host === '' || parse_url($parsedWebsite, PHP_URL_USER) !== null || parse_url($parsedWebsite, PHP_URL_PASS) !== null || $this->length($website) > 500) {
+                return $this->error('Bitte eine gültige Webseite mit http:// oder https:// angeben.', Response::HTTP_BAD_REQUEST);
+            }
+        }
+        if ($this->length($street) < 2 || $this->length($street) > 160) {
+            return $this->error('Bitte eine Straße mit Hausnummer angeben.', Response::HTTP_BAD_REQUEST);
+        }
+        $postalPattern = $country === 'D' ? '/^\d{5}$/' : '/^[1-9]\d{3}$/';
+        if (!in_array($country, ['D', 'A', 'CH'], true) || preg_match($postalPattern, $postalCode) !== 1) {
+            return $this->error('Bitte Land und eine gültige Postleitzahl angeben.', Response::HTTP_BAD_REQUEST);
+        }
+        if ($this->length($city) < 2 || $this->length($city) > 100) {
+            return $this->error('Bitte einen Ort mit 2 bis 100 Zeichen angeben.', Response::HTTP_BAD_REQUEST);
+        }
+
+        $workshop = [
+            'id' => bin2hex(random_bytes(16)),
+            'status' => 'pending',
+            'name' => $name,
+            'website' => $website,
+            'street' => $street,
+            'postalCode' => $postalCode,
+            'city' => $city,
+            'country' => $country,
+            'submittedByUserId' => (string) $user['id'],
+            'createdAt' => (new \DateTimeImmutable())->format(DATE_ATOM),
+            'reviewedAt' => null,
+            'reviewedBy' => null,
+        ];
+        $duplicate = false;
+        $workshopKey = $this->workshopKey($workshop);
+        $this->storage->update(function (array &$data) use ($workshop, $workshopKey, &$duplicate): void {
+            foreach ($data['workshops'] as $existing) {
+                if (($existing['status'] ?? null) !== 'rejected' && $this->workshopKey($existing) === $workshopKey) {
+                    $duplicate = true;
+                    return;
+                }
+            }
+            $data['workshops'][] = $workshop;
+        });
+
+        if ($duplicate) {
+            return $this->error('Diese Werkstatt ist bereits vorgeschlagen oder veröffentlicht.', Response::HTTP_CONFLICT);
+        }
+
+        return new JsonResponse([
+            'workshop' => $this->publicWorkshop($workshop),
+            'message' => 'Danke! Der Werkstattvorschlag wird vor der Veröffentlichung geprüft.',
+        ], Response::HTTP_CREATED);
+    }
+
+    #[Route('/api/admin/workshops', name: 'api_admin_workshops', methods: ['GET'])]
+    public function adminWorkshops(Request $request): JsonResponse
+    {
+        $reviewer = $this->moderationReviewer($request);
+        if ($reviewer === null) {
+            return $this->unauthorized();
+        }
+
+        $workshops = array_values(array_filter(
+            $this->storage->read()['workshops'] ?? [],
+            static fn (array $workshop): bool => in_array($workshop['status'] ?? null, ['pending', 'approved'], true),
+        ));
+        usort($workshops, static function (array $left, array $right): int {
+            $statusOrder = ['pending' => 0, 'approved' => 1];
+            return [$statusOrder[$left['status'] ?? 'approved'] ?? 1, (string) ($right['createdAt'] ?? '')]
+                <=> [$statusOrder[$right['status'] ?? 'approved'] ?? 1, (string) ($left['createdAt'] ?? '')];
+        });
+
+        $response = new JsonResponse([
+            'workshops' => array_map(fn (array $workshop): array => $this->adminWorkshop($workshop, $reviewer), $workshops),
+        ]);
+        $response->headers->set('Cache-Control', 'private, no-store');
+        return $response;
+    }
+
+    #[Route('/api/admin/workshops/{id}', name: 'api_admin_workshop_status', methods: ['PATCH'])]
+    public function updateWorkshopStatus(string $id, Request $request): JsonResponse
+    {
+        $reviewer = $this->moderationReviewer($request);
+        if ($reviewer === null) {
+            return $this->unauthorized();
+        }
+        if (!$this->validModeratorCsrfToken($request)) {
+            return $this->error('Ungültige Sitzung.', Response::HTTP_FORBIDDEN);
+        }
+
+        $status = $this->jsonPayload($request)['status'] ?? null;
+        if (!is_string($status) || !in_array($status, ['approved', 'rejected'], true)) {
+            return $this->error('Ungültiger Werkstattstatus.', Response::HTTP_BAD_REQUEST);
+        }
+
+        $updated = null;
+        $selfReview = false;
+        $this->storage->update(function (array &$data) use ($id, $status, $reviewer, &$updated, &$selfReview): void {
+            foreach ($data['workshops'] as &$workshop) {
+                if (($workshop['id'] ?? null) !== $id) {
+                    continue;
+                }
+                if ($this->isOwnModeratorWorkshop($workshop, $reviewer)) {
+                    $selfReview = true;
+                    return;
+                }
+                $workshop['status'] = $status;
+                $workshop['reviewedAt'] = (new \DateTimeImmutable())->format(DATE_ATOM);
+                $workshop['reviewedBy'] = $reviewer['name'];
+                $updated = $workshop;
+                break;
+            }
+            unset($workshop);
+        });
+
+        if ($selfReview) {
+            return $this->error('Eigene Werkstattvorschläge können nicht selbst geprüft werden.', Response::HTTP_FORBIDDEN);
+        }
+        if (!is_array($updated)) {
+            return $this->error('Werkstatt nicht gefunden.', Response::HTTP_NOT_FOUND);
+        }
+
+        return new JsonResponse([
+            'workshop' => $this->adminWorkshop($updated, $reviewer),
+            'message' => $status === 'approved' ? 'Werkstatt veröffentlicht.' : 'Werkstatt abgelehnt.',
+        ]);
+    }
+
     #[Route('/api/feedback', name: 'api_feedback_vote', methods: ['POST'])]
     public function vote(Request $request): JsonResponse
     {
@@ -1242,6 +1428,54 @@ final class CommunityController
         $response = new JsonResponse(['users' => array_map(fn (array $user): array => $this->adminUser($user), $users)]);
         $response->headers->set('Cache-Control', 'no-store');
         return $response;
+    }
+
+    #[Route('/api/admin/users/{id}/confirm-email', name: 'api_admin_user_confirm_email', methods: ['PATCH'])]
+    public function confirmUserEmail(string $id, Request $request): JsonResponse
+    {
+        if (!$this->isAdminAuthenticated()) {
+            return $this->unauthorized();
+        }
+        if (!$this->validCsrfToken($request)) {
+            return $this->error('Ungültige Admin-Sitzung.', Response::HTTP_FORBIDDEN);
+        }
+
+        $updated = null;
+        $alreadyActive = false;
+        $adminEmail = strtolower(trim((string) ($_SESSION['admin_email'] ?? 'admin')));
+        $this->userStorage->update(static function (array &$data) use ($id, $adminEmail, &$updated, &$alreadyActive): void {
+            foreach ($data['users'] as &$candidate) {
+                if (($candidate['id'] ?? null) !== $id) {
+                    continue;
+                }
+
+                if (($candidate['status'] ?? 'active') === 'active') {
+                    $alreadyActive = true;
+                    $updated = $candidate;
+                    break;
+                }
+
+                $candidate['status'] = 'active';
+                $candidate['emailConfirmedAt'] = (new \DateTimeImmutable())->format(DATE_ATOM);
+                $candidate['emailConfirmationMethod'] = 'admin_manual';
+                $candidate['emailConfirmedBy'] = $adminEmail;
+                unset($candidate['emailConfirmationTokenHash'], $candidate['emailConfirmationExpiresAt']);
+                $updated = $candidate;
+                break;
+            }
+            unset($candidate);
+        });
+
+        if (!is_array($updated)) {
+            return $this->error('Mitglied nicht gefunden.', Response::HTTP_NOT_FOUND);
+        }
+
+        return new JsonResponse([
+            'member' => $this->adminUser($updated),
+            'message' => $alreadyActive
+                ? 'Mitglied ist bereits freigeschaltet.'
+                : 'E-Mail manuell bestätigt. Das Mitglied kann sich jetzt einloggen.',
+        ]);
     }
 
     #[Route('/api/admin/users/{id}/role', name: 'api_admin_user_role', methods: ['PATCH'])]
@@ -2027,6 +2261,58 @@ final class CommunityController
             'approvedAt' => $comment['approvedAt'] ?? null,
             'reviewVersion' => $this->reviewVersion($comment),
         ];
+    }
+
+    private function publicWorkshop(array $workshop): array
+    {
+        $country = in_array($workshop['country'] ?? null, ['D', 'A', 'CH'], true) ? $workshop['country'] : 'D';
+        return [
+            'id' => (string) $workshop['id'],
+            'name' => (string) $workshop['name'],
+            'website' => (string) ($workshop['website'] ?? ''),
+            'street' => (string) ($workshop['street'] ?? ''),
+            'postalCode' => (string) $workshop['postalCode'],
+            'city' => (string) $workshop['city'],
+            'country' => $country,
+            'countryLabel' => $this->workshopCountryLabel($country),
+            'prefix' => substr((string) $workshop['postalCode'], 0, 2),
+        ];
+    }
+
+    private function adminWorkshop(array $workshop, array $reviewer): array
+    {
+        return $this->publicWorkshop($workshop) + [
+            'status' => (string) ($workshop['status'] ?? 'pending'),
+            'createdAt' => (string) ($workshop['createdAt'] ?? ''),
+            'reviewedAt' => isset($workshop['reviewedAt']) && is_string($workshop['reviewedAt']) ? $workshop['reviewedAt'] : null,
+            'reviewedBy' => isset($workshop['reviewedBy']) && is_string($workshop['reviewedBy']) ? $workshop['reviewedBy'] : null,
+            'submittedByName' => ($submitter = $this->userStorage->findById((string) ($workshop['submittedByUserId'] ?? ''))) !== null ? (string) ($submitter['name'] ?? '') : 'Unbekannt',
+            'canModerate' => !$this->isOwnModeratorWorkshop($workshop, $reviewer),
+        ];
+    }
+
+    private function workshopCountryLabel(string $country): string
+    {
+        return ['D' => 'Deutschland', 'A' => 'Österreich', 'CH' => 'Schweiz'][$country] ?? $country;
+    }
+
+    private function workshopKey(array $workshop): string
+    {
+        $parts = [
+            (string) ($workshop['name'] ?? ''),
+            (string) ($workshop['postalCode'] ?? ''),
+            (string) ($workshop['city'] ?? ''),
+        ];
+        $value = implode('|', array_map(static fn (string $part): string => trim($part), $parts));
+        $value = preg_replace('/\s+/u', ' ', $value) ?? $value;
+        return mb_strtolower($value, 'UTF-8');
+    }
+
+    private function isOwnModeratorWorkshop(array $workshop, array $reviewer): bool
+    {
+        return ($reviewer['role'] ?? null) === 'moderator'
+            && is_string($workshop['submittedByUserId'] ?? null)
+            && ($workshop['submittedByUserId'] ?? null) === ($reviewer['id'] ?? null);
     }
 
     private function adminUser(array $user): array

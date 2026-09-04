@@ -161,6 +161,8 @@ try {
     $assert($auth->currentUser()['id'] === $moderator, 'Moderator cookie selected correctly');
     $status($controller->communityReports($request('GET', [], 'test-csrf', 'admin')), 200, 'Explicit admin context switches back to admin cookie');
     require __DIR__ . '/admin-profile-checks.php';
+    require __DIR__ . '/admin-member-confirmation-checks.php';
+    require __DIR__ . '/workshop-checks.php';
     require __DIR__ . '/mention-suggestion-checks.php';
     require __DIR__ . '/self-review-checks.php';
     require __DIR__ . '/review-editing-checks.php';

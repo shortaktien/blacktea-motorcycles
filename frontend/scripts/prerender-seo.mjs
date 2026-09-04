@@ -85,6 +85,7 @@ const staticPages = [
   { path: '/community', title: 'BTM Community — Black Tea Motorbikes – Hilfe', description: 'Erfahrungen, Umbauten und Reparaturtipps von BTM-Ridern teilen und die neuesten Beiträge der Community entdecken.' },
   { path: '/faq', title: 'FAQ — Black Tea Motorbikes – Hilfe', description: 'Eigenständig beantwortete Fragen zu Black Tea Bonfire und Wildfire: Varianten, Reichweite, Display, Akku, Bremsen und Wartung.' },
   { path: '/karte', title: 'Community-Karte — Black Tea Motorbikes – Hilfe', description: 'Ungefähre PLZ-Regionen der BTM-Community in Deutschland, Österreich und der Schweiz.' },
+  { path: '/werkstaetten', title: 'Werkstätten für BTM-Bikes — Black Tea Motorbikes – Hilfe', description: 'Werkstätten in Deutschland, Österreich und der Schweiz finden oder einen geprüften Tipp aus der Community eintragen.' },
   { path: '/quellen', title: 'Quellen — Black Tea Motorbikes – Hilfe', description: 'Nachvollziehbare Quellen zu Insolvenzstatus, Handbüchern, lokalen PDFs, Ersatzteilspuren und Community-Wissen.' },
   { path: '/impressum', title: 'Impressum — Black Tea Motorbikes – Hilfe', description: 'Anbieterinformationen und rechtliche Hinweise zu Black Tea Motorbikes – Hilfe.' },
   { path: '/datenschutz', title: 'Datenschutz — Black Tea Motorbikes – Hilfe', description: 'Datenschutzhinweise zu Kommentaren, Bildanhängen und dem Betrieb von Black Tea Motorbikes – Hilfe.' },

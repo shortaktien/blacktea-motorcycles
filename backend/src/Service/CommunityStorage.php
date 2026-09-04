@@ -192,7 +192,7 @@ final class CommunityStorage
             : $updated['notificationSettings']['moderators'][$identity];
     }
 
-    /** @return array{feedback: array<string, array{up: int, down: int}>, comments: list<array<string, mixed>>, bugReports: list<array<string, mixed>>, staffChat: list<array<string, mixed>>, notificationSettings: array{admin: array<string, bool>, moderators: array<string, array<string, bool>>}} */
+    /** @return array{feedback: array<string, array{up: int, down: int}>, comments: list<array<string, mixed>>, workshops: list<array<string, mixed>>, bugReports: list<array<string, mixed>>, staffChat: list<array<string, mixed>>, notificationSettings: array{admin: array<string, bool>, moderators: array<string, array<string, bool>>}} */
     private function decode($handle): array
     {
         rewind($handle);
@@ -255,6 +255,21 @@ final class CommunityStorage
             }
         }
 
+        $workshops = [];
+        foreach (($data['workshops'] ?? []) as $workshop) {
+            if (!is_array($workshop) || !isset($workshop['id'], $workshop['name'], $workshop['country'], $workshop['postalCode'], $workshop['city'])) {
+                continue;
+            }
+            $workshop['status'] = in_array($workshop['status'] ?? null, ['pending', 'approved', 'rejected'], true)
+                ? $workshop['status']
+                : 'pending';
+            $workshop['website'] = is_string($workshop['website'] ?? null) ? $workshop['website'] : '';
+            $workshop['street'] = is_string($workshop['street'] ?? null) ? $workshop['street'] : '';
+            $workshop['postalCode'] = is_string($workshop['postalCode'] ?? null) ? $workshop['postalCode'] : '';
+            $workshop['city'] = is_string($workshop['city'] ?? null) ? $workshop['city'] : '';
+            $workshops[] = $workshop;
+        }
+
         $bugReports = [];
         foreach (($data['bugReports'] ?? []) as $bugReport) {
             if (is_array($bugReport) && isset($bugReport['id'])) {
@@ -280,6 +295,7 @@ final class CommunityStorage
         return [
             'feedback' => $feedback,
             'comments' => $comments,
+            'workshops' => $workshops,
             'bugReports' => $bugReports,
             'staffChat' => $staffChat,
             'notificationSettings' => [
@@ -294,6 +310,7 @@ final class CommunityStorage
         return [
             'feedback' => [],
             'comments' => [],
+            'workshops' => [],
             'bugReports' => [],
             'staffChat' => [],
             'notificationSettings' => [
