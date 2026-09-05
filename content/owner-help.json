@@ -1,0 +1,68 @@
+{
+  "pages": [
+    {
+      "path": "/insolvenz",
+      "title": "Black Tea Motorbikes insolvent: Hilfe für Besitzer & Besteller",
+      "heading": "Black Tea Insolvenz: Was kannst du jetzt tun?",
+      "description": "Hilfe zur Black Tea Motorbikes Insolvenz: Verfahrensstand prüfen, Bestellunterlagen sichern, Ersatzteile suchen und Reparaturen vorbereiten.",
+      "reviewedAt": "2026-09-04",
+      "intro": "Du wartest auf dein Motorrad, brauchst ein Ersatzteil oder suchst Hilfe für eine Reparatur? Hier findest du die nächsten Schritte für Bonfire und Wildfire. BTM-Hilfe ist eine unabhängige Community und kein Ansprechpartner der Black Tea Motorbikes GmbH.",
+      "summary": "Belegt ist die Anordnung der vorläufigen Insolvenzverwaltung vom 14. Juli 2026 durch das Amtsgericht München, Aktenzeichen 1513 IN 2588/26. Die am 4. September eingesehene Sekundärquelle führt Sicherungsmaßnahmen auf. Ein aktueller Eröffnungsbeschluss wurde hier nicht amtlich verifiziert. Prüfe neue Beschlüsse und Fristen im amtlichen Insolvenzportal.",
+      "sections": [
+        {
+          "id": "verfahrensstand",
+          "title": "Wo prüfst du den Verfahrensstand?",
+          "paragraphs": ["Suche im amtlichen Insolvenzportal nach Black Tea Motorbikes GmbH, Amtsgericht München und dem Aktenzeichen 1513 IN 2588/26. Achte auf das Datum und die Art der Bekanntmachung. Eine Veröffentlichung zu Sicherungsmaßnahmen ist kein Eröffnungsbeschluss.", "Die dokumentierte Anordnung nennt Florian Loserth als vorläufigen Insolvenzverwalter. Entnimm aktuelle Kontaktdaten, Zuständigkeit und etwaige Fristen der jeweiligen Bekanntmachung. Diese Seite kann weder eine Lieferung noch die Erstattung einer Zahlung bestätigen."],
+          "links": [{"label": "Amtliche Bekanntmachungen suchen", "href": "https://www.insolvenzbekanntmachungen.de/"}, {"label": "Dokumentierte Anordnung vom 14.07.2026 (Sekundärquelle)", "href": "https://www.versteigerungskalender.de/insolvenzkalender/blaeck-tea-motorbikes-gmbh"}]
+        },
+        {
+          "id": "bestellung",
+          "title": "Du hast bezahlt und wartest auf dein Bike",
+          "paragraphs": ["Sichere Bestellung, Rechnung, Zahlungsbelege und bisherigen Schriftverkehr. Notiere die bestellte Variante, Akkuanzahl und offene Ausstattung. Bitte die zuständige Stelle schriftlich um Auskunft zum konkreten Auftrag.", "Eine Vorauszahlung sichert die Lieferung nicht. Ob eine Forderung anzumelden ist, hängt vom Verfahrensstand und deinem Vertrag ab. Frist und Empfänger stehen im Eröffnungsbeschluss; Grund, Betrag und Belege gehören zur Anmeldung. Eine Rückzahlung ist damit nicht garantiert. Lass individuelle Nachzahlungsangebote unabhängig prüfen."],
+          "links": [{"label": "Verbraucherzentrale: Vorauszahlung und Firmeninsolvenz", "href": "https://www.verbraucherzentrale.de/wissen/vertraege-reklamation/kundenrechte/wenn-eine-firma-insolvent-wird-das-sind-ihre-rechte-10630"}, {"label": "§ 28 InsO: Aufforderung an Gläubiger", "href": "https://www.gesetze-im-internet.de/inso/__28.html"}, {"label": "§ 174 InsO: Anmeldung und Belege", "href": "https://www.gesetze-im-internet.de/inso/__174.html"}]
+        },
+        {
+          "id": "reparatur",
+          "title": "Deine Bonfire oder Wildfire braucht eine Reparatur",
+          "paragraphs": ["Beginne mit Modellvariante, Baujahr und dem beobachteten Fehler. Sichere das passende Handbuch und fotografiere Fehlermeldungen. Mit diesen Angaben kann eine Werkstatt besser einschätzen, ob sie den Auftrag übernehmen kann.", "Kläre einen möglichen Gewährleistungsfall zunächst mit deinem Verkäufer; eine freiwillige Garantie ist davon zu unterscheiden. Die Community ersetzt keine Kostenübernahme. Frage vor einer Beauftragung nach Diagnosekosten, Teilebeschaffung und dem weiteren Vorgehen."],
+          "links": [{"label": "Werkstattkontakt vorbereiten", "href": "/hilfe/werkstatt-vorbereiten"}, {"label": "Reparaturhilfen nach Fehlerbild", "href": "/hilfe"}, {"label": "Werkstätten und Community-Tipps", "href": "/werkstaetten"}, {"label": "Verbraucherzentrale: Mängel und Insolvenz", "href": "https://www.verbraucherzentrale.de/wissen/vertraege-reklamation/kundenrechte/wenn-eine-firma-insolvent-wird-das-sind-ihre-rechte-10630"}]
+        },
+        {
+          "id": "ersatzteile",
+          "title": "Du brauchst Ersatzteile oder Unterlagen",
+          "paragraphs": ["Im Ersatzteilarchiv findest du historische Bezeichnungen, Varianten und vorhandene Bezugsquellen. Ein alter Shop-Eintrag belegt weder einen heutigen Lagerbestand noch die Passform für dein Motorrad. Vergleiche die konkrete Ausführung vor einer Bestellung.", "Bewahre dein Handbuch, Schaltpläne und Wartungsnachweise auch lokal auf. Fehlende Teilenummern oder eigene Erfahrungen kannst du mit Modellbezug und Quelle einreichen. Nach Prüfung helfen sie dem nächsten Besitzer mit demselben Problem."],
+          "links": [{"label": "Ersatzteile systematisch finden", "href": "/hilfe/ersatzteil-finden"}, {"label": "Ersatzteilkatalog öffnen", "href": "/ersatzteile"}, {"label": "Handbücher und Schaltpläne", "href": "/pdfs/index.html"}, {"label": "Wissen im Bike-Wiki ergänzen", "href": "/wiki"}]
+        }
+      ]
+    },
+    {
+      "path": "/hilfe/werkstatt-vorbereiten",
+      "title": "Black Tea Reparatur: Werkstattkontakt vorbereiten",
+      "heading": "Mit den richtigen Angaben zur Werkstatt.",
+      "description": "Bonfire oder Wildfire defekt? Erstelle einen Reparatur-Steckbrief mit Modell, Fehlerbild und Unterlagen zum Kopieren oder Herunterladen.",
+      "reviewedAt": "2026-09-04",
+      "tool": true,
+      "intro": "Wenn der Hersteller-Service schwer erreichbar ist, spart eine gute Fehlerbeschreibung Rückfragen. Dieser Leitfaden hilft dir, eine Anfrage an einen Fachbetrieb oder die BTM-Community vorzubereiten.",
+      "summary": "Notiere Modell und Baujahr, die genaue Fehlermeldung, den Zeitpunkt des Auftretens und bisherige Maßnahmen. Ergänze passende Handbuchseiten und Fotos. Der Steckbrief unten funktioniert ohne Konto und erstellt eine Textdatei für deine eigene Verwendung.",
+      "sections": [
+        {"id": "fehlerbild", "title": "Beschreibe die Beobachtung möglichst genau", "paragraphs": ["‚Das Bike fährt nicht‘ lässt viele Ursachen offen. Hilfreicher ist: Geht das Display an? Wird ein Fehlercode angezeigt? Trat das Problem beim Einschalten, Laden oder während der Fahrt auf? Schreibe nur auf, was du tatsächlich beobachtet hast.", "Notiere den letzten funktionierenden Zustand und mögliche Veränderungen: längere Standzeit, Regen, Teiletausch oder Umbau. Einen Fehler nicht absichtlich erneut provozieren. Bei ungewöhnlicher Wärme, Geruch, Rauch, sichtbaren Akkuschäden oder Bremsproblemen keine weitere Probefahrt oder Ladeprobe durchführen; qualifizierte Hilfe hinzuziehen."], "links": [{"label": "Vorhandene Hilfen zum Fehlerbild", "href": "/hilfe"}]},
+        {"id": "unterlagen", "title": "Modell und Dokumente zuordnen", "paragraphs": ["Bonfire S, E und X sowie unterschiedliche Wildfire-Baujahre können verschiedene Komponenten haben. Übernimm die Modellbezeichnung aus deinen Fahrzeugunterlagen. Notiere bekannte Akku-, Display- oder Controller-Bezeichnungen nur, wenn du sie ohne Demontage sicher ablesen kannst.", "Für eine erste öffentliche Anfrage genügen Modell, Baujahr und Fehlerbild. Vollständige FIN, Adresse, Rechnung und Zahlungsdaten gehören nicht in einen Community-Beitrag. Vertrauliche Unterlagen kannst du einem ausgewählten Fachbetrieb später gezielt bereitstellen."], "links": [{"label": "Bonfire: Handbuch und Modellvarianten", "href": "/bikes/bonfire"}, {"label": "Wildfire: technische Unterlagen", "href": "/bikes/wildfire"}]},
+        {"id": "auftrag", "title": "Vor dem Transport den Auftrag klären", "paragraphs": ["Frage, ob der Betrieb dein Modell und das betroffene Bauteil prüfen kann, welche Unterlagen fehlen und wie Diagnosekosten vereinbart werden. Kläre auch, wer Ersatzteile beschafft und ob das Fahrzeug transportiert werden muss.", "Der Steckbrief ist eine Anfrage, keine Diagnose oder Reparaturfreigabe. Halte eine später bestätigte Ursache und das tatsächlich verbaute Ersatzteil fest. So wird aus einer einzelnen Reparatur nachvollziehbares Wissen für andere Fahrer."], "links": [{"label": "Werkstätten ansehen", "href": "/werkstaetten"}, {"label": "Reparaturanfrage an die Community", "href": "/hilfe/anfragen"}]}
+      ]
+    },
+    {
+      "path": "/hilfe/ersatzteil-finden",
+      "title": "Black Tea Ersatzteile finden: Bonfire & Wildfire abgleichen",
+      "heading": "Das richtige Black Tea Ersatzteil finden.",
+      "description": "Ersatzteile für Bonfire und Wildfire suchen: Modell, Teilenummer, Maße und Bezugsstatus prüfen. Mit Vorlage für eine gezielte Teileanfrage.",
+      "reviewedAt": "2026-09-04",
+      "intro": "Der historische BTM-Katalog ist ein Ausgangspunkt für die Suche. Diese Schritte helfen dir, einen Treffer deinem Fahrzeug zuzuordnen und fehlende Angaben gezielt beim Händler oder in der Community nachzufragen.",
+      "summary": "Modell und Baujahr erfassen, historische Bezeichnung nachschlagen und die konkrete Ausführung vergleichen. Erst danach Lieferbarkeit und Passform mit einem Anbieter oder Fachbetrieb klären. Ein ähnliches Produktfoto oder ein passender Stecker allein reicht nicht aus.",
+      "sections": [
+        {"id": "identifizieren", "title": "1. Das verbaute Teil identifizieren", "paragraphs": ["Notiere Motorradvariante, Baujahr und vorhandene Bezeichnungen auf dem Bauteil. Ein Foto der Einbaulage und eine lesbare Beschriftung sind oft hilfreicher als der allgemeine Begriff ‚Display‘ oder ‚Ladegerät‘. Öffne dafür keine elektrischen Baugruppen.", "Suche im Katalog nach Bezeichnung oder Baugruppe. Auf jeder Detailseite findest du den dokumentierten Modellbezug, Archivquellen und den Bezugsstatus. Über die Teileanfrage kannst du diese Angaben direkt in einen Steckbrief übernehmen."], "links": [{"label": "Historischen Ersatzteilkatalog durchsuchen", "href": "/ersatzteile"}]},
+        {"id": "vergleichen", "title": "2. Ausführung und Kompatibilität abgleichen", "paragraphs": ["Vergleiche bei mechanischen Teilen Befestigung, Maße und Ausführung anhand verlässlicher Unterlagen. Bei elektrischen Komponenten müssen zusätzlich elektrische Daten, Belegung und gegebenenfalls Kommunikationsprotokoll zur konkreten Fahrzeugversion passen. Lass diesen Abgleich durch einen Fachbetrieb durchführen.", "Für ein Display sind beispielsweise Anzeigeversion und Protokoll relevant; bei Ladegeräten genügt eine ähnliche Spannungsangabe nicht. Bremsen, Fahrwerk, Akku und Antrieb brauchen eine fachkundige Prüfung. Eine Community-Erfahrung mit einem anderen Baujahr ist keine allgemeine Freigabe."], "links": [{"label": "Display: dokumentierte Varianten", "href": "/ersatzteile/display"}, {"label": "Bonfire-Unterlagen", "href": "/bikes/bonfire"}, {"label": "Wildfire-Unterlagen", "href": "/bikes/wildfire"}]},
+        {"id": "bezugsstatus", "title": "3. Bezugsstatus und offene Fragen klären", "paragraphs": ["Historische Preise und Shop-Verfügbarkeit beziehen sich auf eine Archivaufnahme. Ein Bezugslink ist ein Recherchehinweis; lies den jeweiligen Passformstatus und die noch offenen Bedingungen. Frage den Anbieter nach genauer Ausführung und tatsächlicher Lieferbarkeit.", "Wenn kein passender Link vorhanden ist, nutze die Anfragevorlage mit Teilenamen, Fahrzeugvariante und Quelle. Dokumentiere später die bestätigte Teilenummer und das Ergebnis des Einbaus durch den Fachbetrieb. Reiche belegte Ergänzungen auf der entsprechenden Ersatzteilseite ein."], "links": [{"label": "Anfragevorlage öffnen", "href": "/hilfe/werkstatt-vorbereiten#steckbrief"}, {"label": "Hinweise zur Insolvenz und zu Bestellungen", "href": "/insolvenz"}]}
+      ]
+    }
+  ]
+}

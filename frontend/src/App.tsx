@@ -1,7 +1,9 @@
 import { createContext, useCallback, useContext, useEffect, useId, useMemo, useRef, useState, type ChangeEvent, type FormEvent, type MouseEvent, type ReactNode, type TextareaHTMLAttributes } from 'react';
 import { formatUserHandle, getMentionQuery, insertMention, splitUserText, type MentionQuery, type UserMention } from './mentions';
 import faqContent from '../../content/faq.json';
+import { ownerHelpPages, OwnerHelpContent, OwnerHelpLinks, RepairBrief } from './OwnerHelp';
 import partsCatalog from '../../research/parts.json';
+import partResearchMap from '../../content/part-research-map.json';
 import partDetailsCatalog from '../../research/parts-details.json';
 import siteConfig from './site-config.json';
 import { communityMapCountries, communityMapSubdivisions, communityMapViewBox, getCommunityMapPoint, type CommunityMapModel, type CommunityMapRegion, type PostalCountry } from './community-map';
@@ -13,6 +15,7 @@ type Filter = 'Alle' | CardKind;
 type BikeModel = 'Bonfire' | 'Bonfire S' | 'Bonfire E' | 'Bonfire X' | 'Wildfire';
 
 type FaqItem = {
+  id: string;
   question: string;
   answer: string;
   linkLabel: string;
@@ -593,20 +596,9 @@ const inferPartCategory = (slug: string): PartCategory => {
 
 const partResearchEntries = ((partsCatalog as unknown as { entries?: PartResearchEntry[] }).entries ?? []);
 const archivedPartDetails = ((partDetailsCatalog as unknown as { entries?: ArchivedPartDetail[] }).entries ?? []);
-const researchEntryBySlug: Record<string, PartResearchEntry | undefined> = {
-  'hub-motor': partResearchEntries.find((entry) => entry.id === 'wildfire-qsmotor-controller-lead'),
-  'speiche-mit-nippel': partResearchEntries.find((entry) => entry.id === 'wildfire-spokes-suppliers'),
-  bremsbelage: partResearchEntries.find((entry) => entry.id === 'bonfire-mcb833-amazon-candidate'),
-  bremszylinder: partResearchEntries.find((entry) => entry.id === 'btm-bremszylinder'),
-  'copy-of-beifahrerfussrasten': partResearchEntries.find((entry) => entry.id === 'btm-beifahrerfussrasten'),
-  tank: partResearchEntries.find((entry) => entry.id === 'btm-tank'),
-  'passenger-hold': partResearchEntries.find((entry) => entry.id === 'btm-passenger-hold-b-grade'),
-  'dcdc-converter': partResearchEntries.find((entry) => entry.id === 'wildfire-dcdc-ips-dtd110s1210'),
-  'reparatur-qs8s-stecker': partResearchEntries.find((entry) => entry.id === 'wildfire-qs8-antispark-amazon-candidates'),
-  'dual-sport-reifen-upgrade': partResearchEntries.find((entry) => entry.id === 'bonfire-heidenau-manual-matches'),
-  ladegerat: partResearchEntries.find((entry) => entry.id === 'bonfire-tangspower-588v-10a-xlr-candidate'),
-  'usb-charging-port': partResearchEntries.find((entry) => entry.id === 'wildfire-usb-charging-port-amazon-candidate'),
-};
+const researchEntryBySlug: Record<string, PartResearchEntry | undefined> = Object.fromEntries(
+  Object.entries(partResearchMap).map(([slug, id]) => [slug, partResearchEntries.find((entry) => entry.id === id)]),
+);
 
 const partTechnicalEvidence: Record<string, { text: string; href: string; label: string; eyebrow?: string }> = {
   'side-stand': {
@@ -2151,12 +2143,20 @@ function getRelatedKnowledge(article: WikiArticle): RelatedKnowledgeItem[] {
     .map(({ score: _score, ...item }) => item);
 }
 
-const webMcpKnowledgeEntries: WebMcpKnowledgeEntry[] = [
+export const webMcpKnowledgeEntries: WebMcpKnowledgeEntry[] = [
+  ...ownerHelpPages.map((page) => ({
+    kind: 'owner' as const, title: page.title, href: page.path,
+    text: [page.heading, page.intro, page.summary, ...page.sections.flatMap((section) => [section.title, ...section.paragraphs])].join(' '),
+  })),
+  ...historicalShopParts.map((part) => ({
+    kind: 'part' as const, title: part.title, href: part.path,
+    text: [part.title, part.model, part.category, part.historicalSummary, part.compatibilityNote, part.purchaseNote].join(' '),
+  })),
   ...faqItems.map((item) => ({
     kind: 'faq' as const,
     title: item.question,
     text: `${item.question} ${item.answer} ${item.sourceLabel ?? ''}`,
-    href: item.linkHref,
+    href: `/faq#${item.id}`,
   })),
   ...wikiArticles.map((article) => ({
     kind: 'wiki' as const,
@@ -2193,12 +2193,12 @@ function WebMcpTools() {
     const controller = new AbortController();
     void modelContext.registerTool({
       name: 'search_btm_knowledge',
-      description: 'Search the public Black Tea Motorbikes FAQ, bike wiki, PDFs, and repair guides. Returns short excerpts and links; it never accesses private data or changes state.',
+      description: 'Search public Black Tea Motorbikes owner and insolvency help, spare parts, FAQ, bike wiki, PDFs, and repair guides. Returns short excerpts and links; it never accesses private data or changes state.',
       inputSchema: {
         type: 'object',
         properties: {
           query: { type: 'string', description: 'Search term, symptom, model, part, or question.' },
-          scope: { type: 'string', enum: ['all', 'faq', 'wiki', 'repair', 'pdf'], description: 'Optional area to search; defaults to all.' },
+          scope: { type: 'string', enum: ['all', 'faq', 'wiki', 'repair', 'pdf', 'owner', 'part'], description: 'Optional area to search; defaults to all.' },
         },
         required: ['query'],
         additionalProperties: false,
@@ -2213,12 +2213,12 @@ function WebMcpTools() {
   return null;
 }
 
-type GlobalSearchScope = 'all' | 'faq' | 'wiki' | 'repair' | 'pdf';
+type GlobalSearchScope = 'all' | 'faq' | 'wiki' | 'repair' | 'pdf' | 'owner' | 'part';
 type GlobalSearchEntry = WebMcpKnowledgeEntry & { label: string; description: string };
 
 const globalSearchEntries: GlobalSearchEntry[] = webMcpKnowledgeEntries.map((entry) => ({
   ...entry,
-  label: entry.kind === 'faq' ? 'FAQ' : entry.kind === 'wiki' ? 'Wiki' : entry.kind === 'repair' ? 'Reparaturhilfe' : 'PDF',
+  label: entry.kind === 'faq' ? 'FAQ' : entry.kind === 'wiki' ? 'Wiki' : entry.kind === 'repair' ? 'Reparaturhilfe' : entry.kind === 'owner' ? 'Besitzerhilfe' : entry.kind === 'part' ? 'Ersatzteil' : 'PDF',
   description: cleanWebMcpText(entry.text).slice(0, 220),
 }));
 
@@ -2287,7 +2287,7 @@ function SearchPage() {
           <a className="repair-back" href="/">← Zur Sammelmappe</a>
           <div className="eyebrow handwritten">ein suchfeld für alles wichtige</div>
           <h1>Wissen finden.</h1>
-          <p>Durchsuche FAQ, Wiki, gesicherte PDFs, Reparaturhilfen und freigegebene Reparaturfälle an einem Ort.</p>
+          <p>Finde Antworten zur Insolvenz, Ersatzteile, Handbücher und Reparaturwissen für deine Bonfire oder Wildfire an einem Ort.</p>
         </section>
         <section className="search-page-section section-pad">
           <div className="global-search-toolbar card-doodle">
@@ -2296,8 +2296,8 @@ function SearchPage() {
               <span className="sr-only">Wissen durchsuchen</span>
               <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="z. B. Akku, Fehlercode 13, CT-22 …" autoFocus />
             </label>
-            <label className="global-search-scope">Bereich<select value={scope} onChange={(event) => setScope(event.target.value as GlobalSearchScope)}><option value="all">Alles</option><option value="faq">FAQ</option><option value="wiki">Wiki</option><option value="pdf">PDFs</option><option value="repair">Reparatur</option></select></label>
-            <span className="global-search-count">{query.trim() ? `${results.length} Treffer` : 'FAQ · Wiki · PDFs · Reparatur'}</span>
+            <label className="global-search-scope">Bereich<select value={scope} onChange={(event) => setScope(event.target.value as GlobalSearchScope)}><option value="all">Alles</option><option value="faq">FAQ</option><option value="wiki">Wiki</option><option value="pdf">PDFs</option><option value="repair">Reparatur</option><option value="owner">Besitzerhilfe</option><option value="part">Ersatzteile</option></select></label>
+            <span className="global-search-count">{query.trim() ? `${results.length} Treffer` : 'FAQ · Wiki · PDFs · Reparatur · Ersatzteile'}</span>
           </div>
           {!query.trim() && <div className="global-search-suggestions card-doodle"><div className="eyebrow handwritten">schnellstart</div><p>Starte mit einem dieser häufigen Suchbegriffe:</p><div>{suggestions.map((suggestion) => <button className="search-suggestion" type="button" key={suggestion} onClick={() => setQuery(suggestion)}>{suggestion} ↗</button>)}</div></div>}
           {query.trim() && <div className="global-search-results">{results.map((entry) => {
@@ -2470,13 +2470,30 @@ function getWikiSeoTitle(article: Pick<WikiArticle, 'path' | 'title' | 'model'>)
   return `${article.title} — ${article.model} — Black Tea Motorbikes – Hilfe`;
 }
 
+export function getPageSeo(path: string): SeoMetadata {
+  return getSeoMetadata(path, repairGuides.find((item) => item.path === path), historicalShopParts.find((item) => item.path === path), bikeProfiles.find((item) => item.path === path), wikiArticles.find((item) => item.path === path));
+}
+
 function getSeoMetadata(path: string, guide?: RepairGuide, part?: HistoricalShopPart, bike?: BikeProfile, wikiArticle?: WikiArticle): SeoMetadata {
+  const ownerPage = ownerHelpPages.find((page) => page.path === path);
+  if (ownerPage) return {
+    title: ownerPage.title, description: ownerPage.description, canonicalPath: path,
+    robots: 'index,follow,max-image-preview:large',
+    jsonLd: { '@context': 'https://schema.org', '@graph': [websiteSchema, {
+      '@type': 'Article', '@id': `${siteOrigin}${path}#article`, headline: ownerPage.heading,
+      description: ownerPage.description, url: `${siteOrigin}${path}`, inLanguage: 'de-DE',
+      dateModified: ownerPage.reviewedAt, isPartOf: { '@id': `${siteOrigin}/#website` },
+      author: { '@type': 'Organization', name: 'BTM-Hilfe Redaktion', url: `${siteOrigin}/impressum` },
+      citation: [...new Set(ownerPage.sections.flatMap((section) => section.links.map((link) => link.href)))].map((href) => href.startsWith('/') ? `${siteOrigin}${href}` : href),
+    }, breadcrumbSchema([{ name: 'Startseite', url: `${siteOrigin}/` }, { name: ownerPage.heading, url: `${siteOrigin}${path}` }])] },
+  };
+
   if (path === '/admin' || path === '/login' || path === '/registrieren' || path === '/konto' || path === '/passwort-zuruecksetzen' || path === '/suche') {
     return {
       title: path === '/konto' ? 'Mein Bereich — Black Tea Motorbikes – Hilfe' : path === '/registrieren' ? 'Registrieren — Black Tea Motorbikes – Hilfe' : path === '/login' ? 'Einloggen — Black Tea Motorbikes – Hilfe' : path === '/passwort-zuruecksetzen' ? 'Passwort zurücksetzen — Black Tea Motorbikes – Hilfe' : path === '/suche' ? 'Suche — Black Tea Motorbikes – Hilfe' : 'Admin — Black Tea Motorbikes – Hilfe',
       description: path === '/suche' ? 'Zentrale Suche über FAQ, Wiki, gesicherte PDFs und Reparaturhilfen für Black Tea Motorbikes.' : 'Persönlicher Bereich von Black Tea Motorbikes – Hilfe.',
       canonicalPath: path,
-      robots: 'noindex,nofollow,noarchive',
+      robots: path === '/suche' ? 'noindex,follow,noarchive' : 'noindex,nofollow,noarchive',
       jsonLd: {},
     };
   }
@@ -2663,8 +2680,8 @@ function getSeoMetadata(path: string, guide?: RepairGuide, part?: HistoricalShop
 
   const metadata: Record<string, { title: string; description: string }> = {
     '/': {
-      title: 'Black Tea Motorbikes – Hilfe — Community & Reparaturwissen',
-      description: 'Der Treffpunkt für Bonfire- und Wildfire-Rider: Community, DACH-Karte, Reparaturhilfe, Ersatzteile, Wiki und PDFs. Wissen finden und Erfahrungen teilen.',
+      title: 'Black Tea Hilfe: Insolvenz, Ersatzteile & Reparaturwissen',
+      description: 'Unabhängige Hilfe für Black Tea Bonfire und Wildfire: Orientierung zur Insolvenz, Ersatzteile, Handbücher, Reparaturwissen und Werkstattkontakte.',
     },
     '/hilfe': {
       title: 'Reparaturhilfe — Black Tea Motorbikes – Hilfe',
@@ -2703,7 +2720,7 @@ function getSeoMetadata(path: string, guide?: RepairGuide, part?: HistoricalShop
       description: 'Datenschutzhinweise zu Kommentaren, Bildanhängen und dem Betrieb von Black Tea Motorbikes – Hilfe.',
     },
     '/wiki': {
-      title: 'Wiki — Black Tea Hilfe',
+      title: 'Wiki — Black Tea Motorbikes – Hilfe',
       description: 'Technische Grundlagen, Handbuchdaten und nachvollziehbare Hinweise zu den Black Tea Bikes Bonfire und Wildfire.',
     },
   };
@@ -2722,24 +2739,22 @@ function getSeoMetadata(path: string, guide?: RepairGuide, part?: HistoricalShop
     : path === '/ersatzteile'
       ? historicalShopParts.map((item) => ({ name: item.title, url: `${siteOrigin}${item.path}` }))
       : [];
-  const jsonLd = collectionItems.length ? {
+  const pageUrl = `${siteOrigin}${path === '/' ? '/' : path}`;
+  const jsonLd = {
     '@context': 'https://schema.org',
-    '@graph': [
-      websiteSchema,
-      {
-        '@type': 'CollectionPage',
-        name: page.title,
-        description: page.description,
-        url: `${siteOrigin}${path === '/' ? '/' : path}`,
-        inLanguage: 'de-DE',
-        mainEntity: {
-          '@type': 'ItemList',
-          numberOfItems: path === '/ersatzteile' ? historicalShopParts.length : collectionItems.length,
-          itemListElement: collectionItems.map((item, index) => ({ '@type': 'ListItem', position: index + 1, name: item.name, url: item.url })),
-        },
-      },
-    ],
-  } : { '@context': 'https://schema.org', ...websiteSchema };
+    '@graph': [websiteSchema, {
+      '@type': collectionItems.length ? 'CollectionPage' : 'WebPage',
+      '@id': `${pageUrl}#webpage`, name: page.title, description: page.description,
+      url: pageUrl, inLanguage: 'de-DE', isPartOf: { '@id': `${siteOrigin}/#website` },
+      ...(collectionItems.length ? { mainEntity: {
+        '@type': 'ItemList', numberOfItems: collectionItems.length,
+        itemListElement: collectionItems.map((item, index) => ({ '@type': 'ListItem', position: index + 1, name: item.name, url: item.url })),
+      } } : {}),
+    }, breadcrumbSchema([
+      { name: 'Startseite', url: `${siteOrigin}/` },
+      ...(path === '/' ? [] : [{ name: page.title, url: pageUrl }]),
+    ])],
+  };
 
   return {
     ...page,
@@ -2834,6 +2849,7 @@ function AppContent({ initialPath }: { initialPath?: string } = {}) {
     || path === '/quellen'
     || path === '/impressum'
     || path === '/datenschutz'
+    || ownerHelpPages.some((page) => page.path === path)
     || path === '/wiki'
     || Boolean(guide)
     || Boolean(part)
@@ -2844,6 +2860,8 @@ function AppContent({ initialPath }: { initialPath?: string } = {}) {
     applySeoMetadata(seoMetadata);
   }, [seoMetadata.canonicalPath, seoMetadata.description, seoMetadata.robots, seoMetadata.title, guide?.id, part?.id]);
 
+  const ownerPage = ownerHelpPages.find((page) => page.path === path);
+  if (ownerPage) return <div className="site-shell"><GuideHeader /><OwnerHelpContent page={ownerPage} /><GuideFooter /></div>;
   if (guide) return <RepairGuidePage guide={guide} />;
   if (path === '/admin') return <AdminPage />;
   if (path === '/login') return <LoginPage />;
@@ -3490,7 +3508,7 @@ function HomePage() {
   const [query, setQuery] = useState('');
 
   useEffect(() => {
-    document.title = 'Black Tea Motorbikes – Hilfe — Community & Reparaturwissen';
+    document.title = 'Black Tea Hilfe: Insolvenz, Ersatzteile & Reparaturwissen';
   }, []);
 
   const filteredResources = useMemo(() => {
@@ -3517,7 +3535,7 @@ function HomePage() {
           <span>black tea motorbikes – <strong>hilfe</strong></span>
         </a>
         <nav className="main-nav" aria-label="Hauptnavigation">
-          <a href="#status">Status</a>
+          <a href="/insolvenz">Insolvenz-Hilfe</a>
           <MapMenu />
           <a href="/community">Community</a>
           <RepairMenu />
@@ -3535,13 +3553,13 @@ function HomePage() {
         <section className="hero section-pad">
           <div className="hero-copy">
             <div className="eyebrow handwritten">von ridern · für rider</div>
-            <h1>Damit gute Bikes<br /><span className="scribble-underline">weiterfahren.</span></h1>
-            <p className="hero-lede">Dein Treffpunkt für Bonfire und Wildfire. Tausche dich mit anderen BTM-Ridern aus, finde Hilfe für dein Bike und teile, was du unterwegs oder beim Schrauben gelernt hast. Gemeinsam wissen wir mehr.</p>
+            <h1>Black Tea Hilfe.<br /><span className="scribble-underline">Damit dein Bike weiterfährt.</span></h1>
+            <p className="hero-lede">Deine Bonfire oder Wildfire braucht Hilfe? Hier findest du Handbücher, Ersatzteilspuren und Reparaturwissen – und Orientierung zur Insolvenz von Black Tea Motorbikes. Gemeinsam halten wir Wissen verfügbar und helfen einander beim Weiterfahren.</p>
             <div className="hero-actions">
               <a className="button button-ink" href="/community">Community entdecken <span aria-hidden="true">↗</span></a>
               <a className="button button-ghost" href="/hilfe">Reparaturhilfe finden <span aria-hidden="true">↗</span></a>
             </div>
-            <p className="micro-note handwritten">↳ unabhängig, gemeinsam und mit Lust aufs Weiterfahren.</p>
+            <p className="micro-note handwritten">↳ unabhängige Community · kein offizieller Herstellerservice</p>
           </div>
 
           <div className="hero-doodle">
@@ -3584,17 +3602,18 @@ function HomePage() {
           <p className="home-discover-note">Mit deinem Konto kannst du mitreden, dein Fahrerprofil gestalten und Benachrichtigungen zu Antworten, Erwähnungen und Reaktionen erhalten. Zum Lesen und Stöbern brauchst du kein Konto.</p>
         </section>
 
+        <section className="section-pad"><OwnerHelpLinks /></section>
         <section id="status" className="status-section section-pad">
           <div className="status-card card-doodle">
             <div className="status-topline">
               <span className="status-dot" />
               <span className="status-label">Stand der Dinge</span>
-              <span className="status-date">04.09.2026</span>
+              <span className="status-date">Quellenabgleich: 04.09.2026</span>
             </div>
             <div className="status-grid">
               <div>
                 <h2>Vorläufige Insolvenzverwaltung angeordnet.</h2>
-                <p>Das Amtsgericht München hat am 14.07.2026 Sicherungsmaßnahmen im Verfahren gegen die Black Tea Motorbikes GmbH angeordnet. Das ist ein laufender Verfahrensstand — keine Aussage darüber, welche Fahrzeuge, Teile oder Services am Ende verfügbar bleiben.</p>
+                <p>Das Amtsgericht München hat am 14.07.2026 Sicherungsmaßnahmen im Verfahren gegen die Black Tea Motorbikes GmbH angeordnet. Die eingesehene Sekundärquelle dokumentiert diese Anordnung. Ein aktueller Eröffnungsbeschluss wurde hier nicht amtlich verifiziert; neue Beschlüsse und Fristen bitte im amtlichen Insolvenzportal prüfen.</p>
               </div>
               <dl className="fact-list">
                 <div><dt>Gericht</dt><dd>Amtsgericht München</dd></div>
@@ -3605,7 +3624,7 @@ function HomePage() {
             </div>
             <div className="status-footer">
               <span>⚠ Verfügbarkeit, Garantie und Forderungen bitte nicht aus dieser Seite ableiten.</span>
-              <a href="#chronik">Zeitliche Einordnung ↓</a>
+              <a href="/insolvenz">Nächste Schritte für Besitzer und Besteller ↗</a>
               <a href={sourceLinks[0].href} target="_blank" rel="nofollow noreferrer">Verfahrensquelle öffnen ↗</a>
             </div>
           </div>
@@ -3624,8 +3643,7 @@ function HomePage() {
           </div>
           <div className="timeline">
             <TimelineItem date="14.07.2026" title="Sicherungsmaßnahmen angeordnet" text="Das Amtsgericht München ordnet vorläufige Insolvenzverwaltung an. Aktenzeichen: 1513 IN 2588/26." sourceHref={sourceLinks[0].href} sourceLabel="Verfahrensquelle" />
-            <TimelineItem date="16.07.2026" title="Erste öffentliche Berichte" text="Die ersten Berichte ordnen die Situation ein. Welche Folgen das für Bestellungen, Reparaturen und Ersatzteile hat, war zu diesem Zeitpunkt noch offen." sourceHref={sourceLinks[0].href} sourceLabel="Verfahrensquelle" />
-            <TimelineItem date="01.09.2026" title="Verfahrensstand erneut veröffentlicht" text="Der laufende Verfahrensstand ist erneut öffentlich dokumentiert. Für verbindliche rechtliche Fragen ist die zuständige Stelle maßgeblich." sourceHref={sourceLinks[0].href} sourceLabel="Verfahrensquelle" />
+            <TimelineItem date="16.07.2026" title="Erste öffentliche Berichte" text="Die ersten Berichte ordnen die Situation ein. Welche Folgen das für Bestellungen, Reparaturen und Ersatzteile hat, war zu diesem Zeitpunkt noch offen." sourceHref="https://scooterhelden.de/2026/07/16/black-tea-motorbikes-insolvent-was-passiert-jetzt-mit-bonfire-und-wildfire/" sourceLabel="Scooterhelden, 16.07.2026" />
             <TimelineItem date="02.09.2026" title="MOTORRAD Online ordnet Folgen ein" text="MOTORRAD Online beschreibt die 2026er Bonfire und Wildfire und weist auf das vorläufige Insolvenzverfahren hin. Liefertermine, Verfügbarkeit, Gewährleistung/Service und Ersatzteilversorgung sind dadurch schwerer verlässlich einzuschätzen." sourceHref={sourceLinks[1].href} sourceLabel="MOTORRAD Online" />
             <TimelineItem date="04.09.2026" title="Verfahrensseite weist neue Veröffentlichungsangabe aus" text="Die Verfahrensseite weist als amtliche Veröffentlichung nun den 04.09.2026 aus; der öffentlich sichtbare Status bleibt „Sicherungsmaßnahmen“. Zusätzlich eingeblendete Angaben enthalten offenkundige Platzhalter und werden deshalb nicht als neue gerichtliche Sachangabe übernommen." sourceHref={sourceLinks[0].href} sourceLabel="Verfahrensquelle" />
           </div>
@@ -4084,6 +4102,16 @@ function FaqPage() {
     window.scrollTo(0, 0);
   }, []);
 
+  useEffect(() => {
+    const revealAnswer = () => {
+      const answer = document.getElementById(window.location.hash.slice(1));
+      if (answer instanceof HTMLDetailsElement) { answer.open = true; answer.scrollIntoView({ block: 'start' }); }
+    };
+    revealAnswer();
+    window.addEventListener('hashchange', revealAnswer);
+    return () => window.removeEventListener('hashchange', revealAnswer);
+  }, []);
+
   const filteredFaqItems = useMemo(() => {
     const normalizedQuery = query.trim().toLocaleLowerCase('de');
     if (!normalizedQuery) return faqItems;
@@ -4096,10 +4124,10 @@ function FaqPage() {
       <main className="repair-page-main faq-page-main">
         <section className="repair-page-hero faq-page-hero section-pad">
           <a className="repair-back" href="/">← Zur Sammelmappe</a>
-          <div className="eyebrow handwritten">fragen aus der suche · selbst erklärt</div>
-          <h1>FAQ</h1>
+          <div className="eyebrow handwritten">antworten für besitzer und besteller</div>
+          <h1>Black Tea: Fragen zu Insolvenz, Ersatzteilen und deinem Bike.</h1>
           <p>Die häufigsten Fragen rund um Black Tea Bonfire und Wildfire sowie zum laufenden Insolvenzverfahren — kurz beantwortet und mit den passenden Quellen verknüpft.</p>
-          <div className="wiki-last-updated"><time dateTime={faqLastUpdated}>Zuletzt geprüft: {formatWikiDate(faqLastUpdated)}</time></div>
+          <div className="wiki-last-updated"><time dateTime={faqLastUpdated}>Redaktionell aktualisiert: {formatWikiDate(faqLastUpdated)}</time></div>
         </section>
 
         <section className="faq-section section-pad">
@@ -4120,11 +4148,11 @@ function FaqPage() {
 
           <div className="faq-list">
             {filteredFaqItems.map((item, index) => (
-              <details className="faq-item card-doodle" key={item.question}>
+              <details className="faq-item card-doodle" id={item.id} key={item.id}>
                 <summary>{highlightWikiText(item.question, query, `faq-question-${index}`)}</summary>
                 <div className="faq-answer">
                   <p>{highlightWikiText(item.answer, query, `faq-answer-${index}`)}</p>
-                  <a href={item.linkHref}>{item.linkLabel} ↗</a>
+                  <a href={item.linkHref}>{item.linkLabel} ↗</a><a className="faq-source-link" href={`/faq#${item.id}`}>Direktlink zu dieser Antwort</a>
                   {item.sourceHref && <a className="faq-source-link" href={item.sourceHref} target="_blank" rel="nofollow noreferrer">{item.sourceLabel ?? 'Quelle öffnen'} ↗</a>}
                 </div>
               </details>
@@ -4328,7 +4356,7 @@ function GuideHeader() {
           <span>black tea motorbikes – <strong>hilfe</strong></span>
         </a>
         <nav className="main-nav" aria-label="Hauptnavigation">
-          <a href="/#status">Status</a>
+          <a href="/insolvenz">Insolvenz-Hilfe</a>
           <MapMenu />
           <a href="/community">Community</a>
           <RepairMenu />
@@ -4931,8 +4959,8 @@ function RepairGuideIndexPage() {
           <a className="repair-back" href="/">← Zur Sammelmappe</a>
           <div className="eyebrow handwritten">kurz erklärt, sauber belegt</div>
           <h1>Reparaturhilfe</h1>
-          <p>Konkrete, redaktionell geprüfte Reparaturhilfen für typische BTM-Fehlerbilder. Keine Forendiskussionen — nur Ablauf, Prüfung, Sicherheit und Quelle.</p>
-          <RepairTabs active="guides" />
+          <p>Akku wird nicht erkannt, Display bleibt dunkel oder eine Fehlermeldung erscheint? Finde die passende Hilfe für deine Bonfire oder Wildfire. Jede Anleitung nennt ihren Modellbezug, die Quelle und die Grenzen der Eigenprüfung.</p>
+          <OwnerHelpLinks /><RepairTabs active="guides" />
         </section>
         <section className="repair-index-section section-pad">
           <div className="repair-search card-doodle">
@@ -6982,6 +7010,7 @@ function PartDetailPage({ part }: { part: HistoricalShopPart }) {
               </div> : <div className="part-no-purchase"><span className="part-buy-label">Noch kein passender Link</span><strong>Momentan haben wir keinen passenden Artikel gefunden.</strong><p>{part.purchaseNote}</p></div>}
             </section>
 
+            <RepairBrief partTitle={part.title} model={part.model} sourcePath={`${siteOrigin}${part.path}`} />
             <KnowledgeProvenance record={getPartKnowledge(part)} />
             <RepairFeedback guideSlug={`ersatzteil-${part.id}`} />
             <RepairComments guideSlug={`ersatzteil-${part.id}`} collapsible />

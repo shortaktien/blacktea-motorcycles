@@ -1,11 +1,753 @@
 {
   "manifestType": "BTM Open Knowledge",
   "schemaVersion": "1.0",
-  "generatedAt": "2026-09-04",
+  "generatedAt": "2026-09-05",
   "language": "de-DE",
   "licensePolicy": "Eigene redaktionelle Aufbereitungen werden als solche gekennzeichnet; Originalquellen bleiben bei ihren jeweiligen Rechteinhabern.",
   "regionalContentPolicy": "Regionale Seiten werden erst veröffentlicht, wenn sie eigenen lokalen Mehrwert bieten. Die ungefähre PLZ-Verortung bleibt bis dahin auf /karte gebündelt.",
   "entries": [
+    {
+      "kind": "faq",
+      "url": "https://btm.shortaktien.de/faq#insolvenzstatus",
+      "title": "Ist Black Tea Motorbikes insolvent?",
+      "answer": "Für die Black Tea Motorbikes GmbH ist die Anordnung der vorläufigen Insolvenzverwaltung vom 14. Juli 2026 dokumentiert: Amtsgericht München, Aktenzeichen 1513 IN 2588/26. Die am 4. September eingesehene Sekundärquelle führt Sicherungsmaßnahmen auf. Ein aktueller Eröffnungsbeschluss wurde hier nicht amtlich verifiziert. Neue Beschlüsse und Fristen bitte im amtlichen Insolvenzportal prüfen.",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "reviewScope": "Redaktionelle Aktualisierung der FAQ; veränderliche Angaben anhand der verlinkten Quellen prüfen.",
+      "licenseStatus": "Eigene redaktionelle Antwort; Quellen behalten ihre jeweiligen Rechte.",
+      "sourceChain": "Verlinkte Quelle oder weiterführender Artikel → redaktionelle Antwort",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "FAQ für Besitzer und Besteller überarbeitet"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://www.versteigerungskalender.de/insolvenzkalender/blaeck-tea-motorbikes-gmbh",
+          "label": "Verfahrensquelle öffnen"
+        }
+      ]
+    },
+    {
+      "kind": "faq",
+      "url": "https://btm.shortaktien.de/faq#ersatzteile-finden",
+      "title": "Wo bekomme ich Ersatzteile für Black Tea Bonfire und Wildfire?",
+      "answer": "Beginne im historischen Ersatzteilkatalog mit Modell, Baujahr und Bauteilbezeichnung. Die Detailseiten zeigen vorhandene Archivquellen, Varianten und den jeweiligen Bezugsstatus. Historische Preise und Lagerangaben sind nicht aktuell. Kläre Passform und Lieferbarkeit für dein konkretes Fahrzeug mit Anbieter oder Fachbetrieb. Auf der Teileseite kannst du eine Anfrage mit dem dokumentierten Teilenamen erstellen.",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "reviewScope": "Redaktionelle Aktualisierung der FAQ; veränderliche Angaben anhand der verlinkten Quellen prüfen.",
+      "licenseStatus": "Eigene redaktionelle Antwort; Quellen behalten ihre jeweiligen Rechte.",
+      "sourceChain": "Verlinkte Quelle oder weiterführender Artikel → redaktionelle Antwort",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "FAQ für Besitzer und Besteller überarbeitet"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://btm.shortaktien.de/hilfe/ersatzteil-finden",
+          "label": "Ersatzteile richtig zuordnen"
+        }
+      ]
+    },
+    {
+      "kind": "faq",
+      "url": "https://btm.shortaktien.de/faq#werkstatt-finden",
+      "title": "Wie finde ich eine Werkstatt für meine Bonfire oder Wildfire?",
+      "answer": "Sieh dir die Werkstatt-Tipps der Community an und frage vorab nach Erfahrung mit deiner Modellvariante und dem betroffenen Bauteil. Bereite Baujahr, Fehlercode, Symptome und passende Unterlagen vor. Mit unserem Reparatur-Steckbrief kannst du diese Angaben ohne Konto zusammenstellen und selbst an einen Fachbetrieb weitergeben.",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "reviewScope": "Redaktionelle Aktualisierung der FAQ; veränderliche Angaben anhand der verlinkten Quellen prüfen.",
+      "licenseStatus": "Eigene redaktionelle Antwort; Quellen behalten ihre jeweiligen Rechte.",
+      "sourceChain": "Verlinkte Quelle oder weiterführender Artikel → redaktionelle Antwort",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "FAQ für Besitzer und Besteller überarbeitet"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://btm.shortaktien.de/hilfe/werkstatt-vorbereiten",
+          "label": "Steckbrief für die Werkstatt erstellen"
+        }
+      ]
+    },
+    {
+      "kind": "faq",
+      "url": "https://btm.shortaktien.de/faq#handbuch-schaltplan",
+      "title": "Wo finde ich Black Tea Handbücher und Schaltpläne?",
+      "answer": "Der PDF-Index bündelt gesicherte Dokumente. Im Bonfire- und Wildfire-Wiki findest du dazu technische Einordnungen und Quellen. Prüfe Modellvariante und Dokumentstand vor der Verwendung; nicht jede Anleitung gilt für jedes Baujahr. Sichere passende Unterlagen für dein Motorrad zusätzlich lokal.",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "reviewScope": "Redaktionelle Aktualisierung der FAQ; veränderliche Angaben anhand der verlinkten Quellen prüfen.",
+      "licenseStatus": "Eigene redaktionelle Antwort; Quellen behalten ihre jeweiligen Rechte.",
+      "sourceChain": "Verlinkte Quelle oder weiterführender Artikel → redaktionelle Antwort",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "FAQ für Besitzer und Besteller überarbeitet"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://btm.shortaktien.de/pdfs/index.html",
+          "label": "Handbücher und Schaltpläne öffnen"
+        }
+      ]
+    },
+    {
+      "kind": "faq",
+      "url": "https://btm.shortaktien.de/faq#akku-nicht-erkannt",
+      "title": "Mein Black Tea Akku wird nicht erkannt – wo beginne ich?",
+      "answer": "Notiere Modell, Akkuversion und die genaue Anzeige oder Fehlermeldung. Unsere Akku-Hilfe ordnet die nächsten Prüfschritte und ihre Grenzen ein. Bei ungewöhnlicher Wärme, Geruch, sichtbaren Schäden oder Feuchtigkeit am Akku keine weiteren Lade- oder Fahrversuche unternehmen. Akku und BMS nicht öffnen oder überbrücken; die weitere Prüfung gehört in qualifizierte Hände.",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "reviewScope": "Redaktionelle Aktualisierung der FAQ; veränderliche Angaben anhand der verlinkten Quellen prüfen.",
+      "licenseStatus": "Eigene redaktionelle Antwort; Quellen behalten ihre jeweiligen Rechte.",
+      "sourceChain": "Verlinkte Quelle oder weiterführender Artikel → redaktionelle Antwort",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "FAQ für Besitzer und Besteller überarbeitet"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://btm.shortaktien.de/hilfe/akku-bms",
+          "label": "Hilfe: Akku wird nicht erkannt"
+        }
+      ]
+    },
+    {
+      "kind": "faq",
+      "url": "https://btm.shortaktien.de/faq#erfahrungen",
+      "title": "Wo finde ich Erfahrungen mit Black Tea Bonfire und Wildfire?",
+      "answer": "Erfahrungen sind Einzelberichte und ergeben deshalb kein einheitliches Qualitätsurteil. Für eine faire Einordnung sollten Baujahr, konkrete Variante, Akku, Nutzung und der jeweilige Servicefall zusammen betrachtet werden. Öffentliche Erfahrungsberichte und belegte technische Angaben sind nicht dasselbe.",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "reviewScope": "Redaktionelle Aktualisierung der FAQ; veränderliche Angaben anhand der verlinkten Quellen prüfen.",
+      "licenseStatus": "Eigene redaktionelle Antwort; Quellen behalten ihre jeweiligen Rechte.",
+      "sourceChain": "Verlinkte Quelle oder weiterführender Artikel → redaktionelle Antwort",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "FAQ für Besitzer und Besteller überarbeitet"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://btm.shortaktien.de/community",
+          "label": "Community-Wissen einordnen"
+        }
+      ]
+    },
+    {
+      "kind": "faq",
+      "url": "https://btm.shortaktien.de/faq#reichweite",
+      "title": "Welche Reichweite haben Blacktea Motorbikes?",
+      "answer": "Eine feste Reichweite gibt es nicht. Modell, Fahrmodus, Geschwindigkeit, Temperatur, Strecke, Reifendruck, Beladung und Akkuzustand verändern den Verbrauch deutlich. Die Angaben im Wiki sind deshalb Orientierungswerte; für dein Fahrzeug ist ein eigener Praxistest unter ähnlichen Bedingungen aussagekräftiger.",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "reviewScope": "Redaktionelle Aktualisierung der FAQ; veränderliche Angaben anhand der verlinkten Quellen prüfen.",
+      "licenseStatus": "Eigene redaktionelle Antwort; Quellen behalten ihre jeweiligen Rechte.",
+      "sourceChain": "Verlinkte Quelle oder weiterführender Artikel → redaktionelle Antwort",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "FAQ für Besitzer und Besteller überarbeitet"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://btm.shortaktien.de/bikes/bonfire#technische-eckdaten",
+          "label": "Technische Eckdaten öffnen"
+        }
+      ]
+    },
+    {
+      "kind": "faq",
+      "url": "https://btm.shortaktien.de/faq#bonfire-x-erfahrungen",
+      "title": "Wie kann ich Erfahrungen mit der Bonfire X sinnvoll vergleichen?",
+      "answer": "Berichte zur Bonfire X sind individuelle Nutzungserfahrungen und keine allgemeine Freigabe für jedes Motorrad. Für die Einordnung zählen unter anderem Baujahr, Akkuanzahl, Softwarestand, Fahrprofil und Wartung. Deshalb trennen wir Erfahrungsberichte bewusst von belegten technischen Werten.",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "reviewScope": "Redaktionelle Aktualisierung der FAQ; veränderliche Angaben anhand der verlinkten Quellen prüfen.",
+      "licenseStatus": "Eigene redaktionelle Antwort; Quellen behalten ihre jeweiligen Rechte.",
+      "sourceChain": "Verlinkte Quelle oder weiterführender Artikel → redaktionelle Antwort",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "FAQ für Besitzer und Besteller überarbeitet"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://btm.shortaktien.de/community",
+          "label": "Erfahrungsberichte ansehen"
+        }
+      ]
+    },
+    {
+      "kind": "faq",
+      "url": "https://btm.shortaktien.de/faq#bestellung-bezahlt",
+      "title": "Was passiert mit einer bereits bezahlten, aber noch nicht gelieferten Bestellung?",
+      "answer": "Eine Vorauszahlung garantiert keine Lieferung. Sichere Bestellung, Rechnung, Zahlungsbelege und Schriftverkehr und frage die zuständige Stelle nach dem konkreten Auftrag. Bei einer Insolvenz kann eine Forderungsanmeldung nötig werden. § 103 InsO betrifft gegenseitige Verträge, die bei Eröffnung von beiden Seiten noch nicht vollständig erfüllt sind; eine vollständig bezahlte Bestellung lässt sich nicht pauschal darunter einordnen. Lass deinen Vertrag und den Verfahrensstand individuell prüfen.",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "reviewScope": "Redaktionelle Aktualisierung der FAQ; veränderliche Angaben anhand der verlinkten Quellen prüfen.",
+      "licenseStatus": "Eigene redaktionelle Antwort; Quellen behalten ihre jeweiligen Rechte.",
+      "sourceChain": "Verlinkte Quelle oder weiterführender Artikel → redaktionelle Antwort",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "FAQ für Besitzer und Besteller überarbeitet"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://www.verbraucherzentrale.de/wissen/vertraege-reklamation/kundenrechte/wenn-eine-firma-insolvent-wird-das-sind-ihre-rechte-10630",
+          "label": "Verbraucherzentrale: Firmeninsolvenz"
+        }
+      ]
+    },
+    {
+      "kind": "faq",
+      "url": "https://btm.shortaktien.de/faq#forderung-anmelden",
+      "title": "Muss ich eine Forderung zur Insolvenztabelle anmelden?",
+      "answer": "Nicht jede Forderung muss sofort angemeldet werden. Erst wenn das Insolvenzverfahren eröffnet ist und die Gläubiger dazu aufgefordert werden, gibt es eine Anmeldefrist und die zuständige Stelle. Dann solltest du Bestellung, Rechnung, Zahlungsbelege, Schriftverkehr und eine nachvollziehbare Forderungsaufstellung bereithalten. Eine Anmeldung führt nicht automatisch zu einer vollständigen Rückzahlung; die Quote ist erst später absehbar.",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "reviewScope": "Redaktionelle Aktualisierung der FAQ; veränderliche Angaben anhand der verlinkten Quellen prüfen.",
+      "licenseStatus": "Eigene redaktionelle Antwort; Quellen behalten ihre jeweiligen Rechte.",
+      "sourceChain": "Verlinkte Quelle oder weiterführender Artikel → redaktionelle Antwort",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "FAQ für Besitzer und Besteller überarbeitet"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://www.verbraucherzentrale.de/wissen/vertraege-reklamation/kundenrechte/wenn-eine-firma-insolvent-wird-das-sind-ihre-rechte-10630",
+          "label": "Hinweise der Verbraucherzentrale"
+        }
+      ]
+    },
+    {
+      "kind": "faq",
+      "url": "https://btm.shortaktien.de/faq#wildfire-nachzahlung",
+      "title": "Was ist das 60-%-Angebot zur Fertigstellung einer Wildfire?",
+      "answer": "Im Forenthread berichten einzelne Vorbesteller von einem individuellen Angebot mit einer zusätzlichen Zahlung von 60 Prozent des ursprünglichen Kaufpreises. Das ist kein allgemein bestätigter Anspruch und keine Empfehlung. Wer ein solches Schreiben erhält, sollte die Bedingungen schriftlich prüfen: konkrete Ausstattung, fehlende Teile, Zahlungsweg, Rückerstattung, Frist und Gewährleistung. Bei dieser Summe ist unabhängige rechtliche Beratung sinnvoll.",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "reviewScope": "Redaktionelle Aktualisierung der FAQ; veränderliche Angaben anhand der verlinkten Quellen prüfen.",
+      "licenseStatus": "Eigene redaktionelle Antwort; Quellen behalten ihre jeweiligen Rechte.",
+      "sourceChain": "Verlinkte Quelle oder weiterführender Artikel → redaktionelle Antwort",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "FAQ für Besitzer und Besteller überarbeitet"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://www.elektroroller-forum.de/viewtopic.php?t=48274",
+          "label": "Diskussion im Forenthread lesen"
+        }
+      ]
+    },
+    {
+      "kind": "faq",
+      "url": "https://btm.shortaktien.de/faq#ansprechpartner",
+      "title": "Wer ist jetzt mein Ansprechpartner?",
+      "answer": "Für verbindliche Fragen zum Insolvenzverfahren, zu einer konkreten Bestellung oder zu einer geforderten Zahlung ist die im Verfahrensstand genannte zuständige Stelle maßgeblich. Forumseinträge, WhatsApp-Nachrichten und Aussagen anderer Fahrer ersetzen keine schriftliche Auskunft des Insolvenzverwalters oder eine rechtliche Beratung. Sichere alle Unterlagen und stelle Fragen mit Bestellnummer und Belegen.",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "reviewScope": "Redaktionelle Aktualisierung der FAQ; veränderliche Angaben anhand der verlinkten Quellen prüfen.",
+      "licenseStatus": "Eigene redaktionelle Antwort; Quellen behalten ihre jeweiligen Rechte.",
+      "sourceChain": "Verlinkte Quelle oder weiterführender Artikel → redaktionelle Antwort",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "FAQ für Besitzer und Besteller überarbeitet"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://btm.shortaktien.de/insolvenz#verfahrensstand",
+          "label": "Verfahrensstand und Zuständigkeit prüfen"
+        }
+      ]
+    },
+    {
+      "kind": "faq",
+      "url": "https://btm.shortaktien.de/faq#garantie-reparatur",
+      "title": "Gibt es weiterhin Garantie, Reparaturen und Ersatzteile?",
+      "answer": "Gesetzliche Gewährleistung richtet sich grundsätzlich gegen deinen Verkäufer; eine freiwillige Garantie hängt vom Garantiegeber und den Bedingungen ab. Prüfe deshalb zuerst, wer auf deiner Rechnung steht. Die Insolvenz des Herstellers bedeutet nicht automatisch, dass ein rechtlich unabhängiger Händler ebenfalls insolvent ist. Reparaturen, Kostenübernahme und Teilelieferungen musst du für deinen Fall klären. Eine Community-Lösung ist keine Herstellergarantie.",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "reviewScope": "Redaktionelle Aktualisierung der FAQ; veränderliche Angaben anhand der verlinkten Quellen prüfen.",
+      "licenseStatus": "Eigene redaktionelle Antwort; Quellen behalten ihre jeweiligen Rechte.",
+      "sourceChain": "Verlinkte Quelle oder weiterführender Artikel → redaktionelle Antwort",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "FAQ für Besitzer und Besteller überarbeitet"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://www.verbraucherzentrale.de/wissen/vertraege-reklamation/kundenrechte/alles-zu-gewaehrleistung-und-schadenersatz-5057",
+          "label": "Verbraucherzentrale: Gewährleistung"
+        }
+      ]
+    },
+    {
+      "kind": "faq",
+      "url": "https://btm.shortaktien.de/faq#paypal",
+      "title": "Greift der PayPal-Käuferschutz bei einer Motorradbestellung?",
+      "answer": "Darauf solltest du dich bei einem Motorrad nicht verlassen: PayPal nennt Fahrzeuge, ausdrücklich auch Motorräder, als vom Käuferschutz ausgeschlossene Artikel. Ratenzahlung, Kreditkartenregeln und mögliche andere Ansprüche können gesondert geregelt sein. Prüfe die für deine Zahlung geltenden Bedingungen direkt bei PayPal und stoppe Zahlungen nicht eigenmächtig ohne Beratung.",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "reviewScope": "Redaktionelle Aktualisierung der FAQ; veränderliche Angaben anhand der verlinkten Quellen prüfen.",
+      "licenseStatus": "Eigene redaktionelle Antwort; Quellen behalten ihre jeweiligen Rechte.",
+      "sourceChain": "Verlinkte Quelle oder weiterführender Artikel → redaktionelle Antwort",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "FAQ für Besitzer und Besteller überarbeitet"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://www.paypal.com/de/legalhub/paypal/buyer-protection?locale.x=de",
+          "label": "PayPal-Bedingungen prüfen"
+        }
+      ]
+    },
+    {
+      "kind": "faq",
+      "url": "https://btm.shortaktien.de/faq#fortfuehrung",
+      "title": "Kann Black Tea weitergeführt oder von einem Investor übernommen werden?",
+      "answer": "Das war im Forenthread eine wiederkehrende Hoffnung, ist aber keine bestätigte Zusage. Ob ein Betrieb fortgeführt, verkauft oder beendet wird, entscheidet sich im Verfahren und hängt von Finanzierung, Vermögenswerten und konkreten Angeboten ab. Bis es eine offizielle Mitteilung gibt, solltest du eine mögliche Übernahme nicht als gesichert einplanen.",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "reviewScope": "Redaktionelle Aktualisierung der FAQ; veränderliche Angaben anhand der verlinkten Quellen prüfen.",
+      "licenseStatus": "Eigene redaktionelle Antwort; Quellen behalten ihre jeweiligen Rechte.",
+      "sourceChain": "Verlinkte Quelle oder weiterführender Artikel → redaktionelle Antwort",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "FAQ für Besitzer und Besteller überarbeitet"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://www.elektroroller-forum.de/viewtopic.php?t=48274",
+          "label": "Forendiskussion zur Einordnung"
+        }
+      ]
+    },
+    {
+      "kind": "faq",
+      "url": "https://btm.shortaktien.de/faq#vorkasse",
+      "title": "Sollte ich jetzt noch ein Fahrzeug oder Ersatzteil per Vorkasse bestellen?",
+      "answer": "Bei einem Unternehmen im Insolvenzverfahren ist Vorkasse besonders riskant. Prüfe zuerst, ob der Verkauf und der Versand für genau diesen Artikel ausdrücklich freigegeben sind, wer Vertragspartner und Zahlungsempfänger ist und welche Rückzahlung im Ausfall vorgesehen ist. Wenn möglich, ist Zahlung Zug um Zug bei Übergabe sicherer; eine individuelle Rechts- oder Verbraucherberatung kann die konkrete Situation bewerten.",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "reviewScope": "Redaktionelle Aktualisierung der FAQ; veränderliche Angaben anhand der verlinkten Quellen prüfen.",
+      "licenseStatus": "Eigene redaktionelle Antwort; Quellen behalten ihre jeweiligen Rechte.",
+      "sourceChain": "Verlinkte Quelle oder weiterführender Artikel → redaktionelle Antwort",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "FAQ für Besitzer und Besteller überarbeitet"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://www.verbraucherzentrale.de/wissen/vertraege-reklamation/kundenrechte/wenn-eine-firma-insolvent-wird-das-sind-ihre-rechte-10630",
+          "label": "Rechte bei Firmeninsolvenz"
+        }
+      ]
+    },
+    {
+      "kind": "faq",
+      "url": "https://btm.shortaktien.de/faq#wildfire-ausstattung",
+      "title": "Was gilt für Wildfire-Bestellungen mit ABS oder fehlenden Akkus?",
+      "answer": "Dazu gab es im Forum unterschiedliche individuelle Rückmeldungen. Aus einem Schreiben oder einer Aussage zu einer einzelnen ABS-, CBS- oder Akku-Konfiguration lässt sich keine allgemeine Zusage für alle Besteller ableiten. Entscheidend sind deine Rechnung, die bestellte Ausstattung, der dokumentierte Fertigungsstand und eine schriftliche Auskunft zur konkreten Bestellung.",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "reviewScope": "Redaktionelle Aktualisierung der FAQ; veränderliche Angaben anhand der verlinkten Quellen prüfen.",
+      "licenseStatus": "Eigene redaktionelle Antwort; Quellen behalten ihre jeweiligen Rechte.",
+      "sourceChain": "Verlinkte Quelle oder weiterführender Artikel → redaktionelle Antwort",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "FAQ für Besitzer und Besteller überarbeitet"
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://www.elektroroller-forum.de/viewtopic.php?t=48274",
+          "label": "Forenbeiträge zur ABS-Frage lesen"
+        }
+      ]
+    },
+    {
+      "kind": "owner-guide",
+      "url": "https://btm.shortaktien.de/insolvenz",
+      "title": "Black Tea Motorbikes insolvent: Hilfe für Besitzer & Besteller",
+      "summary": "Belegt ist die Anordnung der vorläufigen Insolvenzverwaltung vom 14. Juli 2026 durch das Amtsgericht München, Aktenzeichen 1513 IN 2588/26. Die am 4. September eingesehene Sekundärquelle führt Sicherungsmaßnahmen auf. Ein aktueller Eröffnungsbeschluss wurde hier nicht amtlich verifiziert. Prüfe neue Beschlüsse und Fristen im amtlichen Insolvenzportal.",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "reviewScope": "Redaktionelle Orientierung und Quellenabgleich; kein amtlich bestätigter aktueller Verfahrensstand.",
+      "licenseStatus": "Eigene redaktionelle Aufbereitung; verlinkte Quellen behalten ihre jeweiligen Rechte.",
+      "sourceChain": "Verlinkte Quellen und vorhandenes BTM-Wissen → redaktionelle Orientierung",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Leitfaden für Besitzer und Besteller erstellt"
+        }
+      ],
+      "sections": [
+        {
+          "id": "verfahrensstand",
+          "title": "Wo prüfst du den Verfahrensstand?",
+          "paragraphs": [
+            "Suche im amtlichen Insolvenzportal nach Black Tea Motorbikes GmbH, Amtsgericht München und dem Aktenzeichen 1513 IN 2588/26. Achte auf das Datum und die Art der Bekanntmachung. Eine Veröffentlichung zu Sicherungsmaßnahmen ist kein Eröffnungsbeschluss.",
+            "Die dokumentierte Anordnung nennt Florian Loserth als vorläufigen Insolvenzverwalter. Entnimm aktuelle Kontaktdaten, Zuständigkeit und etwaige Fristen der jeweiligen Bekanntmachung. Diese Seite kann weder eine Lieferung noch die Erstattung einer Zahlung bestätigen."
+          ],
+          "links": [
+            {
+              "label": "Amtliche Bekanntmachungen suchen",
+              "href": "https://www.insolvenzbekanntmachungen.de/"
+            },
+            {
+              "label": "Dokumentierte Anordnung vom 14.07.2026 (Sekundärquelle)",
+              "href": "https://www.versteigerungskalender.de/insolvenzkalender/blaeck-tea-motorbikes-gmbh"
+            }
+          ]
+        },
+        {
+          "id": "bestellung",
+          "title": "Du hast bezahlt und wartest auf dein Bike",
+          "paragraphs": [
+            "Sichere Bestellung, Rechnung, Zahlungsbelege und bisherigen Schriftverkehr. Notiere die bestellte Variante, Akkuanzahl und offene Ausstattung. Bitte die zuständige Stelle schriftlich um Auskunft zum konkreten Auftrag.",
+            "Eine Vorauszahlung sichert die Lieferung nicht. Ob eine Forderung anzumelden ist, hängt vom Verfahrensstand und deinem Vertrag ab. Frist und Empfänger stehen im Eröffnungsbeschluss; Grund, Betrag und Belege gehören zur Anmeldung. Eine Rückzahlung ist damit nicht garantiert. Lass individuelle Nachzahlungsangebote unabhängig prüfen."
+          ],
+          "links": [
+            {
+              "label": "Verbraucherzentrale: Vorauszahlung und Firmeninsolvenz",
+              "href": "https://www.verbraucherzentrale.de/wissen/vertraege-reklamation/kundenrechte/wenn-eine-firma-insolvent-wird-das-sind-ihre-rechte-10630"
+            },
+            {
+              "label": "§ 28 InsO: Aufforderung an Gläubiger",
+              "href": "https://www.gesetze-im-internet.de/inso/__28.html"
+            },
+            {
+              "label": "§ 174 InsO: Anmeldung und Belege",
+              "href": "https://www.gesetze-im-internet.de/inso/__174.html"
+            }
+          ]
+        },
+        {
+          "id": "reparatur",
+          "title": "Deine Bonfire oder Wildfire braucht eine Reparatur",
+          "paragraphs": [
+            "Beginne mit Modellvariante, Baujahr und dem beobachteten Fehler. Sichere das passende Handbuch und fotografiere Fehlermeldungen. Mit diesen Angaben kann eine Werkstatt besser einschätzen, ob sie den Auftrag übernehmen kann.",
+            "Kläre einen möglichen Gewährleistungsfall zunächst mit deinem Verkäufer; eine freiwillige Garantie ist davon zu unterscheiden. Die Community ersetzt keine Kostenübernahme. Frage vor einer Beauftragung nach Diagnosekosten, Teilebeschaffung und dem weiteren Vorgehen."
+          ],
+          "links": [
+            {
+              "label": "Werkstattkontakt vorbereiten",
+              "href": "/hilfe/werkstatt-vorbereiten"
+            },
+            {
+              "label": "Reparaturhilfen nach Fehlerbild",
+              "href": "/hilfe"
+            },
+            {
+              "label": "Werkstätten und Community-Tipps",
+              "href": "/werkstaetten"
+            },
+            {
+              "label": "Verbraucherzentrale: Mängel und Insolvenz",
+              "href": "https://www.verbraucherzentrale.de/wissen/vertraege-reklamation/kundenrechte/wenn-eine-firma-insolvent-wird-das-sind-ihre-rechte-10630"
+            }
+          ]
+        },
+        {
+          "id": "ersatzteile",
+          "title": "Du brauchst Ersatzteile oder Unterlagen",
+          "paragraphs": [
+            "Im Ersatzteilarchiv findest du historische Bezeichnungen, Varianten und vorhandene Bezugsquellen. Ein alter Shop-Eintrag belegt weder einen heutigen Lagerbestand noch die Passform für dein Motorrad. Vergleiche die konkrete Ausführung vor einer Bestellung.",
+            "Bewahre dein Handbuch, Schaltpläne und Wartungsnachweise auch lokal auf. Fehlende Teilenummern oder eigene Erfahrungen kannst du mit Modellbezug und Quelle einreichen. Nach Prüfung helfen sie dem nächsten Besitzer mit demselben Problem."
+          ],
+          "links": [
+            {
+              "label": "Ersatzteile systematisch finden",
+              "href": "/hilfe/ersatzteil-finden"
+            },
+            {
+              "label": "Ersatzteilkatalog öffnen",
+              "href": "/ersatzteile"
+            },
+            {
+              "label": "Handbücher und Schaltpläne",
+              "href": "/pdfs/index.html"
+            },
+            {
+              "label": "Wissen im Bike-Wiki ergänzen",
+              "href": "/wiki"
+            }
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://www.insolvenzbekanntmachungen.de/",
+          "label": "Amtliche Bekanntmachungen suchen"
+        },
+        {
+          "url": "https://www.versteigerungskalender.de/insolvenzkalender/blaeck-tea-motorbikes-gmbh",
+          "label": "Dokumentierte Anordnung vom 14.07.2026 (Sekundärquelle)"
+        },
+        {
+          "url": "https://www.verbraucherzentrale.de/wissen/vertraege-reklamation/kundenrechte/wenn-eine-firma-insolvent-wird-das-sind-ihre-rechte-10630",
+          "label": "Verbraucherzentrale: Mängel und Insolvenz"
+        },
+        {
+          "url": "https://www.gesetze-im-internet.de/inso/__28.html",
+          "label": "§ 28 InsO: Aufforderung an Gläubiger"
+        },
+        {
+          "url": "https://www.gesetze-im-internet.de/inso/__174.html",
+          "label": "§ 174 InsO: Anmeldung und Belege"
+        },
+        {
+          "url": "https://btm.shortaktien.de/hilfe/werkstatt-vorbereiten",
+          "label": "Werkstattkontakt vorbereiten"
+        },
+        {
+          "url": "https://btm.shortaktien.de/hilfe",
+          "label": "Reparaturhilfen nach Fehlerbild"
+        },
+        {
+          "url": "https://btm.shortaktien.de/werkstaetten",
+          "label": "Werkstätten und Community-Tipps"
+        },
+        {
+          "url": "https://btm.shortaktien.de/hilfe/ersatzteil-finden",
+          "label": "Ersatzteile systematisch finden"
+        },
+        {
+          "url": "https://btm.shortaktien.de/ersatzteile",
+          "label": "Ersatzteilkatalog öffnen"
+        },
+        {
+          "url": "https://btm.shortaktien.de/pdfs/index.html",
+          "label": "Handbücher und Schaltpläne"
+        },
+        {
+          "url": "https://btm.shortaktien.de/wiki",
+          "label": "Wissen im Bike-Wiki ergänzen"
+        }
+      ]
+    },
+    {
+      "kind": "owner-guide",
+      "url": "https://btm.shortaktien.de/hilfe/werkstatt-vorbereiten",
+      "title": "Black Tea Reparatur: Werkstattkontakt vorbereiten",
+      "summary": "Notiere Modell und Baujahr, die genaue Fehlermeldung, den Zeitpunkt des Auftretens und bisherige Maßnahmen. Ergänze passende Handbuchseiten und Fotos. Der Steckbrief unten funktioniert ohne Konto und erstellt eine Textdatei für deine eigene Verwendung.",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "reviewScope": "Redaktionelle Orientierung und Quellenabgleich; kein amtlich bestätigter aktueller Verfahrensstand.",
+      "licenseStatus": "Eigene redaktionelle Aufbereitung; verlinkte Quellen behalten ihre jeweiligen Rechte.",
+      "sourceChain": "Verlinkte Quellen und vorhandenes BTM-Wissen → redaktionelle Orientierung",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Leitfaden für Besitzer und Besteller erstellt"
+        }
+      ],
+      "sections": [
+        {
+          "id": "fehlerbild",
+          "title": "Beschreibe die Beobachtung möglichst genau",
+          "paragraphs": [
+            "‚Das Bike fährt nicht‘ lässt viele Ursachen offen. Hilfreicher ist: Geht das Display an? Wird ein Fehlercode angezeigt? Trat das Problem beim Einschalten, Laden oder während der Fahrt auf? Schreibe nur auf, was du tatsächlich beobachtet hast.",
+            "Notiere den letzten funktionierenden Zustand und mögliche Veränderungen: längere Standzeit, Regen, Teiletausch oder Umbau. Einen Fehler nicht absichtlich erneut provozieren. Bei ungewöhnlicher Wärme, Geruch, Rauch, sichtbaren Akkuschäden oder Bremsproblemen keine weitere Probefahrt oder Ladeprobe durchführen; qualifizierte Hilfe hinzuziehen."
+          ],
+          "links": [
+            {
+              "label": "Vorhandene Hilfen zum Fehlerbild",
+              "href": "/hilfe"
+            }
+          ]
+        },
+        {
+          "id": "unterlagen",
+          "title": "Modell und Dokumente zuordnen",
+          "paragraphs": [
+            "Bonfire S, E und X sowie unterschiedliche Wildfire-Baujahre können verschiedene Komponenten haben. Übernimm die Modellbezeichnung aus deinen Fahrzeugunterlagen. Notiere bekannte Akku-, Display- oder Controller-Bezeichnungen nur, wenn du sie ohne Demontage sicher ablesen kannst.",
+            "Für eine erste öffentliche Anfrage genügen Modell, Baujahr und Fehlerbild. Vollständige FIN, Adresse, Rechnung und Zahlungsdaten gehören nicht in einen Community-Beitrag. Vertrauliche Unterlagen kannst du einem ausgewählten Fachbetrieb später gezielt bereitstellen."
+          ],
+          "links": [
+            {
+              "label": "Bonfire: Handbuch und Modellvarianten",
+              "href": "/bikes/bonfire"
+            },
+            {
+              "label": "Wildfire: technische Unterlagen",
+              "href": "/bikes/wildfire"
+            }
+          ]
+        },
+        {
+          "id": "auftrag",
+          "title": "Vor dem Transport den Auftrag klären",
+          "paragraphs": [
+            "Frage, ob der Betrieb dein Modell und das betroffene Bauteil prüfen kann, welche Unterlagen fehlen und wie Diagnosekosten vereinbart werden. Kläre auch, wer Ersatzteile beschafft und ob das Fahrzeug transportiert werden muss.",
+            "Der Steckbrief ist eine Anfrage, keine Diagnose oder Reparaturfreigabe. Halte eine später bestätigte Ursache und das tatsächlich verbaute Ersatzteil fest. So wird aus einer einzelnen Reparatur nachvollziehbares Wissen für andere Fahrer."
+          ],
+          "links": [
+            {
+              "label": "Werkstätten ansehen",
+              "href": "/werkstaetten"
+            },
+            {
+              "label": "Reparaturanfrage an die Community",
+              "href": "/hilfe/anfragen"
+            }
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://btm.shortaktien.de/hilfe",
+          "label": "Vorhandene Hilfen zum Fehlerbild"
+        },
+        {
+          "url": "https://btm.shortaktien.de/bikes/bonfire",
+          "label": "Bonfire: Handbuch und Modellvarianten"
+        },
+        {
+          "url": "https://btm.shortaktien.de/bikes/wildfire",
+          "label": "Wildfire: technische Unterlagen"
+        },
+        {
+          "url": "https://btm.shortaktien.de/werkstaetten",
+          "label": "Werkstätten ansehen"
+        },
+        {
+          "url": "https://btm.shortaktien.de/hilfe/anfragen",
+          "label": "Reparaturanfrage an die Community"
+        }
+      ]
+    },
+    {
+      "kind": "owner-guide",
+      "url": "https://btm.shortaktien.de/hilfe/ersatzteil-finden",
+      "title": "Black Tea Ersatzteile finden: Bonfire & Wildfire abgleichen",
+      "summary": "Modell und Baujahr erfassen, historische Bezeichnung nachschlagen und die konkrete Ausführung vergleichen. Erst danach Lieferbarkeit und Passform mit einem Anbieter oder Fachbetrieb klären. Ein ähnliches Produktfoto oder ein passender Stecker allein reicht nicht aus.",
+      "revision": "2026-09-04",
+      "lastReviewed": "2026-09-04",
+      "reviewScope": "Redaktionelle Orientierung und Quellenabgleich; kein amtlich bestätigter aktueller Verfahrensstand.",
+      "licenseStatus": "Eigene redaktionelle Aufbereitung; verlinkte Quellen behalten ihre jeweiligen Rechte.",
+      "sourceChain": "Verlinkte Quellen und vorhandenes BTM-Wissen → redaktionelle Orientierung",
+      "history": [
+        {
+          "date": "2026-09-04",
+          "label": "Leitfaden für Besitzer und Besteller erstellt"
+        }
+      ],
+      "sections": [
+        {
+          "id": "identifizieren",
+          "title": "1. Das verbaute Teil identifizieren",
+          "paragraphs": [
+            "Notiere Motorradvariante, Baujahr und vorhandene Bezeichnungen auf dem Bauteil. Ein Foto der Einbaulage und eine lesbare Beschriftung sind oft hilfreicher als der allgemeine Begriff ‚Display‘ oder ‚Ladegerät‘. Öffne dafür keine elektrischen Baugruppen.",
+            "Suche im Katalog nach Bezeichnung oder Baugruppe. Auf jeder Detailseite findest du den dokumentierten Modellbezug, Archivquellen und den Bezugsstatus. Über die Teileanfrage kannst du diese Angaben direkt in einen Steckbrief übernehmen."
+          ],
+          "links": [
+            {
+              "label": "Historischen Ersatzteilkatalog durchsuchen",
+              "href": "/ersatzteile"
+            }
+          ]
+        },
+        {
+          "id": "vergleichen",
+          "title": "2. Ausführung und Kompatibilität abgleichen",
+          "paragraphs": [
+            "Vergleiche bei mechanischen Teilen Befestigung, Maße und Ausführung anhand verlässlicher Unterlagen. Bei elektrischen Komponenten müssen zusätzlich elektrische Daten, Belegung und gegebenenfalls Kommunikationsprotokoll zur konkreten Fahrzeugversion passen. Lass diesen Abgleich durch einen Fachbetrieb durchführen.",
+            "Für ein Display sind beispielsweise Anzeigeversion und Protokoll relevant; bei Ladegeräten genügt eine ähnliche Spannungsangabe nicht. Bremsen, Fahrwerk, Akku und Antrieb brauchen eine fachkundige Prüfung. Eine Community-Erfahrung mit einem anderen Baujahr ist keine allgemeine Freigabe."
+          ],
+          "links": [
+            {
+              "label": "Display: dokumentierte Varianten",
+              "href": "/ersatzteile/display"
+            },
+            {
+              "label": "Bonfire-Unterlagen",
+              "href": "/bikes/bonfire"
+            },
+            {
+              "label": "Wildfire-Unterlagen",
+              "href": "/bikes/wildfire"
+            }
+          ]
+        },
+        {
+          "id": "bezugsstatus",
+          "title": "3. Bezugsstatus und offene Fragen klären",
+          "paragraphs": [
+            "Historische Preise und Shop-Verfügbarkeit beziehen sich auf eine Archivaufnahme. Ein Bezugslink ist ein Recherchehinweis; lies den jeweiligen Passformstatus und die noch offenen Bedingungen. Frage den Anbieter nach genauer Ausführung und tatsächlicher Lieferbarkeit.",
+            "Wenn kein passender Link vorhanden ist, nutze die Anfragevorlage mit Teilenamen, Fahrzeugvariante und Quelle. Dokumentiere später die bestätigte Teilenummer und das Ergebnis des Einbaus durch den Fachbetrieb. Reiche belegte Ergänzungen auf der entsprechenden Ersatzteilseite ein."
+          ],
+          "links": [
+            {
+              "label": "Anfragevorlage öffnen",
+              "href": "/hilfe/werkstatt-vorbereiten#steckbrief"
+            },
+            {
+              "label": "Hinweise zur Insolvenz und zu Bestellungen",
+              "href": "/insolvenz"
+            }
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://btm.shortaktien.de/ersatzteile",
+          "label": "Historischen Ersatzteilkatalog durchsuchen"
+        },
+        {
+          "url": "https://btm.shortaktien.de/ersatzteile/display",
+          "label": "Display: dokumentierte Varianten"
+        },
+        {
+          "url": "https://btm.shortaktien.de/bikes/bonfire",
+          "label": "Bonfire-Unterlagen"
+        },
+        {
+          "url": "https://btm.shortaktien.de/bikes/wildfire",
+          "label": "Wildfire-Unterlagen"
+        },
+        {
+          "url": "https://btm.shortaktien.de/hilfe/werkstatt-vorbereiten#steckbrief",
+          "label": "Anfragevorlage öffnen"
+        },
+        {
+          "url": "https://btm.shortaktien.de/insolvenz",
+          "label": "Hinweise zur Insolvenz und zu Bestellungen"
+        }
+      ]
+    },
     {
       "kind": "wiki",
       "url": "https://btm.shortaktien.de/bikes/bonfire",
@@ -73,7 +815,12 @@
           "label": "Reparaturhilfe redaktionell geprüft"
         }
       ],
-      "sources": []
+      "sources": [
+        {
+          "url": "https://www.elektroroller-forum.de/viewtopic.php?t=48272",
+          "label": "ElektroRoller-Forum · „Ersatzteile BT Wildfire“ · Thema 48272"
+        }
+      ]
     },
     {
       "kind": "repair-guide",
@@ -90,7 +837,12 @@
           "label": "Reparaturhilfe redaktionell geprüft"
         }
       ],
-      "sources": []
+      "sources": [
+        {
+          "url": "https://www.elektroroller-forum.de/viewtopic.php?t=48850",
+          "label": "ElektroRoller-Forum · „Reparatur Bonfire-Akku“ · Thema 48850"
+        }
+      ]
     },
     {
       "kind": "repair-guide",
@@ -107,7 +859,12 @@
           "label": "Reparaturhilfe redaktionell geprüft"
         }
       ],
-      "sources": []
+      "sources": [
+        {
+          "url": "https://www.elektroroller-forum.de/viewtopic.php?t=49336",
+          "label": "ElektroRoller-Forum · „Fehleranalyse an der Bonfire/Wildfire“ · Thema 49336"
+        }
+      ]
     },
     {
       "kind": "repair-guide",
@@ -124,7 +881,12 @@
           "label": "Reparaturhilfe redaktionell geprüft"
         }
       ],
-      "sources": []
+      "sources": [
+        {
+          "url": "https://www.elektroroller-forum.de/viewtopic.php?t=49333",
+          "label": "ElektroRoller-Forum · „MOSFET Error – Wildfire steht“ · Thema 49333"
+        }
+      ]
     },
     {
       "kind": "repair-guide",
@@ -141,7 +903,12 @@
           "label": "Reparaturhilfe redaktionell geprüft"
         }
       ],
-      "sources": []
+      "sources": [
+        {
+          "url": "https://www.elektroroller-forum.de/viewtopic.php?t=48453",
+          "label": "ElektroRoller-Forum · „Controller-Problem BTM Bonfire Performance“ · Thema 48453"
+        }
+      ]
     },
     {
       "kind": "repair-guide",
@@ -158,7 +925,12 @@
           "label": "Reparaturhilfe redaktionell geprüft"
         }
       ],
-      "sources": []
+      "sources": [
+        {
+          "url": "https://www.elektroroller-forum.de/viewtopic.php?t=48425",
+          "label": "ElektroRoller-Forum · „Wildfire – starke Vibrationen aus dem Antrieb“ · Thema 48425"
+        }
+      ]
     },
     {
       "kind": "repair-guide",
@@ -175,7 +947,12 @@
           "label": "Reparaturhilfe redaktionell geprüft"
         }
       ],
-      "sources": []
+      "sources": [
+        {
+          "url": "https://www.elektroroller-forum.de/viewtopic.php?t=49324",
+          "label": "ElektroRoller-Forum · „Wildfire – Gabelbrücke unten – Schrauben gerissen“ · Thema 49324"
+        }
+      ]
     },
     {
       "kind": "repair-guide",
@@ -192,7 +969,12 @@
           "label": "Reparaturhilfe redaktionell geprüft"
         }
       ],
-      "sources": []
+      "sources": [
+        {
+          "url": "https://btm.shortaktien.de/pdfs/21-gabelabdichtung-community.pdf",
+          "label": "BTM Community · lokale PDF „Gabelabdichtung“"
+        }
+      ]
     },
     {
       "kind": "repair-guide",
@@ -209,7 +991,12 @@
           "label": "Reparaturhilfe redaktionell geprüft"
         }
       ],
-      "sources": []
+      "sources": [
+        {
+          "url": "https://www.elektroroller-forum.de/viewtopic.php?t=48948",
+          "label": "ElektroRoller-Forum · „Vorderrad-Ausbau Blacktea Bonfire?“ · Thema 48948"
+        }
+      ]
     },
     {
       "kind": "repair-guide",
@@ -226,7 +1013,12 @@
           "label": "Reparaturhilfe redaktionell geprüft"
         }
       ],
-      "sources": []
+      "sources": [
+        {
+          "url": "https://www.elektroroller-forum.de/viewtopic.php?t=48744",
+          "label": "ElektroRoller-Forum · „Wildfire Hinterrad reparieren“ · Thema 48744"
+        }
+      ]
     },
     {
       "kind": "repair-guide",
@@ -243,7 +1035,12 @@
           "label": "Reparaturhilfe redaktionell geprüft"
         }
       ],
-      "sources": []
+      "sources": [
+        {
+          "url": "https://www.elektroroller-forum.de/viewtopic.php?t=44905",
+          "label": "ElektroRoller-Forum · „Wildfire – Laden Steckdose und Typ 2 öffentlich“ · Thema 44905"
+        }
+      ]
     },
     {
       "kind": "repair-guide",
@@ -260,7 +1057,12 @@
           "label": "Reparaturhilfe redaktionell geprüft"
         }
       ],
-      "sources": []
+      "sources": [
+        {
+          "url": "https://www.elektroroller-forum.de/viewtopic.php?t=46657",
+          "label": "ElektroRoller-Forum · „Wildfire: NFC, aber wie einbauen?“ · Thema 46657"
+        }
+      ]
     },
     {
       "kind": "repair-guide",
@@ -277,7 +1079,12 @@
           "label": "Reparaturhilfe redaktionell geprüft"
         }
       ],
-      "sources": []
+      "sources": [
+        {
+          "url": "https://www.elektroroller-forum.de/viewtopic.php?t=48743",
+          "label": "ElektroRoller-Forum · „Bonfireakkus dauerhaft außerhalb laden: QS8-Alternative?“ · Thema 48743"
+        }
+      ]
     },
     {
       "kind": "repair-guide",
@@ -294,7 +1101,12 @@
           "label": "Reparaturhilfe redaktionell geprüft"
         }
       ],
-      "sources": []
+      "sources": [
+        {
+          "url": "https://www.elektroroller-forum.de/viewtopic.php?t=47365",
+          "label": "ElektroRoller-Forum · „Zusammenfassung von Tipps“ · Thema 47365"
+        }
+      ]
     },
     {
       "kind": "repair-guide",
@@ -311,19 +1123,24 @@
           "label": "Reparaturhilfe redaktionell geprüft"
         }
       ],
-      "sources": []
+      "sources": [
+        {
+          "url": "https://www.elektroroller-forum.de/viewtopic.php?t=47365",
+          "label": "Wildfire-Handbuch 1.4 · Community-PDF und Forum · Thema 47365"
+        }
+      ]
     },
     {
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/alu-topcase",
       "title": "Alu-Topcase",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -338,13 +1155,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/bar-end-mirrors",
       "title": "Lenkerendenspiegel",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -359,13 +1176,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/bearings",
       "title": "Lager",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -380,13 +1197,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/change-the-color-of-my-off-road-protection",
       "title": "Farbauswahl Offroad-Schutz",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -401,13 +1218,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/blinkerhalterung-vorne",
       "title": "Blinkerhalterung (vorne)",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -422,13 +1239,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/bluetooth-dongle",
       "title": "Bluetooth Dongle",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -457,6 +1274,10 @@
         {
           "url": "https://web.archive.org/web/20231130201331id_/https://www.blackteamotorbikes.com/products/bremsbelage",
           "label": "Archivierter Originaleintrag"
+        },
+        {
+          "url": "https://www.elektroroller-forum.de/viewtopic.php?t=48272",
+          "label": "Recherchequelle zum Bauteil"
         }
       ]
     },
@@ -464,13 +1285,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/bremsen",
       "title": "Bremsen",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -485,13 +1306,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/bremsleitung",
       "title": "Bremsleitung",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -506,13 +1327,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/bremslichtkabel",
       "title": "Bremslichtkabel",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -527,13 +1348,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/bremsscheibe",
       "title": "Bremsscheibe",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -548,13 +1369,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/bremszylinder",
       "title": "Bremssattel",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -562,6 +1383,10 @@
         {
           "url": "https://web.archive.org/web/20231130213148id_/https://www.blackteamotorbikes.com/products/bremszylinder",
           "label": "Archivierter Originaleintrag"
+        },
+        {
+          "url": "https://www.blackteamotorbikes.com/products/bremszylinder",
+          "label": "Recherchequelle zum Bauteil"
         }
       ]
     },
@@ -569,13 +1394,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/bremszylinder-und-hebel",
       "title": "Bremszylinder und -hebel",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -590,13 +1415,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/charger-upgrade",
       "title": "10A Charger Upgrade",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -611,13 +1436,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/charging-bundle",
       "title": "Charging Bundle",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -632,13 +1457,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/copy-of-52-v-batterie",
       "title": "52 V Batterie",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -653,13 +1478,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/copy-of-beifahrerfussrasten",
       "title": "Schwinge",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -667,6 +1492,10 @@
         {
           "url": "https://web.archive.org/web/20240229082559id_/https://www.blackteamotorbikes.com/products/copy-of-beifahrerfussrasten",
           "label": "Archivierter Originaleintrag"
+        },
+        {
+          "url": "https://www.blackteamotorbikes.com/products/copy-of-achse",
+          "label": "Recherchequelle zum Bauteil"
         }
       ]
     },
@@ -674,13 +1503,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/copy-of-achse",
       "title": "Beifahrerfußrasten",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -695,13 +1524,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/copy-of-federbeine",
       "title": "Achse",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -716,13 +1545,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/copy-of-gabelbruckenset",
       "title": "Motorhalterung-Set",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -737,13 +1566,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/copy-of-motorhalterung-set",
       "title": "Mutterabdeckung-Set",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -758,13 +1587,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/copy-of-off-road-schutz",
       "title": "Dual Sport Lenker",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -779,13 +1608,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/classic-indicator",
       "title": "Klassische Blinker",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -800,13 +1629,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/classic-mirrors",
       "title": "Klassische Spiegel",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -835,6 +1664,18 @@
         {
           "url": "https://web.archive.org/web/20240623020107id_/https://www.blackteamotorbikes.com/products/dcdc-converter",
           "label": "Archivierter Originaleintrag"
+        },
+        {
+          "url": "https://www.elektroroller-forum.de/viewtopic.php?t=48272",
+          "label": "Recherchequelle zum Bauteil"
+        },
+        {
+          "url": "https://www.idealplusing.com/index/product/detail/id/47",
+          "label": "Recherchequelle zum Bauteil"
+        },
+        {
+          "url": "https://www.idealplusing.com/storage/uploads/files/product/IPS-DTD110S12%20DC%20DC%20Converter.pdf",
+          "label": "Recherchequelle zum Bauteil"
         }
       ]
     },
@@ -842,13 +1683,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/display",
       "title": "Display",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -863,13 +1704,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/dual-sport-reifen-upgrade",
       "title": "Dual-Sport-Reifen-Upgrade",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -884,13 +1725,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/enduro-fender",
       "title": "Enduro-Kotflügel",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -905,13 +1746,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/felge",
       "title": "Felge",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -926,13 +1767,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/fork-stabiliser",
       "title": "Gabelstabilisator",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -947,13 +1788,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/front-wheel",
       "title": "Vorderrad",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -968,13 +1809,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/foot-pegs-set",
       "title": "Fußrasten-Set",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -989,13 +1830,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/gabelbrucke-mit-lenkerklemmen",
       "title": "Gabelbrückenset",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -1010,13 +1851,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/gabelset",
       "title": "Gabelset",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -1031,13 +1872,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/gasdruck-federbeine",
       "title": "Gasdruck-Federbeine",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -1052,13 +1893,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/goldene-usd-gabel",
       "title": "Goldene USD-Gabel",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -1073,13 +1914,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/handguards",
       "title": "Aluminium Handguards",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -1094,13 +1935,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/handlebar-crash-bars",
       "title": "Lenker-Sturzbügel",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -1115,13 +1956,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/handlebar-risers",
       "title": "Lenkererhöhung",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -1136,13 +1977,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/headlight",
       "title": "Scheinwerfer",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -1157,13 +1998,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/headlight-grill",
       "title": "Scheinwerfergitter",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -1178,13 +2019,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/hintere-stossdampfer",
       "title": "Hintere Stoßdämpfer",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -1199,13 +2040,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/hinterer-radschutz",
       "title": "Hinterer Radschutz",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -1234,6 +2075,10 @@
         {
           "url": "https://web.archive.org/web/20241012160510id_/https://www.blackteamotorbikes.com/products/hub-motor",
           "label": "Archivierter Originaleintrag"
+        },
+        {
+          "url": "https://www.elektroroller-forum.de/viewtopic.php?t=48272",
+          "label": "Recherchequelle zum Bauteil"
         }
       ]
     },
@@ -1241,13 +2086,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/kabel",
       "title": "Kabel",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -1262,13 +2107,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/key-set",
       "title": "Schlüsselsatz",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -1283,13 +2128,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/keyless-go",
       "title": "Keyless Go",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -1304,13 +2149,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/keyless-go-retro-fit",
       "title": "Keyless-Go-Retrofit",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -1325,13 +2170,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/kill-switch",
       "title": "Kill-Switch",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -1346,13 +2191,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/ladegerat",
       "title": "Ladegerät",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -1367,13 +2212,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/langer-alu-radschutz",
       "title": "Langer Alu-Radschutz",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -1388,13 +2233,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/langer-bonfire-sitz",
       "title": "Langer Bonfire-Sitz",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -1409,13 +2254,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/led-blinker",
       "title": "LED-Blinker",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -1430,13 +2275,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/led-indicators",
       "title": "LED Blinker",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -1451,13 +2296,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/lenker",
       "title": "Lenker",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -1472,13 +2317,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/light-holder",
       "title": "Scheinwerferhalter",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -1493,13 +2338,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/lower-foot-rests",
       "title": "Lower Foot Rests",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -1514,13 +2359,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/luftgekuhlt",
       "title": "Luftgekühlt",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -1535,13 +2380,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/modern-bundle",
       "title": "Modern-Bundle",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -1556,13 +2401,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/moped-license-plate-holder",
       "title": "Moped-Kennzeichenhalter",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -1577,13 +2422,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/mutterabdeckung-set",
       "title": "Mutterabdeckung Set",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -1593,13 +2438,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/nfc-karte-nachrustkit",
       "title": "NFC-Karte / Nachrüstkit",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -1614,13 +2459,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/off-road-bundle",
       "title": "Offroad-Bundle",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -1635,13 +2480,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/off-road-schutz",
       "title": "Offroad-Schutz",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -1651,13 +2496,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/passenger-hold",
       "title": "Soziushalter",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -1665,6 +2510,10 @@
         {
           "url": "https://web.archive.org/web/20240524155112id_/https://www.blackteamotorbikes.com/products/passenger-hold",
           "label": "Archivierter Originaleintrag"
+        },
+        {
+          "url": "https://www.blackteamotorbikes.com/products/passenger-hold",
+          "label": "Recherchequelle zum Bauteil"
         }
       ]
     },
@@ -1672,13 +2521,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/performance-bundle",
       "title": "Performance-Bundle",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -1693,13 +2542,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/radabdeckung",
       "title": "Radabdeckung",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -1714,13 +2563,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/range-extender-bundle",
       "title": "Reichweiten-Bundle",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -1735,13 +2584,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/rear-light",
       "title": "Rücklicht",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -1756,13 +2605,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/rear-rack",
       "title": "Gepäckträger hinten",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -1777,13 +2626,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/reflektoren",
       "title": "Reflektoren",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -1798,29 +2647,34 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/reparatur-qs8s-stecker",
       "title": "QS8-S-Stecker-Reparatur",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
-      "sources": []
+      "sources": [
+        {
+          "url": "https://www.blackteamotorbikes.com/products/reparatur-qs8s-stecker",
+          "label": "Recherchequelle zum Bauteil"
+        }
+      ]
     },
     {
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/retro-windschild",
       "title": "Retro-Windschild",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -1835,13 +2689,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/ride-mode-button",
       "title": "Fahrmodi-Taster",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -1856,13 +2710,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/schaltereinheit",
       "title": "Schaltereinheit",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -1877,13 +2731,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/scheinwerfer-retrofit",
       "title": "Scheinwerfer-Retrofit",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -1898,13 +2752,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/schuko-auf-typ-2-adapter",
       "title": "Schuko-auf-Typ-2-Adapter",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -1919,13 +2773,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/schuko-ladekabel-fur-wildfire",
       "title": "Schuko-Ladekabel für Wildfire",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -1940,13 +2794,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/seat",
       "title": "Sitz",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -1961,13 +2815,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/seitenstander-kill-switch",
       "title": "Seitenständer Kill Switch",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -1982,13 +2836,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/side-bag",
       "title": "Seitentasche",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -2003,13 +2857,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/side-cover",
       "title": "Seitenabdeckung",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -2024,13 +2878,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/side-stand",
       "title": "Seitenständer",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -2045,13 +2899,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/side-stand-spring-set",
       "title": "Seitenständer-Feder-Set",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -2066,13 +2920,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/sitz-b-ware-gebraucht",
       "title": "Sitz (B-Ware / gebraucht)",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -2101,6 +2955,10 @@
         {
           "url": "https://web.archive.org/web/20240523225106id_/https://www.blackteamotorbikes.com/products/speiche-mit-nippel",
           "label": "Archivierter Originaleintrag"
+        },
+        {
+          "url": "https://www.elektroroller-forum.de/viewtopic.php?t=48272",
+          "label": "Recherchequelle zum Bauteil"
         }
       ]
     },
@@ -2108,13 +2966,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/stand",
       "title": "Montageständer",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -2129,13 +2987,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/stander-copy",
       "title": "Ständer",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -2150,13 +3008,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/starter-relais-12-v",
       "title": "12-V-Starterrelais",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -2171,13 +3029,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/sticker-set",
       "title": "Sticker-Set",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -2192,13 +3050,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/surf-rack",
       "title": "Surf-Rack",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -2213,13 +3071,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/tall-rider-bundle",
       "title": "Tall-Rider-Bundle",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -2234,13 +3092,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/tank",
       "title": "Tank",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -2248,6 +3106,10 @@
         {
           "url": "https://web.archive.org/web/20240524171856id_/https://www.blackteamotorbikes.com/products/tank",
           "label": "Archivierter Originaleintrag"
+        },
+        {
+          "url": "https://www.blackteamotorbikes.com/products/tank",
+          "label": "Recherchequelle zum Bauteil"
         }
       ]
     },
@@ -2255,13 +3117,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/tank-b-ware",
       "title": "Tank (B-Ware)",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -2276,13 +3138,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/tankgummi-set",
       "title": "Tankgummi Set",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -2297,13 +3159,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/tft-touch-display-retrofit",
       "title": "TFT-Touchdisplay-Retrofit",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -2318,13 +3180,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/typ-2-kabel",
       "title": "Typ-2-Kabel",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -2339,13 +3201,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/usb-charging-port",
       "title": "USB-Ladeport",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -2353,6 +3215,10 @@
         {
           "url": "https://web.archive.org/web/20230514052827id_/https://www.blackteamotorbikes.com/products/usb-charging-port",
           "label": "Archivierter Originaleintrag"
+        },
+        {
+          "url": "https://www.elektroroller-forum.de/viewtopic.php?t=44761&start=80",
+          "label": "Recherchequelle zum Bauteil"
         }
       ]
     },
@@ -2360,13 +3226,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/usd-gabelset",
       "title": "USD-Gabel-Set",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -2381,13 +3247,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/wildfire",
       "title": "Wildfire",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -2402,13 +3268,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/wildfire-abs",
       "title": "Wildfire ABS",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -2423,13 +3289,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/wildfire-gabelbruckenset",
       "title": "Wildfire-Gabelbrücken-Set",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -2444,13 +3310,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/wildfire-konfiguration",
       "title": "Wildfire-Konfiguration",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -2465,13 +3331,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/wildfire-performance",
       "title": "Wildfire Performance",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -2486,13 +3352,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/windschild",
       "title": "Windschild",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],
@@ -2502,13 +3368,13 @@
       "kind": "part",
       "url": "https://btm.shortaktien.de/ersatzteile/xlr-charging-port",
       "title": "XLR-Ladeport",
-      "revision": "2026-09-04",
-      "lastReviewed": "2026-09-04",
+      "revision": "2026-09-02",
+      "lastReviewed": "2026-09-02",
       "licenseStatus": "Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.",
       "sourceChain": "Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar",
       "history": [
         {
-          "date": "2026-09-04",
+          "date": "2026-09-02",
           "label": "Ersatzteil-Datensatz zuletzt redaktionell geprüft"
         }
       ],

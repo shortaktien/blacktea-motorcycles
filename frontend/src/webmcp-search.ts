@@ -1,4 +1,4 @@
-export type WebMcpScope = 'all' | 'faq' | 'wiki' | 'repair' | 'pdf';
+export type WebMcpScope = 'all' | 'faq' | 'wiki' | 'repair' | 'pdf' | 'owner' | 'part';
 
 export type WebMcpKnowledgeEntry = {
   kind: Exclude<WebMcpScope, 'all'>;
@@ -67,7 +67,7 @@ export function searchBtmKnowledge(
 ): string {
   const query = typeof queryValue === 'string' ? queryValue.trim().slice(0, 120) : '';
   const requestedScope = typeof scopeValue === 'string' ? scopeValue : 'all';
-  const scope: WebMcpScope = ['all', 'faq', 'wiki', 'repair', 'pdf'].includes(requestedScope)
+  const scope: WebMcpScope = ['all', 'faq', 'wiki', 'repair', 'pdf', 'owner', 'part'].includes(requestedScope)
     ? requestedScope as WebMcpScope
     : 'all';
 

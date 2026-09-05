@@ -4,3 +4,5 @@ import { App } from './App';
 export function render(pathname: string): string {
   return renderToString(<App initialPath={pathname} />);
 }
+
+export { getPageSeo, webMcpKnowledgeEntries } from './App';

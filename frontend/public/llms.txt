@@ -6,7 +6,10 @@ Die Website richtet sich an Besitzerinnen und Besitzer von Bonfire- und Wildfire
 
 ## Kernseiten
 
-- [Black Tea Motorbikes – Hilfe — Community & Reparaturwissen](https://btm.shortaktien.de/): Der Treffpunkt für Bonfire- und Wildfire-Rider: Community, DACH-Karte, Reparaturhilfe, Ersatzteile, Wiki und PDFs. Wissen finden und Erfahrungen teilen.
+- [Black Tea Motorbikes insolvent: Hilfe für Besitzer & Besteller](https://btm.shortaktien.de/insolvenz): Hilfe zur Black Tea Motorbikes Insolvenz: Verfahrensstand prüfen, Bestellunterlagen sichern, Ersatzteile suchen und Reparaturen vorbereiten.
+- [Black Tea Reparatur: Werkstattkontakt vorbereiten](https://btm.shortaktien.de/hilfe/werkstatt-vorbereiten): Bonfire oder Wildfire defekt? Erstelle einen Reparatur-Steckbrief mit Modell, Fehlerbild und Unterlagen zum Kopieren oder Herunterladen.
+- [Black Tea Ersatzteile finden: Bonfire & Wildfire abgleichen](https://btm.shortaktien.de/hilfe/ersatzteil-finden): Ersatzteile für Bonfire und Wildfire suchen: Modell, Teilenummer, Maße und Bezugsstatus prüfen. Mit Vorlage für eine gezielte Teileanfrage.
+- [Black Tea Hilfe: Insolvenz, Ersatzteile & Reparaturwissen](https://btm.shortaktien.de/): Unabhängige Hilfe für Black Tea Bonfire und Wildfire: Orientierung zur Insolvenz, Ersatzteile, Handbücher, Reparaturwissen und Werkstattkontakte.
 - [Reparaturhilfe — Black Tea Motorbikes – Hilfe](https://btm.shortaktien.de/hilfe): Redaktionell geordnete Reparaturhilfen für typische Bonfire- und Wildfire-Fehlerbilder — mit Kurzablauf, ausführlicher Prüfung, Sicherheit und Quelle.
 - [Reparatur anfragen — Black Tea Motorbikes – Hilfe](https://btm.shortaktien.de/hilfe/anfragen): Reparaturanfragen zu Black Tea Bonfire und Wildfire stellen, Erfahrungen teilen und gemeinsam nachvollziehbare Lösungen dokumentieren.
 - [Ersatzteile — Black Tea Motorbikes – Hilfe](https://btm.shortaktien.de/ersatzteile): Historischer BTM-Ersatzteilkatalog mit Modellbezug, Teilenamen und Quellen. Bestand und Preise vor dem Kauf prüfen.
@@ -20,6 +23,12 @@ Die Website richtet sich an Besitzerinnen und Besitzer von Bonfire- und Wildfire
 - [Wiki — Black Tea Motorbikes – Hilfe](https://btm.shortaktien.de/wiki): Das BTM-Wiki enthält redaktionell geprüfte Artikel zu Bonfire und Wildfire und wird gemeinsam erweitert.
 - [Black Tea Bonfire – Technik, Probleme & Reparaturhilfe](https://btm.shortaktien.de/bikes/bonfire): Technische Wiki-Seite zur Black Tea Bonfire mit Handbuchdaten, Modellvarianten und nachvollziehbaren Quellen.
 - [Black Tea Wildfire – Technik, Probleme & Reparaturhilfe](https://btm.shortaktien.de/bikes/wildfire): Technische Wiki-Seite zur Black Tea Wildfire mit Handbuchdaten, Modellvarianten und nachvollziehbaren Quellen.
+
+## Hilfe für Besitzer und Besteller
+
+- [Black Tea Motorbikes insolvent: Hilfe für Besitzer & Besteller](https://btm.shortaktien.de/insolvenz): Belegt ist die Anordnung der vorläufigen Insolvenzverwaltung vom 14. Juli 2026 durch das Amtsgericht München, Aktenzeichen 1513 IN 2588/26. Die am 4. September eingesehene Sekundärquelle führt Sicherungsmaßnahmen auf. Ein aktueller Eröffnungsbeschluss wurde hier nicht amtlich verifiziert. Prüfe neue Beschlüsse und Fristen im amtlichen Insolvenzportal.
+- [Black Tea Reparatur: Werkstattkontakt vorbereiten](https://btm.shortaktien.de/hilfe/werkstatt-vorbereiten): Notiere Modell und Baujahr, die genaue Fehlermeldung, den Zeitpunkt des Auftretens und bisherige Maßnahmen. Ergänze passende Handbuchseiten und Fotos. Der Steckbrief unten funktioniert ohne Konto und erstellt eine Textdatei für deine eigene Verwendung.
+- [Black Tea Ersatzteile finden: Bonfire & Wildfire abgleichen](https://btm.shortaktien.de/hilfe/ersatzteil-finden): Modell und Baujahr erfassen, historische Bezeichnung nachschlagen und die konkrete Ausführung vergleichen. Erst danach Lieferbarkeit und Passform mit einem Anbieter oder Fachbetrieb klären. Ein ähnliches Produktfoto oder ein passender Stecker allein reicht nicht aus.
 
 ## Reparaturhilfen
 

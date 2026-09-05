@@ -6,7 +6,10 @@ const frontendRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const publicRoot = join(frontendRoot, 'public');
 const wikiRoot = join(frontendRoot, '..', 'content', 'wiki');
 const appSource = readFileSync(join(frontendRoot, 'src', 'App.tsx'), 'utf8');
+const faqContent = JSON.parse(readFileSync(join(frontendRoot, '..', 'content', 'faq.json'), 'utf8'));
+const ownerHelpPages = JSON.parse(readFileSync(join(frontendRoot, '..', 'content', 'owner-help.json'), 'utf8')).pages;
 const siteConfig = JSON.parse(readFileSync(join(frontendRoot, 'src', 'site-config.json'), 'utf8'));
+const partResearchMap = JSON.parse(readFileSync(join(frontendRoot, '..', 'content', 'part-research-map.json'), 'utf8'));
 const partsCatalog = JSON.parse(readFileSync(join(frontendRoot, '..', 'research', 'parts.json'), 'utf8'));
 const partDetailsCatalog = JSON.parse(readFileSync(join(frontendRoot, '..', 'research', 'parts-details.json'), 'utf8'));
 const siteOrigin = (process.env.VITE_SITE_URL || siteConfig.siteOrigin).replace(/\/+$/, '');
@@ -28,6 +31,8 @@ const guides = [...appSource.matchAll(guidePattern)].map((match) => ({
   title: match[3],
   model: match[4],
   intro: match[5],
+  sourceHref: appSource.slice(match.index + match[0].length).match(/sourceHref:\s*'([^']+)'/)?.[1],
+  sourceLabel: appSource.slice(match.index + match[0].length).match(/sourceLabel:\s*'([^']+)'/)?.[1],
 }));
 
 const mapFromApp = (name) => {
@@ -92,9 +97,10 @@ if (guides.length === 0) {
 }
 
 const staticPages = [
+  ...ownerHelpPages,
   // Regionale PLZ-Seiten bleiben bewusst außen vor, bis dort eigener lokaler
   // Mehrwert existiert. Die ungefähre Verortung läuft ausschließlich über /karte.
-  { path: '/', title: 'Black Tea Motorbikes – Hilfe — Community & Reparaturwissen', description: 'Der Treffpunkt für Bonfire- und Wildfire-Rider: Community, DACH-Karte, Reparaturhilfe, Ersatzteile, Wiki und PDFs. Wissen finden und Erfahrungen teilen.' },
+  { path: '/', title: 'Black Tea Hilfe: Insolvenz, Ersatzteile & Reparaturwissen', description: 'Unabhängige Hilfe für Black Tea Bonfire und Wildfire: Orientierung zur Insolvenz, Ersatzteile, Handbücher, Reparaturwissen und Werkstattkontakte.' },
   { path: '/hilfe', title: 'Reparaturhilfe — Black Tea Motorbikes – Hilfe', description: 'Redaktionell geordnete Reparaturhilfen für typische Bonfire- und Wildfire-Fehlerbilder — mit Kurzablauf, ausführlicher Prüfung, Sicherheit und Quelle.' },
   { path: '/hilfe/anfragen', title: 'Reparatur anfragen — Black Tea Motorbikes – Hilfe', description: 'Reparaturanfragen zu Black Tea Bonfire und Wildfire stellen, Erfahrungen teilen und gemeinsam nachvollziehbare Lösungen dokumentieren.' },
   { path: '/ersatzteile', title: 'Ersatzteile — Black Tea Motorbikes – Hilfe', description: 'Historischer BTM-Ersatzteilkatalog mit Modellbezug, Teilenamen und Quellen. Bestand und Preise vor dem Kauf prüfen.' },
@@ -128,7 +134,7 @@ const ownPaths = [...new Set([
 const absoluteUrl = (path) => `${siteOrigin}${path === '/' ? '/' : path}`;
 const escapeXml = (value) => value.replace(/[<>&'\"]/g, (character) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', "'": '&apos;', '"': '&quot;' }[character]));
 const lastmodFor = (path) => {
-  const value = lastmodByPath[path] ?? explicitLastmod;
+  const value = lastmodByPath[path] ?? explicitLastmod ?? ownerHelpPages.find((page) => page.path === path)?.reviewedAt;
   return typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value) ? `<lastmod>${value}</lastmod>` : '';
 };
 
@@ -152,6 +158,25 @@ const openKnowledgeManifest = {
   licensePolicy: 'Eigene redaktionelle Aufbereitungen werden als solche gekennzeichnet; Originalquellen bleiben bei ihren jeweiligen Rechteinhabern.',
   regionalContentPolicy: 'Regionale Seiten werden erst veröffentlicht, wenn sie eigenen lokalen Mehrwert bieten. Die ungefähre PLZ-Verortung bleibt bis dahin auf /karte gebündelt.',
   entries: [
+    ...faqContent.items.map((item) => ({
+      kind: 'faq', url: absoluteUrl(`/faq#${item.id}`), title: item.question, answer: item.answer,
+      revision: faqContent.lastUpdated, lastReviewed: faqContent.lastUpdated,
+      reviewScope: 'Redaktionelle Aktualisierung der FAQ; veränderliche Angaben anhand der verlinkten Quellen prüfen.',
+      licenseStatus: 'Eigene redaktionelle Antwort; Quellen behalten ihre jeweiligen Rechte.',
+      sourceChain: 'Verlinkte Quelle oder weiterführender Artikel → redaktionelle Antwort',
+      history: [{ date: faqContent.lastUpdated, label: 'FAQ für Besitzer und Besteller überarbeitet' }],
+      sources: [{ url: item.sourceHref ?? (item.linkHref.startsWith('/') ? absoluteUrl(item.linkHref) : item.linkHref), label: item.sourceLabel ?? item.linkLabel }],
+    })),
+    ...ownerHelpPages.map((page) => ({
+      kind: 'owner-guide', url: absoluteUrl(page.path), title: page.title,
+      summary: page.summary, revision: page.reviewedAt, lastReviewed: page.reviewedAt,
+      reviewScope: 'Redaktionelle Orientierung und Quellenabgleich; kein amtlich bestätigter aktueller Verfahrensstand.',
+      licenseStatus: 'Eigene redaktionelle Aufbereitung; verlinkte Quellen behalten ihre jeweiligen Rechte.',
+      sourceChain: 'Verlinkte Quellen und vorhandenes BTM-Wissen → redaktionelle Orientierung',
+      history: [{ date: page.reviewedAt, label: 'Leitfaden für Besitzer und Besteller erstellt' }],
+      sections: page.sections,
+      sources: [...new Map(page.sections.flatMap((section) => section.links).map((link) => [link.href, { url: link.href.startsWith('/') ? absoluteUrl(link.href) : link.href, label: link.label }])).values()],
+    })),
     ...wikiArticles.map((article) => ({
       kind: 'wiki',
       url: absoluteUrl(article.path),
@@ -174,12 +199,13 @@ const openKnowledgeManifest = {
       licenseStatus: 'Eigene redaktionelle Aufbereitung; Originalquelle bleibt bei ihrem Rechteinhaber.',
       sourceChain: 'Community-Hinweise → redaktionelle Reparaturhilfe → geprüfte Community-Ergänzungen',
       history: [{ date: '2026-09-02', label: 'Reparaturhilfe redaktionell geprüft' }],
-      sources: [],
+      sources: guide.sourceHref ? [{ url: guide.sourceHref.startsWith('/') ? absoluteUrl(guide.sourceHref) : guide.sourceHref, label: guide.sourceLabel ?? 'Quelle der Reparaturhilfe' }] : [],
     })),
     ...parts.map((part) => {
       const archived = partDetailsCatalog.entries?.find((entry) => entry.slug === part.id && entry.ok);
       const sourceUrl = archived?.archive;
-      const reviewedAt = partsCatalog.sourcing_policy?.checked_at ?? '2026-09-04';
+      const research = partsCatalog.entries.find((entry) => entry.id === partResearchMap[part.id]);
+      const reviewedAt = research?.checked_at ?? partsCatalog.researched_at;
       return {
         kind: 'part',
         url: absoluteUrl(part.path),
@@ -189,7 +215,7 @@ const openKnowledgeManifest = {
         licenseStatus: 'Eigene Beschreibung; Archiv- und Herstellerinhalte bleiben bei ihren Rechteinhabern.',
         sourceChain: 'Historischer Shop-Eintrag → Archivaufnahme → technische Recherche → Bezugslink, falls belastbar',
         history: [{ date: reviewedAt, label: 'Ersatzteil-Datensatz zuletzt redaktionell geprüft' }],
-        sources: sourceUrl ? [{ url: sourceUrl, label: 'Archivierter Originaleintrag' }] : [],
+        sources: [...new Set([sourceUrl, research?.source_url, research?.manufacturer_reference, research?.manufacturer_datasheet].filter(Boolean))].map((url) => ({ url, label: url === sourceUrl ? 'Archivierter Originaleintrag' : 'Recherchequelle zum Bauteil' })),
       };
     }),
   ],
@@ -207,6 +233,10 @@ const llms = [
   '## Kernseiten',
   '',
   ...staticPages.filter((page) => !page.robots?.startsWith('noindex')).map((page) => `- [${page.title}](${absoluteUrl(page.path)}): ${page.description}`),
+  '',
+  '## Hilfe für Besitzer und Besteller',
+  '',
+  ...ownerHelpPages.map((page) => `- [${page.title}](${absoluteUrl(page.path)}): ${page.summary}`),
   '',
   '## Reparaturhilfen',
   '',
@@ -248,6 +278,15 @@ const fullLlms = [
   '',
   ...staticPages.filter((page) => !page.robots?.startsWith('noindex')).map((page) => `- [${page.title}](${absoluteUrl(page.path)}): ${page.description}`),
   '',
+  '## Häufige Fragen',
+  '',
+  ...faqContent.items.flatMap((item) => [`### ${item.question}`, item.answer, `- [Antwort mit Quellen](${absoluteUrl(`/faq#${item.id}`)})`, '']),
+  '## Hilfe für Besitzer und Besteller',
+  '',
+  ...ownerHelpPages.flatMap((page) => [
+    `### ${page.heading}`, `URL: ${absoluteUrl(page.path)}`, `Redaktioneller Stand: ${page.reviewedAt}`, page.summary,
+    ...page.sections.flatMap((section) => [`#### ${section.title}`, ...section.paragraphs, ...section.links.map((link) => `- [${link.label}](${link.href.startsWith('/') ? absoluteUrl(link.href) : link.href})`)]), '',
+  ]),
   '## Reparaturhilfen',
   '',
   ...guides.flatMap((guide) => [

@@ -152,6 +152,30 @@ Die eigentlichen PDF-Dateien werden aus Rechte- und Speichergründen nicht über
 
 ## Entwicklung ohne Docker
 
+### Besitzerhilfe und redaktionelle Inhalte
+
+Die Leitfäden unter `/insolvenz`, `/hilfe/werkstatt-vorbereiten` und
+`/hilfe/ersatzteil-finden` werden aus `content/owner-help.json` erzeugt. Jede
+Seite benötigt einen eigenen Nutzen, belegbare Aussagen und passende Quellen.
+`reviewedAt` bezeichnet die redaktionelle Bearbeitung, keine automatische
+Bestätigung eines aktuellen Insolvenzstands. Ein Build aktualisiert dieses Datum
+nicht. FAQ-Antworten liegen in `content/faq.json`; ihre `id` ist eine dauerhafte
+Linkadresse und sollte bei Textkorrekturen erhalten bleiben.
+
+Der Reparatur-Steckbrief verarbeitet Eingaben ausschließlich im geöffneten
+Browserfenster. Auf Ersatzteilseiten übernimmt er die dokumentierten Katalogdaten;
+Besitzer müssen ihre konkrete Variante ergänzen. Kopieren und Textdownload lösen
+keine Anfrage an eine Werkstatt oder die Community aus.
+
+`content/part-research-map.json` ordnet Ersatzteilseiten den recherchierten
+Datensätzen zu. Website und Open-Knowledge-Manifest nutzen diese Zuordnung für
+Quellen und Prüfdaten gemeinsam. Nach Inhaltsänderungen den Build und
+`npm run check:owner-help` im Frontend ausführen. Der Check vergleicht auch die
+Metadaten des statischen HTML mit denen der Browseranwendung.
+
+Recherche, Änderungen und Sichtbarkeitsgrenzen sind in
+[docs/sichtbarkeit-2026-09-04.md](docs/sichtbarkeit-2026-09-04.md) dokumentiert.
+
 ### Frontend
 
 Für die Entwicklung ohne Docker werden Node.js 24 und npm 10 oder neuer verwendet.

@@ -6,12 +6,10 @@ const frontendRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const distRoot = join(frontendRoot, 'dist');
 const wikiRoot = join(frontendRoot, '..', 'content', 'wiki');
 const appSource = readFileSync(join(frontendRoot, 'src', 'App.tsx'), 'utf8');
+const ownerHelpPages = JSON.parse(readFileSync(join(frontendRoot, '..', 'content', 'owner-help.json'), 'utf8')).pages;
 const siteConfig = JSON.parse(readFileSync(join(frontendRoot, 'src', 'site-config.json'), 'utf8'));
 const partsCatalog = JSON.parse(readFileSync(join(frontendRoot, '..', 'research', 'parts.json'), 'utf8'));
 const partDetailsCatalog = JSON.parse(readFileSync(join(frontendRoot, '..', 'research', 'parts-details.json'), 'utf8'));
-const faqContent = JSON.parse(readFileSync(join(frontendRoot, '..', 'content', 'faq.json'), 'utf8'));
-const faqItems = faqContent.items ?? [];
-const faqLastUpdated = faqContent.lastUpdated;
 const siteOrigin = (process.env.VITE_SITE_URL || siteConfig.siteOrigin).replace(/\/+$/, '');
 const indexPath = join(distRoot, 'index.html');
 const serverEntryPath = join(frontendRoot, 'dist-server', 'entry-server.js');
@@ -75,10 +73,11 @@ if (guides.length === 0 || !readFileSync(indexPath, 'utf8')) {
 }
 
 const staticPages = [
+  ...ownerHelpPages,
   // No profile ID or member data belongs in the static build. An empty root
   // makes main.tsx mount the actual URL instead of hydrating another page.
   { path: '/profil', title: 'Fahrerprofil — Black Tea Motorbikes – Hilfe', description: 'Öffentliches Fahrerprofil der BTM-Community.', robots: 'noindex,follow,noarchive', clientOnly: true },
-  { path: '/', title: 'Black Tea Motorbikes – Hilfe — Community & Reparaturwissen', description: 'Der Treffpunkt für Bonfire- und Wildfire-Rider: Community, DACH-Karte, Reparaturhilfe, Ersatzteile, Wiki und PDFs. Wissen finden und Erfahrungen teilen.' },
+  { path: '/', title: 'Black Tea Hilfe: Insolvenz, Ersatzteile & Reparaturwissen', description: 'Unabhängige Hilfe für Black Tea Bonfire und Wildfire: Orientierung zur Insolvenz, Ersatzteile, Handbücher, Reparaturwissen und Werkstattkontakte.' },
   { path: '/hilfe', title: 'Reparaturhilfe — Black Tea Motorbikes – Hilfe', description: 'Redaktionell geordnete Reparaturhilfen für typische Bonfire- und Wildfire-Fehlerbilder — mit Kurzablauf, ausführlicher Prüfung, Sicherheit und Quelle.' },
   { path: '/hilfe/anfragen', title: 'Reparatur anfragen — Black Tea Motorbikes – Hilfe', description: 'Reparaturanfragen zu Black Tea Bonfire und Wildfire stellen, Erfahrungen teilen und gemeinsam nachvollziehbare Lösungen dokumentieren.' },
   { path: '/ersatzteile', title: 'Ersatzteile — Black Tea Motorbikes – Hilfe', description: 'Historischer BTM-Ersatzteilkatalog mit Modellbezug, Teilenamen und Quellen. Bestand und Preise vor dem Kauf prüfen.' },
@@ -118,94 +117,14 @@ const pages = [
   })),
 ];
 const source = readFileSync(indexPath, 'utf8');
-const { render } = await import(serverEntryPath);
+const { render, getPageSeo } = await import(serverEntryPath);
 const absoluteUrl = (path) => `${siteOrigin}${path === '/' ? '/' : path}`;
 const escapeAttribute = (value) => String(value).replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character]));
-const websiteSchema = {
-  '@type': 'WebSite',
-  '@id': `${siteOrigin}/#website`,
-  name: 'Black Tea Motorbikes – Hilfe',
-  url: `${siteOrigin}/`,
-  inLanguage: 'de-DE',
-};
-
-const breadcrumbSchema = (page) => ({
-  '@type': 'BreadcrumbList',
-  itemListElement: [
-    { '@type': 'ListItem', position: 1, name: 'Startseite', item: `${siteOrigin}/` },
-    ...(page.guide ? [
-      { '@type': 'ListItem', position: 2, name: 'Reparaturhilfe', item: `${siteOrigin}/hilfe` },
-      { '@type': 'ListItem', position: 3, name: page.guide.title, item: absoluteUrl(page.path) },
-    ] : page.part ? [
-      { '@type': 'ListItem', position: 2, name: 'Ersatzteile', item: `${siteOrigin}/ersatzteile` },
-      { '@type': 'ListItem', position: 3, name: page.part.title, item: absoluteUrl(page.path) },
-    ] : page.path !== '/' ? [{ '@type': 'ListItem', position: 2, name: page.title, item: absoluteUrl(page.path) }] : []),
-  ],
-});
-
-const schemaFor = (page) => {
-  if (page.robots?.startsWith('noindex')) return null;
-
-  const pageSchema = page.path === '/faq' ? {
-    '@type': 'FAQPage',
-    '@id': `${absoluteUrl(page.path)}#faqpage`,
-    name: page.title,
-    description: page.description,
-    url: absoluteUrl(page.path),
-    inLanguage: 'de-DE',
-    dateModified: faqLastUpdated,
-    mainEntity: faqItems.map((item) => ({
-      '@type': 'Question',
-      name: item.question,
-      acceptedAnswer: { '@type': 'Answer', text: item.answer },
-    })),
-  } : page.guide ? {
-    '@type': 'HowTo',
-    '@id': `${absoluteUrl(page.path)}#howto`,
-    name: page.guide.title,
-    description: page.description,
-    url: absoluteUrl(page.path),
-    inLanguage: 'de-DE',
-    step: page.guide.steps.map((step, index) => ({
-      '@type': 'HowToStep',
-      position: index + 1,
-      name: `Prüfschritt ${index + 1}`,
-      text: step,
-    })),
-  } : page.part ? {
-    '@type': 'WebPage',
-    '@id': `${absoluteUrl(page.path)}#webpage`,
-    name: page.part.title,
-    description: page.description,
-    url: absoluteUrl(page.path),
-    inLanguage: 'de-DE',
-    about: { '@type': 'Thing', name: page.part.title },
-  } : page.wikiArticle ? {
-    '@type': 'Article',
-    '@id': `${absoluteUrl(page.path)}#article`,
-    headline: page.wikiArticle.title,
-    description: page.description,
-    url: absoluteUrl(page.path),
-    inLanguage: 'de-DE',
-    ...(page.wikiArticle.lastUpdated ? { dateModified: page.wikiArticle.lastUpdated } : {}),
-    isPartOf: { '@id': `${siteOrigin}/#website` },
-    about: { '@type': 'Thing', name: page.wikiArticle.model },
-  } : {
-    '@type': page.path === '/hilfe' || page.path === '/ersatzteile' || page.path === '/community' || page.path === '/quellen' ? 'CollectionPage' : 'WebPage',
-    '@id': `${absoluteUrl(page.path)}#webpage`,
-    name: page.title,
-    description: page.description,
-    url: absoluteUrl(page.path),
-    inLanguage: 'de-DE',
-    isPartOf: { '@id': `${siteOrigin}/#website` },
-  };
-
-  return { '@context': 'https://schema.org', '@graph': [websiteSchema, pageSchema, breadcrumbSchema(page)] };
-};
-
 const replaceTag = (html, pattern, replacement) => html.replace(pattern, replacement);
 
-for (const page of pages) {
+for (const definition of pages) {
+  const seo = definition.clientOnly ? { ...definition, jsonLd: {} } : getPageSeo(definition.path);
+  const page = { ...definition, title: seo.title, description: seo.description, robots: seo.robots };
   let html = source;
   const renderedBody = page.clientOnly ? '' : render(page.path);
   const robots = page.robots || 'index,follow,max-image-preview:large';
@@ -225,7 +144,7 @@ for (const page of pages) {
     html = html.replace(/<link rel="canonical"[^>]*>/, '').replace(/<meta property="og:url"[^>]*>/, '');
   }
 
-  const schema = schemaFor(page);
+  const schema = page.robots?.startsWith('noindex') ? null : seo.jsonLd;
   const schemaTag = schema ? `<script id="site-jsonld" type="application/ld+json">${JSON.stringify(schema, null, 2).replace(/</g, '\\u003c')}</script>` : '';
   html = replaceTag(html, /<script id="site-jsonld" type="application\/ld\+json">[\s\S]*?<\/script>/, schemaTag);
   html = html.replace('<div id="root"></div>', `<div id="root">${renderedBody}</div>`);

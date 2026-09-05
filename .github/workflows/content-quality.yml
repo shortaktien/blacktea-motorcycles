@@ -36,6 +36,9 @@ jobs:
       - name: Build frontend
         run: npm run build
 
+      - name: Validate owner help and metadata consistency
+        run: npm run check:owner-help
+
       - name: Validate pSEO catalog
         run: npm run check:pseo
 

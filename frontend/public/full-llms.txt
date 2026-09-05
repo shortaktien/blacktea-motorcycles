@@ -1,6 +1,6 @@
 # Black Tea Motorbikes – Hilfe — vollständiger Inhaltsindex
 
-> Vollständige, maschinenlesbare Übersicht der öffentlich zugänglichen Inhalte von https://btm.shortaktien.de. Build-Index: 2026-09-04.
+> Vollständige, maschinenlesbare Übersicht der öffentlich zugänglichen Inhalte von https://btm.shortaktien.de. Build-Index: 2026-09-05.
 
 ## Einordnung
 
@@ -11,7 +11,10 @@
 
 ## Übersichtsseiten
 
-- [Black Tea Motorbikes – Hilfe — Community & Reparaturwissen](https://btm.shortaktien.de/): Der Treffpunkt für Bonfire- und Wildfire-Rider: Community, DACH-Karte, Reparaturhilfe, Ersatzteile, Wiki und PDFs. Wissen finden und Erfahrungen teilen.
+- [Black Tea Motorbikes insolvent: Hilfe für Besitzer & Besteller](https://btm.shortaktien.de/insolvenz): Hilfe zur Black Tea Motorbikes Insolvenz: Verfahrensstand prüfen, Bestellunterlagen sichern, Ersatzteile suchen und Reparaturen vorbereiten.
+- [Black Tea Reparatur: Werkstattkontakt vorbereiten](https://btm.shortaktien.de/hilfe/werkstatt-vorbereiten): Bonfire oder Wildfire defekt? Erstelle einen Reparatur-Steckbrief mit Modell, Fehlerbild und Unterlagen zum Kopieren oder Herunterladen.
+- [Black Tea Ersatzteile finden: Bonfire & Wildfire abgleichen](https://btm.shortaktien.de/hilfe/ersatzteil-finden): Ersatzteile für Bonfire und Wildfire suchen: Modell, Teilenummer, Maße und Bezugsstatus prüfen. Mit Vorlage für eine gezielte Teileanfrage.
+- [Black Tea Hilfe: Insolvenz, Ersatzteile & Reparaturwissen](https://btm.shortaktien.de/): Unabhängige Hilfe für Black Tea Bonfire und Wildfire: Orientierung zur Insolvenz, Ersatzteile, Handbücher, Reparaturwissen und Werkstattkontakte.
 - [Reparaturhilfe — Black Tea Motorbikes – Hilfe](https://btm.shortaktien.de/hilfe): Redaktionell geordnete Reparaturhilfen für typische Bonfire- und Wildfire-Fehlerbilder — mit Kurzablauf, ausführlicher Prüfung, Sicherheit und Quelle.
 - [Reparatur anfragen — Black Tea Motorbikes – Hilfe](https://btm.shortaktien.de/hilfe/anfragen): Reparaturanfragen zu Black Tea Bonfire und Wildfire stellen, Erfahrungen teilen und gemeinsam nachvollziehbare Lösungen dokumentieren.
 - [Ersatzteile — Black Tea Motorbikes – Hilfe](https://btm.shortaktien.de/ersatzteile): Historischer BTM-Ersatzteilkatalog mit Modellbezug, Teilenamen und Quellen. Bestand und Preise vor dem Kauf prüfen.
@@ -25,6 +28,147 @@
 - [Wiki — Black Tea Motorbikes – Hilfe](https://btm.shortaktien.de/wiki): Das BTM-Wiki enthält redaktionell geprüfte Artikel zu Bonfire und Wildfire und wird gemeinsam erweitert.
 - [Black Tea Bonfire – Technik, Probleme & Reparaturhilfe](https://btm.shortaktien.de/bikes/bonfire): Technische Wiki-Seite zur Black Tea Bonfire mit Handbuchdaten, Modellvarianten und nachvollziehbaren Quellen.
 - [Black Tea Wildfire – Technik, Probleme & Reparaturhilfe](https://btm.shortaktien.de/bikes/wildfire): Technische Wiki-Seite zur Black Tea Wildfire mit Handbuchdaten, Modellvarianten und nachvollziehbaren Quellen.
+
+## Häufige Fragen
+
+### Ist Black Tea Motorbikes insolvent?
+Für die Black Tea Motorbikes GmbH ist die Anordnung der vorläufigen Insolvenzverwaltung vom 14. Juli 2026 dokumentiert: Amtsgericht München, Aktenzeichen 1513 IN 2588/26. Die am 4. September eingesehene Sekundärquelle führt Sicherungsmaßnahmen auf. Ein aktueller Eröffnungsbeschluss wurde hier nicht amtlich verifiziert. Neue Beschlüsse und Fristen bitte im amtlichen Insolvenzportal prüfen.
+- [Antwort mit Quellen](https://btm.shortaktien.de/faq#insolvenzstatus)
+
+### Wo bekomme ich Ersatzteile für Black Tea Bonfire und Wildfire?
+Beginne im historischen Ersatzteilkatalog mit Modell, Baujahr und Bauteilbezeichnung. Die Detailseiten zeigen vorhandene Archivquellen, Varianten und den jeweiligen Bezugsstatus. Historische Preise und Lagerangaben sind nicht aktuell. Kläre Passform und Lieferbarkeit für dein konkretes Fahrzeug mit Anbieter oder Fachbetrieb. Auf der Teileseite kannst du eine Anfrage mit dem dokumentierten Teilenamen erstellen.
+- [Antwort mit Quellen](https://btm.shortaktien.de/faq#ersatzteile-finden)
+
+### Wie finde ich eine Werkstatt für meine Bonfire oder Wildfire?
+Sieh dir die Werkstatt-Tipps der Community an und frage vorab nach Erfahrung mit deiner Modellvariante und dem betroffenen Bauteil. Bereite Baujahr, Fehlercode, Symptome und passende Unterlagen vor. Mit unserem Reparatur-Steckbrief kannst du diese Angaben ohne Konto zusammenstellen und selbst an einen Fachbetrieb weitergeben.
+- [Antwort mit Quellen](https://btm.shortaktien.de/faq#werkstatt-finden)
+
+### Wo finde ich Black Tea Handbücher und Schaltpläne?
+Der PDF-Index bündelt gesicherte Dokumente. Im Bonfire- und Wildfire-Wiki findest du dazu technische Einordnungen und Quellen. Prüfe Modellvariante und Dokumentstand vor der Verwendung; nicht jede Anleitung gilt für jedes Baujahr. Sichere passende Unterlagen für dein Motorrad zusätzlich lokal.
+- [Antwort mit Quellen](https://btm.shortaktien.de/faq#handbuch-schaltplan)
+
+### Mein Black Tea Akku wird nicht erkannt – wo beginne ich?
+Notiere Modell, Akkuversion und die genaue Anzeige oder Fehlermeldung. Unsere Akku-Hilfe ordnet die nächsten Prüfschritte und ihre Grenzen ein. Bei ungewöhnlicher Wärme, Geruch, sichtbaren Schäden oder Feuchtigkeit am Akku keine weiteren Lade- oder Fahrversuche unternehmen. Akku und BMS nicht öffnen oder überbrücken; die weitere Prüfung gehört in qualifizierte Hände.
+- [Antwort mit Quellen](https://btm.shortaktien.de/faq#akku-nicht-erkannt)
+
+### Wo finde ich Erfahrungen mit Black Tea Bonfire und Wildfire?
+Erfahrungen sind Einzelberichte und ergeben deshalb kein einheitliches Qualitätsurteil. Für eine faire Einordnung sollten Baujahr, konkrete Variante, Akku, Nutzung und der jeweilige Servicefall zusammen betrachtet werden. Öffentliche Erfahrungsberichte und belegte technische Angaben sind nicht dasselbe.
+- [Antwort mit Quellen](https://btm.shortaktien.de/faq#erfahrungen)
+
+### Welche Reichweite haben Blacktea Motorbikes?
+Eine feste Reichweite gibt es nicht. Modell, Fahrmodus, Geschwindigkeit, Temperatur, Strecke, Reifendruck, Beladung und Akkuzustand verändern den Verbrauch deutlich. Die Angaben im Wiki sind deshalb Orientierungswerte; für dein Fahrzeug ist ein eigener Praxistest unter ähnlichen Bedingungen aussagekräftiger.
+- [Antwort mit Quellen](https://btm.shortaktien.de/faq#reichweite)
+
+### Wie kann ich Erfahrungen mit der Bonfire X sinnvoll vergleichen?
+Berichte zur Bonfire X sind individuelle Nutzungserfahrungen und keine allgemeine Freigabe für jedes Motorrad. Für die Einordnung zählen unter anderem Baujahr, Akkuanzahl, Softwarestand, Fahrprofil und Wartung. Deshalb trennen wir Erfahrungsberichte bewusst von belegten technischen Werten.
+- [Antwort mit Quellen](https://btm.shortaktien.de/faq#bonfire-x-erfahrungen)
+
+### Was passiert mit einer bereits bezahlten, aber noch nicht gelieferten Bestellung?
+Eine Vorauszahlung garantiert keine Lieferung. Sichere Bestellung, Rechnung, Zahlungsbelege und Schriftverkehr und frage die zuständige Stelle nach dem konkreten Auftrag. Bei einer Insolvenz kann eine Forderungsanmeldung nötig werden. § 103 InsO betrifft gegenseitige Verträge, die bei Eröffnung von beiden Seiten noch nicht vollständig erfüllt sind; eine vollständig bezahlte Bestellung lässt sich nicht pauschal darunter einordnen. Lass deinen Vertrag und den Verfahrensstand individuell prüfen.
+- [Antwort mit Quellen](https://btm.shortaktien.de/faq#bestellung-bezahlt)
+
+### Muss ich eine Forderung zur Insolvenztabelle anmelden?
+Nicht jede Forderung muss sofort angemeldet werden. Erst wenn das Insolvenzverfahren eröffnet ist und die Gläubiger dazu aufgefordert werden, gibt es eine Anmeldefrist und die zuständige Stelle. Dann solltest du Bestellung, Rechnung, Zahlungsbelege, Schriftverkehr und eine nachvollziehbare Forderungsaufstellung bereithalten. Eine Anmeldung führt nicht automatisch zu einer vollständigen Rückzahlung; die Quote ist erst später absehbar.
+- [Antwort mit Quellen](https://btm.shortaktien.de/faq#forderung-anmelden)
+
+### Was ist das 60-%-Angebot zur Fertigstellung einer Wildfire?
+Im Forenthread berichten einzelne Vorbesteller von einem individuellen Angebot mit einer zusätzlichen Zahlung von 60 Prozent des ursprünglichen Kaufpreises. Das ist kein allgemein bestätigter Anspruch und keine Empfehlung. Wer ein solches Schreiben erhält, sollte die Bedingungen schriftlich prüfen: konkrete Ausstattung, fehlende Teile, Zahlungsweg, Rückerstattung, Frist und Gewährleistung. Bei dieser Summe ist unabhängige rechtliche Beratung sinnvoll.
+- [Antwort mit Quellen](https://btm.shortaktien.de/faq#wildfire-nachzahlung)
+
+### Wer ist jetzt mein Ansprechpartner?
+Für verbindliche Fragen zum Insolvenzverfahren, zu einer konkreten Bestellung oder zu einer geforderten Zahlung ist die im Verfahrensstand genannte zuständige Stelle maßgeblich. Forumseinträge, WhatsApp-Nachrichten und Aussagen anderer Fahrer ersetzen keine schriftliche Auskunft des Insolvenzverwalters oder eine rechtliche Beratung. Sichere alle Unterlagen und stelle Fragen mit Bestellnummer und Belegen.
+- [Antwort mit Quellen](https://btm.shortaktien.de/faq#ansprechpartner)
+
+### Gibt es weiterhin Garantie, Reparaturen und Ersatzteile?
+Gesetzliche Gewährleistung richtet sich grundsätzlich gegen deinen Verkäufer; eine freiwillige Garantie hängt vom Garantiegeber und den Bedingungen ab. Prüfe deshalb zuerst, wer auf deiner Rechnung steht. Die Insolvenz des Herstellers bedeutet nicht automatisch, dass ein rechtlich unabhängiger Händler ebenfalls insolvent ist. Reparaturen, Kostenübernahme und Teilelieferungen musst du für deinen Fall klären. Eine Community-Lösung ist keine Herstellergarantie.
+- [Antwort mit Quellen](https://btm.shortaktien.de/faq#garantie-reparatur)
+
+### Greift der PayPal-Käuferschutz bei einer Motorradbestellung?
+Darauf solltest du dich bei einem Motorrad nicht verlassen: PayPal nennt Fahrzeuge, ausdrücklich auch Motorräder, als vom Käuferschutz ausgeschlossene Artikel. Ratenzahlung, Kreditkartenregeln und mögliche andere Ansprüche können gesondert geregelt sein. Prüfe die für deine Zahlung geltenden Bedingungen direkt bei PayPal und stoppe Zahlungen nicht eigenmächtig ohne Beratung.
+- [Antwort mit Quellen](https://btm.shortaktien.de/faq#paypal)
+
+### Kann Black Tea weitergeführt oder von einem Investor übernommen werden?
+Das war im Forenthread eine wiederkehrende Hoffnung, ist aber keine bestätigte Zusage. Ob ein Betrieb fortgeführt, verkauft oder beendet wird, entscheidet sich im Verfahren und hängt von Finanzierung, Vermögenswerten und konkreten Angeboten ab. Bis es eine offizielle Mitteilung gibt, solltest du eine mögliche Übernahme nicht als gesichert einplanen.
+- [Antwort mit Quellen](https://btm.shortaktien.de/faq#fortfuehrung)
+
+### Sollte ich jetzt noch ein Fahrzeug oder Ersatzteil per Vorkasse bestellen?
+Bei einem Unternehmen im Insolvenzverfahren ist Vorkasse besonders riskant. Prüfe zuerst, ob der Verkauf und der Versand für genau diesen Artikel ausdrücklich freigegeben sind, wer Vertragspartner und Zahlungsempfänger ist und welche Rückzahlung im Ausfall vorgesehen ist. Wenn möglich, ist Zahlung Zug um Zug bei Übergabe sicherer; eine individuelle Rechts- oder Verbraucherberatung kann die konkrete Situation bewerten.
+- [Antwort mit Quellen](https://btm.shortaktien.de/faq#vorkasse)
+
+### Was gilt für Wildfire-Bestellungen mit ABS oder fehlenden Akkus?
+Dazu gab es im Forum unterschiedliche individuelle Rückmeldungen. Aus einem Schreiben oder einer Aussage zu einer einzelnen ABS-, CBS- oder Akku-Konfiguration lässt sich keine allgemeine Zusage für alle Besteller ableiten. Entscheidend sind deine Rechnung, die bestellte Ausstattung, der dokumentierte Fertigungsstand und eine schriftliche Auskunft zur konkreten Bestellung.
+- [Antwort mit Quellen](https://btm.shortaktien.de/faq#wildfire-ausstattung)
+
+## Hilfe für Besitzer und Besteller
+
+### Black Tea Insolvenz: Was kannst du jetzt tun?
+URL: https://btm.shortaktien.de/insolvenz
+Redaktioneller Stand: 2026-09-04
+Belegt ist die Anordnung der vorläufigen Insolvenzverwaltung vom 14. Juli 2026 durch das Amtsgericht München, Aktenzeichen 1513 IN 2588/26. Die am 4. September eingesehene Sekundärquelle führt Sicherungsmaßnahmen auf. Ein aktueller Eröffnungsbeschluss wurde hier nicht amtlich verifiziert. Prüfe neue Beschlüsse und Fristen im amtlichen Insolvenzportal.
+#### Wo prüfst du den Verfahrensstand?
+Suche im amtlichen Insolvenzportal nach Black Tea Motorbikes GmbH, Amtsgericht München und dem Aktenzeichen 1513 IN 2588/26. Achte auf das Datum und die Art der Bekanntmachung. Eine Veröffentlichung zu Sicherungsmaßnahmen ist kein Eröffnungsbeschluss.
+Die dokumentierte Anordnung nennt Florian Loserth als vorläufigen Insolvenzverwalter. Entnimm aktuelle Kontaktdaten, Zuständigkeit und etwaige Fristen der jeweiligen Bekanntmachung. Diese Seite kann weder eine Lieferung noch die Erstattung einer Zahlung bestätigen.
+- [Amtliche Bekanntmachungen suchen](https://www.insolvenzbekanntmachungen.de/)
+- [Dokumentierte Anordnung vom 14.07.2026 (Sekundärquelle)](https://www.versteigerungskalender.de/insolvenzkalender/blaeck-tea-motorbikes-gmbh)
+#### Du hast bezahlt und wartest auf dein Bike
+Sichere Bestellung, Rechnung, Zahlungsbelege und bisherigen Schriftverkehr. Notiere die bestellte Variante, Akkuanzahl und offene Ausstattung. Bitte die zuständige Stelle schriftlich um Auskunft zum konkreten Auftrag.
+Eine Vorauszahlung sichert die Lieferung nicht. Ob eine Forderung anzumelden ist, hängt vom Verfahrensstand und deinem Vertrag ab. Frist und Empfänger stehen im Eröffnungsbeschluss; Grund, Betrag und Belege gehören zur Anmeldung. Eine Rückzahlung ist damit nicht garantiert. Lass individuelle Nachzahlungsangebote unabhängig prüfen.
+- [Verbraucherzentrale: Vorauszahlung und Firmeninsolvenz](https://www.verbraucherzentrale.de/wissen/vertraege-reklamation/kundenrechte/wenn-eine-firma-insolvent-wird-das-sind-ihre-rechte-10630)
+- [§ 28 InsO: Aufforderung an Gläubiger](https://www.gesetze-im-internet.de/inso/__28.html)
+- [§ 174 InsO: Anmeldung und Belege](https://www.gesetze-im-internet.de/inso/__174.html)
+#### Deine Bonfire oder Wildfire braucht eine Reparatur
+Beginne mit Modellvariante, Baujahr und dem beobachteten Fehler. Sichere das passende Handbuch und fotografiere Fehlermeldungen. Mit diesen Angaben kann eine Werkstatt besser einschätzen, ob sie den Auftrag übernehmen kann.
+Kläre einen möglichen Gewährleistungsfall zunächst mit deinem Verkäufer; eine freiwillige Garantie ist davon zu unterscheiden. Die Community ersetzt keine Kostenübernahme. Frage vor einer Beauftragung nach Diagnosekosten, Teilebeschaffung und dem weiteren Vorgehen.
+- [Werkstattkontakt vorbereiten](https://btm.shortaktien.de/hilfe/werkstatt-vorbereiten)
+- [Reparaturhilfen nach Fehlerbild](https://btm.shortaktien.de/hilfe)
+- [Werkstätten und Community-Tipps](https://btm.shortaktien.de/werkstaetten)
+- [Verbraucherzentrale: Mängel und Insolvenz](https://www.verbraucherzentrale.de/wissen/vertraege-reklamation/kundenrechte/wenn-eine-firma-insolvent-wird-das-sind-ihre-rechte-10630)
+#### Du brauchst Ersatzteile oder Unterlagen
+Im Ersatzteilarchiv findest du historische Bezeichnungen, Varianten und vorhandene Bezugsquellen. Ein alter Shop-Eintrag belegt weder einen heutigen Lagerbestand noch die Passform für dein Motorrad. Vergleiche die konkrete Ausführung vor einer Bestellung.
+Bewahre dein Handbuch, Schaltpläne und Wartungsnachweise auch lokal auf. Fehlende Teilenummern oder eigene Erfahrungen kannst du mit Modellbezug und Quelle einreichen. Nach Prüfung helfen sie dem nächsten Besitzer mit demselben Problem.
+- [Ersatzteile systematisch finden](https://btm.shortaktien.de/hilfe/ersatzteil-finden)
+- [Ersatzteilkatalog öffnen](https://btm.shortaktien.de/ersatzteile)
+- [Handbücher und Schaltpläne](https://btm.shortaktien.de/pdfs/index.html)
+- [Wissen im Bike-Wiki ergänzen](https://btm.shortaktien.de/wiki)
+
+### Mit den richtigen Angaben zur Werkstatt.
+URL: https://btm.shortaktien.de/hilfe/werkstatt-vorbereiten
+Redaktioneller Stand: 2026-09-04
+Notiere Modell und Baujahr, die genaue Fehlermeldung, den Zeitpunkt des Auftretens und bisherige Maßnahmen. Ergänze passende Handbuchseiten und Fotos. Der Steckbrief unten funktioniert ohne Konto und erstellt eine Textdatei für deine eigene Verwendung.
+#### Beschreibe die Beobachtung möglichst genau
+‚Das Bike fährt nicht‘ lässt viele Ursachen offen. Hilfreicher ist: Geht das Display an? Wird ein Fehlercode angezeigt? Trat das Problem beim Einschalten, Laden oder während der Fahrt auf? Schreibe nur auf, was du tatsächlich beobachtet hast.
+Notiere den letzten funktionierenden Zustand und mögliche Veränderungen: längere Standzeit, Regen, Teiletausch oder Umbau. Einen Fehler nicht absichtlich erneut provozieren. Bei ungewöhnlicher Wärme, Geruch, Rauch, sichtbaren Akkuschäden oder Bremsproblemen keine weitere Probefahrt oder Ladeprobe durchführen; qualifizierte Hilfe hinzuziehen.
+- [Vorhandene Hilfen zum Fehlerbild](https://btm.shortaktien.de/hilfe)
+#### Modell und Dokumente zuordnen
+Bonfire S, E und X sowie unterschiedliche Wildfire-Baujahre können verschiedene Komponenten haben. Übernimm die Modellbezeichnung aus deinen Fahrzeugunterlagen. Notiere bekannte Akku-, Display- oder Controller-Bezeichnungen nur, wenn du sie ohne Demontage sicher ablesen kannst.
+Für eine erste öffentliche Anfrage genügen Modell, Baujahr und Fehlerbild. Vollständige FIN, Adresse, Rechnung und Zahlungsdaten gehören nicht in einen Community-Beitrag. Vertrauliche Unterlagen kannst du einem ausgewählten Fachbetrieb später gezielt bereitstellen.
+- [Bonfire: Handbuch und Modellvarianten](https://btm.shortaktien.de/bikes/bonfire)
+- [Wildfire: technische Unterlagen](https://btm.shortaktien.de/bikes/wildfire)
+#### Vor dem Transport den Auftrag klären
+Frage, ob der Betrieb dein Modell und das betroffene Bauteil prüfen kann, welche Unterlagen fehlen und wie Diagnosekosten vereinbart werden. Kläre auch, wer Ersatzteile beschafft und ob das Fahrzeug transportiert werden muss.
+Der Steckbrief ist eine Anfrage, keine Diagnose oder Reparaturfreigabe. Halte eine später bestätigte Ursache und das tatsächlich verbaute Ersatzteil fest. So wird aus einer einzelnen Reparatur nachvollziehbares Wissen für andere Fahrer.
+- [Werkstätten ansehen](https://btm.shortaktien.de/werkstaetten)
+- [Reparaturanfrage an die Community](https://btm.shortaktien.de/hilfe/anfragen)
+
+### Das richtige Black Tea Ersatzteil finden.
+URL: https://btm.shortaktien.de/hilfe/ersatzteil-finden
+Redaktioneller Stand: 2026-09-04
+Modell und Baujahr erfassen, historische Bezeichnung nachschlagen und die konkrete Ausführung vergleichen. Erst danach Lieferbarkeit und Passform mit einem Anbieter oder Fachbetrieb klären. Ein ähnliches Produktfoto oder ein passender Stecker allein reicht nicht aus.
+#### 1. Das verbaute Teil identifizieren
+Notiere Motorradvariante, Baujahr und vorhandene Bezeichnungen auf dem Bauteil. Ein Foto der Einbaulage und eine lesbare Beschriftung sind oft hilfreicher als der allgemeine Begriff ‚Display‘ oder ‚Ladegerät‘. Öffne dafür keine elektrischen Baugruppen.
+Suche im Katalog nach Bezeichnung oder Baugruppe. Auf jeder Detailseite findest du den dokumentierten Modellbezug, Archivquellen und den Bezugsstatus. Über die Teileanfrage kannst du diese Angaben direkt in einen Steckbrief übernehmen.
+- [Historischen Ersatzteilkatalog durchsuchen](https://btm.shortaktien.de/ersatzteile)
+#### 2. Ausführung und Kompatibilität abgleichen
+Vergleiche bei mechanischen Teilen Befestigung, Maße und Ausführung anhand verlässlicher Unterlagen. Bei elektrischen Komponenten müssen zusätzlich elektrische Daten, Belegung und gegebenenfalls Kommunikationsprotokoll zur konkreten Fahrzeugversion passen. Lass diesen Abgleich durch einen Fachbetrieb durchführen.
+Für ein Display sind beispielsweise Anzeigeversion und Protokoll relevant; bei Ladegeräten genügt eine ähnliche Spannungsangabe nicht. Bremsen, Fahrwerk, Akku und Antrieb brauchen eine fachkundige Prüfung. Eine Community-Erfahrung mit einem anderen Baujahr ist keine allgemeine Freigabe.
+- [Display: dokumentierte Varianten](https://btm.shortaktien.de/ersatzteile/display)
+- [Bonfire-Unterlagen](https://btm.shortaktien.de/bikes/bonfire)
+- [Wildfire-Unterlagen](https://btm.shortaktien.de/bikes/wildfire)
+#### 3. Bezugsstatus und offene Fragen klären
+Historische Preise und Shop-Verfügbarkeit beziehen sich auf eine Archivaufnahme. Ein Bezugslink ist ein Recherchehinweis; lies den jeweiligen Passformstatus und die noch offenen Bedingungen. Frage den Anbieter nach genauer Ausführung und tatsächlicher Lieferbarkeit.
+Wenn kein passender Link vorhanden ist, nutze die Anfragevorlage mit Teilenamen, Fahrzeugvariante und Quelle. Dokumentiere später die bestätigte Teilenummer und das Ergebnis des Einbaus durch den Fachbetrieb. Reiche belegte Ergänzungen auf der entsprechenden Ersatzteilseite ein.
+- [Anfragevorlage öffnen](https://btm.shortaktien.de/hilfe/werkstatt-vorbereiten#steckbrief)
+- [Hinweise zur Insolvenz und zu Bestellungen](https://btm.shortaktien.de/insolvenz)
 
 ## Reparaturhilfen
 
@@ -718,5 +862,5 @@
 
 ## Daten und Aktualität
 
-- Automatischer Index-Build: 2026-09-04.
+- Automatischer Index-Build: 2026-09-05.
 - Für aktuelle Verfügbarkeit, Preise und rechtliche Verfahrensstände immer die jeweils verlinkte Quelle und den eigenen Modell-/Baujahrstand prüfen.

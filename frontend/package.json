@@ -21,7 +21,8 @@
     "prebuild": "npm run seo:generate",
     "dev": "vite",
     "build": "tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.node.json --noEmit && vite build && vite build --ssr src/entry-server.tsx --outDir dist-server && node scripts/prerender-seo.mjs",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "check:owner-help": "node --experimental-strip-types scripts/check-owner-help.mjs"
   },
   "dependencies": {
     "@vitejs/plugin-react": "^4.3.4",

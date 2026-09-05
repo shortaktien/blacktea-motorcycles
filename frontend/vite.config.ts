@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath, URL } from 'node:url';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
@@ -58,6 +58,18 @@ export default defineConfig({
   plugins: [
     {
       name: 'blacktea-site-meta',
+      configurePreviewServer(server) {
+        // Serve the prerendered HTML for canonical paths, as production Caddy
+        // does. Vite otherwise falls back to the homepage without a final slash.
+        server.middlewares.use((request, _response, next) => {
+          const url = new URL(request.url ?? '/', 'http://localhost');
+          const path = url.pathname.replace(/\/+$/, '');
+          if (/^\/[a-z0-9/-]+$/.test(path) && existsSync(new URL(`./dist${path}/index.html`, import.meta.url))) {
+            request.url = `${path}/index.html${url.search}`;
+          }
+          next();
+        });
+      },
       transformIndexHtml(html, context) {
         const requestedPath = new URL(context.originalUrl ?? context.path, 'http://localhost').pathname.replace(/\/index\.html$/, '') || '/';
         const guide = guides.find((item) => item.path === requestedPath);
