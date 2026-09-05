@@ -413,7 +413,7 @@ const getProfileId = (path: string) => {
 const sourceLinks = [
   {
     title: 'Verfahrensstatus',
-    detail: 'Versteigerungskalender · Aktenzeichen 1513 IN 2588/26',
+    detail: 'Versteigerungskalender · Aktenzeichen 1513 IN 2588/26 · amtliche Veröffentlichung 04.09.2026',
     href: 'https://www.versteigerungskalender.de/insolvenzkalender/blaeck-tea-motorbikes-gmbh',
   },
   {
@@ -3589,7 +3589,7 @@ function HomePage() {
             <div className="status-topline">
               <span className="status-dot" />
               <span className="status-label">Stand der Dinge</span>
-              <span className="status-date">02.09.2026</span>
+              <span className="status-date">04.09.2026</span>
             </div>
             <div className="status-grid">
               <div>
@@ -3627,6 +3627,7 @@ function HomePage() {
             <TimelineItem date="16.07.2026" title="Erste öffentliche Berichte" text="Die ersten Berichte ordnen die Situation ein. Welche Folgen das für Bestellungen, Reparaturen und Ersatzteile hat, war zu diesem Zeitpunkt noch offen." sourceHref={sourceLinks[0].href} sourceLabel="Verfahrensquelle" />
             <TimelineItem date="01.09.2026" title="Verfahrensstand erneut veröffentlicht" text="Der laufende Verfahrensstand ist erneut öffentlich dokumentiert. Für verbindliche rechtliche Fragen ist die zuständige Stelle maßgeblich." sourceHref={sourceLinks[0].href} sourceLabel="Verfahrensquelle" />
             <TimelineItem date="02.09.2026" title="MOTORRAD Online ordnet Folgen ein" text="MOTORRAD Online beschreibt die 2026er Bonfire und Wildfire und weist auf das vorläufige Insolvenzverfahren hin. Liefertermine, Verfügbarkeit, Gewährleistung/Service und Ersatzteilversorgung sind dadurch schwerer verlässlich einzuschätzen." sourceHref={sourceLinks[1].href} sourceLabel="MOTORRAD Online" />
+            <TimelineItem date="04.09.2026" title="Verfahrensseite weist neue Veröffentlichungsangabe aus" text="Die Verfahrensseite weist als amtliche Veröffentlichung nun den 04.09.2026 aus; der öffentlich sichtbare Status bleibt „Sicherungsmaßnahmen“. Zusätzlich eingeblendete Angaben enthalten offenkundige Platzhalter und werden deshalb nicht als neue gerichtliche Sachangabe übernommen." sourceHref={sourceLinks[0].href} sourceLabel="Verfahrensquelle" />
           </div>
         </section>
 
