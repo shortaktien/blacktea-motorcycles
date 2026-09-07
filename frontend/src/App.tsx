@@ -416,7 +416,7 @@ const getProfileId = (path: string) => {
 const sourceLinks = [
   {
     title: 'Verfahrensstatus',
-    detail: 'Versteigerungskalender · Aktenzeichen 1513 IN 2588/26 · amtliche Veröffentlichung 04.09.2026',
+    detail: 'Versteigerungskalender · Aktenzeichen 1513 IN 2588/26 · amtliche Veröffentlichung 07.09.2026',
     href: 'https://www.versteigerungskalender.de/insolvenzkalender/blaeck-tea-motorbikes-gmbh',
   },
   {
@@ -3608,7 +3608,7 @@ function HomePage() {
             <div className="status-topline">
               <span className="status-dot" />
               <span className="status-label">Stand der Dinge</span>
-              <span className="status-date">Quellenabgleich: 04.09.2026</span>
+              <span className="status-date">Quellenabgleich: 07.09.2026</span>
             </div>
             <div className="status-grid">
               <div>
@@ -3637,7 +3637,7 @@ function HomePage() {
               <h2>Was bisher bekannt ist</h2>
             </div>
             <div className="timeline-highlight">
-              <strong>4 Stationen</strong>
+              <strong>5 Stationen</strong>
               <span>Die wichtigsten öffentlich dokumentierten Schritte zum Verfahren.</span>
             </div>
           </div>
@@ -3646,6 +3646,7 @@ function HomePage() {
             <TimelineItem date="16.07.2026" title="Erste öffentliche Berichte" text="Die ersten Berichte ordnen die Situation ein. Welche Folgen das für Bestellungen, Reparaturen und Ersatzteile hat, war zu diesem Zeitpunkt noch offen." sourceHref="https://scooterhelden.de/2026/07/16/black-tea-motorbikes-insolvent-was-passiert-jetzt-mit-bonfire-und-wildfire/" sourceLabel="Scooterhelden, 16.07.2026" />
             <TimelineItem date="02.09.2026" title="MOTORRAD Online ordnet Folgen ein" text="MOTORRAD Online beschreibt die 2026er Bonfire und Wildfire und weist auf das vorläufige Insolvenzverfahren hin. Liefertermine, Verfügbarkeit, Gewährleistung/Service und Ersatzteilversorgung sind dadurch schwerer verlässlich einzuschätzen." sourceHref={sourceLinks[1].href} sourceLabel="MOTORRAD Online" />
             <TimelineItem date="04.09.2026" title="Verfahrensseite weist neue Veröffentlichungsangabe aus" text="Die Verfahrensseite weist als amtliche Veröffentlichung nun den 04.09.2026 aus; der öffentlich sichtbare Status bleibt „Sicherungsmaßnahmen“. Zusätzlich eingeblendete Angaben enthalten offenkundige Platzhalter und werden deshalb nicht als neue gerichtliche Sachangabe übernommen." sourceHref={sourceLinks[0].href} sourceLabel="Verfahrensquelle" />
+            <TimelineItem date="07.09.2026" title="Verfahrensseite aktualisiert Veröffentlichungsangabe" text="Die Verfahrensseite weist als amtliche Veröffentlichung nun den 07.09.2026 aus; der öffentlich sichtbare Status bleibt „Sicherungsmaßnahmen“. Die zusätzlich eingeblendeten Angaben enthalten weiterhin offenkundige Platzhalter und werden deshalb nicht als neue gerichtliche Sachangabe übernommen." sourceHref={sourceLinks[0].href} sourceLabel="Verfahrensquelle" />
           </div>
         </section>
 
