@@ -416,13 +416,23 @@ const getProfileId = (path: string) => {
 const sourceLinks = [
   {
     title: 'Verfahrensstatus',
-    detail: 'Versteigerungskalender · Aktenzeichen 1513 IN 2588/26 · amtliche Veröffentlichung 07.09.2026',
+    detail: 'Versteigerungskalender (Sekundärquelle) · ursprüngliche Veröffentlichung 14.07.2026 · Aktenzeichen 1513 IN 2588/26',
     href: 'https://www.versteigerungskalender.de/insolvenzkalender/blaeck-tea-motorbikes-gmbh',
   },
   {
     title: 'MOTORRAD Online · Bonfire und Wildfire',
     detail: 'Retro-E-Motorräder aus München · veröffentlicht am 02.09.2026',
     href: 'https://www.motorradonline.de/elektro/retro-e-motorraeder-black-tea-bonfire-und-wildfire-a1-und-b196/',
+  },
+  {
+    title: 'Herstellerseite · blackteamotorbikes.com',
+    detail: 'Abruf am 25.09.2026: Shopify meldet „Shop nicht verfügbar“; belegt nur die Nichterreichbarkeit des Webauftritts an diesem Tag.',
+    href: 'https://www.blackteamotorbikes.com/',
+  },
+  {
+    title: 'Herstellerseite · blackteamoto.com',
+    detail: 'Abruf am 25.09.2026: Shopify meldet „Shop nicht verfügbar“; belegt nur die Nichterreichbarkeit des Webauftritts an diesem Tag.',
+    href: 'https://www.blackteamoto.com/',
   },
   {
     title: 'Bonfire-Handbuch',
@@ -3608,7 +3618,7 @@ function HomePage() {
             <div className="status-topline">
               <span className="status-dot" />
               <span className="status-label">Stand der Dinge</span>
-              <span className="status-date">Quellenabgleich: 07.09.2026</span>
+              <span className="status-date">Quellenabgleich: 25.09.2026</span>
             </div>
             <div className="status-grid">
               <div>
@@ -3637,16 +3647,17 @@ function HomePage() {
               <h2>Was bisher bekannt ist</h2>
             </div>
             <div className="timeline-highlight">
-              <strong>5 Stationen</strong>
-              <span>Die wichtigsten öffentlich dokumentierten Schritte zum Verfahren.</span>
+              <strong>6 Stationen</strong>
+              <span>Öffentlich dokumentierte Verfahrensschritte, Presseberichte und aktuelle Quellenhinweise.</span>
             </div>
           </div>
           <div className="timeline">
             <TimelineItem date="14.07.2026" title="Sicherungsmaßnahmen angeordnet" text="Das Amtsgericht München ordnet vorläufige Insolvenzverwaltung an. Aktenzeichen: 1513 IN 2588/26." sourceHref={sourceLinks[0].href} sourceLabel="Verfahrensquelle" />
             <TimelineItem date="16.07.2026" title="Erste öffentliche Berichte" text="Die ersten Berichte ordnen die Situation ein. Welche Folgen das für Bestellungen, Reparaturen und Ersatzteile hat, war zu diesem Zeitpunkt noch offen." sourceHref="https://scooterhelden.de/2026/07/16/black-tea-motorbikes-insolvent-was-passiert-jetzt-mit-bonfire-und-wildfire/" sourceLabel="Scooterhelden, 16.07.2026" />
             <TimelineItem date="02.09.2026" title="MOTORRAD Online ordnet Folgen ein" text="MOTORRAD Online beschreibt die 2026er Bonfire und Wildfire und weist auf das vorläufige Insolvenzverfahren hin. Liefertermine, Verfügbarkeit, Gewährleistung/Service und Ersatzteilversorgung sind dadurch schwerer verlässlich einzuschätzen." sourceHref={sourceLinks[1].href} sourceLabel="MOTORRAD Online" />
-            <TimelineItem date="04.09.2026" title="Verfahrensseite weist neue Veröffentlichungsangabe aus" text="Die Verfahrensseite weist als amtliche Veröffentlichung nun den 04.09.2026 aus; der öffentlich sichtbare Status bleibt „Sicherungsmaßnahmen“. Zusätzlich eingeblendete Angaben enthalten offenkundige Platzhalter und werden deshalb nicht als neue gerichtliche Sachangabe übernommen." sourceHref={sourceLinks[0].href} sourceLabel="Verfahrensquelle" />
-            <TimelineItem date="07.09.2026" title="Verfahrensseite aktualisiert Veröffentlichungsangabe" text="Die Verfahrensseite weist als amtliche Veröffentlichung nun den 07.09.2026 aus; der öffentlich sichtbare Status bleibt „Sicherungsmaßnahmen“. Die zusätzlich eingeblendeten Angaben enthalten weiterhin offenkundige Platzhalter und werden deshalb nicht als neue gerichtliche Sachangabe übernommen." sourceHref={sourceLinks[0].href} sourceLabel="Verfahrensquelle" />
+            <TimelineItem date="04.09.2026" title="Verfahrensseite zeigt neue Datumsangabe" text="Die Sekundärquelle zeigte am 04.09.2026 eine neue Veröffentlichungsangabe; der öffentlich sichtbare Status blieb „Sicherungsmaßnahmen“. Ein konkreter Originaltext wurde nicht verifiziert. Einblendungen mit Platzhaltern gelten nicht als neuer Gerichtstext." sourceHref={sourceLinks[0].href} sourceLabel="Verfahrensquelle (Sekundärquelle)" />
+            <TimelineItem date="07.09.2026" title="Fortgeschriebene Datumszeile bleibt unbestätigt" text="Der Eintrag dokumentiert eine vorgerückte Datumszeile der Sekundärquelle, nicht einen verifizierten Gerichtsbeschluss. Beim Abruf am 25.09.2026 stand die Zeile auf 25.09.2026; daneben waren weiterhin „Amtsgericht Musterhausen“, „XYZ IN 23/32324“ und Lorem-ipsum-Platzhalter sichtbar. Das amtliche Insolvenzportal ergab bei den heutigen Suchen keine Treffer; dies beweist nicht, dass es keine weitere Veröffentlichung gibt." sourceHref={sourceLinks[0].href} sourceLabel="Verfahrensquelle (Sekundärquelle)" />
+            <TimelineItem date="25.09.2026" title="Hersteller-Webauftritte derzeit nicht verfügbar" text="Beim Abruf zeigten blackteamotorbikes.com und blackteamoto.com die Shopify-Meldung „Shop nicht verfügbar“. Das belegt nur die Nichterreichbarkeit dieser Webauftritte an diesem Datum; es belegt weder eine Betriebseinstellung noch eine Änderung am Insolvenzverfahren." sourceHref={sourceLinks[2].href} sourceLabel="Herstellerseite, Abruf 25.09.2026" />
           </div>
         </section>
 
