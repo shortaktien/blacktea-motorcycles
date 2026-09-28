@@ -9,6 +9,7 @@ import siteConfig from './site-config.json';
 import { communityMapCountries, communityMapSubdivisions, communityMapViewBox, getCommunityMapPoint, type CommunityMapModel, type CommunityMapRegion, type PostalCountry } from './community-map';
 import { cleanWebMcpText, searchBtmKnowledge, webMcpExcerpt, type WebMcpKnowledgeEntry } from './webmcp-search';
 import { sourceKindFromType, sourceKindLabel, type SourceReference } from './source-reference';
+import { getOptionalServicesChoice, setOptionalServiceConsent } from './optional-services';
 
 type CardKind = 'Dokument' | 'Ersatzteil' | 'Community';
 type Filter = 'Alle' | CardKind;
@@ -2331,21 +2332,6 @@ async function apiJson<T>(input: RequestInfo | URL, init?: RequestInit): Promise
   return payload as T;
 }
 
-const COOKIE_CONSENT_KEY = 'btm-cookie-consent';
-
-function setOptionalServiceConsent(choice: 'accepted' | 'rejected'): void {
-  if (typeof window === 'undefined') return;
-
-  try {
-    window.localStorage.setItem(COOKIE_CONSENT_KEY, choice);
-  } catch {
-    // A blocked local storage must never break the website or the login flow.
-  }
-
-  document.documentElement.dataset.optionalServices = choice === 'accepted' ? 'allowed' : 'blocked';
-  window.dispatchEvent(new CustomEvent('btm-cookie-consent-changed', { detail: choice }));
-}
-
 const normaliseDisplayName = (value: string): string => value
   .toLowerCase()
   .replace(/[^a-z0-9äöüß]/g, '')
@@ -2903,14 +2889,9 @@ function CookieConsentBanner() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    try {
-      const choice = window.localStorage.getItem(COOKIE_CONSENT_KEY);
-      document.documentElement.dataset.optionalServices = choice === 'accepted' ? 'allowed' : 'blocked';
-      setVisible(!choice);
-    } catch {
-      // Do not interrupt the page when local storage is unavailable.
-      document.documentElement.dataset.optionalServices = 'blocked';
-    }
+    const choice = getOptionalServicesChoice();
+    document.documentElement.dataset.optionalServices = choice === 'accepted' ? 'allowed' : 'blocked';
+    setVisible(choice === null);
   }, []);
 
   if (!visible) return null;
@@ -2925,12 +2906,12 @@ function CookieConsentBanner() {
       <div>
         <div className="eyebrow handwritten">kurz und transparent</div>
         <h2>Deine Cookie-Wahl.</h2>
-        <p>Aktuell laden wir keine Analyse-, Werbe- oder eingebetteten Drittanbieter-Dienste. Technisch notwendige Sitzungsfunktionen bleiben aktiv. Wenn später optionale Inhalte dazukommen, laden wir sie nur nach deiner Zustimmung.</p>
+        <p>Wenn du optionale Dienste erlaubst, nutzen wir Sentry zur Fehler- und Performance-Analyse. Auf öffentlichen Seiten kann Sentry außerdem stichprobenbasiert eine maskierte Sitzungsaufzeichnung erstellen. Texte und Eingaben werden maskiert, Medien blockiert; auf Anmelde-, Konto-, Admin- und Passwort-Reset-Seiten gibt es keine Aufzeichnungen.</p>
         <a href="/datenschutz">Mehr zum Datenschutz ↗</a>
       </div>
       <div className="cookie-consent-actions">
         <button className="button button-ghost" type="button" onClick={() => choose('rejected')}>Ablehnen</button>
-        <button className="button button-ink" type="button" onClick={() => choose('accepted')}>Optionale Inhalte erlauben</button>
+        <button className="button button-ink" type="button" onClick={() => choose('accepted')}>Sentry erlauben</button>
       </div>
     </section>
   );
@@ -4306,13 +4287,15 @@ function LegalPage({ kind }: { kind: 'impressum' | 'datenschutz' }) {
             <h2>{isPrivacy ? 'Datenschutz' : 'Impressum'}</h2>
             {isPrivacy ? (
               <>
-                <p className="legal-meta">Stand: 02.09.2026</p>
+                <p className="legal-meta">Stand: 28.09.2026</p>
                 <h3>Verantwortlicher</h3>
                 <p>Alexander Komissarov<br />Teplitzer Str. 104<br />01219 Dresden<br />Deutschland<br /><a href="mailto:hallo@shortaktien.de">hallo@shortaktien.de</a></p>
                 <h3>Besuch der Website</h3>
-                <p>Diese Website stellt Dokumente und Hinweise bereit. Es gibt keine eingebauten Analyse- und Marketingdienste. Für moderierte Kommentare, Reparaturanfragen, Wiki-Ergänzungen, Benachrichtigungen und den optionalen Newsletter können Nutzer freiwillig ein Konto anlegen.</p>
+                <p>Diese Website stellt Dokumente und Hinweise bereit. Es gibt keine Werbe- oder Marketingdienste. Für moderierte Kommentare, Reparaturanfragen, Wiki-Ergänzungen, Benachrichtigungen und den optionalen Newsletter können Nutzer freiwillig ein Konto anlegen.</p>
                 <h3>Optionale Dienste und Cookie-Wahl</h3>
-                <p>Aktuell werden keine Analyse-, Werbe- oder Marketing-Cookies und keine eingebetteten Drittanbieter-Dienste geladen. Die Auswahl im Hinweisbanner wird nur lokal im Browser gespeichert. Technisch notwendige Sitzungsfunktionen für Anmeldung und Community bleiben davon unberührt. Bei „Ablehnen“ werden optionale Inhalte nicht nachgeladen; externe Seiten öffnen sich erst nach einem bewussten Klick auf einen externen Link.</p>
+                <p>Die Auswahl im Hinweisbanner wird lokal im Browser gespeichert. Erst nach „Sentry erlauben“ wird das Sentry-SDK im Browser aktiviert und sendet technische Fehler- und Leistungsdaten an Sentry. Sitzungsaufzeichnungen werden nur auf öffentlichen Seiten ohne URL-Parameter erstellt; Texte und Eingaben sind maskiert, Medien blockiert. Anmelde-, Konto-, Admin- und Passwort-Reset-Seiten werden nicht aufgezeichnet. Bei „Ablehnen“ bleibt das Browser-SDK deaktiviert. Technisch notwendige Sitzungsfunktionen für Anmeldung und Community bleiben davon unberührt.</p>
+                <h3>Technische Fehlerdiagnose</h3>
+                <p>Wenn <code>SENTRY_DSN</code> für das Backend gesetzt ist, werden technische Backend-Fehler und stichprobenweise Leistungsdaten unabhängig von der Browser-Auswahl an Sentry übermittelt. Die automatische Erfassung von Nutzerdaten ist deaktiviert. Sentry verarbeitet die Daten als externer Dienstleister; Informationen zur <a href="https://sentry.io/legal/dpa/1.0.0/" target="_blank" rel="nofollow noreferrer">Datenverarbeitung bei Sentry</a> findest du in den dortigen Unterlagen. Externe Seiten öffnen sich erst nach einem bewussten Klick; dann gelten die Datenschutzbestimmungen des jeweiligen Anbieters.</p>
                 <h3>Nutzerkonto, Kommentare und Bildanhänge</h3>
                 <p>Bei der Registrierung werden Name, E-Mail-Adresse und ein Passwort-Hash gespeichert. Die E-Mail-Adresse wird über Mailjet bestätigt; erst danach wird das Konto aktiviert. Im persönlichen Bereich können freiwillig Modell, Kilometerstand, Kurzvorstellung, Land/Region, Avatarbild, Avatar-Stil sowie Einstellungen für Interaktions-Benachrichtigungen und den Newsletter gespeichert werden. Anzeigename, Modell, Land, freiwillige Kilometerangabe, Kurzvorstellung, Avatar und freigegebene Community-Beiträge können auf dem öffentlichen Profil und an Beiträgen erscheinen; E-Mail-Adresse und vollständige Postleitzahl bleiben intern. Der Newsletter wird ausschließlich an bestätigte Nutzer mit aktivierter Einstellung über Mailjet versendet und kann im persönlichen Bereich jederzeit abbestellt werden.</p>
                 <p>Wenn du eingeloggt einen Kommentar, eine Reparaturanfrage oder einen Wiki-Vorschlag abgibst, übernimmt die Website Name und E-Mail-Adresse aus deinem bestätigten Konto. Beitragstext, optional eine Quellenangabe und optional ein Bild werden intern zur redaktionellen Prüfung gespeichert. Erst nach Freigabe erscheint der Beitrag öffentlich; die E-Mail-Adresse bleibt intern. Anonyme Einsendungen erhalten weiterhin eine einzelne Bestätigungs-E-Mail über Mailjet, bevor sie bei uns zur Prüfung landen.</p>

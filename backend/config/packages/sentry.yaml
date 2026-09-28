@@ -1,0 +1,6 @@
+when@prod:
+  sentry:
+    options:
+      environment: '%kernel.environment%'
+      traces_sample_rate: 0.1
+      send_default_pii: false
