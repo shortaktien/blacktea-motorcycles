@@ -124,6 +124,16 @@ MAILJET_FROM_EMAIL=info@shortaktien.de
 MAILJET_FROM_NAME=BTM-Hilfe
 ```
 
+Für Sentry reicht dieselbe Projekt-DSN einmalig in `backend/.env` als
+`SENTRY_DSN`. Das Backend-SDK liest die Variable direkt. Nach einer Zustimmung
+über **„Sentry erlauben“** lädt das Frontend die öffentliche Browser-DSN vom
+Backend; dafür ist keine Frontend- oder Root-`.env` nötig. Die bisher
+gespeicherte Auswahl wird dafür einmalig neu abgefragt. Ohne DSN werden keine
+Sentry-Ereignisse gesendet. Session Replay läuft nur nach dieser Zustimmung auf
+Seiten ohne URL-Parameter und nicht auf Anmelde-, Konto-, Admin- oder
+Passwort-Reset-Seiten. Texte und Eingaben werden maskiert, Medien blockiert.
+Das serverseitige Backend-Monitoring ist aktiv, sobald `SENTRY_DSN` gesetzt ist.
+
 Der GitHub-Token sowie die Mailjet-Zugangsdaten dürfen niemals in `frontend/`, im Browser-Bundle oder in GitHub-Issue-Inhalten landen. Öffentliche Beiträge und Bugmeldungen werden vor der Annahme per Einmal-Link in einer Bestätigungs-E-Mail verifiziert. Der Link läuft standardmäßig nach 24 Stunden ab. Bestätigte Beiträge landen anschließend in der redaktionellen Prüfung; erst bestätigte Bugmeldungen werden als GitHub-Issue angelegt. Name und Beschreibung werden bei Bugmeldungen ins Issue übernommen; die E-Mail dient der Bestätigung und Spambegrenzung und wird nicht öffentlich veröffentlicht. Im Repository sind GitHub Issues bereits aktiviert und das Label `bug` vorhanden.
 
 ### Anwendung starten
