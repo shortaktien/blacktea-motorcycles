@@ -3,12 +3,12 @@ title: Black Tea Wildfire
 model: Wildfire
 intro: Technische Dokumente, elektrische Systeme und belegte Diagnosehinweise zur Black Tea Wildfire.
 status: Startartikel · offen für Ergänzungen
-lastUpdated: 2026-09-03
-revision: 2026-09-04
+lastUpdated: 2026-10-07
+revision: 2026-10-07
 reviewedAt: 2026-09-04
 licenseStatus: Eigene redaktionelle Aufbereitung; Originalquellen bleiben bei ihren Rechteinhabern.
 sourceChain: Lokale Dokumente → redaktionelle Aufbereitung → geprüfte Community-Ergänzungen
-history: 2026-09-04|Quellenkette und Wissensstatus ergänzt; 2026-09-03|Technische Wiki-Grundlage redaktionell geordnet
+history: 2026-10-07|Dokumentauswahl und direkte Wege zu Reparaturhilfen ergänzt; 2026-09-04|Quellenkette und Wissensstatus ergänzt; 2026-09-03|Technische Wiki-Grundlage redaktionell geordnet
 source: /pdfs/19-wildfire-handbuch-community.pdf
 sourceLabel: Wildfire-Handbuch lokal öffnen
 sourceType: manual
@@ -20,6 +20,19 @@ sourceStatus: lokal gesichert
 Diese Seite bündelt die wichtigsten technischen Anlaufpunkte zur Black Tea Wildfire. Sie ist eine unabhängige redaktionelle Aufbereitung aus lokal gesicherten Dokumentenspuren und Community-Berichten, keine aktuelle Herstellerfreigabe. Softwarestand, Baujahr, Ausstattung und Umbauten können die tatsächliche Fahrzeugkonfiguration verändern.
 
 Vor einer Diagnose deshalb Modelljahr, Anzeige-/Controller-Version, Akku-Konfiguration und die konkrete Fahrzeugvariante festhalten. Fotos von Steckern und Bauteilaufklebern helfen bei der späteren Zuordnung.
+
+## Welche Wildfire-Unterlagen brauche ich?
+
+Die Wildfire-Unterlagen stammen aus unterschiedlichen Dokumentständen. Das [Community-Handbuch](/pdfs/19-wildfire-handbuch-community.pdf) bündelt Bedienung und technische Orientierung; der [Wartungshinweis](/pdfs/20-wildfire-wartung-community.pdf) ergänzt die Pflege. Widersprüchliche Zahlen werden im Artikel kenntlich gemacht, nicht zu einem vermeintlich einheitlichen Herstellerwert zusammengeführt.
+
+| Deine Frage | Passender Einstieg |
+| --- | --- |
+| Welche Reichweite und Fahrmodi sind dokumentiert? | [Eckdaten mit Quellen und Einschränkungen](#technische-eckdaten-aus-den-community-unterlagen) |
+| Welches Ersatzteil passt zu meinem Baujahr und meiner Ausstattung? | [Modell, Bauteil und Passform abgleichen](/hilfe/ersatzteil-finden) |
+| Der Akku oder das BMS zeigt einen Fehler | [Akku-Hilfe und sichere Abbruchkriterien](/hilfe/akku-bms) |
+| Ich möchte einen Fachbetrieb anfragen | [Fehlerbild und Unterlagen zusammenstellen](/hilfe/werkstatt-vorbereiten#steckbrief) |
+
+Notiere insbesondere, ob ein oder zwei Akkus, welches Display und welche Bremsausführung dokumentiert sind. Übernimm keine Controller-, Lade- oder Drehmomentwerte allein deshalb, weil das andere Motorrad ebenfalls „Wildfire“ heißt. Fragen zu einer noch offenen Lieferung oder einer Forderung gehören in die [Insolvenz-Hilfe](/insolvenz).
 
 ## Sicherheits- und Erstcheck
 

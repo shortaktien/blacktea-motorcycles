@@ -18,7 +18,28 @@
           "id": "verfahrensstand",
           "title": "Wo prüfst du den Verfahrensstand?",
           "paragraphs": ["Der amtliche Eröffnungsbeschluss des Amtsgerichts München datiert vom 05.10.2026 und eröffnet das Verfahren wegen Zahlungsunfähigkeit um 12:35 Uhr. Er nennt Rechtsanwalt Florian Loserth als Insolvenzverwalter und führt die Anmelde- und Widerspruchsfristen auf. Maßgeblich sind der Originaltext und etwaige spätere amtliche Bekanntmachungen. Diese Seite bestätigt weder Lieferungen noch Rückzahlungen.", "Die Bekanntmachung fordert Insolvenzgläubiger auf, Forderungen bis zum 24.11.2026 beim Insolvenzverwalter schriftlich anzumelden. Beteiligte erhalten Gelegenheit, bis zum 05.01.2027 beim Insolvenzgericht schriftlich den Forderungsanmeldungen zu widersprechen. Ob und in welcher Höhe eine konkrete Forderung besteht, ist anhand der individuellen Unterlagen zu klären."],
-          "links": [{"label": "Amtliche Bekanntmachung vom 05.10.2026 · 1513 IN 2588/26", "href": "https://neu.insolvenzbekanntmachungen.de/ap/text.xhtml?x=0.1287627958418941"}, {"label": "Sicherungsanordnung vom 14.07.2026 (Sekundärquelle)", "href": "https://www.versteigerungskalender.de/insolvenzkalender/blaeck-tea-motorbikes-gmbh"}]
+          "links": [{"label": "Amtliche Suche: Bekanntmachung vom 05.10.2026 · 1513 IN 2588/26", "href": "https://neu.insolvenzbekanntmachungen.de/ap/suche.jsf"}, {"label": "Sicherungsanordnung vom 14.07.2026 (Sekundärquelle)", "href": "https://www.versteigerungskalender.de/insolvenzkalender/blaeck-tea-motorbikes-gmbh"}],
+          "sourceQuote": {
+            "id": "originalbeschluss",
+            "title": "Amtlicher Originaltext vom 05.10.2026 (Auszug)",
+            "source": "Amtsgericht München – Insolvenzgericht · 1513 IN 2588/26 · veröffentlicht am 05.10.2026 · abgerufen am 07.10.2026 über Insolvenzbekanntmachungen der Justiz",
+            "href": "https://neu.insolvenzbekanntmachungen.de/ap/",
+            "note": "Wörtlicher Auszug aus dem Eröffnungsbeschluss. Die Absätze zu Eröffnung, Verwalter und Forderungsanmeldung sind übernommen; ausgelassene Passagen sind mit […] gekennzeichnet. Weitere Verfahrensanordnungen und die Rechtsbehelfsbelehrung sind hier nicht wiedergegeben. Der Auszug dokumentiert den Beschluss vom 05.10.2026, nicht spätere Änderungen.",
+            "paragraphs": [
+              "1. Das Insolvenzverfahren über das Vermögen der Schuldnerin wird wegen Zahlungsunfähigkeit am 05.10.2026 um 12.35 Uhr eröffnet.",
+              "2. Zum Insolvenzverwalter wird bestellt:\nRechtsanwalt  Loserth Florian\nHerzogstraße 9, 80803 München\nTelefon: +49 (89) 613 72 85 0\nTelefax: +49 (89) 613 72 85 51\nEmail: anwalt@berater-kanzlei.bayern",
+              "3. Die Insolvenzgläubiger werden aufgefordert, Insolvenzforderungen (§ 38 InsO) bis zum 24.11.2026 bei dem Insolvenzverwalter schriftlich anzumelden.",
+              "Die Anmeldung kann durch Übermittlung eines elektronischen Dokuments erfolgen; der Insolvenzverwalter kann einen gängigen elektronischen Übermittlungsweg sowie ein gängiges Dateiformat vorgeben. Der Insolvenzverwalter muss daneben einen sicheren Übermittlungsweg im Sinne des § 130a der Zivilprozessordnung für die Übermittlung anbieten.",
+              "Gläubiger, die elektronische Dokumente über sichere elektronische Übermittlungswege (§ 130a ZPO) empfangen können, können unter Angabe des über einen solchen Weg erreichbaren Postfachs ihre Zustimmung zu elektronischen Zustellungen erklären. Die Zustimmung gegenüber dem Insolvenzgericht gilt mit der Einreichung eines elektronischen Dokuments auf einem sicheren Übermittlungsweg in diesem Verfahren als erteilt.",
+              "Bei der Anmeldung sind Grund und Betrag der Forderung anzugeben. Der Anmeldung sollen die Urkunden, aus denen sich die Forderung ergibt, in Abdruck beigefügt werden. Sofern die Anmeldung mittels eines elektronischen Dokuments erfolgt, kann auch eine elektronische Rechnung übermittelt werden. Auf Verlangen des Insolvenzverwalters oder des Insolvenzgerichts sind Ausdrucke, Abschriften oder Originale von Urkunden einzureichen.",
+              "4. Das Insolvenzverfahren wird bis auf Weiteres schriftlich durchgeführt, § 5 Abs. 2 InsO.\nDie Beteiligten erhalten Gelegenheit, bis 05.01.2027 den Forderungsanmeldungen schriftlich beim Insolvenzgericht zu widersprechen.",
+              "[…]",
+              "Die Forderungsanmeldungen und die Insolvenztabelle können durch die Beteiligten auf der Geschäftsstelle des Insolvenzgerichts eingesehen werden.",
+              "Nach Ablauf der Widerspruchsfrist werden die Forderungen geprüft; Forderungen, gegen die bis dahin kein Widerspruch erhoben wurde, gelten als festgestellt.",
+              "Hinweise:\nGläubiger, deren Forderungen festgestellt werden, erhalten keine Benachrichtigung.",
+              "[…]"
+            ]
+          }
         },
         {
           "id": "bestellung",

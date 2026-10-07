@@ -3,12 +3,12 @@ title: Black Tea Bonfire
 model: Bonfire
 intro: Technische Grundlagen, Modellvarianten und belegte Wartungsspuren zur Black Tea Bonfire.
 status: Startartikel · offen für Ergänzungen
-lastUpdated: 2026-09-03
-revision: 2026-09-04
+lastUpdated: 2026-10-07
+revision: 2026-10-07
 reviewedAt: 2026-09-04
 licenseStatus: Eigene redaktionelle Aufbereitung; Originalquellen bleiben bei ihren Rechteinhabern.
 sourceChain: Lokale Dokumente → redaktionelle Aufbereitung → geprüfte Community-Ergänzungen
-history: 2026-09-04|Quellenkette und Wissensstatus ergänzt; 2026-09-03|Technische Wiki-Grundlage redaktionell geordnet
+history: 2026-10-07|Modellzuordnung und direkte Wege zu Unterlagen und Reparaturhilfen ergänzt; 2026-09-04|Quellenkette und Wissensstatus ergänzt; 2026-09-03|Technische Wiki-Grundlage redaktionell geordnet
 source: /pdfs/15-bonfire-handbuch-lokal.pdf
 sourceLabel: Bonfire-Handbuch lokal öffnen
 sourceType: manual
@@ -19,7 +19,20 @@ sourceStatus: lokal gesichert
 
 Diese Seite sammelt die wichtigsten technischen Anlaufpunkte zur Black Tea Bonfire. Sie ist eine unabhängige redaktionelle Aufbereitung und keine aktuelle Herstellerfreigabe. Historische Angaben können je nach Baujahr, Ausstattung und Fahrzeugvariante abweichen.
 
-Für die Einordnung sollte vor jeder Bestellung oder Reparatur zuerst die genaue Variante notiert werden: Bonfire, Bonfire 45 oder Bonfire X, Baujahr sowie sichtbare Unterschiede bei Akku, Bremse, Rädern, Steckern und Anzeige.
+Für die Einordnung sollte vor jeder Bestellung oder Reparatur zuerst die genaue Variante aus den Fahrzeugunterlagen notiert werden: Bonfire S, E oder X, Baujahr sowie sichtbare Unterschiede bei Akku, Bremse, Rädern, Steckern und Anzeige. Eine Geschwindigkeitsklasse oder der Name „Bonfire“ allein identifiziert nicht alle verbauten Komponenten.
+
+## Welche Bonfire-Unterlagen passen zu meinem Motorrad?
+
+Die technische Tabelle weiter unten trennt S, E und X. Die nummerierten Fahrzeug-, Akku- und Displaybilder dieses Artikels zeigen dagegen die Bonfire X; sie sind keine Bauteilfreigabe für S oder E. Vergleiche die Beschriftung deines Fahrzeugs mit dem [lokal gesicherten Bonfire-Handbuch](/pdfs/15-bonfire-handbuch-lokal.pdf), bevor du Angaben auf eine andere Variante überträgst.
+
+| Deine Frage | Passender Einstieg |
+| --- | --- |
+| Welche technischen Angaben unterscheiden S, E und X? | [Variantentabelle und gemeinsame Eckdaten](#technische-eckdaten) |
+| Welches Teil brauche ich und was muss ich vergleichen? | [Ersatzteil identifizieren und Passform klären](/hilfe/ersatzteil-finden) |
+| Der Akku wird nicht erkannt | [Fehlerbild und Grenzen der Akku-Prüfung](/hilfe/akku-bms) |
+| Welche Angaben braucht eine Werkstatt? | [Reparatur-Steckbrief vorbereiten](/hilfe/werkstatt-vorbereiten#steckbrief) |
+
+Die Links trennen technische Dokumentation, Ersatzteilsuche und konkrete Reparaturanfrage. Angaben zu Insolvenz, Bestellungen und Forderungen stehen in der [Insolvenz-Hilfe](/insolvenz), nicht in den historischen technischen Tabellen.
 
 ## Motorrad-Übersicht
 

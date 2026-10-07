@@ -8,7 +8,8 @@ import { searchBtmKnowledge } from '../src/webmcp-search.ts';
 const root = fileURLToPath(new URL('../', import.meta.url));
 const read = (path) => readFileSync(join(root, path), 'utf8');
 const guides = JSON.parse(read('../content/owner-help.json')).pages;
-const faq = JSON.parse(read('../content/faq.json')).items;
+const faqContent = JSON.parse(read('../content/faq.json'));
+const faq = faqContent.items;
 const manifest = JSON.parse(read('dist/open-knowledge.json'));
 const sitemap = read('dist/sitemap.xml');
 const htmlFor = (path) => read(`dist${path === '/' ? '' : path}/index.html`);
@@ -65,6 +66,52 @@ for (const item of faq) {
   const entry = webMcpKnowledgeEntries.find((entry) => entry.kind === 'faq' && entry.title === item.question);
   assert.equal(entry.href, `/faq#${item.id}`, 'Search must point to the actual answer');
 }
+
+// A newly verified case status must not leave the previously provisional FAQ
+// answer or the filing deadline out of sync with the dedicated owner guide.
+const insolvencyGuide = guides.find((page) => page.path === '/insolvenz');
+const insolvencyFaq = faq.find((item) => item.id === 'insolvenzstatus');
+const claimsFaq = faq.find((item) => item.id === 'forderung-anmelden');
+assert.ok(insolvencyGuide && insolvencyFaq && claimsFaq);
+assert.ok(faqContent.lastUpdated >= insolvencyGuide.reviewedAt, 'FAQ review must cover the latest case-status update');
+assert.doesNotMatch(insolvencyFaq.answer, /Eröffnungsbeschluss wurde hier nicht amtlich verifiziert/);
+assert.match(insolvencyFaq.answer, /1513 IN 2588\/26/);
+assert.match(insolvencyFaq.answer, /5\. Oktober 2026/);
+assert.match(claimsFaq.answer, /24\. November 2026/);
+assert.match(insolvencyGuide.summary, /24\.11\.2026/);
+assert.ok(faq.some((item) => item.id === 'amtlichen-beschluss-finden' && item.linkHref === '/insolvenz#originalbeschluss'));
+
+// The portal's text URL needs a prior search session; never publish it as a permalink.
+for (const path of ['/', '/insolvenz', '/faq', '/quellen']) {
+  const html = htmlFor(path);
+  assert.doesNotMatch(html, /href="https:\/\/neu\.insolvenzbekanntmachungen\.de\/ap\/text\.xhtml/, `${path}: session-dependent source link`);
+  const sourceDestination = path === '/' ? '/insolvenz#originalbeschluss' : 'https://neu.insolvenzbekanntmachungen.de/ap/';
+  assert.ok(html.includes(sourceDestination), `${path}: source or local original-text excerpt must be linked`);
+}
+assert.match(htmlFor('/insolvenz'), /href="#originalbeschluss">Amtlichen Originaltext/);
+assert.doesNotMatch(decode(htmlFor('/insolvenz')), /So findest du den Originaltext:/);
+const originalQuote = insolvencyGuide.sections.find((section) => section.sourceQuote)?.sourceQuote;
+assert.ok(originalQuote);
+assert.match(htmlFor('/insolvenz'), /<blockquote cite="https:\/\/neu\.insolvenzbekanntmachungen\.de\/ap\/"/);
+for (const paragraph of originalQuote.paragraphs) {
+  assert.ok(decode(htmlFor('/insolvenz')).includes(paragraph), 'Original quote must be readable without JavaScript');
+}
+
+// All 13 crawled but excluded core pages must have working static links and
+// exact anchors, including the quick-start references in long model articles.
+for (const path of ['/', '/insolvenz', '/faq', '/bikes/bonfire', '/bikes/wildfire', '/wiki', '/hilfe/controller', '/hilfe', '/werkstaetten', '/hilfe/akku-bms', '/ersatzteile', '/hilfe/ersatzteil-finden', '/community']) {
+  const html = htmlFor(path);
+  const headingIds = [...html.matchAll(/<h[2-4][^>]*id="([^\"]+)"/g)].map((match) => match[1]);
+  assert.equal(new Set(headingIds).size, headingIds.length, `${path}: headings must have unique anchors`);
+  for (const href of [...html.matchAll(/href="([^\"]+)"/g)].map((match) => decode(match[1]))) {
+    if (!href.startsWith('/') && !href.startsWith('#')) continue;
+    const url = new URL(href, `https://btm.shortaktien.de${path}`);
+    const file = url.pathname === '/' ? 'dist/index.html' : url.pathname.includes('.') ? `dist${url.pathname}` : `dist${url.pathname}/index.html`;
+    assert.ok(existsSync(join(root, file)), `${path}: missing core-page link ${href}`);
+    if (url.hash) assert.ok(read(file).includes(`id="${url.hash.slice(1)}"`), `${path}: missing core-page anchor ${href}`);
+  }
+}
+assert.match(htmlFor('/bikes/bonfire'), /<h3 id="bremsen-2"/, 'Repeated Bonfire heading must match the TOC target');
 for (const [query, scope, href] of [
   ['Black Tea Insolvenz', 'owner', '/insolvenz'],
   ['Werkstattkontakt', 'owner', '/hilfe/werkstatt-vorbereiten'],

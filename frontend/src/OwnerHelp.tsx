@@ -22,7 +22,10 @@ export function OwnerHelpContent({ page }: { page: OwnerHelpPageData }) {
       <p className="wiki-last-updated">Redaktionell bearbeitet: <time dateTime={page.reviewedAt}>{page.reviewedAt.split('-').reverse().join('.')}</time></p>
     </section>
     <div className="owner-help-body section-pad">
-      <aside className="owner-help-summary card-doodle" aria-label="Das Wichtigste"><p>{page.summary}</p></aside>
+      <aside className="owner-help-summary card-doodle" aria-label="Das Wichtigste">
+        <p>{page.summary}</p>
+        {page.path === '/insolvenz' && <p><a href="#originalbeschluss">Amtlichen Originaltext vom 05.10.2026 direkt lesen ↓</a></p>}
+      </aside>
       <nav className="owner-help-toc" aria-label="Auf dieser Seite">
         {page.sections.map((section) => <a key={section.id} href={`#${section.id}`}>{section.title}</a>)}
         {page.tool && <a href="#steckbrief">Deinen Steckbrief erstellen</a>}
@@ -30,6 +33,14 @@ export function OwnerHelpContent({ page }: { page: OwnerHelpPageData }) {
       {page.sections.map((section) => <section className="owner-help-section" id={section.id} key={section.id}>
         <h2>{section.title}</h2>
         {section.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+        {'sourceQuote' in section && section.sourceQuote && <aside className="owner-help-original card-doodle" id={section.sourceQuote.id} aria-labelledby={`${section.sourceQuote.id}-title`}>
+          <h3 id={`${section.sourceQuote.id}-title`}>{section.sourceQuote.title}</h3>
+          <p>{section.sourceQuote.note}</p>
+          <blockquote cite={section.sourceQuote.href}>
+            {section.sourceQuote.paragraphs.map((paragraph, index) => <p key={index}>{paragraph}</p>)}
+          </blockquote>
+          <p><strong>Quelle:</strong> {section.sourceQuote.source}. <a href={section.sourceQuote.href}>Amtliches Justizportal ↗</a></p>
+        </aside>}
         <ul>{section.links.map((link) => <li key={link.href}><a href={link.href}>{link.label} ↗</a></li>)}</ul>
       </section>)}
       {page.tool && <RepairBrief />}

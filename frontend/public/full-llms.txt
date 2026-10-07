@@ -32,7 +32,7 @@
 ## Häufige Fragen
 
 ### Ist Black Tea Motorbikes insolvent?
-Für die Black Tea Motorbikes GmbH ist die Anordnung der vorläufigen Insolvenzverwaltung vom 14. Juli 2026 dokumentiert: Amtsgericht München, Aktenzeichen 1513 IN 2588/26. Die am 4. September eingesehene Sekundärquelle führt Sicherungsmaßnahmen auf. Ein aktueller Eröffnungsbeschluss wurde hier nicht amtlich verifiziert. Neue Beschlüsse und Fristen bitte im amtlichen Insolvenzportal prüfen.
+Ja. Das Amtsgericht München hat das Insolvenzverfahren am 5. Oktober 2026 um 12:35 Uhr wegen Zahlungsunfähigkeit eröffnet (1513 IN 2588/26). Insolvenzverwalter ist Rechtsanwalt Florian Loserth. Der amtliche Beschluss wurde am 7. Oktober 2026 geprüft. Eine Verfahrenseröffnung bestätigt weder die Lieferung einer Bestellung noch eine Rückzahlung; spätere Bekanntmachungen bleiben maßgeblich.
 - [Antwort mit Quellen](https://btm.shortaktien.de/faq#insolvenzstatus)
 
 ### Wo bekomme ich Ersatzteile für Black Tea Bonfire und Wildfire?
@@ -68,8 +68,12 @@ Eine Vorauszahlung garantiert keine Lieferung. Sichere Bestellung, Rechnung, Zah
 - [Antwort mit Quellen](https://btm.shortaktien.de/faq#bestellung-bezahlt)
 
 ### Muss ich eine Forderung zur Insolvenztabelle anmelden?
-Nicht jede Forderung muss sofort angemeldet werden. Erst wenn das Insolvenzverfahren eröffnet ist und die Gläubiger dazu aufgefordert werden, gibt es eine Anmeldefrist und die zuständige Stelle. Dann solltest du Bestellung, Rechnung, Zahlungsbelege, Schriftverkehr und eine nachvollziehbare Forderungsaufstellung bereithalten. Eine Anmeldung führt nicht automatisch zu einer vollständigen Rückzahlung; die Quote ist erst später absehbar.
+Der Eröffnungsbeschluss vom 5. Oktober 2026 fordert Insolvenzgläubiger auf, Insolvenzforderungen bis zum 24. November 2026 beim Insolvenzverwalter anzumelden. Grund und Betrag sind anzugeben; Belege zur Forderung sollen beigefügt werden. Ob dein konkreter Anspruch darunter fällt, musst du anhand deiner Unterlagen klären. Die im Beschluss genannte Frist 5. Januar 2027 betrifft Widersprüche gegen Forderungsanmeldungen beim Insolvenzgericht, nicht die Anmeldung beim Verwalter. Eine Anmeldung garantiert keine vollständige Rückzahlung.
 - [Antwort mit Quellen](https://btm.shortaktien.de/faq#forderung-anmelden)
+
+### Wie finde ich den amtlichen Black-Tea-Insolvenzbeschluss?
+Die wesentlichen Passagen des Eröffnungsbeschlusses vom 5. Oktober 2026 kannst du direkt in unserer Insolvenz-Hilfe lesen: als wörtlichen Auszug mit Quellenangabe, Aktenzeichen 1513 IN 2588/26 und Abrufdatum 7. Oktober 2026. Auslassungen sind gekennzeichnet. Quelle ist die amtliche Veröffentlichung des Amtsgerichts München, nicht unsere redaktionelle Zusammenfassung.
+- [Antwort mit Quellen](https://btm.shortaktien.de/faq#amtlichen-beschluss-finden)
 
 ### Was ist das 60-%-Angebot zur Fertigstellung einer Wildfire?
 Im Forenthread berichten einzelne Vorbesteller von einem individuellen Angebot mit einer zusätzlichen Zahlung von 60 Prozent des ursprünglichen Kaufpreises. Das ist kein allgemein bestätigter Anspruch und keine Empfehlung. Wer ein solches Schreiben erhält, sollte die Bedingungen schriftlich prüfen: konkrete Ausstattung, fehlende Teile, Zahlungsweg, Rückerstattung, Frist und Gewährleistung. Bei dieser Summe ist unabhängige rechtliche Beratung sinnvoll.
@@ -108,7 +112,7 @@ Das Amtsgericht München eröffnete das Insolvenzverfahren über die Black Tea M
 #### Wo prüfst du den Verfahrensstand?
 Der amtliche Eröffnungsbeschluss des Amtsgerichts München datiert vom 05.10.2026 und eröffnet das Verfahren wegen Zahlungsunfähigkeit um 12:35 Uhr. Er nennt Rechtsanwalt Florian Loserth als Insolvenzverwalter und führt die Anmelde- und Widerspruchsfristen auf. Maßgeblich sind der Originaltext und etwaige spätere amtliche Bekanntmachungen. Diese Seite bestätigt weder Lieferungen noch Rückzahlungen.
 Die Bekanntmachung fordert Insolvenzgläubiger auf, Forderungen bis zum 24.11.2026 beim Insolvenzverwalter schriftlich anzumelden. Beteiligte erhalten Gelegenheit, bis zum 05.01.2027 beim Insolvenzgericht schriftlich den Forderungsanmeldungen zu widersprechen. Ob und in welcher Höhe eine konkrete Forderung besteht, ist anhand der individuellen Unterlagen zu klären.
-- [Amtliche Bekanntmachung vom 05.10.2026 · 1513 IN 2588/26](https://neu.insolvenzbekanntmachungen.de/ap/text.xhtml?x=0.1287627958418941)
+- [Amtliche Suche: Bekanntmachung vom 05.10.2026 · 1513 IN 2588/26](https://neu.insolvenzbekanntmachungen.de/ap/suche.jsf)
 - [Sicherungsanordnung vom 14.07.2026 (Sekundärquelle)](https://www.versteigerungskalender.de/insolvenzkalender/blaeck-tea-motorbikes-gmbh)
 #### Du hast bezahlt und wartest auf dein Bike
 Sichere Bestellung, Rechnung, Zahlungsbelege und bisherigen Schriftverkehr. Notiere die bestellte Variante, Akkuanzahl und offene Ausstattung. Bitte die zuständige Stelle schriftlich um Auskunft zum konkreten Auftrag.
@@ -816,7 +820,7 @@ Wenn kein passender Link vorhanden ist, nutze die Anfragevorlage mit Teilenamen,
 - [Wiki-Artikel öffnen](https://btm.shortaktien.de/bikes/bonfire)
 - Modellbezug: Bonfire
 - Kurzbeschreibung: Technische Grundlagen, Modellvarianten und belegte Wartungsspuren zur Black Tea Bonfire.
-- Wissensstatus: Version 2026-09-04, letzte Prüfung 2026-09-04.
+- Wissensstatus: Version 2026-10-07, letzte Prüfung 2026-09-04.
 - Lizenzstatus: Eigene redaktionelle Aufbereitung; Originalquellen bleiben bei ihren Rechteinhabern.
 - Quellenkette: Lokale Dokumente → redaktionelle Aufbereitung → geprüfte Community-Ergänzungen
 
@@ -825,7 +829,7 @@ Wenn kein passender Link vorhanden ist, nutze die Anfragevorlage mit Teilenamen,
 - [Wiki-Artikel öffnen](https://btm.shortaktien.de/bikes/wildfire)
 - Modellbezug: Wildfire
 - Kurzbeschreibung: Technische Dokumente, elektrische Systeme und belegte Diagnosehinweise zur Black Tea Wildfire.
-- Wissensstatus: Version 2026-09-04, letzte Prüfung 2026-09-04.
+- Wissensstatus: Version 2026-10-07, letzte Prüfung 2026-09-04.
 - Lizenzstatus: Eigene redaktionelle Aufbereitung; Originalquellen bleiben bei ihren Rechteinhabern.
 - Quellenkette: Lokale Dokumente → redaktionelle Aufbereitung → geprüfte Community-Ergänzungen
 
