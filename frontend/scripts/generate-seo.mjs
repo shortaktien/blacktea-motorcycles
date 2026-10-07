@@ -170,10 +170,10 @@ const openKnowledgeManifest = {
     ...ownerHelpPages.map((page) => ({
       kind: 'owner-guide', url: absoluteUrl(page.path), title: page.title,
       summary: page.summary, revision: page.reviewedAt, lastReviewed: page.reviewedAt,
-      reviewScope: 'Redaktionelle Orientierung und Quellenabgleich; kein amtlich bestätigter aktueller Verfahrensstand.',
+      reviewScope: page.reviewScope ?? 'Redaktionelle Quellenorientierung; keine individuelle Rechts-, Liefer- oder Rückzahlungsauskunft.',
       licenseStatus: 'Eigene redaktionelle Aufbereitung; verlinkte Quellen behalten ihre jeweiligen Rechte.',
       sourceChain: 'Verlinkte Quellen und vorhandenes BTM-Wissen → redaktionelle Orientierung',
-      history: [{ date: page.reviewedAt, label: 'Leitfaden für Besitzer und Besteller erstellt' }],
+      history: page.history ?? [{ date: page.reviewedAt, label: 'Leitfaden für Besitzer und Besteller erstellt' }],
       sections: page.sections,
       sources: [...new Map(page.sections.flatMap((section) => section.links).map((link) => [link.href, { url: link.href.startsWith('/') ? absoluteUrl(link.href) : link.href, label: link.label }])).values()],
     })),

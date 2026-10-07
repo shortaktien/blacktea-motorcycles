@@ -421,6 +421,11 @@ const sourceLinks = [
     href: 'https://www.versteigerungskalender.de/insolvenzkalender/blaeck-tea-motorbikes-gmbh',
   },
   {
+    title: 'Amtliche Insolvenzbekanntmachung',
+    detail: 'Amtsgericht München · Eröffnung am 05.10.2026, 12:35 Uhr · Aktenzeichen 1513 IN 2588/26 · abgerufen am 07.10.2026',
+    href: 'https://neu.insolvenzbekanntmachungen.de/ap/text.xhtml?x=0.1287627958418941',
+  },
+  {
     title: 'MOTORRAD Online · Bonfire und Wildfire',
     detail: 'Retro-E-Motorräder aus München · veröffentlicht am 02.09.2026',
     href: 'https://www.motorradonline.de/elektro/retro-e-motorraeder-black-tea-bonfire-und-wildfire-a1-und-b196/',
@@ -3599,12 +3604,12 @@ function HomePage() {
             <div className="status-topline">
               <span className="status-dot" />
               <span className="status-label">Stand der Dinge</span>
-              <span className="status-date">Quellenabgleich: 25.09.2026</span>
+              <span className="status-date">Quellenabgleich: 07.10.2026</span>
             </div>
             <div className="status-grid">
               <div>
-                <h2>Vorläufige Insolvenzverwaltung angeordnet.</h2>
-                <p>Das Amtsgericht München hat am 14.07.2026 Sicherungsmaßnahmen im Verfahren gegen die Black Tea Motorbikes GmbH angeordnet. Die eingesehene Sekundärquelle dokumentiert diese Anordnung. Ein aktueller Eröffnungsbeschluss wurde hier nicht amtlich verifiziert; neue Beschlüsse und Fristen bitte im amtlichen Insolvenzportal prüfen.</p>
+                <h2>Insolvenzverfahren eröffnet.</h2>
+                <p>Das Amtsgericht München eröffnete das Verfahren über die Black Tea Motorbikes GmbH wegen Zahlungsunfähigkeit am 05.10.2026 um 12:35 Uhr (1513 IN 2588/26) und bestellte Rechtsanwalt Florian Loserth zum Insolvenzverwalter. Laut amtlichem Beschluss sind Forderungen bis 24.11.2026 anzumelden; schriftliche Widersprüche gegen Forderungsanmeldungen sind bis 05.01.2027 beim Insolvenzgericht möglich. Originaltext abgerufen am 07.10.2026.</p>
               </div>
               <dl className="fact-list">
                 <div><dt>Gericht</dt><dd>Amtsgericht München</dd></div>
@@ -3616,7 +3621,7 @@ function HomePage() {
             <div className="status-footer">
               <span>⚠ Verfügbarkeit, Garantie und Forderungen bitte nicht aus dieser Seite ableiten.</span>
               <a href="/insolvenz">Nächste Schritte für Besitzer und Besteller ↗</a>
-              <a href={sourceLinks[0].href} target="_blank" rel="nofollow noreferrer">Verfahrensquelle öffnen ↗</a>
+              <a href={sourceLinks[1].href} target="_blank" rel="nofollow noreferrer">Amtliche Bekanntmachung öffnen ↗</a>
             </div>
           </div>
         </section>
@@ -3628,17 +3633,18 @@ function HomePage() {
               <h2>Was bisher bekannt ist</h2>
             </div>
             <div className="timeline-highlight">
-              <strong>6 Stationen</strong>
+              <strong>7 Stationen</strong>
               <span>Öffentlich dokumentierte Verfahrensschritte, Presseberichte und aktuelle Quellenhinweise.</span>
             </div>
           </div>
           <div className="timeline">
             <TimelineItem date="14.07.2026" title="Sicherungsmaßnahmen angeordnet" text="Das Amtsgericht München ordnet vorläufige Insolvenzverwaltung an. Aktenzeichen: 1513 IN 2588/26." sourceHref={sourceLinks[0].href} sourceLabel="Verfahrensquelle" />
             <TimelineItem date="16.07.2026" title="Erste öffentliche Berichte" text="Die ersten Berichte ordnen die Situation ein. Welche Folgen das für Bestellungen, Reparaturen und Ersatzteile hat, war zu diesem Zeitpunkt noch offen." sourceHref="https://scooterhelden.de/2026/07/16/black-tea-motorbikes-insolvent-was-passiert-jetzt-mit-bonfire-und-wildfire/" sourceLabel="Scooterhelden, 16.07.2026" />
-            <TimelineItem date="02.09.2026" title="MOTORRAD Online ordnet Folgen ein" text="MOTORRAD Online beschreibt die 2026er Bonfire und Wildfire und weist auf das vorläufige Insolvenzverfahren hin. Liefertermine, Verfügbarkeit, Gewährleistung/Service und Ersatzteilversorgung sind dadurch schwerer verlässlich einzuschätzen." sourceHref={sourceLinks[1].href} sourceLabel="MOTORRAD Online" />
+            <TimelineItem date="02.09.2026" title="MOTORRAD Online ordnet Folgen ein" text="MOTORRAD Online beschreibt die 2026er Bonfire und Wildfire und weist auf das vorläufige Insolvenzverfahren hin. Liefertermine, Verfügbarkeit, Gewährleistung/Service und Ersatzteilversorgung sind dadurch schwerer verlässlich einzuschätzen." sourceHref={sourceLinks[2].href} sourceLabel="MOTORRAD Online" />
             <TimelineItem date="04.09.2026" title="Verfahrensseite zeigt neue Datumsangabe" text="Die Sekundärquelle zeigte am 04.09.2026 eine neue Veröffentlichungsangabe; der öffentlich sichtbare Status blieb „Sicherungsmaßnahmen“. Ein konkreter Originaltext wurde nicht verifiziert. Einblendungen mit Platzhaltern gelten nicht als neuer Gerichtstext." sourceHref={sourceLinks[0].href} sourceLabel="Verfahrensquelle (Sekundärquelle)" />
-            <TimelineItem date="07.09.2026" title="Fortgeschriebene Datumszeile bleibt unbestätigt" text="Der Eintrag dokumentiert eine vorgerückte Datumszeile der Sekundärquelle, nicht einen verifizierten Gerichtsbeschluss. Beim Abruf am 25.09.2026 stand die Zeile auf 25.09.2026; daneben waren weiterhin „Amtsgericht Musterhausen“, „XYZ IN 23/32324“ und Lorem-ipsum-Platzhalter sichtbar. Das amtliche Insolvenzportal ergab bei den heutigen Suchen keine Treffer; dies beweist nicht, dass es keine weitere Veröffentlichung gibt." sourceHref={sourceLinks[0].href} sourceLabel="Verfahrensquelle (Sekundärquelle)" />
-            <TimelineItem date="25.09.2026" title="Hersteller-Webauftritte derzeit nicht verfügbar" text="Beim Abruf zeigten blackteamotorbikes.com und blackteamoto.com die Shopify-Meldung „Shop nicht verfügbar“. Das belegt nur die Nichterreichbarkeit dieser Webauftritte an diesem Datum; es belegt weder eine Betriebseinstellung noch eine Änderung am Insolvenzverfahren." sourceHref={sourceLinks[2].href} sourceLabel="Herstellerseite, Abruf 25.09.2026" />
+            <TimelineItem date="07.09.2026" title="Fortgeschriebene Datumszeile bleibt unbestätigt" text="Der Eintrag dokumentiert eine vorgerückte Datumszeile der Sekundärquelle, nicht einen verifizierten Gerichtsbeschluss. Beim Abruf am 25.09.2026 stand die Zeile auf 25.09.2026; daneben waren weiterhin „Amtsgericht Musterhausen“, „XYZ IN 23/32324“ und Lorem-ipsum-Platzhalter sichtbar. Die amtliche Portalsuche vom 25.09.2026 ergab damals keine Treffer; das war kein Beleg, dass es keine spätere Veröffentlichung gibt." sourceHref={sourceLinks[0].href} sourceLabel="Verfahrensquelle (Sekundärquelle)" />
+            <TimelineItem date="25.09.2026" title="Hersteller-Webauftritte derzeit nicht verfügbar" text="Beim Abruf zeigten blackteamotorbikes.com und blackteamoto.com die Shopify-Meldung „Shop nicht verfügbar“. Das belegt nur die Nichterreichbarkeit dieser Webauftritte an diesem Datum; es belegt weder eine Betriebseinstellung noch eine Änderung am Insolvenzverfahren." sourceHref={sourceLinks[3].href} sourceLabel="Herstellerseite, Abruf 25.09.2026" />
+            <TimelineItem date="05.10.2026" title="Insolvenzverfahren amtlich eröffnet" text="Das Amtsgericht München eröffnete das Verfahren wegen Zahlungsunfähigkeit am 05.10.2026 um 12:35 Uhr. Rechtsanwalt Florian Loserth wurde zum Insolvenzverwalter bestellt. Der Beschluss setzt den 24.11.2026 als Anmeldefrist für Insolvenzforderungen; das Verfahren wird bis auf Weiteres schriftlich geführt und sieht den 05.01.2027 als Frist für schriftliche Widersprüche gegen Forderungsanmeldungen vor. Amtlicher Originaltext geprüft, Abruf 07.10.2026." sourceHref={sourceLinks[1].href} sourceLabel="Amtliche Insolvenzbekanntmachung" />
           </div>
         </section>
 
