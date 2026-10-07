@@ -106,6 +106,12 @@ for (const path of ['/', '/insolvenz', '/faq', '/bikes/bonfire', '/bikes/wildfir
   for (const href of [...html.matchAll(/href="([^\"]+)"/g)].map((match) => decode(match[1]))) {
     if (!href.startsWith('/') && !href.startsWith('#')) continue;
     const url = new URL(href, `https://btm.shortaktien.de${path}`);
+    // PDFs are intentionally not tracked; production keeps the archive separately.
+    // The dedicated SEO test validates local files when they are available.
+    if (url.pathname.startsWith('/pdfs/') && url.pathname.endsWith('.pdf')) {
+      assert.ok(read('dist/pdfs/index.html').includes(url.pathname), `${path}: PDF must be listed in the archive ${href}`);
+      continue;
+    }
     const file = url.pathname === '/' ? 'dist/index.html' : url.pathname.includes('.') ? `dist${url.pathname}` : `dist${url.pathname}/index.html`;
     assert.ok(existsSync(join(root, file)), `${path}: missing core-page link ${href}`);
     if (url.hash) assert.ok(read(file).includes(`id="${url.hash.slice(1)}"`), `${path}: missing core-page anchor ${href}`);
