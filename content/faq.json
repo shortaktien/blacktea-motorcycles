@@ -1,13 +1,13 @@
 {
-  "lastUpdated": "2026-09-04",
+  "lastUpdated": "2026-10-07",
   "items": [
     {
       "question": "Ist Black Tea Motorbikes insolvent?",
-      "answer": "Für die Black Tea Motorbikes GmbH ist die Anordnung der vorläufigen Insolvenzverwaltung vom 14. Juli 2026 dokumentiert: Amtsgericht München, Aktenzeichen 1513 IN 2588/26. Die am 4. September eingesehene Sekundärquelle führt Sicherungsmaßnahmen auf. Ein aktueller Eröffnungsbeschluss wurde hier nicht amtlich verifiziert. Neue Beschlüsse und Fristen bitte im amtlichen Insolvenzportal prüfen.",
+      "answer": "Ja. Das Amtsgericht München hat das Insolvenzverfahren am 5. Oktober 2026 um 12:35 Uhr wegen Zahlungsunfähigkeit eröffnet (1513 IN 2588/26). Insolvenzverwalter ist Rechtsanwalt Florian Loserth. Der amtliche Beschluss wurde am 7. Oktober 2026 geprüft. Eine Verfahrenseröffnung bestätigt weder die Lieferung einer Bestellung noch eine Rückzahlung; spätere Bekanntmachungen bleiben maßgeblich.",
       "linkLabel": "Verfahrensstand und Zuständigkeit prüfen",
       "linkHref": "/insolvenz#verfahrensstand",
-      "sourceLabel": "Verfahrensquelle öffnen",
-      "sourceHref": "https://www.versteigerungskalender.de/insolvenzkalender/blaeck-tea-motorbikes-gmbh",
+      "sourceLabel": "Amtliche Bekanntmachungen durchsuchen",
+      "sourceHref": "https://neu.insolvenzbekanntmachungen.de/ap/suche.jsf",
       "id": "insolvenzstatus"
     },
     {
@@ -70,10 +70,21 @@
     },
     {
       "question": "Muss ich eine Forderung zur Insolvenztabelle anmelden?",
-      "answer": "Nicht jede Forderung muss sofort angemeldet werden. Erst wenn das Insolvenzverfahren eröffnet ist und die Gläubiger dazu aufgefordert werden, gibt es eine Anmeldefrist und die zuständige Stelle. Dann solltest du Bestellung, Rechnung, Zahlungsbelege, Schriftverkehr und eine nachvollziehbare Forderungsaufstellung bereithalten. Eine Anmeldung führt nicht automatisch zu einer vollständigen Rückzahlung; die Quote ist erst später absehbar.",
-      "linkLabel": "Hinweise der Verbraucherzentrale",
-      "linkHref": "https://www.verbraucherzentrale.de/wissen/vertraege-reklamation/kundenrechte/wenn-eine-firma-insolvent-wird-das-sind-ihre-rechte-10630",
+      "answer": "Der Eröffnungsbeschluss vom 5. Oktober 2026 fordert Insolvenzgläubiger auf, Insolvenzforderungen bis zum 24. November 2026 beim Insolvenzverwalter anzumelden. Grund und Betrag sind anzugeben; Belege zur Forderung sollen beigefügt werden. Ob dein konkreter Anspruch darunter fällt, musst du anhand deiner Unterlagen klären. Die im Beschluss genannte Frist 5. Januar 2027 betrifft Widersprüche gegen Forderungsanmeldungen beim Insolvenzgericht, nicht die Anmeldung beim Verwalter. Eine Anmeldung garantiert keine vollständige Rückzahlung.",
+      "linkLabel": "Verfahrensstand und Fristen prüfen",
+      "linkHref": "/insolvenz#verfahrensstand",
+      "sourceLabel": "Amtliche Bekanntmachungen durchsuchen",
+      "sourceHref": "https://neu.insolvenzbekanntmachungen.de/ap/suche.jsf",
       "id": "forderung-anmelden"
+    },
+    {
+      "id": "amtlichen-beschluss-finden",
+      "question": "Wie finde ich den amtlichen Black-Tea-Insolvenzbeschluss?",
+      "answer": "Die wesentlichen Passagen des Eröffnungsbeschlusses vom 5. Oktober 2026 kannst du direkt in unserer Insolvenz-Hilfe lesen: als wörtlichen Auszug mit Quellenangabe, Aktenzeichen 1513 IN 2588/26 und Abrufdatum 7. Oktober 2026. Auslassungen sind gekennzeichnet. Quelle ist die amtliche Veröffentlichung des Amtsgerichts München, nicht unsere redaktionelle Zusammenfassung.",
+      "linkLabel": "Originaltext direkt lesen",
+      "linkHref": "/insolvenz#originalbeschluss",
+      "sourceLabel": "Justizportal: Insolvenzbekanntmachungen",
+      "sourceHref": "https://neu.insolvenzbekanntmachungen.de/ap/"
     },
     {
       "question": "Was ist das 60-%-Angebot zur Fertigstellung einer Wildfire?",
@@ -130,6 +141,11 @@
     }
   ],
   "references": [
+    {
+      "title": "Amtliche Insolvenzbekanntmachungen",
+      "detail": "Amtsgericht München · 1513 IN 2588/26 · Eröffnungsbeschluss vom 05.10.2026, Originaltext geprüft am 07.10.2026; über die Suche öffnen",
+      "href": "https://neu.insolvenzbekanntmachungen.de/ap/suche.jsf"
+    },
     {
       "title": "Kontakt zu BTM, Insolvenz?",
       "detail": "Elektroroller-Forum · anekdotische Erfahrungsberichte, kein amtlicher Verfahrensstand",

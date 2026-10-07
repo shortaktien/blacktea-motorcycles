@@ -422,8 +422,8 @@ const sourceLinks = [
   },
   {
     title: 'Amtliche Insolvenzbekanntmachung',
-    detail: 'Amtsgericht München · Eröffnung am 05.10.2026, 12:35 Uhr · Aktenzeichen 1513 IN 2588/26 · abgerufen am 07.10.2026',
-    href: 'https://neu.insolvenzbekanntmachungen.de/ap/text.xhtml?x=0.1287627958418941',
+    detail: 'Amtsgericht München · 1513 IN 2588/26 · Veröffentlichung 05.10.2026 · Originaltext-Auszug direkt in unserer Insolvenz-Hilfe lesbar · abgerufen am 07.10.2026',
+    href: 'https://neu.insolvenzbekanntmachungen.de/ap/suche.jsf',
   },
   {
     title: 'MOTORRAD Online · Bonfire und Wildfire',
@@ -1866,6 +1866,13 @@ function slugifyWikiHeading(value: string): string {
     .replace(/^-+|-+$/g, '') || 'abschnitt';
 }
 
+function nextWikiHeadingId(label: string, usedIds: Map<string, number>): string {
+  const baseId = slugifyWikiHeading(label);
+  const occurrence = usedIds.get(baseId) ?? 0;
+  usedIds.set(baseId, occurrence + 1);
+  return occurrence === 0 ? baseId : `${baseId}-${occurrence + 1}`;
+}
+
 function formatWikiDate(value: string): string {
   const date = new Date(`${value}T12:00:00`);
   if (Number.isNaN(date.getTime())) return value;
@@ -1881,10 +1888,7 @@ function getWikiToc(body: string): WikiTocItem[] {
     if (!match) continue;
     const level = match[1].length as 2 | 3 | 4;
     const label = match[2].trim();
-    const baseId = slugifyWikiHeading(label);
-    const occurrence = usedIds.get(baseId) ?? 0;
-    usedIds.set(baseId, occurrence + 1);
-    items.push({ id: occurrence === 0 ? baseId : `${baseId}-${occurrence + 1}`, label, level });
+    items.push({ id: nextWikiHeadingId(label, usedIds), label, level });
   }
 
   return items;
@@ -1960,6 +1964,7 @@ const wikiImageDimensions: Record<string, { width: number; height: number }> = {
 function renderWikiMarkdown(body: string, onEditHeading: (heading: string) => void, query = ''): ReactNode[] {
   const lines = body.split(/\r?\n/);
   const blocks: ReactNode[] = [];
+  const usedIds = new Map<string, number>();
   let index = 0;
 
   while (index < lines.length) {
@@ -1974,7 +1979,7 @@ function renderWikiMarkdown(body: string, onEditHeading: (heading: string) => vo
       const level = headingMatch[1].length === 2 ? 'h2' : headingMatch[1].length === 3 ? 'h3' : 'h4';
       const Heading = level;
       const heading = headingMatch[2].trim();
-      blocks.push(<Heading key={`wiki-block-${index}`} id={slugifyWikiHeading(heading)}><span className="wiki-heading-text">{highlightWikiText(heading, query, `wiki-heading-${index}`)}</span><button className="wiki-heading-edit" type="button" onClick={() => onEditHeading(heading)}>Bearbeiten</button></Heading>);
+      blocks.push(<Heading key={`wiki-block-${index}`} id={nextWikiHeadingId(heading, usedIds)}><span className="wiki-heading-text">{highlightWikiText(heading, query, `wiki-heading-${index}`)}</span><button className="wiki-heading-edit" type="button" onClick={() => onEditHeading(heading)}>Bearbeiten</button></Heading>);
       index += 1;
       continue;
     }
@@ -2088,10 +2093,7 @@ function getWikiArticleSearchResults(body: string, query: string): WikiTocItem[]
     if (headingMatch) {
       finishSection();
       const label = headingMatch[2].trim();
-      const baseId = slugifyWikiHeading(label);
-      const occurrence = usedIds.get(baseId) ?? 0;
-      usedIds.set(baseId, occurrence + 1);
-      current = { id: occurrence === 0 ? baseId : `${baseId}-${occurrence + 1}`, label, level: headingMatch[1].length as 2 | 3 | 4, text: '' };
+      current = { id: nextWikiHeadingId(label, usedIds), label, level: headingMatch[1].length as 2 | 3 | 4, text: '' };
       continue;
     }
     if (current) current.text += ` ${line}`;
@@ -3621,7 +3623,7 @@ function HomePage() {
             <div className="status-footer">
               <span>⚠ Verfügbarkeit, Garantie und Forderungen bitte nicht aus dieser Seite ableiten.</span>
               <a href="/insolvenz">Nächste Schritte für Besitzer und Besteller ↗</a>
-              <a href={sourceLinks[1].href} target="_blank" rel="nofollow noreferrer">Amtliche Bekanntmachung öffnen ↗</a>
+              <a href="/insolvenz#originalbeschluss">Amtlichen Originaltext vom 05.10.2026 direkt lesen ↗</a>
             </div>
           </div>
         </section>
@@ -3644,7 +3646,7 @@ function HomePage() {
             <TimelineItem date="04.09.2026" title="Verfahrensseite zeigt neue Datumsangabe" text="Die Sekundärquelle zeigte am 04.09.2026 eine neue Veröffentlichungsangabe; der öffentlich sichtbare Status blieb „Sicherungsmaßnahmen“. Ein konkreter Originaltext wurde nicht verifiziert. Einblendungen mit Platzhaltern gelten nicht als neuer Gerichtstext." sourceHref={sourceLinks[0].href} sourceLabel="Verfahrensquelle (Sekundärquelle)" />
             <TimelineItem date="07.09.2026" title="Fortgeschriebene Datumszeile bleibt unbestätigt" text="Der Eintrag dokumentiert eine vorgerückte Datumszeile der Sekundärquelle, nicht einen verifizierten Gerichtsbeschluss. Beim Abruf am 25.09.2026 stand die Zeile auf 25.09.2026; daneben waren weiterhin „Amtsgericht Musterhausen“, „XYZ IN 23/32324“ und Lorem-ipsum-Platzhalter sichtbar. Die amtliche Portalsuche vom 25.09.2026 ergab damals keine Treffer; das war kein Beleg, dass es keine spätere Veröffentlichung gibt." sourceHref={sourceLinks[0].href} sourceLabel="Verfahrensquelle (Sekundärquelle)" />
             <TimelineItem date="25.09.2026" title="Hersteller-Webauftritte derzeit nicht verfügbar" text="Beim Abruf zeigten blackteamotorbikes.com und blackteamoto.com die Shopify-Meldung „Shop nicht verfügbar“. Das belegt nur die Nichterreichbarkeit dieser Webauftritte an diesem Datum; es belegt weder eine Betriebseinstellung noch eine Änderung am Insolvenzverfahren." sourceHref={sourceLinks[3].href} sourceLabel="Herstellerseite, Abruf 25.09.2026" />
-            <TimelineItem date="05.10.2026" title="Insolvenzverfahren amtlich eröffnet" text="Das Amtsgericht München eröffnete das Verfahren wegen Zahlungsunfähigkeit am 05.10.2026 um 12:35 Uhr. Rechtsanwalt Florian Loserth wurde zum Insolvenzverwalter bestellt. Der Beschluss setzt den 24.11.2026 als Anmeldefrist für Insolvenzforderungen; das Verfahren wird bis auf Weiteres schriftlich geführt und sieht den 05.01.2027 als Frist für schriftliche Widersprüche gegen Forderungsanmeldungen vor. Amtlicher Originaltext geprüft, Abruf 07.10.2026." sourceHref={sourceLinks[1].href} sourceLabel="Amtliche Insolvenzbekanntmachung" />
+            <TimelineItem date="05.10.2026" title="Insolvenzverfahren amtlich eröffnet" text="Das Amtsgericht München eröffnete das Verfahren wegen Zahlungsunfähigkeit am 05.10.2026 um 12:35 Uhr. Rechtsanwalt Florian Loserth wurde zum Insolvenzverwalter bestellt. Der Beschluss setzt den 24.11.2026 als Anmeldefrist für Insolvenzforderungen; das Verfahren wird bis auf Weiteres schriftlich geführt und sieht den 05.01.2027 als Frist für schriftliche Widersprüche gegen Forderungsanmeldungen vor. Amtlicher Originaltext geprüft, Abruf 07.10.2026." sourceHref="/insolvenz#originalbeschluss" sourceLabel="Amtlicher Originaltext vom 05.10.2026 (Auszug)" />
           </div>
         </section>
 

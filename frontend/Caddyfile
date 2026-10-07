@@ -26,6 +26,10 @@
     @generatedDocuments path /robots.txt /sitemap.xml /llms.txt /llms-full.txt
     header @generatedDocuments Cache-Control "public, max-age=300, must-revalidate"
 
+    # Googlebot also requests the conventional favicon path even though the
+    # HTML declares the existing WebP icon. Keep one asset and redirect to it.
+    redir /favicon.ico /favicon.webp 301
+
     # The public URL is the stable HTML entry in the sitemap.
     redir /pdfs /pdfs/index.html 301
     redir /pdfs/ /pdfs/index.html 301

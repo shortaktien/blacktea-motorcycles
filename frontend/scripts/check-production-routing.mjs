@@ -54,6 +54,12 @@ try {
   }
   const sitemap = await (await fetch(`${base}/sitemap.xml`)).text();
   assert.doesNotMatch(sitemap, /\/profil(?:\/|<)/, 'Profiles must not enter the sitemap');
+  const faviconRedirect = await fetch(`${base}/favicon.ico`, { redirect: 'manual' });
+  assert.equal(faviconRedirect.status, 301, 'Conventional favicon path must not return 404');
+  assert.equal(faviconRedirect.headers.get('location'), '/favicon.webp');
+  const favicon = await fetch(`${base}/favicon.webp`);
+  assert.equal(favicon.status, 200, 'Declared favicon exists');
+  assert.match(favicon.headers.get('content-type') ?? '', /^image\/webp\b/);
   const shell = await (await fetch(`${base}${profile}`)).text();
   const asset = shell.match(/<script[^>]*src="([^\"]+)"/)?.[1];
   assert.ok(asset?.startsWith('/assets/'));

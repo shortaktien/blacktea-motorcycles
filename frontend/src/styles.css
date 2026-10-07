@@ -1199,6 +1199,9 @@ h3 { margin-bottom: 10px; color: var(--charcoal); font-size: 21px; line-height: 
 .owner-help-toc { flex-direction: column; }
 .owner-help-links a { font-weight: 700; text-underline-offset: 4px; }
 .owner-help-section { margin-block: 44px; scroll-margin-top: 100px; }
+.owner-help-original { padding: 24px; scroll-margin-top: 100px; }
+.owner-help-original blockquote { margin: 20px 0; padding-left: 18px; border-left: 3px solid var(--pink); }
+.owner-help-original blockquote p { white-space: pre-line; overflow-wrap: anywhere; }
 .owner-help-section p, .owner-help-section li, .owner-help-editorial, .repair-brief p { line-height: 1.75; }
 .owner-help-section li { margin-block: 8px; }
 .owner-help-editorial { border-top: 1px solid currentColor; padding-top: 20px; font-size: .9rem; }
