@@ -1,6 +1,6 @@
 # Black Tea Motorbikes – Hilfe — vollständiger Inhaltsindex
 
-> Vollständige, maschinenlesbare Übersicht der öffentlich zugänglichen Inhalte von https://btm.shortaktien.de. Build-Index: 2026-09-05.
+> Vollständige, maschinenlesbare Übersicht der öffentlich zugänglichen Inhalte von https://btm.shortaktien.de. Build-Index: 2026-10-07.
 
 ## Einordnung
 
@@ -103,16 +103,16 @@ Dazu gab es im Forum unterschiedliche individuelle Rückmeldungen. Aus einem Sch
 
 ### Black Tea Insolvenz: Was kannst du jetzt tun?
 URL: https://btm.shortaktien.de/insolvenz
-Redaktioneller Stand: 2026-09-04
-Belegt ist die Anordnung der vorläufigen Insolvenzverwaltung vom 14. Juli 2026 durch das Amtsgericht München, Aktenzeichen 1513 IN 2588/26. Die am 4. September eingesehene Sekundärquelle führt Sicherungsmaßnahmen auf. Ein aktueller Eröffnungsbeschluss wurde hier nicht amtlich verifiziert. Prüfe neue Beschlüsse und Fristen im amtlichen Insolvenzportal.
+Redaktioneller Stand: 2026-10-07
+Das Amtsgericht München eröffnete das Insolvenzverfahren über die Black Tea Motorbikes GmbH wegen Zahlungsunfähigkeit am 05.10.2026 um 12:35 Uhr (1513 IN 2588/26) und bestellte Rechtsanwalt Florian Loserth zum Insolvenzverwalter. Laut amtlichem Beschluss sind Forderungen bis 24.11.2026 beim Insolvenzverwalter anzumelden; schriftliche Widersprüche gegen Forderungsanmeldungen sind bis 05.01.2027 beim Insolvenzgericht möglich. Originaltext abgerufen am 07.10.2026.
 #### Wo prüfst du den Verfahrensstand?
-Suche im amtlichen Insolvenzportal nach Black Tea Motorbikes GmbH, Amtsgericht München und dem Aktenzeichen 1513 IN 2588/26. Achte auf das Datum und die Art der Bekanntmachung. Eine Veröffentlichung zu Sicherungsmaßnahmen ist kein Eröffnungsbeschluss.
-Die dokumentierte Anordnung nennt Florian Loserth als vorläufigen Insolvenzverwalter. Entnimm aktuelle Kontaktdaten, Zuständigkeit und etwaige Fristen der jeweiligen Bekanntmachung. Diese Seite kann weder eine Lieferung noch die Erstattung einer Zahlung bestätigen.
-- [Amtliche Bekanntmachungen suchen](https://www.insolvenzbekanntmachungen.de/)
-- [Dokumentierte Anordnung vom 14.07.2026 (Sekundärquelle)](https://www.versteigerungskalender.de/insolvenzkalender/blaeck-tea-motorbikes-gmbh)
+Der amtliche Eröffnungsbeschluss des Amtsgerichts München datiert vom 05.10.2026 und eröffnet das Verfahren wegen Zahlungsunfähigkeit um 12:35 Uhr. Er nennt Rechtsanwalt Florian Loserth als Insolvenzverwalter und führt die Anmelde- und Widerspruchsfristen auf. Maßgeblich sind der Originaltext und etwaige spätere amtliche Bekanntmachungen. Diese Seite bestätigt weder Lieferungen noch Rückzahlungen.
+Die Bekanntmachung fordert Insolvenzgläubiger auf, Forderungen bis zum 24.11.2026 beim Insolvenzverwalter schriftlich anzumelden. Beteiligte erhalten Gelegenheit, bis zum 05.01.2027 beim Insolvenzgericht schriftlich den Forderungsanmeldungen zu widersprechen. Ob und in welcher Höhe eine konkrete Forderung besteht, ist anhand der individuellen Unterlagen zu klären.
+- [Amtliche Bekanntmachung vom 05.10.2026 · 1513 IN 2588/26](https://neu.insolvenzbekanntmachungen.de/ap/text.xhtml?x=0.1287627958418941)
+- [Sicherungsanordnung vom 14.07.2026 (Sekundärquelle)](https://www.versteigerungskalender.de/insolvenzkalender/blaeck-tea-motorbikes-gmbh)
 #### Du hast bezahlt und wartest auf dein Bike
 Sichere Bestellung, Rechnung, Zahlungsbelege und bisherigen Schriftverkehr. Notiere die bestellte Variante, Akkuanzahl und offene Ausstattung. Bitte die zuständige Stelle schriftlich um Auskunft zum konkreten Auftrag.
-Eine Vorauszahlung sichert die Lieferung nicht. Ob eine Forderung anzumelden ist, hängt vom Verfahrensstand und deinem Vertrag ab. Frist und Empfänger stehen im Eröffnungsbeschluss; Grund, Betrag und Belege gehören zur Anmeldung. Eine Rückzahlung ist damit nicht garantiert. Lass individuelle Nachzahlungsangebote unabhängig prüfen.
+Eine Vorauszahlung sichert die Lieferung nicht. Der amtliche Beschluss fordert Insolvenzgläubiger zur schriftlichen Forderungsanmeldung bis zum 24.11.2026 beim Insolvenzverwalter auf. Grund, Betrag und Belege gehören zur Anmeldung. Eine Rückzahlung ist damit nicht garantiert. Lass individuelle Nachzahlungsangebote unabhängig prüfen und kläre eine konkrete Forderung anhand deiner Unterlagen.
 - [Verbraucherzentrale: Vorauszahlung und Firmeninsolvenz](https://www.verbraucherzentrale.de/wissen/vertraege-reklamation/kundenrechte/wenn-eine-firma-insolvent-wird-das-sind-ihre-rechte-10630)
 - [§ 28 InsO: Aufforderung an Gläubiger](https://www.gesetze-im-internet.de/inso/__28.html)
 - [§ 174 InsO: Anmeldung und Belege](https://www.gesetze-im-internet.de/inso/__174.html)
@@ -862,5 +862,5 @@ Wenn kein passender Link vorhanden ist, nutze die Anfragevorlage mit Teilenamen,
 
 ## Daten und Aktualität
 
-- Automatischer Index-Build: 2026-09-05.
+- Automatischer Index-Build: 2026-10-07.
 - Für aktuelle Verfügbarkeit, Preise und rechtliche Verfahrensstände immer die jeweils verlinkte Quelle und den eigenen Modell-/Baujahrstand prüfen.
