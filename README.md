@@ -212,10 +212,11 @@ Der Deploy-Workflow führt diesen Check zusätzlich über einen statischen HTTP-
 
 ### Backend
 
-Das Backend benötigt PHP 8.2 oder neuer sowie Composer. Abhängigkeiten installieren und den Entwicklungsserver starten:
+Das Backend benötigt einen gepatchten PHP-Zweig sowie Composer: mindestens 8.2.35, 8.3.36, 8.4.27 oder 8.5.12 im jeweiligen Zweig. Die Composer-Plattform `8.2.0` beschreibt nur die Auflösung kompatibler Abhängigkeiten und installiert oder aktualisiert keine PHP-Laufzeit. Abhängigkeiten installieren und den Entwicklungsserver starten:
 
 ```bash
 cd backend
+php scripts/check-php-runtime.php
 composer install
 php -S 127.0.0.1:8000 -t public public/index.php
 ```
@@ -271,8 +272,31 @@ Der Symfony-Cache wird nicht persistent eingebunden. Lokale Testdaten, Sessions 
 Die öffentliche Website kann unabhängig davon lokal mit Docker gestartet werden. Für den VPS wird der Produktionsstack verwendet:
 
 ```bash
-docker compose -f docker-compose.prod.yml up --build -d
+cd /opt/btm
+bash deploy/restart-with-persistent-data.sh
+docker compose -f docker-compose.prod.yml exec -T backend /proc/1/exe /app/scripts/check-php-runtime.php
+curl --fail --silent --show-error https://btm.shortaktien.de/api/health
 ```
+
+### PHP-Sicherheitsupdates
+
+Die [offizielle PHP-Sicherheitswarnung vom 21.10.2026](https://www.php.net/archive/2026.php) betrifft CVE-2026-109618 und CVE-2026-109619. Ein Update der Laufzeit und der Neustart aller PHP-Prozesse sind erforderlich. Ein erfolgreicher HTTP-Health-Check allein weist die PHP-Version nicht nach.
+
+Entwicklung, Produktions-Compose und Deploy-CI verwenden gemeinsam `backend/Dockerfile` mit `php:8.4.27-cli-alpine`. Auch Composer wird im Build unter dieser PHP-Version ausgeführt; aus `composer:2` wird nur das Composer-Programm übernommen. Der Build und der Produktionsneustart prüfen die tatsächlich ausgeführte PHP-Version mit `backend/scripts/check-php-runtime.php`. Der Deploy-Helper lädt Basis-Images mit `--pull`, sichert die bestehenden Laufzeitdaten und ersetzt den Backend-Container durch das neu gebaute Image.
+
+In diesem Stack läuft `php -S` hinter einem HTTP-Proxy, kein PHP-FPM. Der Container-Austausch beendet den bisherigen PHP-Prozess und startet die gepatchte Laufzeit. Ein bloßes `docker compose restart` verwendet weiterhin das bisherige Image. Der Produktions-Helper muss aus dem geprüften, aktualisierten Stand unter `/opt/btm` ausgeführt werden; seine Runtime-Verzeichnisse und Backups müssen vorhanden sein.
+
+Lokale Docker-Entwicklung nach Übernahme des Patches:
+
+```bash
+docker compose build --pull backend
+docker compose up -d --no-deps --force-recreate backend
+docker compose exec -T backend /proc/1/exe /app/scripts/check-php-runtime.php
+```
+
+Bei einer nativen Installation muss der Paketmanager die verwendete PHP-Version separat auf den Patchstand aktualisieren. Unter Homebrew beispielsweise `brew update` und `brew upgrade php`, sobald die Formula mindestens PHP 8.5.12 liefert; danach `php backend/scripts/check-php-runtime.php` ausführen und einen laufenden Entwicklungsserver neu starten. Ein Docker-Build aktualisiert das Host-PHP nicht.
+
+Nur falls ein abweichender Server tatsächlich PHP-FPM verwendet: das zum Zweig passende PHP-FPM-Paket und seine Erweiterungen aktualisieren, die Pool-Konfiguration prüfen, den konkret ermittelten Dienst vollständig neu starten (zum Beispiel `sudo systemctl restart php8.4-fpm`) und sowohl dessen Binary-Version (`php-fpm8.4 -v`) als auch die neuen Worker-PIDs kontrollieren. Für diesen FPM-Schritt gibt es im Projekt keinen eingerichteten Deploypfad. Kein öffentliches `phpinfo()`-Skript zum Versionsnachweis anlegen.
 
 `frontend/Dockerfile.prod` baut zuerst mit `npm run build`, inklusive SEO-Dateigenerierung und serverseitigem Prerendering. Das fertige `dist/` wird anschließend ausschließlich über den Caddy-Container auf Port 80 ausgeliefert. Der Vite-Dev-Server ist in diesem Stack nicht enthalten und wird nicht öffentlich betrieben. API-Anfragen werden intern von Caddy an `backend:8000` weitergeleitet.
 

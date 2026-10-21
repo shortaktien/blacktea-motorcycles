@@ -81,7 +81,8 @@ jobs:
       - name: Test backend image without embedded runtime data
         working-directory: .
         run: |
-          docker build -t btm-backend-check backend
+          docker build --pull -t btm-backend-check backend
+          docker run --rm btm-backend-check php scripts/check-php-runtime.php
           docker run --rm \
             -e APP_ENV=prod -e APP_DEBUG=0 -e APP_SECRET=isolated-runtime-check \
             -e 'APP_RUNTIME_OPTIONS={"disable_dotenv":true}' \
