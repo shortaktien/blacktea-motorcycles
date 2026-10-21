@@ -12,7 +12,7 @@ for directory in "$runtime" "$backups"; do
 done
 compose=(docker compose -f docker-compose.prod.yml)
 # Build before interrupting the old backend; a failed build leaves it running.
-"${compose[@]}" build
+"${compose[@]}" build --pull
 backend_id=$("${compose[@]}" ps -aq backend)
 test -n "$backend_id" || { echo 'No existing backend; refusing implicit empty-store initialization.' >&2; exit 1; }
 test "$(docker inspect --format '{{.State.Running}}' "$backend_id")" = true
@@ -62,4 +62,7 @@ for part in data uploads sessions; do
   mounted=$(docker inspect --format "{{range .Mounts}}{{if eq .Destination \"/app/var/$part\"}}{{.Source}}{{end}}{{end}}" "$new_backend")
   test "$mounted" = "$runtime/$part" || { echo "Missing persistent mount: $part" >&2; exit 1; }
 done
+# Execute the running server's binary, not a potentially different host PHP.
+# Do not consume the remaining commands of the caller's SSH heredoc.
+"${compose[@]}" exec -T backend /proc/1/exe /app/scripts/check-php-runtime.php </dev/null
 echo 'Accounts, posts, uploads and sessions are now stored outside the container.'
