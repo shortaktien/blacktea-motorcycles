@@ -1,7 +1,7 @@
 {
   "manifestType": "BTM Open Knowledge",
   "schemaVersion": "1.0",
-  "generatedAt": "2026-10-07",
+  "generatedAt": "2026-10-22",
   "language": "de-DE",
   "licensePolicy": "Eigene redaktionelle Aufbereitungen werden als solche gekennzeichnet; Originalquellen bleiben bei ihren jeweiligen Rechteinhabern.",
   "regionalContentPolicy": "Regionale Seiten werden erst veröffentlicht, wenn sie eigenen lokalen Mehrwert bieten. Die ungefähre PLZ-Verortung bleibt bis dahin auf /karte gebündelt.",
@@ -11,7 +11,7 @@
       "url": "https://btm.shortaktien.de/faq#insolvenzstatus",
       "title": "Ist Black Tea Motorbikes insolvent?",
       "answer": "Ja. Das Amtsgericht München hat das Insolvenzverfahren am 5. Oktober 2026 um 12:35 Uhr wegen Zahlungsunfähigkeit eröffnet (1513 IN 2588/26). Insolvenzverwalter ist Rechtsanwalt Florian Loserth. Der amtliche Beschluss wurde am 7. Oktober 2026 geprüft. Eine Verfahrenseröffnung bestätigt weder die Lieferung einer Bestellung noch eine Rückzahlung; spätere Bekanntmachungen bleiben maßgeblich.",
-      "revision": "2026-10-07",
+      "revision": "2026-10-22",
       "lastReviewed": "2026-10-07",
       "reviewScope": "Redaktionelle Aktualisierung der FAQ; veränderliche Angaben anhand der verlinkten Quellen prüfen.",
       "licenseStatus": "Eigene redaktionelle Antwort; Quellen behalten ihre jeweiligen Rechte.",
@@ -19,7 +19,11 @@
       "history": [
         {
           "date": "2026-10-07",
-          "label": "FAQ für Besitzer und Besteller überarbeitet"
+          "label": "Antworten und amtlichen Verfahrensstand abgeglichen"
+        },
+        {
+          "date": "2026-10-22",
+          "label": "FAQ nach Anliegen gegliedert; Seitentitel, Verantwortlichkeit und Datumsangaben überarbeitet"
         }
       ],
       "sources": [
@@ -34,7 +38,7 @@
       "url": "https://btm.shortaktien.de/faq#ersatzteile-finden",
       "title": "Wo bekomme ich Ersatzteile für Black Tea Bonfire und Wildfire?",
       "answer": "Beginne im historischen Ersatzteilkatalog mit Modell, Baujahr und Bauteilbezeichnung. Die Detailseiten zeigen vorhandene Archivquellen, Varianten und den jeweiligen Bezugsstatus. Historische Preise und Lagerangaben sind nicht aktuell. Kläre Passform und Lieferbarkeit für dein konkretes Fahrzeug mit Anbieter oder Fachbetrieb. Auf der Teileseite kannst du eine Anfrage mit dem dokumentierten Teilenamen erstellen.",
-      "revision": "2026-10-07",
+      "revision": "2026-10-22",
       "lastReviewed": "2026-10-07",
       "reviewScope": "Redaktionelle Aktualisierung der FAQ; veränderliche Angaben anhand der verlinkten Quellen prüfen.",
       "licenseStatus": "Eigene redaktionelle Antwort; Quellen behalten ihre jeweiligen Rechte.",
@@ -42,7 +46,11 @@
       "history": [
         {
           "date": "2026-10-07",
-          "label": "FAQ für Besitzer und Besteller überarbeitet"
+          "label": "Antworten und amtlichen Verfahrensstand abgeglichen"
+        },
+        {
+          "date": "2026-10-22",
+          "label": "FAQ nach Anliegen gegliedert; Seitentitel, Verantwortlichkeit und Datumsangaben überarbeitet"
         }
       ],
       "sources": [
@@ -57,7 +65,7 @@
       "url": "https://btm.shortaktien.de/faq#werkstatt-finden",
       "title": "Wie finde ich eine Werkstatt für meine Bonfire oder Wildfire?",
       "answer": "Sieh dir die Werkstatt-Tipps der Community an und frage vorab nach Erfahrung mit deiner Modellvariante und dem betroffenen Bauteil. Bereite Baujahr, Fehlercode, Symptome und passende Unterlagen vor. Mit unserem Reparatur-Steckbrief kannst du diese Angaben ohne Konto zusammenstellen und selbst an einen Fachbetrieb weitergeben.",
-      "revision": "2026-10-07",
+      "revision": "2026-10-22",
       "lastReviewed": "2026-10-07",
       "reviewScope": "Redaktionelle Aktualisierung der FAQ; veränderliche Angaben anhand der verlinkten Quellen prüfen.",
       "licenseStatus": "Eigene redaktionelle Antwort; Quellen behalten ihre jeweiligen Rechte.",
@@ -65,7 +73,11 @@
       "history": [
         {
           "date": "2026-10-07",
-          "label": "FAQ für Besitzer und Besteller überarbeitet"
+          "label": "Antworten und amtlichen Verfahrensstand abgeglichen"
+        },
+        {
+          "date": "2026-10-22",
+          "label": "FAQ nach Anliegen gegliedert; Seitentitel, Verantwortlichkeit und Datumsangaben überarbeitet"
         }
       ],
       "sources": [
@@ -80,7 +92,7 @@
       "url": "https://btm.shortaktien.de/faq#handbuch-schaltplan",
       "title": "Wo finde ich Black Tea Handbücher und Schaltpläne?",
       "answer": "Der PDF-Index bündelt gesicherte Dokumente. Im Bonfire- und Wildfire-Wiki findest du dazu technische Einordnungen und Quellen. Prüfe Modellvariante und Dokumentstand vor der Verwendung; nicht jede Anleitung gilt für jedes Baujahr. Sichere passende Unterlagen für dein Motorrad zusätzlich lokal.",
-      "revision": "2026-10-07",
+      "revision": "2026-10-22",
       "lastReviewed": "2026-10-07",
       "reviewScope": "Redaktionelle Aktualisierung der FAQ; veränderliche Angaben anhand der verlinkten Quellen prüfen.",
       "licenseStatus": "Eigene redaktionelle Antwort; Quellen behalten ihre jeweiligen Rechte.",
@@ -88,7 +100,11 @@
       "history": [
         {
           "date": "2026-10-07",
-          "label": "FAQ für Besitzer und Besteller überarbeitet"
+          "label": "Antworten und amtlichen Verfahrensstand abgeglichen"
+        },
+        {
+          "date": "2026-10-22",
+          "label": "FAQ nach Anliegen gegliedert; Seitentitel, Verantwortlichkeit und Datumsangaben überarbeitet"
         }
       ],
       "sources": [
@@ -103,7 +119,7 @@
       "url": "https://btm.shortaktien.de/faq#akku-nicht-erkannt",
       "title": "Mein Black Tea Akku wird nicht erkannt – wo beginne ich?",
       "answer": "Notiere Modell, Akkuversion und die genaue Anzeige oder Fehlermeldung. Unsere Akku-Hilfe ordnet die nächsten Prüfschritte und ihre Grenzen ein. Bei ungewöhnlicher Wärme, Geruch, sichtbaren Schäden oder Feuchtigkeit am Akku keine weiteren Lade- oder Fahrversuche unternehmen. Akku und BMS nicht öffnen oder überbrücken; die weitere Prüfung gehört in qualifizierte Hände.",
-      "revision": "2026-10-07",
+      "revision": "2026-10-22",
       "lastReviewed": "2026-10-07",
       "reviewScope": "Redaktionelle Aktualisierung der FAQ; veränderliche Angaben anhand der verlinkten Quellen prüfen.",
       "licenseStatus": "Eigene redaktionelle Antwort; Quellen behalten ihre jeweiligen Rechte.",
@@ -111,7 +127,11 @@
       "history": [
         {
           "date": "2026-10-07",
-          "label": "FAQ für Besitzer und Besteller überarbeitet"
+          "label": "Antworten und amtlichen Verfahrensstand abgeglichen"
+        },
+        {
+          "date": "2026-10-22",
+          "label": "FAQ nach Anliegen gegliedert; Seitentitel, Verantwortlichkeit und Datumsangaben überarbeitet"
         }
       ],
       "sources": [
@@ -126,7 +146,7 @@
       "url": "https://btm.shortaktien.de/faq#erfahrungen",
       "title": "Wo finde ich Erfahrungen mit Black Tea Bonfire und Wildfire?",
       "answer": "Erfahrungen sind Einzelberichte und ergeben deshalb kein einheitliches Qualitätsurteil. Für eine faire Einordnung sollten Baujahr, konkrete Variante, Akku, Nutzung und der jeweilige Servicefall zusammen betrachtet werden. Öffentliche Erfahrungsberichte und belegte technische Angaben sind nicht dasselbe.",
-      "revision": "2026-10-07",
+      "revision": "2026-10-22",
       "lastReviewed": "2026-10-07",
       "reviewScope": "Redaktionelle Aktualisierung der FAQ; veränderliche Angaben anhand der verlinkten Quellen prüfen.",
       "licenseStatus": "Eigene redaktionelle Antwort; Quellen behalten ihre jeweiligen Rechte.",
@@ -134,7 +154,11 @@
       "history": [
         {
           "date": "2026-10-07",
-          "label": "FAQ für Besitzer und Besteller überarbeitet"
+          "label": "Antworten und amtlichen Verfahrensstand abgeglichen"
+        },
+        {
+          "date": "2026-10-22",
+          "label": "FAQ nach Anliegen gegliedert; Seitentitel, Verantwortlichkeit und Datumsangaben überarbeitet"
         }
       ],
       "sources": [
@@ -149,7 +173,7 @@
       "url": "https://btm.shortaktien.de/faq#reichweite",
       "title": "Welche Reichweite haben Blacktea Motorbikes?",
       "answer": "Eine feste Reichweite gibt es nicht. Modell, Fahrmodus, Geschwindigkeit, Temperatur, Strecke, Reifendruck, Beladung und Akkuzustand verändern den Verbrauch deutlich. Die Angaben im Wiki sind deshalb Orientierungswerte; für dein Fahrzeug ist ein eigener Praxistest unter ähnlichen Bedingungen aussagekräftiger.",
-      "revision": "2026-10-07",
+      "revision": "2026-10-22",
       "lastReviewed": "2026-10-07",
       "reviewScope": "Redaktionelle Aktualisierung der FAQ; veränderliche Angaben anhand der verlinkten Quellen prüfen.",
       "licenseStatus": "Eigene redaktionelle Antwort; Quellen behalten ihre jeweiligen Rechte.",
@@ -157,7 +181,11 @@
       "history": [
         {
           "date": "2026-10-07",
-          "label": "FAQ für Besitzer und Besteller überarbeitet"
+          "label": "Antworten und amtlichen Verfahrensstand abgeglichen"
+        },
+        {
+          "date": "2026-10-22",
+          "label": "FAQ nach Anliegen gegliedert; Seitentitel, Verantwortlichkeit und Datumsangaben überarbeitet"
         }
       ],
       "sources": [
@@ -172,7 +200,7 @@
       "url": "https://btm.shortaktien.de/faq#bonfire-x-erfahrungen",
       "title": "Wie kann ich Erfahrungen mit der Bonfire X sinnvoll vergleichen?",
       "answer": "Berichte zur Bonfire X sind individuelle Nutzungserfahrungen und keine allgemeine Freigabe für jedes Motorrad. Für die Einordnung zählen unter anderem Baujahr, Akkuanzahl, Softwarestand, Fahrprofil und Wartung. Deshalb trennen wir Erfahrungsberichte bewusst von belegten technischen Werten.",
-      "revision": "2026-10-07",
+      "revision": "2026-10-22",
       "lastReviewed": "2026-10-07",
       "reviewScope": "Redaktionelle Aktualisierung der FAQ; veränderliche Angaben anhand der verlinkten Quellen prüfen.",
       "licenseStatus": "Eigene redaktionelle Antwort; Quellen behalten ihre jeweiligen Rechte.",
@@ -180,7 +208,11 @@
       "history": [
         {
           "date": "2026-10-07",
-          "label": "FAQ für Besitzer und Besteller überarbeitet"
+          "label": "Antworten und amtlichen Verfahrensstand abgeglichen"
+        },
+        {
+          "date": "2026-10-22",
+          "label": "FAQ nach Anliegen gegliedert; Seitentitel, Verantwortlichkeit und Datumsangaben überarbeitet"
         }
       ],
       "sources": [
@@ -195,7 +227,7 @@
       "url": "https://btm.shortaktien.de/faq#bestellung-bezahlt",
       "title": "Was passiert mit einer bereits bezahlten, aber noch nicht gelieferten Bestellung?",
       "answer": "Eine Vorauszahlung garantiert keine Lieferung. Sichere Bestellung, Rechnung, Zahlungsbelege und Schriftverkehr und frage die zuständige Stelle nach dem konkreten Auftrag. Bei einer Insolvenz kann eine Forderungsanmeldung nötig werden. § 103 InsO betrifft gegenseitige Verträge, die bei Eröffnung von beiden Seiten noch nicht vollständig erfüllt sind; eine vollständig bezahlte Bestellung lässt sich nicht pauschal darunter einordnen. Lass deinen Vertrag und den Verfahrensstand individuell prüfen.",
-      "revision": "2026-10-07",
+      "revision": "2026-10-22",
       "lastReviewed": "2026-10-07",
       "reviewScope": "Redaktionelle Aktualisierung der FAQ; veränderliche Angaben anhand der verlinkten Quellen prüfen.",
       "licenseStatus": "Eigene redaktionelle Antwort; Quellen behalten ihre jeweiligen Rechte.",
@@ -203,7 +235,11 @@
       "history": [
         {
           "date": "2026-10-07",
-          "label": "FAQ für Besitzer und Besteller überarbeitet"
+          "label": "Antworten und amtlichen Verfahrensstand abgeglichen"
+        },
+        {
+          "date": "2026-10-22",
+          "label": "FAQ nach Anliegen gegliedert; Seitentitel, Verantwortlichkeit und Datumsangaben überarbeitet"
         }
       ],
       "sources": [
@@ -218,7 +254,7 @@
       "url": "https://btm.shortaktien.de/faq#forderung-anmelden",
       "title": "Muss ich eine Forderung zur Insolvenztabelle anmelden?",
       "answer": "Der Eröffnungsbeschluss vom 5. Oktober 2026 fordert Insolvenzgläubiger auf, Insolvenzforderungen bis zum 24. November 2026 beim Insolvenzverwalter anzumelden. Grund und Betrag sind anzugeben; Belege zur Forderung sollen beigefügt werden. Ob dein konkreter Anspruch darunter fällt, musst du anhand deiner Unterlagen klären. Die im Beschluss genannte Frist 5. Januar 2027 betrifft Widersprüche gegen Forderungsanmeldungen beim Insolvenzgericht, nicht die Anmeldung beim Verwalter. Eine Anmeldung garantiert keine vollständige Rückzahlung.",
-      "revision": "2026-10-07",
+      "revision": "2026-10-22",
       "lastReviewed": "2026-10-07",
       "reviewScope": "Redaktionelle Aktualisierung der FAQ; veränderliche Angaben anhand der verlinkten Quellen prüfen.",
       "licenseStatus": "Eigene redaktionelle Antwort; Quellen behalten ihre jeweiligen Rechte.",
@@ -226,7 +262,11 @@
       "history": [
         {
           "date": "2026-10-07",
-          "label": "FAQ für Besitzer und Besteller überarbeitet"
+          "label": "Antworten und amtlichen Verfahrensstand abgeglichen"
+        },
+        {
+          "date": "2026-10-22",
+          "label": "FAQ nach Anliegen gegliedert; Seitentitel, Verantwortlichkeit und Datumsangaben überarbeitet"
         }
       ],
       "sources": [
@@ -241,7 +281,7 @@
       "url": "https://btm.shortaktien.de/faq#amtlichen-beschluss-finden",
       "title": "Wie finde ich den amtlichen Black-Tea-Insolvenzbeschluss?",
       "answer": "Die wesentlichen Passagen des Eröffnungsbeschlusses vom 5. Oktober 2026 kannst du direkt in unserer Insolvenz-Hilfe lesen: als wörtlichen Auszug mit Quellenangabe, Aktenzeichen 1513 IN 2588/26 und Abrufdatum 7. Oktober 2026. Auslassungen sind gekennzeichnet. Quelle ist die amtliche Veröffentlichung des Amtsgerichts München, nicht unsere redaktionelle Zusammenfassung.",
-      "revision": "2026-10-07",
+      "revision": "2026-10-22",
       "lastReviewed": "2026-10-07",
       "reviewScope": "Redaktionelle Aktualisierung der FAQ; veränderliche Angaben anhand der verlinkten Quellen prüfen.",
       "licenseStatus": "Eigene redaktionelle Antwort; Quellen behalten ihre jeweiligen Rechte.",
@@ -249,7 +289,11 @@
       "history": [
         {
           "date": "2026-10-07",
-          "label": "FAQ für Besitzer und Besteller überarbeitet"
+          "label": "Antworten und amtlichen Verfahrensstand abgeglichen"
+        },
+        {
+          "date": "2026-10-22",
+          "label": "FAQ nach Anliegen gegliedert; Seitentitel, Verantwortlichkeit und Datumsangaben überarbeitet"
         }
       ],
       "sources": [
@@ -264,7 +308,7 @@
       "url": "https://btm.shortaktien.de/faq#wildfire-nachzahlung",
       "title": "Was ist das 60-%-Angebot zur Fertigstellung einer Wildfire?",
       "answer": "Im Forenthread berichten einzelne Vorbesteller von einem individuellen Angebot mit einer zusätzlichen Zahlung von 60 Prozent des ursprünglichen Kaufpreises. Das ist kein allgemein bestätigter Anspruch und keine Empfehlung. Wer ein solches Schreiben erhält, sollte die Bedingungen schriftlich prüfen: konkrete Ausstattung, fehlende Teile, Zahlungsweg, Rückerstattung, Frist und Gewährleistung. Bei dieser Summe ist unabhängige rechtliche Beratung sinnvoll.",
-      "revision": "2026-10-07",
+      "revision": "2026-10-22",
       "lastReviewed": "2026-10-07",
       "reviewScope": "Redaktionelle Aktualisierung der FAQ; veränderliche Angaben anhand der verlinkten Quellen prüfen.",
       "licenseStatus": "Eigene redaktionelle Antwort; Quellen behalten ihre jeweiligen Rechte.",
@@ -272,7 +316,11 @@
       "history": [
         {
           "date": "2026-10-07",
-          "label": "FAQ für Besitzer und Besteller überarbeitet"
+          "label": "Antworten und amtlichen Verfahrensstand abgeglichen"
+        },
+        {
+          "date": "2026-10-22",
+          "label": "FAQ nach Anliegen gegliedert; Seitentitel, Verantwortlichkeit und Datumsangaben überarbeitet"
         }
       ],
       "sources": [
@@ -287,7 +335,7 @@
       "url": "https://btm.shortaktien.de/faq#ansprechpartner",
       "title": "Wer ist jetzt mein Ansprechpartner?",
       "answer": "Für verbindliche Fragen zum Insolvenzverfahren, zu einer konkreten Bestellung oder zu einer geforderten Zahlung ist die im Verfahrensstand genannte zuständige Stelle maßgeblich. Forumseinträge, WhatsApp-Nachrichten und Aussagen anderer Fahrer ersetzen keine schriftliche Auskunft des Insolvenzverwalters oder eine rechtliche Beratung. Sichere alle Unterlagen und stelle Fragen mit Bestellnummer und Belegen.",
-      "revision": "2026-10-07",
+      "revision": "2026-10-22",
       "lastReviewed": "2026-10-07",
       "reviewScope": "Redaktionelle Aktualisierung der FAQ; veränderliche Angaben anhand der verlinkten Quellen prüfen.",
       "licenseStatus": "Eigene redaktionelle Antwort; Quellen behalten ihre jeweiligen Rechte.",
@@ -295,7 +343,11 @@
       "history": [
         {
           "date": "2026-10-07",
-          "label": "FAQ für Besitzer und Besteller überarbeitet"
+          "label": "Antworten und amtlichen Verfahrensstand abgeglichen"
+        },
+        {
+          "date": "2026-10-22",
+          "label": "FAQ nach Anliegen gegliedert; Seitentitel, Verantwortlichkeit und Datumsangaben überarbeitet"
         }
       ],
       "sources": [
@@ -310,7 +362,7 @@
       "url": "https://btm.shortaktien.de/faq#garantie-reparatur",
       "title": "Gibt es weiterhin Garantie, Reparaturen und Ersatzteile?",
       "answer": "Gesetzliche Gewährleistung richtet sich grundsätzlich gegen deinen Verkäufer; eine freiwillige Garantie hängt vom Garantiegeber und den Bedingungen ab. Prüfe deshalb zuerst, wer auf deiner Rechnung steht. Die Insolvenz des Herstellers bedeutet nicht automatisch, dass ein rechtlich unabhängiger Händler ebenfalls insolvent ist. Reparaturen, Kostenübernahme und Teilelieferungen musst du für deinen Fall klären. Eine Community-Lösung ist keine Herstellergarantie.",
-      "revision": "2026-10-07",
+      "revision": "2026-10-22",
       "lastReviewed": "2026-10-07",
       "reviewScope": "Redaktionelle Aktualisierung der FAQ; veränderliche Angaben anhand der verlinkten Quellen prüfen.",
       "licenseStatus": "Eigene redaktionelle Antwort; Quellen behalten ihre jeweiligen Rechte.",
@@ -318,7 +370,11 @@
       "history": [
         {
           "date": "2026-10-07",
-          "label": "FAQ für Besitzer und Besteller überarbeitet"
+          "label": "Antworten und amtlichen Verfahrensstand abgeglichen"
+        },
+        {
+          "date": "2026-10-22",
+          "label": "FAQ nach Anliegen gegliedert; Seitentitel, Verantwortlichkeit und Datumsangaben überarbeitet"
         }
       ],
       "sources": [
@@ -333,7 +389,7 @@
       "url": "https://btm.shortaktien.de/faq#paypal",
       "title": "Greift der PayPal-Käuferschutz bei einer Motorradbestellung?",
       "answer": "Darauf solltest du dich bei einem Motorrad nicht verlassen: PayPal nennt Fahrzeuge, ausdrücklich auch Motorräder, als vom Käuferschutz ausgeschlossene Artikel. Ratenzahlung, Kreditkartenregeln und mögliche andere Ansprüche können gesondert geregelt sein. Prüfe die für deine Zahlung geltenden Bedingungen direkt bei PayPal und stoppe Zahlungen nicht eigenmächtig ohne Beratung.",
-      "revision": "2026-10-07",
+      "revision": "2026-10-22",
       "lastReviewed": "2026-10-07",
       "reviewScope": "Redaktionelle Aktualisierung der FAQ; veränderliche Angaben anhand der verlinkten Quellen prüfen.",
       "licenseStatus": "Eigene redaktionelle Antwort; Quellen behalten ihre jeweiligen Rechte.",
@@ -341,7 +397,11 @@
       "history": [
         {
           "date": "2026-10-07",
-          "label": "FAQ für Besitzer und Besteller überarbeitet"
+          "label": "Antworten und amtlichen Verfahrensstand abgeglichen"
+        },
+        {
+          "date": "2026-10-22",
+          "label": "FAQ nach Anliegen gegliedert; Seitentitel, Verantwortlichkeit und Datumsangaben überarbeitet"
         }
       ],
       "sources": [
@@ -356,7 +416,7 @@
       "url": "https://btm.shortaktien.de/faq#fortfuehrung",
       "title": "Kann Black Tea weitergeführt oder von einem Investor übernommen werden?",
       "answer": "Das war im Forenthread eine wiederkehrende Hoffnung, ist aber keine bestätigte Zusage. Ob ein Betrieb fortgeführt, verkauft oder beendet wird, entscheidet sich im Verfahren und hängt von Finanzierung, Vermögenswerten und konkreten Angeboten ab. Bis es eine offizielle Mitteilung gibt, solltest du eine mögliche Übernahme nicht als gesichert einplanen.",
-      "revision": "2026-10-07",
+      "revision": "2026-10-22",
       "lastReviewed": "2026-10-07",
       "reviewScope": "Redaktionelle Aktualisierung der FAQ; veränderliche Angaben anhand der verlinkten Quellen prüfen.",
       "licenseStatus": "Eigene redaktionelle Antwort; Quellen behalten ihre jeweiligen Rechte.",
@@ -364,7 +424,11 @@
       "history": [
         {
           "date": "2026-10-07",
-          "label": "FAQ für Besitzer und Besteller überarbeitet"
+          "label": "Antworten und amtlichen Verfahrensstand abgeglichen"
+        },
+        {
+          "date": "2026-10-22",
+          "label": "FAQ nach Anliegen gegliedert; Seitentitel, Verantwortlichkeit und Datumsangaben überarbeitet"
         }
       ],
       "sources": [
@@ -379,7 +443,7 @@
       "url": "https://btm.shortaktien.de/faq#vorkasse",
       "title": "Sollte ich jetzt noch ein Fahrzeug oder Ersatzteil per Vorkasse bestellen?",
       "answer": "Bei einem Unternehmen im Insolvenzverfahren ist Vorkasse besonders riskant. Prüfe zuerst, ob der Verkauf und der Versand für genau diesen Artikel ausdrücklich freigegeben sind, wer Vertragspartner und Zahlungsempfänger ist und welche Rückzahlung im Ausfall vorgesehen ist. Wenn möglich, ist Zahlung Zug um Zug bei Übergabe sicherer; eine individuelle Rechts- oder Verbraucherberatung kann die konkrete Situation bewerten.",
-      "revision": "2026-10-07",
+      "revision": "2026-10-22",
       "lastReviewed": "2026-10-07",
       "reviewScope": "Redaktionelle Aktualisierung der FAQ; veränderliche Angaben anhand der verlinkten Quellen prüfen.",
       "licenseStatus": "Eigene redaktionelle Antwort; Quellen behalten ihre jeweiligen Rechte.",
@@ -387,7 +451,11 @@
       "history": [
         {
           "date": "2026-10-07",
-          "label": "FAQ für Besitzer und Besteller überarbeitet"
+          "label": "Antworten und amtlichen Verfahrensstand abgeglichen"
+        },
+        {
+          "date": "2026-10-22",
+          "label": "FAQ nach Anliegen gegliedert; Seitentitel, Verantwortlichkeit und Datumsangaben überarbeitet"
         }
       ],
       "sources": [
@@ -402,7 +470,7 @@
       "url": "https://btm.shortaktien.de/faq#wildfire-ausstattung",
       "title": "Was gilt für Wildfire-Bestellungen mit ABS oder fehlenden Akkus?",
       "answer": "Dazu gab es im Forum unterschiedliche individuelle Rückmeldungen. Aus einem Schreiben oder einer Aussage zu einer einzelnen ABS-, CBS- oder Akku-Konfiguration lässt sich keine allgemeine Zusage für alle Besteller ableiten. Entscheidend sind deine Rechnung, die bestellte Ausstattung, der dokumentierte Fertigungsstand und eine schriftliche Auskunft zur konkreten Bestellung.",
-      "revision": "2026-10-07",
+      "revision": "2026-10-22",
       "lastReviewed": "2026-10-07",
       "reviewScope": "Redaktionelle Aktualisierung der FAQ; veränderliche Angaben anhand der verlinkten Quellen prüfen.",
       "licenseStatus": "Eigene redaktionelle Antwort; Quellen behalten ihre jeweiligen Rechte.",
@@ -410,7 +478,11 @@
       "history": [
         {
           "date": "2026-10-07",
-          "label": "FAQ für Besitzer und Besteller überarbeitet"
+          "label": "Antworten und amtlichen Verfahrensstand abgeglichen"
+        },
+        {
+          "date": "2026-10-22",
+          "label": "FAQ nach Anliegen gegliedert; Seitentitel, Verantwortlichkeit und Datumsangaben überarbeitet"
         }
       ],
       "sources": [
@@ -425,7 +497,7 @@
       "url": "https://btm.shortaktien.de/insolvenz",
       "title": "Black Tea Motorbikes insolvent: Hilfe für Besitzer & Besteller",
       "summary": "Das Amtsgericht München eröffnete das Insolvenzverfahren über die Black Tea Motorbikes GmbH wegen Zahlungsunfähigkeit am 05.10.2026 um 12:35 Uhr (1513 IN 2588/26) und bestellte Rechtsanwalt Florian Loserth zum Insolvenzverwalter. Laut amtlichem Beschluss sind Forderungen bis 24.11.2026 beim Insolvenzverwalter anzumelden; schriftliche Widersprüche gegen Forderungsanmeldungen sind bis 05.01.2027 beim Insolvenzgericht möglich. Originaltext abgerufen am 07.10.2026.",
-      "revision": "2026-10-07",
+      "revision": "2026-10-22",
       "lastReviewed": "2026-10-07",
       "reviewScope": "Amtliche Verfahrenseröffnung und veröffentlichte Fristen geprüft; keine Aussage zu Lieferungen, Rückzahlungen oder individuellen Forderungen.",
       "licenseStatus": "Eigene redaktionelle Aufbereitung; verlinkte Quellen behalten ihre jeweiligen Rechte.",
@@ -438,6 +510,10 @@
         {
           "date": "2026-10-07",
           "label": "Amtliche Verfahrenseröffnung und Fristen geprüft"
+        },
+        {
+          "date": "2026-10-22",
+          "label": "Quellen-Prüfhistorie, Verantwortlichkeit und FAQ-Verweise ergänzt; keine erneute amtliche Statusprüfung"
         }
       ],
       "sections": [

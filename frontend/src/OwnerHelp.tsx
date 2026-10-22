@@ -1,5 +1,6 @@
 import { useId, useState } from 'react';
 import ownerHelp from '../../content/owner-help.json';
+import { EditorialNote, formatEditorialDate } from './EditorialNote';
 
 export const ownerHelpPages = ownerHelp.pages;
 export type OwnerHelpPageData = (typeof ownerHelpPages)[number];
@@ -19,7 +20,7 @@ export function OwnerHelpContent({ page }: { page: OwnerHelpPageData }) {
       <div className="eyebrow handwritten">bonfire &amp; wildfire · hilfe für besitzer</div>
       <h1>{page.heading}</h1>
       <p>{page.intro}</p>
-      <p className="wiki-last-updated">Redaktionell bearbeitet: <time dateTime={page.reviewedAt}>{page.reviewedAt.split('-').reverse().join('.')}</time></p>
+      <EditorialNote sourceCheckedAt={page.reviewedAt} updatedAt={'updatedAt' in page ? page.updatedAt : undefined} />
     </section>
     <div className="owner-help-body section-pad">
       <aside className="owner-help-summary card-doodle" aria-label="Das Wichtigste">
@@ -28,6 +29,7 @@ export function OwnerHelpContent({ page }: { page: OwnerHelpPageData }) {
       </aside>
       <nav className="owner-help-toc" aria-label="Auf dieser Seite">
         {page.sections.map((section) => <a key={section.id} href={`#${section.id}`}>{section.title}</a>)}
+        {'sourceChecks' in page && page.sourceChecks && <a href="#quellenpruefung">Quellen und Prüfstand</a>}
         {page.tool && <a href="#steckbrief">Deinen Steckbrief erstellen</a>}
       </nav>
       {page.sections.map((section) => <section className="owner-help-section" id={section.id} key={section.id}>
@@ -43,6 +45,15 @@ export function OwnerHelpContent({ page }: { page: OwnerHelpPageData }) {
         </aside>}
         <ul>{section.links.map((link) => <li key={link.href}><a href={link.href}>{link.label} ↗</a></li>)}</ul>
       </section>)}
+      {'sourceChecks' in page && page.sourceChecks && <section className="owner-help-section" id="quellenpruefung" aria-labelledby="source-checks-title">
+        <h2 id="source-checks-title">Welche Angaben sind belegt?</h2>
+        <p>Der folgende Prüfstand beschreibt die dokumentierten Quellenabrufe. Spätere Bekanntmachungen oder Änderungen werden damit nicht bestätigt.</p>
+        <ul className="source-checks-list">{page.sourceChecks.map((check) => <li key={check.label}>
+          <strong><a href={check.href}>{check.label}</a></strong> · geprüft am <time dateTime={check.checkedAt}>{formatEditorialDate(check.checkedAt)}</time>
+          <p>{check.scope}</p>
+        </li>)}</ul>
+        <a href="/faq#insolvenz-bestellung">Häufige Fragen zu Bestellung und Verfahren ↗</a>
+      </section>}
       {page.tool && <RepairBrief />}
       <p className="owner-help-editorial">Eigene redaktionelle Orientierung von BTM-Hilfe. Quellen und weiterführende Unterlagen stehen beim jeweiligen Abschnitt. Herstellerunterlagen und fremde Beiträge behalten ihren eigenen Rechte- und Versionsstand. Rechtliche Fragen zum Einzelfall gehören in eine unabhängige Beratung.</p>
       <OwnerHelpLinks />

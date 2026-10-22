@@ -43,3 +43,40 @@ Es wurden im Rahmen dieser Untersuchung keine Inhalte gelöscht, keine Seiten au
 - `git diff --check`: erfolgreich.
 - `node --experimental-strip-types frontend/scripts/check-owner-help.mjs`: erfolgreich; 138 HTML-Routen, drei Leitfäden, 17 FAQ-Direktlinks und vier Suchintentionen.
 - Produktions-Routing-Test nicht ausführbar: kein laufender Docker-Daemon am konfigurierten OrbStack-Socket. Die neuen HTTP-Assertions sind daher noch nicht zur Laufzeit bestätigt.
+## Nachprüfung und Überarbeitung am 22.10.2026
+
+- GSC-Leistung, Websuche, verfügbarer Export 02.09.–20.10.2026: 97 Klicks,
+  691 Impressionen, 14 % CTR, durchschnittliche Position 5,6. Ab 26.09. sind
+  bis einschließlich 20.10. an allen 25 Tagen null Klicks und Impressionen gemeldet.
+- Der exportierte Indexverlauf zeigt ab 22.09. nur noch 1 statt vorher
+  10 indexierter URLs. Stand 16.10.: 146 gefunden, zurzeit nicht indexiert;
+  13 gecrawlt, zurzeit nicht indexiert. Als indexiert wird nur
+  `/ersatzteile/display` aufgeführt. Die Berichtsdaten beweisen nicht den
+  genauen Zeitpunkt oder die Ursache des Indexverlusts.
+- `/insolvenz`: letzter regulärer Crawl 07.10., Abruf erfolgreich,
+  Indexierung erlaubt, selbstreferenzierende Canonical-URL; weiterhin
+  „Gecrawlt – zurzeit nicht indexiert“. Der Live-Test am 22.10. bestätigt
+  Abrufbarkeit, Indexierbarkeit und sichtbaren Inhalt im Smartphone-Rendering.
+- Sitemap am 22.10. erfolgreich gelesen, 160 URLs. Crawlbericht bis 21.10.:
+  149 Anfragen, 463 ms durchschnittliche Reaktionszeit, keine Hostprobleme
+  in den letzten 90 Tagen. Keine manuellen Maßnahmen oder Sicherheitsprobleme.
+- Googles September-Spam-Update begann am 24.09., nach dem im Indexbericht
+  verzeichneten Rückgang. Eine Verursachung ist damit nicht belegt.
+
+Die Überarbeitung ergänzt Herausgeber und Quellenmethodik, eine sichtbare
+Prüfhistorie auf `/insolvenz`, drei FAQ-Themenbereiche mit unveränderten
+Antwort-Direktlinks sowie konkrete Archivangaben und offene Recherchefragen
+für Ersatzteile. Strukturänderungen und Quellenprüfungen haben getrennte
+Datumsangaben. Der amtliche Quellenstand bleibt am 07.10.; am 22.10. wurde
+kein neuer amtlicher Verfahrensstand bestätigt. Bestehende Archiv-URLs und
+ihre Indexierbarkeit bleiben erhalten.
+
+Nach Auslieferung zuerst die Indexierung von `/insolvenz`, `/faq` und `/`
+beobachten und danach gleich lange Zeiträume im Leistungsbericht vergleichen.
+Wiederholte Indexierungsanträge sind für „Gecrawlt – zurzeit nicht indexiert“
+laut Google nicht erforderlich. Eine Wiederaufnahme oder Erholung ist nicht
+garantiert.
+
+Quellen: [Google-Indexbericht – Erläuterungen](https://support.google.com/webmasters/answer/7440203),
+[hilfreiche und verlässliche Inhalte](https://developers.google.com/search/docs/fundamentals/creating-helpful-content),
+[September 2026 Spam Update](https://status.search.google.com/incidents/XhUDXP7A67iHCD2kmbVu).

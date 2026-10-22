@@ -6,6 +6,7 @@ const frontendRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const distRoot = join(frontendRoot, 'dist');
 const wikiRoot = join(frontendRoot, '..', 'content', 'wiki');
 const appSource = readFileSync(join(frontendRoot, 'src', 'App.tsx'), 'utf8');
+const faqContent = JSON.parse(readFileSync(join(frontendRoot, '..', 'content', 'faq.json'), 'utf8'));
 const ownerHelpPages = JSON.parse(readFileSync(join(frontendRoot, '..', 'content', 'owner-help.json'), 'utf8')).pages;
 const siteConfig = JSON.parse(readFileSync(join(frontendRoot, 'src', 'site-config.json'), 'utf8'));
 const partsCatalog = JSON.parse(readFileSync(join(frontendRoot, '..', 'research', 'parts.json'), 'utf8'));
@@ -82,7 +83,7 @@ const staticPages = [
   { path: '/hilfe/anfragen', title: 'Reparatur anfragen — Black Tea Motorbikes – Hilfe', description: 'Reparaturanfragen zu Black Tea Bonfire und Wildfire stellen, Erfahrungen teilen und gemeinsam nachvollziehbare Lösungen dokumentieren.' },
   { path: '/ersatzteile', title: 'Ersatzteile — Black Tea Motorbikes – Hilfe', description: 'Historischer BTM-Ersatzteilkatalog mit Modellbezug, Teilenamen und Quellen. Bestand und Preise vor dem Kauf prüfen.' },
   { path: '/community', title: 'BTM Community — Black Tea Motorbikes – Hilfe', description: 'Erfahrungen, Umbauten und Reparaturtipps von BTM-Ridern teilen und die neuesten Beiträge der Community entdecken.' },
-  { path: '/faq', title: 'FAQ — Black Tea Motorbikes – Hilfe', description: 'Eigenständig beantwortete Fragen zu Black Tea Bonfire und Wildfire: Varianten, Reichweite, Display, Akku, Bremsen und Wartung.' },
+  { path: '/faq', title: faqContent.pageTitle, description: faqContent.description },
   { path: '/karte', title: 'Community-Karte — Black Tea Motorbikes – Hilfe', description: 'Ungefähre PLZ-Regionen der BTM-Community in Deutschland, Österreich und der Schweiz.' },
   { path: '/werkstaetten', title: 'Werkstätten für BTM-Bikes — Black Tea Motorbikes – Hilfe', description: 'Werkstätten in Deutschland, Österreich und der Schweiz finden oder einen geprüften Tipp aus der Community eintragen.' },
   { path: '/quellen', title: 'Quellen — Black Tea Motorbikes – Hilfe', description: 'Nachvollziehbare Quellen zu Insolvenzstatus, Handbüchern, lokalen PDFs, Ersatzteilspuren und Community-Wissen.' },

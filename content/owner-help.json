@@ -6,10 +6,20 @@
       "heading": "Black Tea Insolvenz: Was kannst du jetzt tun?",
       "description": "Hilfe zur Black Tea Motorbikes Insolvenz: Verfahrensstand prüfen, Bestellunterlagen sichern, Ersatzteile suchen und Reparaturen vorbereiten.",
       "reviewedAt": "2026-10-07",
+      "updatedAt": "2026-10-22",
       "reviewScope": "Amtliche Verfahrenseröffnung und veröffentlichte Fristen geprüft; keine Aussage zu Lieferungen, Rückzahlungen oder individuellen Forderungen.",
       "history": [
         {"date": "2026-09-04", "label": "Leitfaden für Besitzer und Besteller erstellt"},
-        {"date": "2026-10-07", "label": "Amtliche Verfahrenseröffnung und Fristen geprüft"}
+        {"date": "2026-10-07", "label": "Amtliche Verfahrenseröffnung und Fristen geprüft"},
+        {"date": "2026-10-22", "label": "Quellen-Prüfhistorie, Verantwortlichkeit und FAQ-Verweise ergänzt; keine erneute amtliche Statusprüfung"}
+      ],
+      "sourceChecks": [
+        {
+          "label": "Eröffnungsbeschluss des Amtsgerichts München vom 05.10.2026",
+          "href": "#originalbeschluss",
+          "checkedAt": "2026-10-07",
+          "scope": "Der lokal dokumentierte Auszug belegt die Eröffnung, den bestellten Insolvenzverwalter sowie die im Beschluss genannten Anmelde- und Widerspruchsfristen. Er belegt weder Lieferzusagen noch Rückzahlungen oder spätere Änderungen am Verfahren."
+        }
       ],
       "intro": "Du wartest auf dein Motorrad, brauchst ein Ersatzteil oder suchst Hilfe für eine Reparatur? Hier findest du die nächsten Schritte für Bonfire und Wildfire. BTM-Hilfe ist eine unabhängige Community und kein Ansprechpartner der Black Tea Motorbikes GmbH.",
       "summary": "Das Amtsgericht München eröffnete das Insolvenzverfahren über die Black Tea Motorbikes GmbH wegen Zahlungsunfähigkeit am 05.10.2026 um 12:35 Uhr (1513 IN 2588/26) und bestellte Rechtsanwalt Florian Loserth zum Insolvenzverwalter. Laut amtlichem Beschluss sind Forderungen bis 24.11.2026 beim Insolvenzverwalter anzumelden; schriftliche Widersprüche gegen Forderungsanmeldungen sind bis 05.01.2027 beim Insolvenzgericht möglich. Originaltext abgerufen am 07.10.2026.",

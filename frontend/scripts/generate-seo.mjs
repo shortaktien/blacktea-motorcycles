@@ -105,7 +105,7 @@ const staticPages = [
   { path: '/hilfe/anfragen', title: 'Reparatur anfragen — Black Tea Motorbikes – Hilfe', description: 'Reparaturanfragen zu Black Tea Bonfire und Wildfire stellen, Erfahrungen teilen und gemeinsam nachvollziehbare Lösungen dokumentieren.' },
   { path: '/ersatzteile', title: 'Ersatzteile — Black Tea Motorbikes – Hilfe', description: 'Historischer BTM-Ersatzteilkatalog mit Modellbezug, Teilenamen und Quellen. Bestand und Preise vor dem Kauf prüfen.' },
   { path: '/community', title: 'BTM Community — Black Tea Motorbikes – Hilfe', description: 'Erfahrungen, Umbauten und Reparaturtipps von BTM-Ridern teilen und die neuesten Beiträge der Community entdecken.' },
-  { path: '/faq', title: 'FAQ — Black Tea Motorbikes – Hilfe', description: 'Eigenständig beantwortete Fragen zu Black Tea Bonfire und Wildfire: Varianten, Reichweite, Display, Akku, Bremsen und Wartung.' },
+  { path: '/faq', title: faqContent.pageTitle, description: faqContent.description },
   { path: '/karte', title: 'Community-Karte — Black Tea Motorbikes – Hilfe', description: 'Ungefähre PLZ-Regionen der BTM-Community in Deutschland, Österreich und der Schweiz.' },
   { path: '/werkstaetten', title: 'Werkstätten für BTM-Bikes — Black Tea Motorbikes – Hilfe', description: 'Werkstätten in Deutschland, Österreich und der Schweiz finden oder einen geprüften Tipp aus der Community eintragen.' },
   { path: '/quellen', title: 'Quellen — Black Tea Motorbikes – Hilfe', description: 'Nachvollziehbare Quellen zu Insolvenzstatus, Handbüchern, lokalen PDFs, Ersatzteilspuren und Community-Wissen.' },
@@ -134,7 +134,7 @@ const ownPaths = [...new Set([
 const absoluteUrl = (path) => `${siteOrigin}${path === '/' ? '/' : path}`;
 const escapeXml = (value) => value.replace(/[<>&'\"]/g, (character) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', "'": '&apos;', '"': '&quot;' }[character]));
 const lastmodFor = (path) => {
-  const value = lastmodByPath[path] ?? explicitLastmod ?? ownerHelpPages.find((page) => page.path === path)?.reviewedAt;
+  const value = lastmodByPath[path] ?? explicitLastmod ?? (path === '/faq' ? faqContent.updatedAt : undefined) ?? ownerHelpPages.find((page) => page.path === path)?.updatedAt ?? ownerHelpPages.find((page) => page.path === path)?.reviewedAt;
   return typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value) ? `<lastmod>${value}</lastmod>` : '';
 };
 
@@ -160,16 +160,16 @@ const openKnowledgeManifest = {
   entries: [
     ...faqContent.items.map((item) => ({
       kind: 'faq', url: absoluteUrl(`/faq#${item.id}`), title: item.question, answer: item.answer,
-      revision: faqContent.lastUpdated, lastReviewed: faqContent.lastUpdated,
+      revision: faqContent.updatedAt, lastReviewed: faqContent.lastUpdated,
       reviewScope: 'Redaktionelle Aktualisierung der FAQ; veränderliche Angaben anhand der verlinkten Quellen prüfen.',
       licenseStatus: 'Eigene redaktionelle Antwort; Quellen behalten ihre jeweiligen Rechte.',
       sourceChain: 'Verlinkte Quelle oder weiterführender Artikel → redaktionelle Antwort',
-      history: [{ date: faqContent.lastUpdated, label: 'FAQ für Besitzer und Besteller überarbeitet' }],
+      history: faqContent.history,
       sources: [{ url: item.sourceHref ?? (item.linkHref.startsWith('/') ? absoluteUrl(item.linkHref) : item.linkHref), label: item.sourceLabel ?? item.linkLabel }],
     })),
     ...ownerHelpPages.map((page) => ({
       kind: 'owner-guide', url: absoluteUrl(page.path), title: page.title,
-      summary: page.summary, revision: page.reviewedAt, lastReviewed: page.reviewedAt,
+      summary: page.summary, revision: page.updatedAt ?? page.reviewedAt, lastReviewed: page.reviewedAt,
       reviewScope: page.reviewScope ?? 'Redaktionelle Quellenorientierung; keine individuelle Rechts-, Liefer- oder Rückzahlungsauskunft.',
       licenseStatus: 'Eigene redaktionelle Aufbereitung; verlinkte Quellen behalten ihre jeweiligen Rechte.',
       sourceChain: 'Verlinkte Quellen und vorhandenes BTM-Wissen → redaktionelle Orientierung',

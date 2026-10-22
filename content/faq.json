@@ -8,56 +8,64 @@
       "linkHref": "/insolvenz#verfahrensstand",
       "sourceLabel": "Amtliche Bekanntmachungen durchsuchen",
       "sourceHref": "https://neu.insolvenzbekanntmachungen.de/ap/suche.jsf",
-      "id": "insolvenzstatus"
+      "id": "insolvenzstatus",
+      "group": "insolvenz-bestellung"
     },
     {
       "id": "ersatzteile-finden",
       "question": "Wo bekomme ich Ersatzteile für Black Tea Bonfire und Wildfire?",
       "answer": "Beginne im historischen Ersatzteilkatalog mit Modell, Baujahr und Bauteilbezeichnung. Die Detailseiten zeigen vorhandene Archivquellen, Varianten und den jeweiligen Bezugsstatus. Historische Preise und Lagerangaben sind nicht aktuell. Kläre Passform und Lieferbarkeit für dein konkretes Fahrzeug mit Anbieter oder Fachbetrieb. Auf der Teileseite kannst du eine Anfrage mit dem dokumentierten Teilenamen erstellen.",
       "linkLabel": "Ersatzteile richtig zuordnen",
-      "linkHref": "/hilfe/ersatzteil-finden"
+      "linkHref": "/hilfe/ersatzteil-finden",
+      "group": "ersatzteile-reparatur"
     },
     {
       "id": "werkstatt-finden",
       "question": "Wie finde ich eine Werkstatt für meine Bonfire oder Wildfire?",
       "answer": "Sieh dir die Werkstatt-Tipps der Community an und frage vorab nach Erfahrung mit deiner Modellvariante und dem betroffenen Bauteil. Bereite Baujahr, Fehlercode, Symptome und passende Unterlagen vor. Mit unserem Reparatur-Steckbrief kannst du diese Angaben ohne Konto zusammenstellen und selbst an einen Fachbetrieb weitergeben.",
       "linkLabel": "Steckbrief für die Werkstatt erstellen",
-      "linkHref": "/hilfe/werkstatt-vorbereiten"
+      "linkHref": "/hilfe/werkstatt-vorbereiten",
+      "group": "ersatzteile-reparatur"
     },
     {
       "id": "handbuch-schaltplan",
       "question": "Wo finde ich Black Tea Handbücher und Schaltpläne?",
       "answer": "Der PDF-Index bündelt gesicherte Dokumente. Im Bonfire- und Wildfire-Wiki findest du dazu technische Einordnungen und Quellen. Prüfe Modellvariante und Dokumentstand vor der Verwendung; nicht jede Anleitung gilt für jedes Baujahr. Sichere passende Unterlagen für dein Motorrad zusätzlich lokal.",
       "linkLabel": "Handbücher und Schaltpläne öffnen",
-      "linkHref": "/pdfs/index.html"
+      "linkHref": "/pdfs/index.html",
+      "group": "ersatzteile-reparatur"
     },
     {
       "id": "akku-nicht-erkannt",
       "question": "Mein Black Tea Akku wird nicht erkannt – wo beginne ich?",
       "answer": "Notiere Modell, Akkuversion und die genaue Anzeige oder Fehlermeldung. Unsere Akku-Hilfe ordnet die nächsten Prüfschritte und ihre Grenzen ein. Bei ungewöhnlicher Wärme, Geruch, sichtbaren Schäden oder Feuchtigkeit am Akku keine weiteren Lade- oder Fahrversuche unternehmen. Akku und BMS nicht öffnen oder überbrücken; die weitere Prüfung gehört in qualifizierte Hände.",
       "linkLabel": "Hilfe: Akku wird nicht erkannt",
-      "linkHref": "/hilfe/akku-bms"
+      "linkHref": "/hilfe/akku-bms",
+      "group": "ersatzteile-reparatur"
     },
     {
       "question": "Wo finde ich Erfahrungen mit Black Tea Bonfire und Wildfire?",
       "answer": "Erfahrungen sind Einzelberichte und ergeben deshalb kein einheitliches Qualitätsurteil. Für eine faire Einordnung sollten Baujahr, konkrete Variante, Akku, Nutzung und der jeweilige Servicefall zusammen betrachtet werden. Öffentliche Erfahrungsberichte und belegte technische Angaben sind nicht dasselbe.",
       "linkLabel": "Community-Wissen einordnen",
       "linkHref": "/community",
-      "id": "erfahrungen"
+      "id": "erfahrungen",
+      "group": "modelle-erfahrungen"
     },
     {
       "question": "Welche Reichweite haben Blacktea Motorbikes?",
       "answer": "Eine feste Reichweite gibt es nicht. Modell, Fahrmodus, Geschwindigkeit, Temperatur, Strecke, Reifendruck, Beladung und Akkuzustand verändern den Verbrauch deutlich. Die Angaben im Wiki sind deshalb Orientierungswerte; für dein Fahrzeug ist ein eigener Praxistest unter ähnlichen Bedingungen aussagekräftiger.",
       "linkLabel": "Technische Eckdaten öffnen",
       "linkHref": "/bikes/bonfire#technische-eckdaten",
-      "id": "reichweite"
+      "id": "reichweite",
+      "group": "modelle-erfahrungen"
     },
     {
       "question": "Wie kann ich Erfahrungen mit der Bonfire X sinnvoll vergleichen?",
       "answer": "Berichte zur Bonfire X sind individuelle Nutzungserfahrungen und keine allgemeine Freigabe für jedes Motorrad. Für die Einordnung zählen unter anderem Baujahr, Akkuanzahl, Softwarestand, Fahrprofil und Wartung. Deshalb trennen wir Erfahrungsberichte bewusst von belegten technischen Werten.",
       "linkLabel": "Erfahrungsberichte ansehen",
       "linkHref": "/community",
-      "id": "bonfire-x-erfahrungen"
+      "id": "bonfire-x-erfahrungen",
+      "group": "modelle-erfahrungen"
     },
     {
       "question": "Was passiert mit einer bereits bezahlten, aber noch nicht gelieferten Bestellung?",
@@ -66,7 +74,8 @@
       "linkHref": "/insolvenz#bestellung",
       "sourceLabel": "Verbraucherzentrale: Firmeninsolvenz",
       "sourceHref": "https://www.verbraucherzentrale.de/wissen/vertraege-reklamation/kundenrechte/wenn-eine-firma-insolvent-wird-das-sind-ihre-rechte-10630",
-      "id": "bestellung-bezahlt"
+      "id": "bestellung-bezahlt",
+      "group": "insolvenz-bestellung"
     },
     {
       "question": "Muss ich eine Forderung zur Insolvenztabelle anmelden?",
@@ -75,7 +84,8 @@
       "linkHref": "/insolvenz#verfahrensstand",
       "sourceLabel": "Amtliche Bekanntmachungen durchsuchen",
       "sourceHref": "https://neu.insolvenzbekanntmachungen.de/ap/suche.jsf",
-      "id": "forderung-anmelden"
+      "id": "forderung-anmelden",
+      "group": "insolvenz-bestellung"
     },
     {
       "id": "amtlichen-beschluss-finden",
@@ -84,21 +94,24 @@
       "linkLabel": "Originaltext direkt lesen",
       "linkHref": "/insolvenz#originalbeschluss",
       "sourceLabel": "Justizportal: Insolvenzbekanntmachungen",
-      "sourceHref": "https://neu.insolvenzbekanntmachungen.de/ap/"
+      "sourceHref": "https://neu.insolvenzbekanntmachungen.de/ap/",
+      "group": "insolvenz-bestellung"
     },
     {
       "question": "Was ist das 60-%-Angebot zur Fertigstellung einer Wildfire?",
       "answer": "Im Forenthread berichten einzelne Vorbesteller von einem individuellen Angebot mit einer zusätzlichen Zahlung von 60 Prozent des ursprünglichen Kaufpreises. Das ist kein allgemein bestätigter Anspruch und keine Empfehlung. Wer ein solches Schreiben erhält, sollte die Bedingungen schriftlich prüfen: konkrete Ausstattung, fehlende Teile, Zahlungsweg, Rückerstattung, Frist und Gewährleistung. Bei dieser Summe ist unabhängige rechtliche Beratung sinnvoll.",
       "linkLabel": "Diskussion im Forenthread lesen",
       "linkHref": "https://www.elektroroller-forum.de/viewtopic.php?t=48274",
-      "id": "wildfire-nachzahlung"
+      "id": "wildfire-nachzahlung",
+      "group": "insolvenz-bestellung"
     },
     {
       "question": "Wer ist jetzt mein Ansprechpartner?",
       "answer": "Für verbindliche Fragen zum Insolvenzverfahren, zu einer konkreten Bestellung oder zu einer geforderten Zahlung ist die im Verfahrensstand genannte zuständige Stelle maßgeblich. Forumseinträge, WhatsApp-Nachrichten und Aussagen anderer Fahrer ersetzen keine schriftliche Auskunft des Insolvenzverwalters oder eine rechtliche Beratung. Sichere alle Unterlagen und stelle Fragen mit Bestellnummer und Belegen.",
       "linkLabel": "Verfahrensstand und Zuständigkeit prüfen",
       "linkHref": "/insolvenz#verfahrensstand",
-      "id": "ansprechpartner"
+      "id": "ansprechpartner",
+      "group": "insolvenz-bestellung"
     },
     {
       "question": "Gibt es weiterhin Garantie, Reparaturen und Ersatzteile?",
@@ -107,14 +120,16 @@
       "linkHref": "/ersatzteile",
       "sourceLabel": "Verbraucherzentrale: Gewährleistung",
       "sourceHref": "https://www.verbraucherzentrale.de/wissen/vertraege-reklamation/kundenrechte/alles-zu-gewaehrleistung-und-schadenersatz-5057",
-      "id": "garantie-reparatur"
+      "id": "garantie-reparatur",
+      "group": "ersatzteile-reparatur"
     },
     {
       "question": "Greift der PayPal-Käuferschutz bei einer Motorradbestellung?",
       "answer": "Darauf solltest du dich bei einem Motorrad nicht verlassen: PayPal nennt Fahrzeuge, ausdrücklich auch Motorräder, als vom Käuferschutz ausgeschlossene Artikel. Ratenzahlung, Kreditkartenregeln und mögliche andere Ansprüche können gesondert geregelt sein. Prüfe die für deine Zahlung geltenden Bedingungen direkt bei PayPal und stoppe Zahlungen nicht eigenmächtig ohne Beratung.",
       "linkLabel": "PayPal-Bedingungen prüfen",
       "linkHref": "https://www.paypal.com/de/legalhub/paypal/buyer-protection?locale.x=de",
-      "id": "paypal"
+      "id": "paypal",
+      "group": "insolvenz-bestellung"
     },
     {
       "question": "Kann Black Tea weitergeführt oder von einem Investor übernommen werden?",
@@ -123,21 +138,24 @@
       "linkHref": "/insolvenz#verfahrensstand",
       "sourceLabel": "Forendiskussion zur Einordnung",
       "sourceHref": "https://www.elektroroller-forum.de/viewtopic.php?t=48274",
-      "id": "fortfuehrung"
+      "id": "fortfuehrung",
+      "group": "insolvenz-bestellung"
     },
     {
       "question": "Sollte ich jetzt noch ein Fahrzeug oder Ersatzteil per Vorkasse bestellen?",
       "answer": "Bei einem Unternehmen im Insolvenzverfahren ist Vorkasse besonders riskant. Prüfe zuerst, ob der Verkauf und der Versand für genau diesen Artikel ausdrücklich freigegeben sind, wer Vertragspartner und Zahlungsempfänger ist und welche Rückzahlung im Ausfall vorgesehen ist. Wenn möglich, ist Zahlung Zug um Zug bei Übergabe sicherer; eine individuelle Rechts- oder Verbraucherberatung kann die konkrete Situation bewerten.",
       "linkLabel": "Rechte bei Firmeninsolvenz",
       "linkHref": "https://www.verbraucherzentrale.de/wissen/vertraege-reklamation/kundenrechte/wenn-eine-firma-insolvent-wird-das-sind-ihre-rechte-10630",
-      "id": "vorkasse"
+      "id": "vorkasse",
+      "group": "insolvenz-bestellung"
     },
     {
       "question": "Was gilt für Wildfire-Bestellungen mit ABS oder fehlenden Akkus?",
       "answer": "Dazu gab es im Forum unterschiedliche individuelle Rückmeldungen. Aus einem Schreiben oder einer Aussage zu einer einzelnen ABS-, CBS- oder Akku-Konfiguration lässt sich keine allgemeine Zusage für alle Besteller ableiten. Entscheidend sind deine Rechnung, die bestellte Ausstattung, der dokumentierte Fertigungsstand und eine schriftliche Auskunft zur konkreten Bestellung.",
       "linkLabel": "Forenbeiträge zur ABS-Frage lesen",
       "linkHref": "https://www.elektroroller-forum.de/viewtopic.php?t=48274",
-      "id": "wildfire-ausstattung"
+      "id": "wildfire-ausstattung",
+      "group": "insolvenz-bestellung"
     }
   ],
   "references": [
@@ -165,6 +183,36 @@
       "title": "PayPal-Käuferschutz",
       "detail": "PayPal Deutschland · Ausschlüsse, darunter Fahrzeuge und Motorräder",
       "href": "https://www.paypal.com/de/legalhub/paypal/buyer-protection?locale.x=de"
+    }
+  ],
+  "pageTitle": "Black Tea FAQ: Insolvenz, Bestellungen & Ersatzteile",
+  "description": "Antworten zur Black Tea Motorbikes Insolvenz, offenen Bestellungen, Forderungen, Ersatzteilen und Reparaturen für Bonfire und Wildfire – mit Quellen und weiterführender Hilfe.",
+  "updatedAt": "2026-10-22",
+  "groups": [
+    {
+      "id": "insolvenz-bestellung",
+      "title": "Insolvenz und offene Bestellungen",
+      "intro": "Verfahrensstand, Zuständigkeit und offene Bestellungen einordnen. Der dokumentierte amtliche Quellenabgleich stammt vom 07.10.2026; spätere Bekanntmachungen bleiben maßgeblich."
+    },
+    {
+      "id": "ersatzteile-reparatur",
+      "title": "Ersatzteile, Reparatur und Unterlagen",
+      "intro": "Ein Teil zuordnen, Unterlagen sichern oder einen Werkstattkontakt vorbereiten. Historische Shopdaten bestätigen keine aktuelle Lieferbarkeit."
+    },
+    {
+      "id": "modelle-erfahrungen",
+      "title": "Modelle, Reichweite und Erfahrungen",
+      "intro": "Technische Angaben und einzelne Erfahrungen unterscheiden. Für Vergleiche zählen Modellvariante, Baujahr und Nutzungsbedingungen."
+    }
+  ],
+  "history": [
+    {
+      "date": "2026-10-07",
+      "label": "Antworten und amtlichen Verfahrensstand abgeglichen"
+    },
+    {
+      "date": "2026-10-22",
+      "label": "FAQ nach Anliegen gegliedert; Seitentitel, Verantwortlichkeit und Datumsangaben überarbeitet"
     }
   ]
 }
