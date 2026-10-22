@@ -1,6 +1,10 @@
 import { createContext, useCallback, useContext, useEffect, useId, useMemo, useRef, useState, type ChangeEvent, type FormEvent, type MouseEvent, type ReactNode, type TextareaHTMLAttributes } from 'react';
 import { formatUserHandle, getMentionQuery, insertMention, splitUserText, type MentionQuery, type UserMention } from './mentions';
 import faqContent from '../../content/faq.json';
+import { FaqContent } from './FaqContent';
+import { EditorialNote, editorialPublisher } from './EditorialNote';
+import { summarizePartArchive } from './part-archive';
+import { PartResearchNotes } from './PartResearchNotes';
 import { ownerHelpPages, OwnerHelpContent, OwnerHelpLinks, RepairBrief } from './OwnerHelp';
 import partsCatalog from '../../research/parts.json';
 import partResearchMap from '../../content/part-research-map.json';
@@ -47,7 +51,6 @@ declare global {
 }
 
 const faqItems: FaqItem[] = faqContent.items;
-const faqLastUpdated = faqContent.lastUpdated;
 
 type Resource = {
   kind: CardKind;
@@ -606,6 +609,7 @@ const humanizePartSlug = (slug: string) => {
 };
 
 const inferPartCategory = (slug: string): PartCategory => {
+  if (slug === 'blinkerhalterung-vorne') return 'Karosserie & Halter';
   const match = historicalPartCategories.find(([, keywords]) => keywords.some((keyword) => slug.includes(keyword)));
   return match?.[0] ?? 'Zubehör';
 };
@@ -845,7 +849,7 @@ const historicalShopParts: HistoricalShopPart[] = partsCatalog.historical_produc
     variantDetails: archivedVariantDetails?.length ? archivedVariantDetails : undefined,
     archiveHref: localPartArchiveHref,
     sources,
-    historicalSummary: partSummaryOverrides[slug] ?? research?.specification_lead ?? `Historischer Ersatzteil-Eintrag für ${model}. Die archivierten Varianten und der alte Preis dienen nur als Orientierung; konkrete Maße, Befestigung, Stecker und Modellstand müssen vor dem Kauf geprüft werden.`,
+    historicalSummary: partSummaryOverrides[slug] ?? research?.specification_lead ?? summarizePartArchive({ title, model, variants: archivedVariants?.length ? archivedVariants : research?.variants ?? details?.variants, timestamp: archived?.timestamp }),
     compatibilityNote: research?.compatibility_note ?? 'Die archivierten Angaben ersetzen keine Passformprüfung. Vor einer Bestellung Modellvariante, Maße, Befestigung, Stecker und Zulassung am Fahrzeug abgleichen.',
     confidence: research?.confidence ?? 'historischer Produktname; aktuelle Verfügbarkeit ungeprüft',
     safetyClass: research?.safety_class ?? partSafetyByCategory[category],
@@ -2485,8 +2489,9 @@ function getSeoMetadata(path: string, guide?: RepairGuide, part?: HistoricalShop
     jsonLd: { '@context': 'https://schema.org', '@graph': [websiteSchema, {
       '@type': 'Article', '@id': `${siteOrigin}${path}#article`, headline: ownerPage.heading,
       description: ownerPage.description, url: `${siteOrigin}${path}`, inLanguage: 'de-DE',
-      dateModified: ownerPage.reviewedAt, isPartOf: { '@id': `${siteOrigin}/#website` },
+      dateModified: 'updatedAt' in ownerPage ? ownerPage.updatedAt : ownerPage.reviewedAt, isPartOf: { '@id': `${siteOrigin}/#website` },
       author: { '@type': 'Organization', name: 'BTM-Hilfe Redaktion', url: `${siteOrigin}/impressum` },
+      publisher: { '@type': 'Person', name: editorialPublisher.publisherName, url: `${siteOrigin}${editorialPublisher.publisherPath}` },
       citation: [...new Set(ownerPage.sections.flatMap((section) => section.links.map((link) => link.href)))].map((href) => href.startsWith('/') ? `${siteOrigin}${href}` : href),
     }, breadcrumbSchema([{ name: 'Startseite', url: `${siteOrigin}/` }, { name: ownerPage.heading, url: `${siteOrigin}${path}` }])] },
   };
@@ -2647,8 +2652,8 @@ function getSeoMetadata(path: string, guide?: RepairGuide, part?: HistoricalShop
   }
 
   if (path === '/faq') {
-    const title = 'FAQ — Black Tea Motorbikes – Hilfe';
-    const description = 'Eigenständig beantwortete Fragen zu Black Tea Bonfire und Wildfire sowie zum laufenden Insolvenzverfahren: Bestellungen, Forderungen, Ersatzteile und Verfahrensstatus.';
+    const title = faqContent.pageTitle;
+    const description = faqContent.description;
     return {
       title,
       description,
@@ -2665,7 +2670,7 @@ function getSeoMetadata(path: string, guide?: RepairGuide, part?: HistoricalShop
             description,
             url: `${siteOrigin}/faq`,
             inLanguage: 'de-DE',
-            dateModified: faqLastUpdated,
+            dateModified: faqContent.updatedAt,
             mainEntity: faqItems.map((item) => ({
               '@type': 'Question',
               name: item.question,
@@ -3753,6 +3758,16 @@ function SourcesPage() {
         </section>
 
         <section className="sources-section section-pad">
+          <section id="redaktion" className="editorial-method" aria-labelledby="editorial-method-title">
+            <h2 id="editorial-method-title">Wer hinter BTM-Hilfe steht und wie wir arbeiten</h2>
+            <p>Herausgeber dieses unabhängigen privaten Projekts ist <a href={editorialPublisher.publisherPath}>{editorialPublisher.publisherName}</a>. BTM-Hilfe bewahrt Unterlagen und bündelt Hinweise für Besitzer von Bonfire und Wildfire. Es besteht keine Verbindung zum Hersteller.</p>
+            <h3>Quellen haben unterschiedliche Aussagekraft</h3>
+            <ul>{editorialPublisher.process.map((step) => <li key={step}>{step}</li>)}</ul>
+            <h3>Was unsere Datumsangaben bedeuten</h3>
+            <p>„Quellenabgleich“ nennt den dokumentierten Abruf- oder Prüfstand. „Aufbereitung überarbeitet“ bezeichnet Änderungen an Text oder Gliederung. Ein neues Seitendatum bestätigt weder einen neuen Verfahrensstand noch erneut geprüfte Bezugsquellen.</p>
+            <h3>So kannst du Wissen ergänzen</h3>
+            <p>Nutze „Hinweis oder Ergänzung?“ auf einer passenden Teileseite für Modell, Baujahr, Bauteilbezeichnung und eine nachvollziehbare Quelle. Fotos der Ausführung oder dokumentierte Werkstattergebnisse helfen beim Abgleich. Persönliche Bestell-, Zahlungs- und Fahrzeugidentifikationsdaten gehören nicht in einen öffentlichen Beitrag.</p>
+          </section>
           <div id="ersatzteil-archiv" className="sources-card card-doodle">
             <div className="section-heading compact">
               <div>
@@ -4096,76 +4111,11 @@ function WorkshopsPage() {
 }
 
 function FaqPage() {
-  const [query, setQuery] = useState('');
-
-  useEffect(() => {
-    document.title = 'FAQ — Black Tea Motorbikes – Hilfe';
-    window.scrollTo(0, 0);
-  }, []);
-
-  useEffect(() => {
-    const revealAnswer = () => {
-      const answer = document.getElementById(window.location.hash.slice(1));
-      if (answer instanceof HTMLDetailsElement) { answer.open = true; answer.scrollIntoView({ block: 'start' }); }
-    };
-    revealAnswer();
-    window.addEventListener('hashchange', revealAnswer);
-    return () => window.removeEventListener('hashchange', revealAnswer);
-  }, []);
-
-  const filteredFaqItems = useMemo(() => {
-    const normalizedQuery = query.trim().toLocaleLowerCase('de');
-    if (!normalizedQuery) return faqItems;
-    return faqItems.filter((item) => [item.question, item.answer, item.sourceLabel ?? ''].some((value) => value.toLocaleLowerCase('de').includes(normalizedQuery)));
-  }, [query]);
-
-  return (
-    <div className="site-shell">
-      <GuideHeader />
-      <main className="repair-page-main faq-page-main">
-        <section className="repair-page-hero faq-page-hero section-pad">
-          <a className="repair-back" href="/">← Zur Sammelmappe</a>
-          <div className="eyebrow handwritten">antworten für besitzer und besteller</div>
-          <h1>Black Tea: Fragen zu Insolvenz, Ersatzteilen und deinem Bike.</h1>
-          <p>Die häufigsten Fragen rund um Black Tea Bonfire und Wildfire sowie zum laufenden Insolvenzverfahren — kurz beantwortet und mit den passenden Quellen verknüpft.</p>
-          <div className="wiki-last-updated"><time dateTime={faqLastUpdated}>Redaktionell aktualisiert: {formatWikiDate(faqLastUpdated)}</time></div>
-        </section>
-
-        <section className="faq-section section-pad">
-          <div className="faq-intro card-doodle">
-            <div className="eyebrow handwritten">wichtiges kurz erklärt</div>
-            <h2>Die wichtigsten Fragen.</h2>
-            <p>Hier findest du verständliche Antworten auf die wichtigsten Fragen zu Black Tea Motorbikes, Bonfire und Wildfire – von Reichweite und Kosten über Akku, Reparaturen und Ersatzteile bis zum weiteren Weg.</p>
-          </div>
-
-          <div className="faq-search card-doodle">
-            <label className="search-box">
-              <span aria-hidden="true">⌕</span>
-              <span className="sr-only">FAQ durchsuchen</span>
-              <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="z. B. Insolvenz, Wildfire, PayPal, Akku …" />
-            </label>
-            <span className="faq-search-count">{query.trim() ? `${filteredFaqItems.length} Treffer` : `${faqItems.length} Fragen`}</span>
-          </div>
-
-          <div className="faq-list">
-            {filteredFaqItems.map((item, index) => (
-              <details className="faq-item card-doodle" id={item.id} key={item.id}>
-                <summary>{highlightWikiText(item.question, query, `faq-question-${index}`)}</summary>
-                <div className="faq-answer">
-                  <p>{highlightWikiText(item.answer, query, `faq-answer-${index}`)}</p>
-                  <a href={item.linkHref}>{item.linkLabel} ↗</a><a className="faq-source-link" href={`/faq#${item.id}`}>Direktlink zu dieser Antwort</a>
-                  {item.sourceHref && <a className="faq-source-link" href={item.sourceHref} target="_blank" rel="nofollow noreferrer">{item.sourceLabel ?? 'Quelle öffnen'} ↗</a>}
-                </div>
-              </details>
-            ))}
-          </div>
-          {filteredFaqItems.length === 0 && <div className="empty-state card-doodle">Nichts gefunden. Versuch es mit „Insolvenz“, „Wildfire“, „PayPal“ oder „Akku“.</div>}
-
-        </section>
-      </main>
-      <GuideFooter />
-    </div>
-  );
+  return <div className="site-shell">
+    <GuideHeader />
+    <FaqContent highlightText={highlightWikiText} />
+    <GuideFooter />
+  </div>;
 }
 
 function SourceList() {
@@ -7013,6 +6963,8 @@ function PartDetailPage({ part }: { part: HistoricalShopPart }) {
               </div> : <div className="part-no-purchase"><span className="part-buy-label">Noch kein passender Link</span><strong>Momentan haben wir keinen passenden Artikel gefunden.</strong><p>{part.purchaseNote}</p></div>}
             </section>
 
+            <PartResearchNotes slug={part.id} />
+            <EditorialNote />
             <RepairBrief partTitle={part.title} model={part.model} sourcePath={`${siteOrigin}${part.path}`} />
             <KnowledgeProvenance record={getPartKnowledge(part)} />
             <RepairFeedback guideSlug={`ersatzteil-${part.id}`} />

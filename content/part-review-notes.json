@@ -1,0 +1,14 @@
+{
+  "blinkerhalterung-vorne": {
+    "summary": "Der Archivname bezeichnet eine vordere Blinkerhalterung. Eine bemaßte Zeichnung oder eine bestätigte Austausch-Teilenummer ist in diesem Eintrag nicht dokumentiert.",
+    "needed": ["Foto der Halterung und ihrer Einbaulage", "Abstand und Durchmesser der Befestigungsbohrungen", "Aufnahme des Blinkers sowie linke oder rechte Fahrzeugseite"]
+  },
+  "tankgummi-set": {
+    "summary": "Der Archivname allein legt weder die Form der einzelnen Gummis noch ihre Position unter der Tankverkleidung fest. Ein gleicher Produktname genügt für die Zuordnung nicht.",
+    "needed": ["Foto und Position jedes Gummis am Fahrzeug", "Abmessungen und Form der vorhandenen Teile", "Modellvariante, Baujahr und Ausführung der Tankverkleidung"]
+  },
+  "front-wheel": {
+    "summary": "Der historische Eintrag „Vorderrad“ benennt keine allgemein freigegebene Rad-Austauschkombination. Das komplette Rad muss zusammen mit Achse und Bremsanlage zur Fahrzeugvariante passen.",
+    "needed": ["Kennzeichnung von Felge und Nabe sowie Fahrzeugvariante", "Achsmaß, Einbaubreite und zugehörige Distanzhülsen", "Bremsscheibenaufnahme und gegebenenfalls ABS-Sensorring; Abgleich durch einen Fachbetrieb"]
+  }
+}

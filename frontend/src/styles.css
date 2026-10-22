@@ -1214,6 +1214,19 @@ h3 { margin-bottom: 10px; color: var(--charcoal); font-size: 21px; line-height: 
 .repair-brief-preview { margin-bottom: 20px; }
 .repair-brief-notice { min-height: 1.75em; }
 .faq-item { scroll-margin-top: 100px; }
+.editorial-note { margin-block: 20px; color: var(--muted); font-size: 14px; line-height: 1.65; }
+.editorial-note p { margin-block: 5px; }
+.editorial-note a { color: var(--ink); text-underline-offset: 3px; }
+.faq-topics { display: flex; flex-wrap: wrap; gap: 12px 24px; max-width: 830px; margin: 0 auto 28px; }
+.faq-topics a { color: var(--ink); font-weight: 700; text-underline-offset: 4px; }
+.faq-topic { max-width: 830px; margin: 36px auto; scroll-margin-top: 100px; }
+.faq-topic > h2 { margin-bottom: 10px; }
+.faq-topic > p { color: var(--muted); line-height: 1.7; }
+.editorial-method { margin-bottom: 36px; scroll-margin-top: 100px; }
+.editorial-method p, .editorial-method li, .source-checks-list li, .part-research-notes p, .part-research-notes li { line-height: 1.75; }
+.source-checks-list li { margin-bottom: 20px; }
+.source-checks-list p { margin-top: 8px; }
+.part-research-notes { margin-block: 28px; padding-block: 12px; border-block: 1px dashed var(--line); }
 @media (max-width: 620px) {
   .repair-brief-fields { grid-template-columns: 1fr; }
   .owner-help-links { flex-direction: column; }
