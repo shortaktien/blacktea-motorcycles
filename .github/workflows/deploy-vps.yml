@@ -145,7 +145,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          # Dieser Ordner wird separat auf dem VPS gepflegt und darf nicht überschrieben werden.
+          # PDF-Dateien bleiben VPS-verwaltet; der versionierte HTML-Index wird aktualisiert.
           rsync -az --delete \
             --exclude='.git/' \
             --exclude='.github/' \
@@ -157,7 +157,8 @@ jobs:
             --exclude='backend/vendor/' \
             --exclude='backend/var/' \
             --exclude='backend/.env' \
-            --exclude='frontend/public/pdfs/' \
+            --include='frontend/public/pdfs/index.html' \
+            --exclude='frontend/public/pdfs/*' \
             --exclude='.env' \
             -e "ssh -i $HOME/.ssh/btm_deploy_key -p $VPS_PORT -o BatchMode=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts" \
             ./ "$VPS_USER@$VPS_HOST:$VPS_APP_PATH/"
