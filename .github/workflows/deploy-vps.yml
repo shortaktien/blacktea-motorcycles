@@ -145,7 +145,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          # PDF-Dateien bleiben VPS-verwaltet; der versionierte HTML-Index wird aktualisiert.
+          # Das PDF-Verzeichnis ist VPS-verwaltet und möglicherweise nicht beschreibbar.
           rsync -az --delete \
             --exclude='.git/' \
             --exclude='.github/' \
@@ -157,8 +157,7 @@ jobs:
             --exclude='backend/vendor/' \
             --exclude='backend/var/' \
             --exclude='backend/.env' \
-            --include='frontend/public/pdfs/index.html' \
-            --exclude='frontend/public/pdfs/*' \
+            --exclude='frontend/public/pdfs/' \
             --exclude='.env' \
             -e "ssh -i $HOME/.ssh/btm_deploy_key -p $VPS_PORT -o BatchMode=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts" \
             ./ "$VPS_USER@$VPS_HOST:$VPS_APP_PATH/"

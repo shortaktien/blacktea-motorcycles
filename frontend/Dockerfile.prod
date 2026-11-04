@@ -9,6 +9,8 @@ COPY content/ /app/content/
 
 ARG VITE_SITE_URL=https://btm.shortaktien.de
 ENV VITE_SITE_URL=${VITE_SITE_URL}
+# Der Index wird außerhalb des VPS-verwalteten PDF-Verzeichnisses synchronisiert.
+RUN mkdir -p public/pdfs && cp pdf-index.html public/pdfs/index.html
 RUN npm run build
 
 FROM caddy:2-alpine
