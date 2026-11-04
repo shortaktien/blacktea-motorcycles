@@ -7,3 +7,8 @@
 /frontend/public/pdfs/*.pdf
 .DS_Store
 .env.local
+
+# Interne Untersuchungen und Betriebsnotizen nicht veröffentlichen.
+/docs/private/
+/docs/google-indexierung-2026-10-07.md
+/docs/moderator-self-review.md
