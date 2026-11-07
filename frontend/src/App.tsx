@@ -3640,7 +3640,7 @@ function HomePage() {
               <h2>Was bisher bekannt ist</h2>
             </div>
             <div className="timeline-highlight">
-              <strong>8 Stationen</strong>
+              <strong>9 Stationen</strong>
               <span>Öffentlich dokumentierte Verfahrensschritte, Presseberichte und aktuelle Quellenhinweise.</span>
             </div>
           </div>
@@ -3653,6 +3653,7 @@ function HomePage() {
             <TimelineItem date="25.09.2026" title="Hersteller-Webauftritte derzeit nicht verfügbar" text="Beim Abruf zeigten blackteamotorbikes.com und blackteamoto.com die Shopify-Meldung „Shop nicht verfügbar“. Das belegt nur die Nichterreichbarkeit dieser Webauftritte an diesem Datum; es belegt weder eine Betriebseinstellung noch eine Änderung am Insolvenzverfahren." sourceHref={sourceLinks[3].href} sourceLabel="Herstellerseite, Abruf 25.09.2026" />
             <TimelineItem date="05.10.2026" title="Insolvenzverfahren amtlich eröffnet" text="Das Amtsgericht München eröffnete das Verfahren wegen Zahlungsunfähigkeit am 05.10.2026 um 12:35 Uhr. Rechtsanwalt Florian Loserth wurde zum Insolvenzverwalter bestellt. Der Beschluss setzt den 24.11.2026 als Anmeldefrist für Insolvenzforderungen; das Verfahren wird bis auf Weiteres schriftlich geführt und sieht den 05.01.2027 als Frist für schriftliche Widersprüche gegen Forderungsanmeldungen vor. Amtlicher Originaltext geprüft, Abruf 07.10.2026." sourceHref="/insolvenz#originalbeschluss" sourceLabel="Amtlicher Originaltext vom 05.10.2026 (Auszug)" />
             <TimelineItem date="29.10.2026" title="Insolvenz-Sofortverkauf mit Black-Tea-Motorrädern" text="Auktionen Schwarzfischer führt in einem Insolvenz-Sofortverkauf Elektromotorräder der Marke Black Tea. Beim Abruf am 29.10.2026 zeigte der Katalog 40 Objekte und nannte den 19.11.2026 um 10:00 Uhr als Katalogtermin. Verfügbarkeit und Bedingungen stehen beim jeweiligen Angebot; der Hinweis ist keine gerichtliche Bekanntmachung." sourceHref="https://www.insolvenz-auktionen-schwarzfischer.de/browse.php?order_by_sort=losnummer_asc&block=337&search_closed=y&search=1" sourceLabel="Auktionen Schwarzfischer · Abruf 29.10.2026" />
+            <TimelineItem date="04.11.2026" title="Fachbericht ordnet Insolvenzverkauf ein" text="SteckerBiker berichtet über 40 Positionen im Insolvenz-Sofortverkauf, darunter Elektromopeds sowie Bonfire- und Wildfire-Modelle. Der Beitrag ordnet die künftige Ersatzteil- und Serviceversorgung als unsicher ein. Diese Einschätzung ist Presseberichterstattung, keine amtliche Verfahrensmitteilung und kein Nachweis, dass bestimmte Teile nicht verfügbar sind. Artikel vom 04.11.2026, abgerufen am 07.11.2026." sourceHref="https://steckerbiker.de/news/hersteller/black-tea-motorbikes-e-motorraeder-aus-insolvenzmasse-in-der-auktion/" sourceLabel="SteckerBiker · Fachbericht · Abruf 07.11.2026" />
           </div>
         </section>
 
