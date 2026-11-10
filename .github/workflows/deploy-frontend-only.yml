@@ -1,0 +1,84 @@
+name: Deploy BTM frontend only
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_deploy:
+        description: Frontend-Änderungen für Produktion geprüft
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: btm-production-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Update static frontend
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment:
+      name: production
+    env:
+      VPS_HOST: ${{ secrets.VPS_HOST }}
+      VPS_USER: ${{ secrets.VPS_USER }}
+      VPS_PORT: ${{ secrets.VPS_PORT || '22' }}
+      VPS_APP_PATH: ${{ secrets.VPS_APP_PATH }}
+      VPS_SSH_PRIVATE_KEY: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+      VPS_SSH_KNOWN_HOSTS: ${{ secrets.VPS_SSH_KNOWN_HOSTS }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: Validate production target
+        shell: bash
+        run: |
+          set -euo pipefail
+          test '${{ inputs.confirm_deploy }}' = 'true'
+          test "$GITHUB_REF_NAME" = main
+          test "$VPS_APP_PATH" = /opt/btm
+          test -n "$VPS_HOST" && test -n "$VPS_USER" && test "$VPS_USER" != root
+          test -n "$VPS_SSH_PRIVATE_KEY" && test -n "$VPS_SSH_KNOWN_HOSTS"
+          case "$VPS_PORT" in (*[!0-9]*|'') exit 1;; esac
+      - name: Configure SSH
+        shell: bash
+        run: |
+          set -euo pipefail
+          install -d -m 700 "$HOME/.ssh"
+          printf '%s\n' "$VPS_SSH_PRIVATE_KEY" > "$HOME/.ssh/btm_deploy_key"
+          chmod 600 "$HOME/.ssh/btm_deploy_key"
+          printf '%s\n' "$VPS_SSH_KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
+          chmod 644 "$HOME/.ssh/known_hosts"
+      - name: Synchronize reviewed frontend files
+        shell: bash
+        run: |
+          set -euo pipefail
+          rsync -azR \
+            -e "ssh -i $HOME/.ssh/btm_deploy_key -p $VPS_PORT -o BatchMode=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts" \
+            content/faq.json content/owner-help.json \
+            frontend/package.json frontend/package-lock.json \
+            frontend/src/OwnerHelp.tsx frontend/src/styles.css \
+            "$VPS_USER@$VPS_HOST:$VPS_APP_PATH/"
+      - name: Build and replace only frontend container
+        shell: bash
+        run: |
+          set -euo pipefail
+          ssh -i "$HOME/.ssh/btm_deploy_key" -p "$VPS_PORT" \
+            -o BatchMode=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile="$HOME/.ssh/known_hosts" \
+            "$VPS_USER@$VPS_HOST" 'bash -s' <<'REMOTE'
+          set -euo pipefail
+          cd /opt/btm
+          docker compose -f docker-compose.prod.yml build frontend
+          docker compose -f docker-compose.prod.yml up -d --no-deps frontend
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent --show-error --max-time 5 http://127.0.0.1:5173/insolvenz | grep -q 'Die vorbelegte Datumsspanne'; then
+              echo 'Aktualisierte Insolvenz-Hilfe ausgeliefert.'
+              exit 0
+            fi
+            sleep 2
+          done
+          echo 'Aktualisierte Insolvenz-Hilfe nicht bestätigt.' >&2
+          exit 1
+          REMOTE

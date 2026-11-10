@@ -25,7 +25,10 @@ export function OwnerHelpContent({ page }: { page: OwnerHelpPageData }) {
     <div className="owner-help-body section-pad">
       <aside className="owner-help-summary card-doodle" aria-label="Das Wichtigste">
         <p>{page.summary}</p>
-        {page.path === '/insolvenz' && <p><a href="#originalbeschluss">Amtlichen Originaltext vom 05.10.2026 direkt lesen ↓</a></p>}
+        {page.path === '/insolvenz' && <>
+          <p>Der dokumentierte Beschlussstand wurde am 07.10.2026 geprüft. Ob es spätere Bekanntmachungen gibt, ist hier nicht bestätigt. <a href="#verfahrensstand">So prüfst du den aktuellen Stand und die Fristen ↓</a></p>
+          <p><a href="#originalbeschluss">Amtlichen Originaltext vom 05.10.2026 direkt lesen ↓</a></p>
+        </>}
       </aside>
       <nav className="owner-help-toc" aria-label="Auf dieser Seite">
         {page.sections.map((section) => <a key={section.id} href={`#${section.id}`}>{section.title}</a>)}
