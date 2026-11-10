@@ -1,4 +1,4 @@
-name: Deploy BTM frontend only
+name: Deploy BTM frontend 0.1.1
 
 on:
   workflow_dispatch:
@@ -73,7 +73,7 @@ jobs:
           docker compose -f docker-compose.prod.yml build frontend
           docker compose -f docker-compose.prod.yml up -d --no-deps frontend
           for attempt in $(seq 1 30); do
-            if curl --fail --silent --show-error --max-time 5 http://127.0.0.1:5173/insolvenz | grep -q 'Die vorbelegte Datumsspanne'; then
+            if page=$(curl --fail --silent --show-error --max-time 5 http://127.0.0.1:5173/insolvenz) && [[ "$page" == *'Die vorbelegte Datumsspanne'* ]]; then
               echo 'Aktualisierte Insolvenz-Hilfe ausgeliefert.'
               exit 0
             fi
