@@ -1195,6 +1195,7 @@ h3 { margin-bottom: 10px; color: var(--charcoal); font-size: 21px; line-height: 
 .owner-help-body { max-width: 1000px; margin-inline: auto; }
 .owner-help-summary, .repair-brief { padding: clamp(20px, 4vw, 38px); margin-block: 24px; }
 .owner-help-summary p { margin: 0; font-size: 1.1rem; line-height: 1.7; }
+.owner-help-summary p + p { margin-top: 1rem; }
 .owner-help-toc, .owner-help-links { display: flex; flex-wrap: wrap; gap: 12px 24px; margin-block: 24px; }
 .owner-help-toc { flex-direction: column; }
 .owner-help-links a { font-weight: 700; text-underline-offset: 4px; }

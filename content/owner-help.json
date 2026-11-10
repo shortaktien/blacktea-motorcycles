@@ -6,12 +6,13 @@
       "heading": "Black Tea Insolvenz: Was kannst du jetzt tun?",
       "description": "Hilfe zur Black Tea Motorbikes Insolvenz: Verfahrensstand prüfen, Bestellunterlagen sichern, Ersatzteile suchen und Reparaturen vorbereiten.",
       "reviewedAt": "2026-10-07",
-      "updatedAt": "2026-10-22",
+      "updatedAt": "2026-11-10",
       "reviewScope": "Amtliche Verfahrenseröffnung und veröffentlichte Fristen geprüft; keine Aussage zu Lieferungen, Rückzahlungen oder individuellen Forderungen.",
       "history": [
         {"date": "2026-09-04", "label": "Leitfaden für Besitzer und Besteller erstellt"},
         {"date": "2026-10-07", "label": "Amtliche Verfahrenseröffnung und Fristen geprüft"},
-        {"date": "2026-10-22", "label": "Quellen-Prüfhistorie, Verantwortlichkeit und FAQ-Verweise ergänzt; keine erneute amtliche Statusprüfung"}
+        {"date": "2026-10-22", "label": "Quellen-Prüfhistorie, Verantwortlichkeit und FAQ-Verweise ergänzt; keine erneute amtliche Statusprüfung"},
+        {"date": "2026-11-10", "label": "Suchhilfe für das amtliche Portal ergänzt; keine erneute Bestätigung des Verfahrensstands"}
       ],
       "sourceChecks": [
         {
@@ -27,7 +28,7 @@
         {
           "id": "verfahrensstand",
           "title": "Wo prüfst du den Verfahrensstand?",
-          "paragraphs": ["Der amtliche Eröffnungsbeschluss des Amtsgerichts München datiert vom 05.10.2026 und eröffnet das Verfahren wegen Zahlungsunfähigkeit um 12:35 Uhr. Er nennt Rechtsanwalt Florian Loserth als Insolvenzverwalter und führt die Anmelde- und Widerspruchsfristen auf. Maßgeblich sind der Originaltext und etwaige spätere amtliche Bekanntmachungen. Diese Seite bestätigt weder Lieferungen noch Rückzahlungen.", "Die Bekanntmachung fordert Insolvenzgläubiger auf, Forderungen bis zum 24.11.2026 beim Insolvenzverwalter schriftlich anzumelden. Beteiligte erhalten Gelegenheit, bis zum 05.01.2027 beim Insolvenzgericht schriftlich den Forderungsanmeldungen zu widersprechen. Ob und in welcher Höhe eine konkrete Forderung besteht, ist anhand der individuellen Unterlagen zu klären."],
+          "paragraphs": ["Der amtliche Eröffnungsbeschluss des Amtsgerichts München datiert vom 05.10.2026 und eröffnet das Verfahren wegen Zahlungsunfähigkeit um 12:35 Uhr. Er nennt Rechtsanwalt Florian Loserth als Insolvenzverwalter und führt die Anmelde- und Widerspruchsfristen auf. Maßgeblich sind der Originaltext und etwaige spätere amtliche Bekanntmachungen. Diese Seite bestätigt weder Lieferungen noch Rückzahlungen.", "Die Bekanntmachung fordert Insolvenzgläubiger auf, Forderungen bis zum 24.11.2026 beim Insolvenzverwalter schriftlich anzumelden. Beteiligte erhalten Gelegenheit, bis zum 05.01.2027 beim Insolvenzgericht schriftlich den Forderungsanmeldungen zu widersprechen. Ob und in welcher Höhe eine konkrete Forderung besteht, ist anhand der individuellen Unterlagen zu klären.", "Für die Suche im amtlichen Portal kannst du Bayern und das Insolvenzgericht München auswählen und das Aktenzeichen 1513 IN 2588/26 in die getrennten Felder eintragen. Prüfe den Veröffentlichungszeitraum: Die vorbelegte Datumsspanne zeigt nicht automatisch alle älteren Bekanntmachungen. Vergleiche Treffer anhand von Firma, Gericht und Aktenzeichen; eine leere Suche allein belegt keine Verfahrensänderung."],
           "links": [{"label": "Amtliche Suche: Bekanntmachung vom 05.10.2026 · 1513 IN 2588/26", "href": "https://neu.insolvenzbekanntmachungen.de/ap/suche.jsf"}, {"label": "Sicherungsanordnung vom 14.07.2026 (Sekundärquelle)", "href": "https://www.versteigerungskalender.de/insolvenzkalender/blaeck-tea-motorbikes-gmbh"}],
           "sourceQuote": {
             "id": "originalbeschluss",
