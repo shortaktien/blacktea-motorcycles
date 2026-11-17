@@ -4,7 +4,7 @@ services:
       context: .
       dockerfile: frontend/Dockerfile.prod
       args:
-        VITE_SITE_URL: https://btm.shortaktien.de
+        VITE_SITE_URL: https://btm-community.de
     expose:
       - "80"
       - "5173"

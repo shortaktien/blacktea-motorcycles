@@ -107,7 +107,7 @@ export default defineConfig({
   server: {
     port: 5173,
     host: true,
-    allowedHosts: ['btm.shortaktien.de'],
+    allowedHosts: ['btm-community.de', 'btm.shortaktien.de'],
     proxy: {
       '/api': {
         target: process.env.VITE_API_PROXY_TARGET ?? 'http://backend:8000',

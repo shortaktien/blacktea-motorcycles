@@ -4,4 +4,4 @@ Disallow: /admin
 Disallow: /api/
 Disallow: /src/
 Disallow: /node_modules/
-Sitemap: https://btm.shortaktien.de/sitemap.xml
+Sitemap: https://btm-community.de/sitemap.xml

@@ -51,7 +51,7 @@ final class EmailConfirmationService
             return $configured;
         }
 
-        return 'https://btm.shortaktien.de';
+        return 'https://btm-community.de';
     }
 
     private function ttlSeconds(): int

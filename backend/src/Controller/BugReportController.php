@@ -260,7 +260,7 @@ final class BugReportController
         $configuredHosts = $_ENV['BUG_REPORT_ALLOWED_HOSTS'] ?? $_SERVER['BUG_REPORT_ALLOWED_HOSTS'] ?? getenv('BUG_REPORT_ALLOWED_HOSTS');
         $allowedHosts = is_string($configuredHosts) && trim($configuredHosts) !== ''
             ? array_filter(array_map(static fn (string $item): string => strtolower(trim($item)), explode(',', $configuredHosts)))
-            : ['btm.shortaktien.de', '127.0.0.1', 'localhost'];
+            : ['btm-community.de', 'btm.shortaktien.de', '127.0.0.1', 'localhost'];
 
         return in_array($host, $allowedHosts, true);
     }

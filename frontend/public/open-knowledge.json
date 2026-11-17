@@ -1,16 +1,16 @@
 {
   "manifestType": "BTM Open Knowledge",
   "schemaVersion": "1.0",
-  "generatedAt": "2026-10-22",
+  "generatedAt": "2026-11-17",
   "language": "de-DE",
   "licensePolicy": "Eigene redaktionelle Aufbereitungen werden als solche gekennzeichnet; Originalquellen bleiben bei ihren jeweiligen Rechteinhabern.",
   "regionalContentPolicy": "Regionale Seiten werden erst veröffentlicht, wenn sie eigenen lokalen Mehrwert bieten. Die ungefähre PLZ-Verortung bleibt bis dahin auf /karte gebündelt.",
   "entries": [
     {
       "kind": "faq",
-      "url": "https://btm.shortaktien.de/faq#insolvenzstatus",
+      "url": "https://btm-community.de/faq#insolvenzstatus",
       "title": "Ist Black Tea Motorbikes insolvent?",
-      "answer": "Ja. Das Amtsgericht München hat das Insolvenzverfahren am 5. Oktober 2026 um 12:35 Uhr wegen Zahlungsunfähigkeit eröffnet (1513 IN 2588/26). Insolvenzverwalter ist Rechtsanwalt Florian Loserth. Der amtliche Beschluss wurde am 7. Oktober 2026 geprüft. Eine Verfahrenseröffnung bestätigt weder die Lieferung einer Bestellung noch eine Rückzahlung; spätere Bekanntmachungen bleiben maßgeblich.",
+      "answer": "Der am 7. Oktober 2026 geprüfte Eröffnungsbeschluss besagt: Das Amtsgericht München hat das Insolvenzverfahren am 5. Oktober 2026 um 12:35 Uhr wegen Zahlungsunfähigkeit eröffnet (1513 IN 2588/26). Insolvenzverwalter ist Rechtsanwalt Florian Loserth. Der amtliche Beschluss wurde am 7. Oktober 2026 geprüft. Eine Verfahrenseröffnung bestätigt weder die Lieferung einer Bestellung noch eine Rückzahlung; spätere Bekanntmachungen bleiben maßgeblich.",
       "revision": "2026-10-22",
       "lastReviewed": "2026-10-07",
       "reviewScope": "Redaktionelle Aktualisierung der FAQ; veränderliche Angaben anhand der verlinkten Quellen prüfen.",
@@ -35,7 +35,7 @@
     },
     {
       "kind": "faq",
-      "url": "https://btm.shortaktien.de/faq#ersatzteile-finden",
+      "url": "https://btm-community.de/faq#ersatzteile-finden",
       "title": "Wo bekomme ich Ersatzteile für Black Tea Bonfire und Wildfire?",
       "answer": "Beginne im historischen Ersatzteilkatalog mit Modell, Baujahr und Bauteilbezeichnung. Die Detailseiten zeigen vorhandene Archivquellen, Varianten und den jeweiligen Bezugsstatus. Historische Preise und Lagerangaben sind nicht aktuell. Kläre Passform und Lieferbarkeit für dein konkretes Fahrzeug mit Anbieter oder Fachbetrieb. Auf der Teileseite kannst du eine Anfrage mit dem dokumentierten Teilenamen erstellen.",
       "revision": "2026-10-22",
@@ -55,14 +55,14 @@
       ],
       "sources": [
         {
-          "url": "https://btm.shortaktien.de/hilfe/ersatzteil-finden",
+          "url": "https://btm-community.de/hilfe/ersatzteil-finden",
           "label": "Ersatzteile richtig zuordnen"
         }
       ]
     },
     {
       "kind": "faq",
-      "url": "https://btm.shortaktien.de/faq#werkstatt-finden",
+      "url": "https://btm-community.de/faq#werkstatt-finden",
       "title": "Wie finde ich eine Werkstatt für meine Bonfire oder Wildfire?",
       "answer": "Sieh dir die Werkstatt-Tipps der Community an und frage vorab nach Erfahrung mit deiner Modellvariante und dem betroffenen Bauteil. Bereite Baujahr, Fehlercode, Symptome und passende Unterlagen vor. Mit unserem Reparatur-Steckbrief kannst du diese Angaben ohne Konto zusammenstellen und selbst an einen Fachbetrieb weitergeben.",
       "revision": "2026-10-22",
@@ -82,14 +82,14 @@
       ],
       "sources": [
         {
-          "url": "https://btm.shortaktien.de/hilfe/werkstatt-vorbereiten",
+          "url": "https://btm-community.de/hilfe/werkstatt-vorbereiten",
           "label": "Steckbrief für die Werkstatt erstellen"
         }
       ]
     },
     {
       "kind": "faq",
-      "url": "https://btm.shortaktien.de/faq#handbuch-schaltplan",
+      "url": "https://btm-community.de/faq#handbuch-schaltplan",
       "title": "Wo finde ich Black Tea Handbücher und Schaltpläne?",
       "answer": "Der PDF-Index bündelt gesicherte Dokumente. Im Bonfire- und Wildfire-Wiki findest du dazu technische Einordnungen und Quellen. Prüfe Modellvariante und Dokumentstand vor der Verwendung; nicht jede Anleitung gilt für jedes Baujahr. Sichere passende Unterlagen für dein Motorrad zusätzlich lokal.",
       "revision": "2026-10-22",
@@ -109,14 +109,14 @@
       ],
       "sources": [
         {
-          "url": "https://btm.shortaktien.de/pdfs/index.html",
+          "url": "https://btm-community.de/pdfs/index.html",
           "label": "Handbücher und Schaltpläne öffnen"
         }
       ]
     },
     {
       "kind": "faq",
-      "url": "https://btm.shortaktien.de/faq#akku-nicht-erkannt",
+      "url": "https://btm-community.de/faq#akku-nicht-erkannt",
       "title": "Mein Black Tea Akku wird nicht erkannt – wo beginne ich?",
       "answer": "Notiere Modell, Akkuversion und die genaue Anzeige oder Fehlermeldung. Unsere Akku-Hilfe ordnet die nächsten Prüfschritte und ihre Grenzen ein. Bei ungewöhnlicher Wärme, Geruch, sichtbaren Schäden oder Feuchtigkeit am Akku keine weiteren Lade- oder Fahrversuche unternehmen. Akku und BMS nicht öffnen oder überbrücken; die weitere Prüfung gehört in qualifizierte Hände.",
       "revision": "2026-10-22",
@@ -136,14 +136,14 @@
       ],
       "sources": [
         {
-          "url": "https://btm.shortaktien.de/hilfe/akku-bms",
+          "url": "https://btm-community.de/hilfe/akku-bms",
           "label": "Hilfe: Akku wird nicht erkannt"
         }
       ]
     },
     {
       "kind": "faq",
-      "url": "https://btm.shortaktien.de/faq#erfahrungen",
+      "url": "https://btm-community.de/faq#erfahrungen",
       "title": "Wo finde ich Erfahrungen mit Black Tea Bonfire und Wildfire?",
       "answer": "Erfahrungen sind Einzelberichte und ergeben deshalb kein einheitliches Qualitätsurteil. Für eine faire Einordnung sollten Baujahr, konkrete Variante, Akku, Nutzung und der jeweilige Servicefall zusammen betrachtet werden. Öffentliche Erfahrungsberichte und belegte technische Angaben sind nicht dasselbe.",
       "revision": "2026-10-22",
@@ -163,14 +163,14 @@
       ],
       "sources": [
         {
-          "url": "https://btm.shortaktien.de/community",
+          "url": "https://btm-community.de/community",
           "label": "Community-Wissen einordnen"
         }
       ]
     },
     {
       "kind": "faq",
-      "url": "https://btm.shortaktien.de/faq#reichweite",
+      "url": "https://btm-community.de/faq#reichweite",
       "title": "Welche Reichweite haben Blacktea Motorbikes?",
       "answer": "Eine feste Reichweite gibt es nicht. Modell, Fahrmodus, Geschwindigkeit, Temperatur, Strecke, Reifendruck, Beladung und Akkuzustand verändern den Verbrauch deutlich. Die Angaben im Wiki sind deshalb Orientierungswerte; für dein Fahrzeug ist ein eigener Praxistest unter ähnlichen Bedingungen aussagekräftiger.",
       "revision": "2026-10-22",
@@ -190,14 +190,14 @@
       ],
       "sources": [
         {
-          "url": "https://btm.shortaktien.de/bikes/bonfire#technische-eckdaten",
+          "url": "https://btm-community.de/bikes/bonfire#technische-eckdaten",
           "label": "Technische Eckdaten öffnen"
         }
       ]
     },
     {
       "kind": "faq",
-      "url": "https://btm.shortaktien.de/faq#bonfire-x-erfahrungen",
+      "url": "https://btm-community.de/faq#bonfire-x-erfahrungen",
       "title": "Wie kann ich Erfahrungen mit der Bonfire X sinnvoll vergleichen?",
       "answer": "Berichte zur Bonfire X sind individuelle Nutzungserfahrungen und keine allgemeine Freigabe für jedes Motorrad. Für die Einordnung zählen unter anderem Baujahr, Akkuanzahl, Softwarestand, Fahrprofil und Wartung. Deshalb trennen wir Erfahrungsberichte bewusst von belegten technischen Werten.",
       "revision": "2026-10-22",
@@ -217,14 +217,14 @@
       ],
       "sources": [
         {
-          "url": "https://btm.shortaktien.de/community",
+          "url": "https://btm-community.de/community",
           "label": "Erfahrungsberichte ansehen"
         }
       ]
     },
     {
       "kind": "faq",
-      "url": "https://btm.shortaktien.de/faq#bestellung-bezahlt",
+      "url": "https://btm-community.de/faq#bestellung-bezahlt",
       "title": "Was passiert mit einer bereits bezahlten, aber noch nicht gelieferten Bestellung?",
       "answer": "Eine Vorauszahlung garantiert keine Lieferung. Sichere Bestellung, Rechnung, Zahlungsbelege und Schriftverkehr und frage die zuständige Stelle nach dem konkreten Auftrag. Bei einer Insolvenz kann eine Forderungsanmeldung nötig werden. § 103 InsO betrifft gegenseitige Verträge, die bei Eröffnung von beiden Seiten noch nicht vollständig erfüllt sind; eine vollständig bezahlte Bestellung lässt sich nicht pauschal darunter einordnen. Lass deinen Vertrag und den Verfahrensstand individuell prüfen.",
       "revision": "2026-10-22",
@@ -251,7 +251,7 @@
     },
     {
       "kind": "faq",
-      "url": "https://btm.shortaktien.de/faq#forderung-anmelden",
+      "url": "https://btm-community.de/faq#forderung-anmelden",
       "title": "Muss ich eine Forderung zur Insolvenztabelle anmelden?",
       "answer": "Der Eröffnungsbeschluss vom 5. Oktober 2026 fordert Insolvenzgläubiger auf, Insolvenzforderungen bis zum 24. November 2026 beim Insolvenzverwalter anzumelden. Grund und Betrag sind anzugeben; Belege zur Forderung sollen beigefügt werden. Ob dein konkreter Anspruch darunter fällt, musst du anhand deiner Unterlagen klären. Die im Beschluss genannte Frist 5. Januar 2027 betrifft Widersprüche gegen Forderungsanmeldungen beim Insolvenzgericht, nicht die Anmeldung beim Verwalter. Eine Anmeldung garantiert keine vollständige Rückzahlung.",
       "revision": "2026-10-22",
@@ -278,7 +278,7 @@
     },
     {
       "kind": "faq",
-      "url": "https://btm.shortaktien.de/faq#amtlichen-beschluss-finden",
+      "url": "https://btm-community.de/faq#amtlichen-beschluss-finden",
       "title": "Wie finde ich den amtlichen Black-Tea-Insolvenzbeschluss?",
       "answer": "Die wesentlichen Passagen des Eröffnungsbeschlusses vom 5. Oktober 2026 kannst du direkt in unserer Insolvenz-Hilfe lesen: als wörtlichen Auszug mit Quellenangabe, Aktenzeichen 1513 IN 2588/26 und Abrufdatum 7. Oktober 2026. Auslassungen sind gekennzeichnet. Quelle ist die amtliche Veröffentlichung des Amtsgerichts München, nicht unsere redaktionelle Zusammenfassung.",
       "revision": "2026-10-22",
@@ -305,7 +305,7 @@
     },
     {
       "kind": "faq",
-      "url": "https://btm.shortaktien.de/faq#wildfire-nachzahlung",
+      "url": "https://btm-community.de/faq#wildfire-nachzahlung",
       "title": "Was ist das 60-%-Angebot zur Fertigstellung einer Wildfire?",
       "answer": "Im Forenthread berichten einzelne Vorbesteller von einem individuellen Angebot mit einer zusätzlichen Zahlung von 60 Prozent des ursprünglichen Kaufpreises. Das ist kein allgemein bestätigter Anspruch und keine Empfehlung. Wer ein solches Schreiben erhält, sollte die Bedingungen schriftlich prüfen: konkrete Ausstattung, fehlende Teile, Zahlungsweg, Rückerstattung, Frist und Gewährleistung. Bei dieser Summe ist unabhängige rechtliche Beratung sinnvoll.",
       "revision": "2026-10-22",
@@ -332,7 +332,7 @@
     },
     {
       "kind": "faq",
-      "url": "https://btm.shortaktien.de/faq#ansprechpartner",
+      "url": "https://btm-community.de/faq#ansprechpartner",
       "title": "Wer ist jetzt mein Ansprechpartner?",
       "answer": "Für verbindliche Fragen zum Insolvenzverfahren, zu einer konkreten Bestellung oder zu einer geforderten Zahlung ist die im Verfahrensstand genannte zuständige Stelle maßgeblich. Forumseinträge, WhatsApp-Nachrichten und Aussagen anderer Fahrer ersetzen keine schriftliche Auskunft des Insolvenzverwalters oder eine rechtliche Beratung. Sichere alle Unterlagen und stelle Fragen mit Bestellnummer und Belegen.",
       "revision": "2026-10-22",
@@ -352,14 +352,14 @@
       ],
       "sources": [
         {
-          "url": "https://btm.shortaktien.de/insolvenz#verfahrensstand",
+          "url": "https://btm-community.de/insolvenz#verfahrensstand",
           "label": "Verfahrensstand und Zuständigkeit prüfen"
         }
       ]
     },
     {
       "kind": "faq",
-      "url": "https://btm.shortaktien.de/faq#garantie-reparatur",
+      "url": "https://btm-community.de/faq#garantie-reparatur",
       "title": "Gibt es weiterhin Garantie, Reparaturen und Ersatzteile?",
       "answer": "Gesetzliche Gewährleistung richtet sich grundsätzlich gegen deinen Verkäufer; eine freiwillige Garantie hängt vom Garantiegeber und den Bedingungen ab. Prüfe deshalb zuerst, wer auf deiner Rechnung steht. Die Insolvenz des Herstellers bedeutet nicht automatisch, dass ein rechtlich unabhängiger Händler ebenfalls insolvent ist. Reparaturen, Kostenübernahme und Teilelieferungen musst du für deinen Fall klären. Eine Community-Lösung ist keine Herstellergarantie.",
       "revision": "2026-10-22",
@@ -386,7 +386,7 @@
     },
     {
       "kind": "faq",
-      "url": "https://btm.shortaktien.de/faq#paypal",
+      "url": "https://btm-community.de/faq#paypal",
       "title": "Greift der PayPal-Käuferschutz bei einer Motorradbestellung?",
       "answer": "Darauf solltest du dich bei einem Motorrad nicht verlassen: PayPal nennt Fahrzeuge, ausdrücklich auch Motorräder, als vom Käuferschutz ausgeschlossene Artikel. Ratenzahlung, Kreditkartenregeln und mögliche andere Ansprüche können gesondert geregelt sein. Prüfe die für deine Zahlung geltenden Bedingungen direkt bei PayPal und stoppe Zahlungen nicht eigenmächtig ohne Beratung.",
       "revision": "2026-10-22",
@@ -413,7 +413,7 @@
     },
     {
       "kind": "faq",
-      "url": "https://btm.shortaktien.de/faq#fortfuehrung",
+      "url": "https://btm-community.de/faq#fortfuehrung",
       "title": "Kann Black Tea weitergeführt oder von einem Investor übernommen werden?",
       "answer": "Das war im Forenthread eine wiederkehrende Hoffnung, ist aber keine bestätigte Zusage. Ob ein Betrieb fortgeführt, verkauft oder beendet wird, entscheidet sich im Verfahren und hängt von Finanzierung, Vermögenswerten und konkreten Angeboten ab. Bis es eine offizielle Mitteilung gibt, solltest du eine mögliche Übernahme nicht als gesichert einplanen.",
       "revision": "2026-10-22",
@@ -440,7 +440,7 @@
     },
     {
       "kind": "faq",
-      "url": "https://btm.shortaktien.de/faq#vorkasse",
+      "url": "https://btm-community.de/faq#vorkasse",
       "title": "Sollte ich jetzt noch ein Fahrzeug oder Ersatzteil per Vorkasse bestellen?",
       "answer": "Bei einem Unternehmen im Insolvenzverfahren ist Vorkasse besonders riskant. Prüfe zuerst, ob der Verkauf und der Versand für genau diesen Artikel ausdrücklich freigegeben sind, wer Vertragspartner und Zahlungsempfänger ist und welche Rückzahlung im Ausfall vorgesehen ist. Wenn möglich, ist Zahlung Zug um Zug bei Übergabe sicherer; eine individuelle Rechts- oder Verbraucherberatung kann die konkrete Situation bewerten.",
       "revision": "2026-10-22",
@@ -467,7 +467,7 @@
     },
     {
       "kind": "faq",
-      "url": "https://btm.shortaktien.de/faq#wildfire-ausstattung",
+      "url": "https://btm-community.de/faq#wildfire-ausstattung",
       "title": "Was gilt für Wildfire-Bestellungen mit ABS oder fehlenden Akkus?",
       "answer": "Dazu gab es im Forum unterschiedliche individuelle Rückmeldungen. Aus einem Schreiben oder einer Aussage zu einer einzelnen ABS-, CBS- oder Akku-Konfiguration lässt sich keine allgemeine Zusage für alle Besteller ableiten. Entscheidend sind deine Rechnung, die bestellte Ausstattung, der dokumentierte Fertigungsstand und eine schriftliche Auskunft zur konkreten Bestellung.",
       "revision": "2026-10-22",
@@ -494,10 +494,10 @@
     },
     {
       "kind": "owner-guide",
-      "url": "https://btm.shortaktien.de/insolvenz",
+      "url": "https://btm-community.de/insolvenz",
       "title": "Black Tea Motorbikes insolvent: Hilfe für Besitzer & Besteller",
       "summary": "Das Amtsgericht München eröffnete das Insolvenzverfahren über die Black Tea Motorbikes GmbH wegen Zahlungsunfähigkeit am 05.10.2026 um 12:35 Uhr (1513 IN 2588/26) und bestellte Rechtsanwalt Florian Loserth zum Insolvenzverwalter. Laut amtlichem Beschluss sind Forderungen bis 24.11.2026 beim Insolvenzverwalter anzumelden; schriftliche Widersprüche gegen Forderungsanmeldungen sind bis 05.01.2027 beim Insolvenzgericht möglich. Originaltext abgerufen am 07.10.2026.",
-      "revision": "2026-10-22",
+      "revision": "2026-11-10",
       "lastReviewed": "2026-10-07",
       "reviewScope": "Amtliche Verfahrenseröffnung und veröffentlichte Fristen geprüft; keine Aussage zu Lieferungen, Rückzahlungen oder individuellen Forderungen.",
       "licenseStatus": "Eigene redaktionelle Aufbereitung; verlinkte Quellen behalten ihre jeweiligen Rechte.",
@@ -514,6 +514,10 @@
         {
           "date": "2026-10-22",
           "label": "Quellen-Prüfhistorie, Verantwortlichkeit und FAQ-Verweise ergänzt; keine erneute amtliche Statusprüfung"
+        },
+        {
+          "date": "2026-11-10",
+          "label": "Suchhilfe für das amtliche Portal ergänzt; keine erneute Bestätigung des Verfahrensstands"
         }
       ],
       "sections": [
@@ -522,7 +526,8 @@
           "title": "Wo prüfst du den Verfahrensstand?",
           "paragraphs": [
             "Der amtliche Eröffnungsbeschluss des Amtsgerichts München datiert vom 05.10.2026 und eröffnet das Verfahren wegen Zahlungsunfähigkeit um 12:35 Uhr. Er nennt Rechtsanwalt Florian Loserth als Insolvenzverwalter und führt die Anmelde- und Widerspruchsfristen auf. Maßgeblich sind der Originaltext und etwaige spätere amtliche Bekanntmachungen. Diese Seite bestätigt weder Lieferungen noch Rückzahlungen.",
-            "Die Bekanntmachung fordert Insolvenzgläubiger auf, Forderungen bis zum 24.11.2026 beim Insolvenzverwalter schriftlich anzumelden. Beteiligte erhalten Gelegenheit, bis zum 05.01.2027 beim Insolvenzgericht schriftlich den Forderungsanmeldungen zu widersprechen. Ob und in welcher Höhe eine konkrete Forderung besteht, ist anhand der individuellen Unterlagen zu klären."
+            "Die Bekanntmachung fordert Insolvenzgläubiger auf, Forderungen bis zum 24.11.2026 beim Insolvenzverwalter schriftlich anzumelden. Beteiligte erhalten Gelegenheit, bis zum 05.01.2027 beim Insolvenzgericht schriftlich den Forderungsanmeldungen zu widersprechen. Ob und in welcher Höhe eine konkrete Forderung besteht, ist anhand der individuellen Unterlagen zu klären.",
+            "Für die Suche im amtlichen Portal kannst du Bayern und das Insolvenzgericht München auswählen und das Aktenzeichen 1513 IN 2588/26 in die getrennten Felder eintragen. Prüfe den Veröffentlichungszeitraum: Die vorbelegte Datumsspanne zeigt nicht automatisch alle älteren Bekanntmachungen. Vergleiche Treffer anhand von Firma, Gericht und Aktenzeichen; eine leere Suche allein belegt keine Verfahrensänderung."
           ],
           "links": [
             {
@@ -653,38 +658,38 @@
           "label": "§ 174 InsO: Anmeldung und Belege"
         },
         {
-          "url": "https://btm.shortaktien.de/hilfe/werkstatt-vorbereiten",
+          "url": "https://btm-community.de/hilfe/werkstatt-vorbereiten",
           "label": "Werkstattkontakt vorbereiten"
         },
         {
-          "url": "https://btm.shortaktien.de/hilfe",
+          "url": "https://btm-community.de/hilfe",
           "label": "Reparaturhilfen nach Fehlerbild"
         },
         {
-          "url": "https://btm.shortaktien.de/werkstaetten",
+          "url": "https://btm-community.de/werkstaetten",
           "label": "Werkstätten und Community-Tipps"
         },
         {
-          "url": "https://btm.shortaktien.de/hilfe/ersatzteil-finden",
+          "url": "https://btm-community.de/hilfe/ersatzteil-finden",
           "label": "Ersatzteile systematisch finden"
         },
         {
-          "url": "https://btm.shortaktien.de/ersatzteile",
+          "url": "https://btm-community.de/ersatzteile",
           "label": "Ersatzteilkatalog öffnen"
         },
         {
-          "url": "https://btm.shortaktien.de/pdfs/index.html",
+          "url": "https://btm-community.de/pdfs/index.html",
           "label": "Handbücher und Schaltpläne"
         },
         {
-          "url": "https://btm.shortaktien.de/wiki",
+          "url": "https://btm-community.de/wiki",
           "label": "Wissen im Bike-Wiki ergänzen"
         }
       ]
     },
     {
       "kind": "owner-guide",
-      "url": "https://btm.shortaktien.de/hilfe/werkstatt-vorbereiten",
+      "url": "https://btm-community.de/hilfe/werkstatt-vorbereiten",
       "title": "Black Tea Reparatur: Werkstattkontakt vorbereiten",
       "summary": "Notiere Modell und Baujahr, die genaue Fehlermeldung, den Zeitpunkt des Auftretens und bisherige Maßnahmen. Ergänze passende Handbuchseiten und Fotos. Der Steckbrief unten funktioniert ohne Konto und erstellt eine Textdatei für deine eigene Verwendung.",
       "revision": "2026-09-04",
@@ -752,30 +757,30 @@
       ],
       "sources": [
         {
-          "url": "https://btm.shortaktien.de/hilfe",
+          "url": "https://btm-community.de/hilfe",
           "label": "Vorhandene Hilfen zum Fehlerbild"
         },
         {
-          "url": "https://btm.shortaktien.de/bikes/bonfire",
+          "url": "https://btm-community.de/bikes/bonfire",
           "label": "Bonfire: Handbuch und Modellvarianten"
         },
         {
-          "url": "https://btm.shortaktien.de/bikes/wildfire",
+          "url": "https://btm-community.de/bikes/wildfire",
           "label": "Wildfire: technische Unterlagen"
         },
         {
-          "url": "https://btm.shortaktien.de/werkstaetten",
+          "url": "https://btm-community.de/werkstaetten",
           "label": "Werkstätten ansehen"
         },
         {
-          "url": "https://btm.shortaktien.de/hilfe/anfragen",
+          "url": "https://btm-community.de/hilfe/anfragen",
           "label": "Reparaturanfrage an die Community"
         }
       ]
     },
     {
       "kind": "owner-guide",
-      "url": "https://btm.shortaktien.de/hilfe/ersatzteil-finden",
+      "url": "https://btm-community.de/hilfe/ersatzteil-finden",
       "title": "Black Tea Ersatzteile finden: Bonfire & Wildfire abgleichen",
       "summary": "Modell und Baujahr erfassen, historische Bezeichnung nachschlagen und die konkrete Ausführung vergleichen. Erst danach Lieferbarkeit und Passform mit einem Anbieter oder Fachbetrieb klären. Ein ähnliches Produktfoto oder ein passender Stecker allein reicht nicht aus.",
       "revision": "2026-09-04",
@@ -847,34 +852,34 @@
       ],
       "sources": [
         {
-          "url": "https://btm.shortaktien.de/ersatzteile",
+          "url": "https://btm-community.de/ersatzteile",
           "label": "Historischen Ersatzteilkatalog durchsuchen"
         },
         {
-          "url": "https://btm.shortaktien.de/ersatzteile/display",
+          "url": "https://btm-community.de/ersatzteile/display",
           "label": "Display: dokumentierte Varianten"
         },
         {
-          "url": "https://btm.shortaktien.de/bikes/bonfire",
+          "url": "https://btm-community.de/bikes/bonfire",
           "label": "Bonfire-Unterlagen"
         },
         {
-          "url": "https://btm.shortaktien.de/bikes/wildfire",
+          "url": "https://btm-community.de/bikes/wildfire",
           "label": "Wildfire-Unterlagen"
         },
         {
-          "url": "https://btm.shortaktien.de/hilfe/werkstatt-vorbereiten#steckbrief",
+          "url": "https://btm-community.de/hilfe/werkstatt-vorbereiten#steckbrief",
           "label": "Anfragevorlage öffnen"
         },
         {
-          "url": "https://btm.shortaktien.de/insolvenz",
+          "url": "https://btm-community.de/insolvenz",
           "label": "Hinweise zur Insolvenz und zu Bestellungen"
         }
       ]
     },
     {
       "kind": "wiki",
-      "url": "https://btm.shortaktien.de/bikes/bonfire",
+      "url": "https://btm-community.de/bikes/bonfire",
       "title": "Black Tea Bonfire",
       "model": "Bonfire",
       "revision": "2026-10-07",
@@ -897,14 +902,14 @@
       ],
       "sources": [
         {
-          "url": "https://btm.shortaktien.de/pdfs/15-bonfire-handbuch-lokal.pdf",
+          "url": "https://btm-community.de/pdfs/15-bonfire-handbuch-lokal.pdf",
           "label": "Bonfire-Handbuch lokal öffnen"
         }
       ]
     },
     {
       "kind": "wiki",
-      "url": "https://btm.shortaktien.de/bikes/wildfire",
+      "url": "https://btm-community.de/bikes/wildfire",
       "title": "Black Tea Wildfire",
       "model": "Wildfire",
       "revision": "2026-10-07",
@@ -927,14 +932,14 @@
       ],
       "sources": [
         {
-          "url": "https://btm.shortaktien.de/pdfs/19-wildfire-handbuch-community.pdf",
+          "url": "https://btm-community.de/pdfs/19-wildfire-handbuch-community.pdf",
           "label": "Wildfire-Handbuch lokal öffnen"
         }
       ]
     },
     {
       "kind": "repair-guide",
-      "url": "https://btm.shortaktien.de/hilfe/dcdc",
+      "url": "https://btm-community.de/hilfe/dcdc",
       "title": "12-V-Versorgung prüfen",
       "model": "Wildfire · DC/DC-Wandler",
       "revision": "2026-09-02",
@@ -956,7 +961,7 @@
     },
     {
       "kind": "repair-guide",
-      "url": "https://btm.shortaktien.de/hilfe/akku-bms",
+      "url": "https://btm-community.de/hilfe/akku-bms",
       "title": "Akku wird nicht erkannt",
       "model": "Bonfire & Wildfire · Akku / BMS",
       "revision": "2026-09-02",
@@ -978,7 +983,7 @@
     },
     {
       "kind": "repair-guide",
-      "url": "https://btm.shortaktien.de/hilfe/fehleranalyse",
+      "url": "https://btm-community.de/hilfe/fehleranalyse",
       "title": "Fehlerbild systematisch eingrenzen",
       "model": "Bonfire & Wildfire · Diagnose",
       "revision": "2026-09-02",
@@ -1000,7 +1005,7 @@
     },
     {
       "kind": "repair-guide",
-      "url": "https://btm.shortaktien.de/hilfe/mosfet",
+      "url": "https://btm-community.de/hilfe/mosfet",
       "title": "MOSFET-Fehler: Wildfire bleibt stehen",
       "model": "Wildfire · FarDriver / Antrieb",
       "revision": "2026-09-02",
@@ -1022,7 +1027,7 @@
     },
     {
       "kind": "repair-guide",
-      "url": "https://btm.shortaktien.de/hilfe/controller",
+      "url": "https://btm-community.de/hilfe/controller",
       "title": "Controller-Ausfall richtig zuordnen",
       "model": "Bonfire Performance · FarDriver / CAN",
       "revision": "2026-09-02",
@@ -1044,7 +1049,7 @@
     },
     {
       "kind": "repair-guide",
-      "url": "https://btm.shortaktien.de/hilfe/vibrationen",
+      "url": "https://btm-community.de/hilfe/vibrationen",
       "title": "Vibrationen und Schläge aus dem Antrieb",
       "model": "Wildfire · Motor, Rad und Controller",
       "revision": "2026-09-02",
@@ -1066,7 +1071,7 @@
     },
     {
       "kind": "repair-guide",
-      "url": "https://btm.shortaktien.de/hilfe/gabelbruecke",
+      "url": "https://btm-community.de/hilfe/gabelbruecke",
       "title": "Gabelbrücke: Schrauben gerissen",
       "model": "Wildfire · Fahrwerk / sicherheitskritisch",
       "revision": "2026-09-02",
@@ -1088,7 +1093,7 @@
     },
     {
       "kind": "repair-guide",
-      "url": "https://btm.shortaktien.de/hilfe/gabelabdichtung",
+      "url": "https://btm-community.de/hilfe/gabelabdichtung",
       "title": "Undichte Gabel abdichten",
       "model": "Wildfire · USD-Gabel",
       "revision": "2026-09-02",
@@ -1103,14 +1108,14 @@
       ],
       "sources": [
         {
-          "url": "https://btm.shortaktien.de/pdfs/21-gabelabdichtung-community.pdf",
+          "url": "https://btm-community.de/pdfs/21-gabelabdichtung-community.pdf",
           "label": "BTM Community · lokale PDF „Gabelabdichtung“"
         }
       ]
     },
     {
       "kind": "repair-guide",
-      "url": "https://btm.shortaktien.de/hilfe/vorderrad",
+      "url": "https://btm-community.de/hilfe/vorderrad",
       "title": "Vorderrad ausbauen und wieder einsetzen",
       "model": "Bonfire · Vorderrad / Bremse",
       "revision": "2026-09-02",
@@ -1132,7 +1137,7 @@
     },
     {
       "kind": "repair-guide",
-      "url": "https://btm.shortaktien.de/hilfe/hinterrad",
+      "url": "https://btm-community.de/hilfe/hinterrad",
       "title": "Hinterrad und Nabenmotor prüfen",
       "model": "Wildfire · Hinterrad / Nabenmotor",
       "revision": "2026-09-02",
@@ -1154,7 +1159,7 @@
     },
     {
       "kind": "repair-guide",
-      "url": "https://btm.shortaktien.de/hilfe/laden",
+      "url": "https://btm-community.de/hilfe/laden",
       "title": "Laden bricht ab oder Typ 2 startet nicht",
       "model": "Bonfire & Wildfire · Laden / BMS",
       "revision": "2026-09-02",
@@ -1176,7 +1181,7 @@
     },
     {
       "kind": "repair-guide",
-      "url": "https://btm.shortaktien.de/hilfe/nfc",
+      "url": "https://btm-community.de/hilfe/nfc",
       "title": "NFC / Keyless nachrüsten und prüfen",
       "model": "Wildfire · Startsystem",
       "revision": "2026-09-02",
@@ -1198,7 +1203,7 @@
     },
     {
       "kind": "repair-guide",
-      "url": "https://btm.shortaktien.de/hilfe/qs8",
+      "url": "https://btm-community.de/hilfe/qs8",
       "title": "QS8-Akkuanschluss sicher prüfen",
       "model": "Bonfire · Akkuanschluss / Hochstrom",
       "revision": "2026-09-02",
@@ -1220,7 +1225,7 @@
     },
     {
       "kind": "repair-guide",
-      "url": "https://btm.shortaktien.de/hilfe/wartung",
+      "url": "https://btm-community.de/hilfe/wartung",
       "title": "Reifen, Bremsen und Lager warten",
       "model": "Bonfire & Wildfire · Wartung",
       "revision": "2026-09-02",
@@ -1242,7 +1247,7 @@
     },
     {
       "kind": "repair-guide",
-      "url": "https://btm.shortaktien.de/hilfe/fehlercodes",
+      "url": "https://btm-community.de/hilfe/fehlercodes",
       "title": "Wildfire-Fehlercodes richtig einordnen",
       "model": "Wildfire · FarDriver / Antrieb",
       "revision": "2026-09-02",
@@ -1264,7 +1269,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/alu-topcase",
+      "url": "https://btm-community.de/ersatzteile/alu-topcase",
       "title": "Alu-Topcase",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -1285,7 +1290,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/bar-end-mirrors",
+      "url": "https://btm-community.de/ersatzteile/bar-end-mirrors",
       "title": "Lenkerendenspiegel",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -1306,7 +1311,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/bearings",
+      "url": "https://btm-community.de/ersatzteile/bearings",
       "title": "Lager",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -1327,7 +1332,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/change-the-color-of-my-off-road-protection",
+      "url": "https://btm-community.de/ersatzteile/change-the-color-of-my-off-road-protection",
       "title": "Farbauswahl Offroad-Schutz",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -1348,7 +1353,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/blinkerhalterung-vorne",
+      "url": "https://btm-community.de/ersatzteile/blinkerhalterung-vorne",
       "title": "Blinkerhalterung (vorne)",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -1369,7 +1374,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/bluetooth-dongle",
+      "url": "https://btm-community.de/ersatzteile/bluetooth-dongle",
       "title": "Bluetooth Dongle",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -1390,7 +1395,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/bremsbelage",
+      "url": "https://btm-community.de/ersatzteile/bremsbelage",
       "title": "Bremsbeläge",
       "revision": "2026-09-04",
       "lastReviewed": "2026-09-04",
@@ -1415,7 +1420,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/bremsen",
+      "url": "https://btm-community.de/ersatzteile/bremsen",
       "title": "Bremsen",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -1436,7 +1441,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/bremsleitung",
+      "url": "https://btm-community.de/ersatzteile/bremsleitung",
       "title": "Bremsleitung",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -1457,7 +1462,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/bremslichtkabel",
+      "url": "https://btm-community.de/ersatzteile/bremslichtkabel",
       "title": "Bremslichtkabel",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -1478,7 +1483,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/bremsscheibe",
+      "url": "https://btm-community.de/ersatzteile/bremsscheibe",
       "title": "Bremsscheibe",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -1499,7 +1504,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/bremszylinder",
+      "url": "https://btm-community.de/ersatzteile/bremszylinder",
       "title": "Bremssattel",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -1524,7 +1529,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/bremszylinder-und-hebel",
+      "url": "https://btm-community.de/ersatzteile/bremszylinder-und-hebel",
       "title": "Bremszylinder und -hebel",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -1545,7 +1550,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/charger-upgrade",
+      "url": "https://btm-community.de/ersatzteile/charger-upgrade",
       "title": "10A Charger Upgrade",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -1566,7 +1571,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/charging-bundle",
+      "url": "https://btm-community.de/ersatzteile/charging-bundle",
       "title": "Charging Bundle",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -1587,7 +1592,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/copy-of-52-v-batterie",
+      "url": "https://btm-community.de/ersatzteile/copy-of-52-v-batterie",
       "title": "52 V Batterie",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -1608,7 +1613,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/copy-of-beifahrerfussrasten",
+      "url": "https://btm-community.de/ersatzteile/copy-of-beifahrerfussrasten",
       "title": "Schwinge",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -1633,7 +1638,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/copy-of-achse",
+      "url": "https://btm-community.de/ersatzteile/copy-of-achse",
       "title": "Beifahrerfußrasten",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -1654,7 +1659,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/copy-of-federbeine",
+      "url": "https://btm-community.de/ersatzteile/copy-of-federbeine",
       "title": "Achse",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -1675,7 +1680,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/copy-of-gabelbruckenset",
+      "url": "https://btm-community.de/ersatzteile/copy-of-gabelbruckenset",
       "title": "Motorhalterung-Set",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -1696,7 +1701,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/copy-of-motorhalterung-set",
+      "url": "https://btm-community.de/ersatzteile/copy-of-motorhalterung-set",
       "title": "Mutterabdeckung-Set",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -1717,7 +1722,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/copy-of-off-road-schutz",
+      "url": "https://btm-community.de/ersatzteile/copy-of-off-road-schutz",
       "title": "Dual Sport Lenker",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -1738,7 +1743,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/classic-indicator",
+      "url": "https://btm-community.de/ersatzteile/classic-indicator",
       "title": "Klassische Blinker",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -1759,7 +1764,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/classic-mirrors",
+      "url": "https://btm-community.de/ersatzteile/classic-mirrors",
       "title": "Klassische Spiegel",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -1780,7 +1785,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/dcdc-converter",
+      "url": "https://btm-community.de/ersatzteile/dcdc-converter",
       "title": "DC/DC-Wandler",
       "revision": "2026-09-04",
       "lastReviewed": "2026-09-04",
@@ -1813,7 +1818,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/display",
+      "url": "https://btm-community.de/ersatzteile/display",
       "title": "Display",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -1834,7 +1839,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/dual-sport-reifen-upgrade",
+      "url": "https://btm-community.de/ersatzteile/dual-sport-reifen-upgrade",
       "title": "Dual-Sport-Reifen-Upgrade",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -1855,7 +1860,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/enduro-fender",
+      "url": "https://btm-community.de/ersatzteile/enduro-fender",
       "title": "Enduro-Kotflügel",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -1876,7 +1881,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/felge",
+      "url": "https://btm-community.de/ersatzteile/felge",
       "title": "Felge",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -1897,7 +1902,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/fork-stabiliser",
+      "url": "https://btm-community.de/ersatzteile/fork-stabiliser",
       "title": "Gabelstabilisator",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -1918,7 +1923,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/front-wheel",
+      "url": "https://btm-community.de/ersatzteile/front-wheel",
       "title": "Vorderrad",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -1939,7 +1944,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/foot-pegs-set",
+      "url": "https://btm-community.de/ersatzteile/foot-pegs-set",
       "title": "Fußrasten-Set",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -1960,7 +1965,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/gabelbrucke-mit-lenkerklemmen",
+      "url": "https://btm-community.de/ersatzteile/gabelbrucke-mit-lenkerklemmen",
       "title": "Gabelbrückenset",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -1981,7 +1986,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/gabelset",
+      "url": "https://btm-community.de/ersatzteile/gabelset",
       "title": "Gabelset",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -2002,7 +2007,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/gasdruck-federbeine",
+      "url": "https://btm-community.de/ersatzteile/gasdruck-federbeine",
       "title": "Gasdruck-Federbeine",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -2023,7 +2028,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/goldene-usd-gabel",
+      "url": "https://btm-community.de/ersatzteile/goldene-usd-gabel",
       "title": "Goldene USD-Gabel",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -2044,7 +2049,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/handguards",
+      "url": "https://btm-community.de/ersatzteile/handguards",
       "title": "Aluminium Handguards",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -2065,7 +2070,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/handlebar-crash-bars",
+      "url": "https://btm-community.de/ersatzteile/handlebar-crash-bars",
       "title": "Lenker-Sturzbügel",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -2086,7 +2091,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/handlebar-risers",
+      "url": "https://btm-community.de/ersatzteile/handlebar-risers",
       "title": "Lenkererhöhung",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -2107,7 +2112,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/headlight",
+      "url": "https://btm-community.de/ersatzteile/headlight",
       "title": "Scheinwerfer",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -2128,7 +2133,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/headlight-grill",
+      "url": "https://btm-community.de/ersatzteile/headlight-grill",
       "title": "Scheinwerfergitter",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -2149,7 +2154,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/hintere-stossdampfer",
+      "url": "https://btm-community.de/ersatzteile/hintere-stossdampfer",
       "title": "Hintere Stoßdämpfer",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -2170,7 +2175,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/hinterer-radschutz",
+      "url": "https://btm-community.de/ersatzteile/hinterer-radschutz",
       "title": "Hinterer Radschutz",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -2191,7 +2196,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/hub-motor",
+      "url": "https://btm-community.de/ersatzteile/hub-motor",
       "title": "Radnabenmotor",
       "revision": "2026-09-04",
       "lastReviewed": "2026-09-04",
@@ -2216,7 +2221,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/kabel",
+      "url": "https://btm-community.de/ersatzteile/kabel",
       "title": "Kabel",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -2237,7 +2242,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/key-set",
+      "url": "https://btm-community.de/ersatzteile/key-set",
       "title": "Schlüsselsatz",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -2258,7 +2263,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/keyless-go",
+      "url": "https://btm-community.de/ersatzteile/keyless-go",
       "title": "Keyless Go",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -2279,7 +2284,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/keyless-go-retro-fit",
+      "url": "https://btm-community.de/ersatzteile/keyless-go-retro-fit",
       "title": "Keyless-Go-Retrofit",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -2300,7 +2305,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/kill-switch",
+      "url": "https://btm-community.de/ersatzteile/kill-switch",
       "title": "Kill-Switch",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -2321,7 +2326,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/ladegerat",
+      "url": "https://btm-community.de/ersatzteile/ladegerat",
       "title": "Ladegerät",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -2342,7 +2347,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/langer-alu-radschutz",
+      "url": "https://btm-community.de/ersatzteile/langer-alu-radschutz",
       "title": "Langer Alu-Radschutz",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -2363,7 +2368,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/langer-bonfire-sitz",
+      "url": "https://btm-community.de/ersatzteile/langer-bonfire-sitz",
       "title": "Langer Bonfire-Sitz",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -2384,7 +2389,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/led-blinker",
+      "url": "https://btm-community.de/ersatzteile/led-blinker",
       "title": "LED-Blinker",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -2405,7 +2410,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/led-indicators",
+      "url": "https://btm-community.de/ersatzteile/led-indicators",
       "title": "LED Blinker",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -2426,7 +2431,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/lenker",
+      "url": "https://btm-community.de/ersatzteile/lenker",
       "title": "Lenker",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -2447,7 +2452,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/light-holder",
+      "url": "https://btm-community.de/ersatzteile/light-holder",
       "title": "Scheinwerferhalter",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -2468,7 +2473,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/lower-foot-rests",
+      "url": "https://btm-community.de/ersatzteile/lower-foot-rests",
       "title": "Lower Foot Rests",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -2489,7 +2494,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/luftgekuhlt",
+      "url": "https://btm-community.de/ersatzteile/luftgekuhlt",
       "title": "Luftgekühlt",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -2510,7 +2515,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/modern-bundle",
+      "url": "https://btm-community.de/ersatzteile/modern-bundle",
       "title": "Modern-Bundle",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -2531,7 +2536,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/moped-license-plate-holder",
+      "url": "https://btm-community.de/ersatzteile/moped-license-plate-holder",
       "title": "Moped-Kennzeichenhalter",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -2552,7 +2557,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/mutterabdeckung-set",
+      "url": "https://btm-community.de/ersatzteile/mutterabdeckung-set",
       "title": "Mutterabdeckung Set",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -2568,7 +2573,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/nfc-karte-nachrustkit",
+      "url": "https://btm-community.de/ersatzteile/nfc-karte-nachrustkit",
       "title": "NFC-Karte / Nachrüstkit",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -2589,7 +2594,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/off-road-bundle",
+      "url": "https://btm-community.de/ersatzteile/off-road-bundle",
       "title": "Offroad-Bundle",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -2610,7 +2615,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/off-road-schutz",
+      "url": "https://btm-community.de/ersatzteile/off-road-schutz",
       "title": "Offroad-Schutz",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -2626,7 +2631,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/passenger-hold",
+      "url": "https://btm-community.de/ersatzteile/passenger-hold",
       "title": "Soziushalter",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -2651,7 +2656,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/performance-bundle",
+      "url": "https://btm-community.de/ersatzteile/performance-bundle",
       "title": "Performance-Bundle",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -2672,7 +2677,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/radabdeckung",
+      "url": "https://btm-community.de/ersatzteile/radabdeckung",
       "title": "Radabdeckung",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -2693,7 +2698,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/range-extender-bundle",
+      "url": "https://btm-community.de/ersatzteile/range-extender-bundle",
       "title": "Reichweiten-Bundle",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -2714,7 +2719,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/rear-light",
+      "url": "https://btm-community.de/ersatzteile/rear-light",
       "title": "Rücklicht",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -2735,7 +2740,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/rear-rack",
+      "url": "https://btm-community.de/ersatzteile/rear-rack",
       "title": "Gepäckträger hinten",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -2756,7 +2761,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/reflektoren",
+      "url": "https://btm-community.de/ersatzteile/reflektoren",
       "title": "Reflektoren",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -2777,7 +2782,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/reparatur-qs8s-stecker",
+      "url": "https://btm-community.de/ersatzteile/reparatur-qs8s-stecker",
       "title": "QS8-S-Stecker-Reparatur",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -2798,7 +2803,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/retro-windschild",
+      "url": "https://btm-community.de/ersatzteile/retro-windschild",
       "title": "Retro-Windschild",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -2819,7 +2824,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/ride-mode-button",
+      "url": "https://btm-community.de/ersatzteile/ride-mode-button",
       "title": "Fahrmodi-Taster",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -2840,7 +2845,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/schaltereinheit",
+      "url": "https://btm-community.de/ersatzteile/schaltereinheit",
       "title": "Schaltereinheit",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -2861,7 +2866,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/scheinwerfer-retrofit",
+      "url": "https://btm-community.de/ersatzteile/scheinwerfer-retrofit",
       "title": "Scheinwerfer-Retrofit",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -2882,7 +2887,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/schuko-auf-typ-2-adapter",
+      "url": "https://btm-community.de/ersatzteile/schuko-auf-typ-2-adapter",
       "title": "Schuko-auf-Typ-2-Adapter",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -2903,7 +2908,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/schuko-ladekabel-fur-wildfire",
+      "url": "https://btm-community.de/ersatzteile/schuko-ladekabel-fur-wildfire",
       "title": "Schuko-Ladekabel für Wildfire",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -2924,7 +2929,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/seat",
+      "url": "https://btm-community.de/ersatzteile/seat",
       "title": "Sitz",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -2945,7 +2950,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/seitenstander-kill-switch",
+      "url": "https://btm-community.de/ersatzteile/seitenstander-kill-switch",
       "title": "Seitenständer Kill Switch",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -2966,7 +2971,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/side-bag",
+      "url": "https://btm-community.de/ersatzteile/side-bag",
       "title": "Seitentasche",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -2987,7 +2992,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/side-cover",
+      "url": "https://btm-community.de/ersatzteile/side-cover",
       "title": "Seitenabdeckung",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -3008,7 +3013,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/side-stand",
+      "url": "https://btm-community.de/ersatzteile/side-stand",
       "title": "Seitenständer",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -3029,7 +3034,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/side-stand-spring-set",
+      "url": "https://btm-community.de/ersatzteile/side-stand-spring-set",
       "title": "Seitenständer-Feder-Set",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -3050,7 +3055,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/sitz-b-ware-gebraucht",
+      "url": "https://btm-community.de/ersatzteile/sitz-b-ware-gebraucht",
       "title": "Sitz (B-Ware / gebraucht)",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -3071,7 +3076,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/speiche-mit-nippel",
+      "url": "https://btm-community.de/ersatzteile/speiche-mit-nippel",
       "title": "Speiche mit Nippel",
       "revision": "2026-09-04",
       "lastReviewed": "2026-09-04",
@@ -3096,7 +3101,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/stand",
+      "url": "https://btm-community.de/ersatzteile/stand",
       "title": "Montageständer",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -3117,7 +3122,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/stander-copy",
+      "url": "https://btm-community.de/ersatzteile/stander-copy",
       "title": "Ständer",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -3138,7 +3143,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/starter-relais-12-v",
+      "url": "https://btm-community.de/ersatzteile/starter-relais-12-v",
       "title": "12-V-Starterrelais",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -3159,7 +3164,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/sticker-set",
+      "url": "https://btm-community.de/ersatzteile/sticker-set",
       "title": "Sticker-Set",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -3180,7 +3185,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/surf-rack",
+      "url": "https://btm-community.de/ersatzteile/surf-rack",
       "title": "Surf-Rack",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -3201,7 +3206,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/tall-rider-bundle",
+      "url": "https://btm-community.de/ersatzteile/tall-rider-bundle",
       "title": "Tall-Rider-Bundle",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -3222,7 +3227,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/tank",
+      "url": "https://btm-community.de/ersatzteile/tank",
       "title": "Tank",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -3247,7 +3252,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/tank-b-ware",
+      "url": "https://btm-community.de/ersatzteile/tank-b-ware",
       "title": "Tank (B-Ware)",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -3268,7 +3273,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/tankgummi-set",
+      "url": "https://btm-community.de/ersatzteile/tankgummi-set",
       "title": "Tankgummi Set",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -3289,7 +3294,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/tft-touch-display-retrofit",
+      "url": "https://btm-community.de/ersatzteile/tft-touch-display-retrofit",
       "title": "TFT-Touchdisplay-Retrofit",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -3310,7 +3315,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/typ-2-kabel",
+      "url": "https://btm-community.de/ersatzteile/typ-2-kabel",
       "title": "Typ-2-Kabel",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -3331,7 +3336,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/usb-charging-port",
+      "url": "https://btm-community.de/ersatzteile/usb-charging-port",
       "title": "USB-Ladeport",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -3356,7 +3361,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/usd-gabelset",
+      "url": "https://btm-community.de/ersatzteile/usd-gabelset",
       "title": "USD-Gabel-Set",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -3377,7 +3382,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/wildfire",
+      "url": "https://btm-community.de/ersatzteile/wildfire",
       "title": "Wildfire",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -3398,7 +3403,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/wildfire-abs",
+      "url": "https://btm-community.de/ersatzteile/wildfire-abs",
       "title": "Wildfire ABS",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -3419,7 +3424,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/wildfire-gabelbruckenset",
+      "url": "https://btm-community.de/ersatzteile/wildfire-gabelbruckenset",
       "title": "Wildfire-Gabelbrücken-Set",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -3440,7 +3445,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/wildfire-konfiguration",
+      "url": "https://btm-community.de/ersatzteile/wildfire-konfiguration",
       "title": "Wildfire-Konfiguration",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -3461,7 +3466,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/wildfire-performance",
+      "url": "https://btm-community.de/ersatzteile/wildfire-performance",
       "title": "Wildfire Performance",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -3482,7 +3487,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/windschild",
+      "url": "https://btm-community.de/ersatzteile/windschild",
       "title": "Windschild",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",
@@ -3498,7 +3503,7 @@
     },
     {
       "kind": "part",
-      "url": "https://btm.shortaktien.de/ersatzteile/xlr-charging-port",
+      "url": "https://btm-community.de/ersatzteile/xlr-charging-port",
       "title": "XLR-Ladeport",
       "revision": "2026-09-02",
       "lastReviewed": "2026-09-02",

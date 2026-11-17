@@ -4,7 +4,7 @@ Black Tea Motorbikes – Hilfe ist ein offenes, gemeinschaftlich gepflegtes Arch
 
 ## Ohne GitHub mitmachen
 
-Kurze Hinweise, Korrekturen, Quellen und optionale Bilder können direkt am Ende der [Bonfire-Wiki-Seite](https://btm.shortaktien.de/bikes/bonfire) oder [Wildfire-Wiki-Seite](https://btm.shortaktien.de/bikes/wildfire) über „Etwas ergänzen oder korrigieren?“ eingereicht werden. Dafür ist kein GitHub-Konto nötig. Jeder Vorschlag landet zunächst als Entwurf in der redaktionellen Prüfung und wird erst nach Freigabe öffentlich angezeigt.
+Kurze Hinweise, Korrekturen, Quellen und optionale Bilder können direkt am Ende der [Bonfire-Wiki-Seite](https://btm-community.de/bikes/bonfire) oder [Wildfire-Wiki-Seite](https://btm-community.de/bikes/wildfire) über „Etwas ergänzen oder korrigieren?“ eingereicht werden. Dafür ist kein GitHub-Konto nötig. Jeder Vorschlag landet zunächst als Entwurf in der redaktionellen Prüfung und wird erst nach Freigabe öffentlich angezeigt.
 
 ## So funktioniert ein Beitrag
 
