@@ -115,14 +115,16 @@ Für das öffentliche **„Bug melden“**-Popup werden Meldungen serverseitig a
 ```dotenv
 GITHUB_REPOSITORY=shortaktien/blacktea-motorcycles
 GITHUB_TOKEN=<nur-serverseitig-setzen>
-BUG_REPORT_ALLOWED_HOSTS=btm.shortaktien.de,127.0.0.1,localhost
-PUBLIC_SITE_URL=https://btm.shortaktien.de
+BUG_REPORT_ALLOWED_HOSTS=btm-community.de,btm.shortaktien.de,127.0.0.1,localhost
+PUBLIC_SITE_URL=https://btm-community.de
 EMAIL_CONFIRMATION_TTL_SECONDS=86400
 MAILJET_API_KEY=<nur-serverseitig-setzen>
 MAILJET_API_SECRET=<nur-serverseitig-setzen>
 MAILJET_FROM_EMAIL=info@shortaktien.de
 MAILJET_FROM_NAME=BTM-Hilfe
 ```
+
+Beim Domainumzug müssen `PUBLIC_SITE_URL` und `BUG_REPORT_ALLOWED_HOSTS` auch in der bestehenden Server-`backend/.env` angepasst werden. Die Beispielwerte ändern keine produktive Konfiguration. DNS, HTTPS und Weiterleitungen müssen vor dem Livegang separat eingerichtet und geprüft werden.
 
 Für Sentry reicht dieselbe Projekt-DSN einmalig in `backend/.env` als
 `SENTRY_DSN`. Das Backend-SDK liest die Variable direkt. Nach einer Zustimmung

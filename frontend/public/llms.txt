@@ -6,63 +6,63 @@ Die Website richtet sich an Besitzerinnen und Besitzer von Bonfire- und Wildfire
 
 ## Kernseiten
 
-- [Black Tea Motorbikes insolvent: Hilfe für Besitzer & Besteller](https://btm.shortaktien.de/insolvenz): Hilfe zur Black Tea Motorbikes Insolvenz: Verfahrensstand prüfen, Bestellunterlagen sichern, Ersatzteile suchen und Reparaturen vorbereiten.
-- [Black Tea Reparatur: Werkstattkontakt vorbereiten](https://btm.shortaktien.de/hilfe/werkstatt-vorbereiten): Bonfire oder Wildfire defekt? Erstelle einen Reparatur-Steckbrief mit Modell, Fehlerbild und Unterlagen zum Kopieren oder Herunterladen.
-- [Black Tea Ersatzteile finden: Bonfire & Wildfire abgleichen](https://btm.shortaktien.de/hilfe/ersatzteil-finden): Ersatzteile für Bonfire und Wildfire suchen: Modell, Teilenummer, Maße und Bezugsstatus prüfen. Mit Vorlage für eine gezielte Teileanfrage.
-- [Black Tea Hilfe: Insolvenz, Ersatzteile & Reparaturwissen](https://btm.shortaktien.de/): Unabhängige Hilfe für Black Tea Bonfire und Wildfire: Orientierung zur Insolvenz, Ersatzteile, Handbücher, Reparaturwissen und Werkstattkontakte.
-- [Reparaturhilfe — Black Tea Motorbikes – Hilfe](https://btm.shortaktien.de/hilfe): Redaktionell geordnete Reparaturhilfen für typische Bonfire- und Wildfire-Fehlerbilder — mit Kurzablauf, ausführlicher Prüfung, Sicherheit und Quelle.
-- [Reparatur anfragen — Black Tea Motorbikes – Hilfe](https://btm.shortaktien.de/hilfe/anfragen): Reparaturanfragen zu Black Tea Bonfire und Wildfire stellen, Erfahrungen teilen und gemeinsam nachvollziehbare Lösungen dokumentieren.
-- [Ersatzteile — Black Tea Motorbikes – Hilfe](https://btm.shortaktien.de/ersatzteile): Historischer BTM-Ersatzteilkatalog mit Modellbezug, Teilenamen und Quellen. Bestand und Preise vor dem Kauf prüfen.
-- [BTM Community — Black Tea Motorbikes – Hilfe](https://btm.shortaktien.de/community): Erfahrungen, Umbauten und Reparaturtipps von BTM-Ridern teilen und die neuesten Beiträge der Community entdecken.
-- [Black Tea FAQ: Insolvenz, Bestellungen & Ersatzteile](https://btm.shortaktien.de/faq): Antworten zur Black Tea Motorbikes Insolvenz, offenen Bestellungen, Forderungen, Ersatzteilen und Reparaturen für Bonfire und Wildfire – mit Quellen und weiterführender Hilfe.
-- [Community-Karte — Black Tea Motorbikes – Hilfe](https://btm.shortaktien.de/karte): Ungefähre PLZ-Regionen der BTM-Community in Deutschland, Österreich und der Schweiz.
-- [Werkstätten für BTM-Bikes — Black Tea Motorbikes – Hilfe](https://btm.shortaktien.de/werkstaetten): Werkstätten in Deutschland, Österreich und der Schweiz finden oder einen geprüften Tipp aus der Community eintragen.
-- [Quellen — Black Tea Motorbikes – Hilfe](https://btm.shortaktien.de/quellen): Nachvollziehbare Quellen zu Insolvenzstatus, Handbüchern, lokalen PDFs, Ersatzteilspuren und Community-Wissen.
-- [Impressum — Black Tea Motorbikes – Hilfe](https://btm.shortaktien.de/impressum): Anbieterinformationen und rechtliche Hinweise zu Black Tea Motorbikes – Hilfe.
-- [Datenschutz — Black Tea Motorbikes – Hilfe](https://btm.shortaktien.de/datenschutz): Datenschutzhinweise zu Kommentaren, Bildanhängen und dem Betrieb von Black Tea Motorbikes – Hilfe.
-- [Wiki — Black Tea Motorbikes – Hilfe](https://btm.shortaktien.de/wiki): Das BTM-Wiki enthält redaktionell geprüfte Artikel zu Bonfire und Wildfire und wird gemeinsam erweitert.
-- [Black Tea Bonfire – Technik, Probleme & Reparaturhilfe](https://btm.shortaktien.de/bikes/bonfire): Technische Wiki-Seite zur Black Tea Bonfire mit Handbuchdaten, Modellvarianten und nachvollziehbaren Quellen.
-- [Black Tea Wildfire – Technik, Probleme & Reparaturhilfe](https://btm.shortaktien.de/bikes/wildfire): Technische Wiki-Seite zur Black Tea Wildfire mit Handbuchdaten, Modellvarianten und nachvollziehbaren Quellen.
+- [Black Tea Motorbikes insolvent: Hilfe für Besitzer & Besteller](https://btm-community.de/insolvenz): Hilfe zur Black Tea Motorbikes Insolvenz: Verfahrensstand prüfen, Bestellunterlagen sichern, Ersatzteile suchen und Reparaturen vorbereiten.
+- [Black Tea Reparatur: Werkstattkontakt vorbereiten](https://btm-community.de/hilfe/werkstatt-vorbereiten): Bonfire oder Wildfire defekt? Erstelle einen Reparatur-Steckbrief mit Modell, Fehlerbild und Unterlagen zum Kopieren oder Herunterladen.
+- [Black Tea Ersatzteile finden: Bonfire & Wildfire abgleichen](https://btm-community.de/hilfe/ersatzteil-finden): Ersatzteile für Bonfire und Wildfire suchen: Modell, Teilenummer, Maße und Bezugsstatus prüfen. Mit Vorlage für eine gezielte Teileanfrage.
+- [Black Tea Hilfe: Insolvenz, Ersatzteile & Reparaturwissen](https://btm-community.de/): Unabhängige Hilfe für Black Tea Bonfire und Wildfire: Orientierung zur Insolvenz, Ersatzteile, Handbücher, Reparaturwissen und Werkstattkontakte.
+- [Reparaturhilfe — Black Tea Motorbikes – Hilfe](https://btm-community.de/hilfe): Redaktionell geordnete Reparaturhilfen für typische Bonfire- und Wildfire-Fehlerbilder — mit Kurzablauf, ausführlicher Prüfung, Sicherheit und Quelle.
+- [Reparatur anfragen — Black Tea Motorbikes – Hilfe](https://btm-community.de/hilfe/anfragen): Reparaturanfragen zu Black Tea Bonfire und Wildfire stellen, Erfahrungen teilen und gemeinsam nachvollziehbare Lösungen dokumentieren.
+- [Ersatzteile — Black Tea Motorbikes – Hilfe](https://btm-community.de/ersatzteile): Historischer BTM-Ersatzteilkatalog mit Modellbezug, Teilenamen und Quellen. Bestand und Preise vor dem Kauf prüfen.
+- [BTM Community — Black Tea Motorbikes – Hilfe](https://btm-community.de/community): Erfahrungen, Umbauten und Reparaturtipps von BTM-Ridern teilen und die neuesten Beiträge der Community entdecken.
+- [Black Tea FAQ: Insolvenz, Bestellungen & Ersatzteile](https://btm-community.de/faq): Antworten zur Black Tea Motorbikes Insolvenz, offenen Bestellungen, Forderungen, Ersatzteilen und Reparaturen für Bonfire und Wildfire – mit Quellen und weiterführender Hilfe.
+- [Community-Karte — Black Tea Motorbikes – Hilfe](https://btm-community.de/karte): Ungefähre PLZ-Regionen der BTM-Community in Deutschland, Österreich und der Schweiz.
+- [Werkstätten für BTM-Bikes — Black Tea Motorbikes – Hilfe](https://btm-community.de/werkstaetten): Werkstätten in Deutschland, Österreich und der Schweiz finden oder einen geprüften Tipp aus der Community eintragen.
+- [Quellen — Black Tea Motorbikes – Hilfe](https://btm-community.de/quellen): Nachvollziehbare Quellen zu Insolvenzstatus, Handbüchern, lokalen PDFs, Ersatzteilspuren und Community-Wissen.
+- [Impressum — Black Tea Motorbikes – Hilfe](https://btm-community.de/impressum): Anbieterinformationen und rechtliche Hinweise zu Black Tea Motorbikes – Hilfe.
+- [Datenschutz — Black Tea Motorbikes – Hilfe](https://btm-community.de/datenschutz): Datenschutzhinweise zu Kommentaren, Bildanhängen und dem Betrieb von Black Tea Motorbikes – Hilfe.
+- [Wiki — Black Tea Motorbikes – Hilfe](https://btm-community.de/wiki): Das BTM-Wiki enthält redaktionell geprüfte Artikel zu Bonfire und Wildfire und wird gemeinsam erweitert.
+- [Black Tea Bonfire – Technik, Probleme & Reparaturhilfe](https://btm-community.de/bikes/bonfire): Technische Wiki-Seite zur Black Tea Bonfire mit Handbuchdaten, Modellvarianten und nachvollziehbaren Quellen.
+- [Black Tea Wildfire – Technik, Probleme & Reparaturhilfe](https://btm-community.de/bikes/wildfire): Technische Wiki-Seite zur Black Tea Wildfire mit Handbuchdaten, Modellvarianten und nachvollziehbaren Quellen.
 
 ## Hilfe für Besitzer und Besteller
 
-- [Black Tea Motorbikes insolvent: Hilfe für Besitzer & Besteller](https://btm.shortaktien.de/insolvenz): Das Amtsgericht München eröffnete das Insolvenzverfahren über die Black Tea Motorbikes GmbH wegen Zahlungsunfähigkeit am 05.10.2026 um 12:35 Uhr (1513 IN 2588/26) und bestellte Rechtsanwalt Florian Loserth zum Insolvenzverwalter. Laut amtlichem Beschluss sind Forderungen bis 24.11.2026 beim Insolvenzverwalter anzumelden; schriftliche Widersprüche gegen Forderungsanmeldungen sind bis 05.01.2027 beim Insolvenzgericht möglich. Originaltext abgerufen am 07.10.2026.
-- [Black Tea Reparatur: Werkstattkontakt vorbereiten](https://btm.shortaktien.de/hilfe/werkstatt-vorbereiten): Notiere Modell und Baujahr, die genaue Fehlermeldung, den Zeitpunkt des Auftretens und bisherige Maßnahmen. Ergänze passende Handbuchseiten und Fotos. Der Steckbrief unten funktioniert ohne Konto und erstellt eine Textdatei für deine eigene Verwendung.
-- [Black Tea Ersatzteile finden: Bonfire & Wildfire abgleichen](https://btm.shortaktien.de/hilfe/ersatzteil-finden): Modell und Baujahr erfassen, historische Bezeichnung nachschlagen und die konkrete Ausführung vergleichen. Erst danach Lieferbarkeit und Passform mit einem Anbieter oder Fachbetrieb klären. Ein ähnliches Produktfoto oder ein passender Stecker allein reicht nicht aus.
+- [Black Tea Motorbikes insolvent: Hilfe für Besitzer & Besteller](https://btm-community.de/insolvenz): Das Amtsgericht München eröffnete das Insolvenzverfahren über die Black Tea Motorbikes GmbH wegen Zahlungsunfähigkeit am 05.10.2026 um 12:35 Uhr (1513 IN 2588/26) und bestellte Rechtsanwalt Florian Loserth zum Insolvenzverwalter. Laut amtlichem Beschluss sind Forderungen bis 24.11.2026 beim Insolvenzverwalter anzumelden; schriftliche Widersprüche gegen Forderungsanmeldungen sind bis 05.01.2027 beim Insolvenzgericht möglich. Originaltext abgerufen am 07.10.2026.
+- [Black Tea Reparatur: Werkstattkontakt vorbereiten](https://btm-community.de/hilfe/werkstatt-vorbereiten): Notiere Modell und Baujahr, die genaue Fehlermeldung, den Zeitpunkt des Auftretens und bisherige Maßnahmen. Ergänze passende Handbuchseiten und Fotos. Der Steckbrief unten funktioniert ohne Konto und erstellt eine Textdatei für deine eigene Verwendung.
+- [Black Tea Ersatzteile finden: Bonfire & Wildfire abgleichen](https://btm-community.de/hilfe/ersatzteil-finden): Modell und Baujahr erfassen, historische Bezeichnung nachschlagen und die konkrete Ausführung vergleichen. Erst danach Lieferbarkeit und Passform mit einem Anbieter oder Fachbetrieb klären. Ein ähnliches Produktfoto oder ein passender Stecker allein reicht nicht aus.
 
 ## Reparaturhilfen
 
-- [12-V-Versorgung prüfen](https://btm.shortaktien.de/hilfe/dcdc): Wildfire · DC/DC-Wandler. Wenn Licht, Steuerung oder andere 12-V-Verbraucher ausfallen, nicht blind ein ähnliches Netzteil bestellen.
-- [Akku wird nicht erkannt](https://btm.shortaktien.de/hilfe/akku-bms): Bonfire & Wildfire · Akku / BMS. Laden sofort stoppen und den Akku nicht auf Verdacht weiterverwenden.
-- [Fehlerbild systematisch eingrenzen](https://btm.shortaktien.de/hilfe/fehleranalyse): Bonfire & Wildfire · Diagnose. Erst Fahrzeug und Symptom sauber einordnen, dann gezielt prüfen lassen — so vermeidest du Teiletausch auf Verdacht.
-- [MOSFET-Fehler: Wildfire bleibt stehen](https://btm.shortaktien.de/hilfe/mosfet): Wildfire · FarDriver / Antrieb. MOSFET-Fehler und fehlende Gasannahme gehören in eine sichere Antriebsdiagnose — nicht in einen weiteren Probefahrt-Test.
-- [Controller-Ausfall richtig zuordnen](https://btm.shortaktien.de/hilfe/controller): Bonfire Performance · FarDriver / CAN. Abschalten bei Rekuperation oder Last kann vom Controller kommen — genauso aber von BMS, Verkabelung oder falschen Einstellungen.
-- [Vibrationen und Schläge aus dem Antrieb](https://btm.shortaktien.de/hilfe/vibrationen): Wildfire · Motor, Rad und Controller. Vibrationen zwischen bestimmten Geschwindigkeiten können mechanisch oder elektrisch entstehen. Erst eingrenzen, dann einstellen oder reparieren.
-- [Gabelbrücke: Schrauben gerissen](https://btm.shortaktien.de/hilfe/gabelbruecke): Wildfire · Fahrwerk / sicherheitskritisch. Gerissene oder unklare Befestigungsschrauben an der Gabelbrücke sind ein Abbruchsignal und keine schnelle Standardreparatur.
-- [Undichte Gabel abdichten](https://btm.shortaktien.de/hilfe/gabelabdichtung): Wildfire · USD-Gabel. Öl an der Gabel ist nicht nur ein Komfortproblem: Es kann die Bremsanlage und die Kontrolle über das Vorderrad beeinträchtigen.
-- [Vorderrad ausbauen und wieder einsetzen](https://btm.shortaktien.de/hilfe/vorderrad): Bonfire · Vorderrad / Bremse. Der Ausbau ist machbar, aber Spacer, Bremsanlage, Achse und Drehmoment müssen in der richtigen Reihenfolge dokumentiert werden.
-- [Hinterrad und Nabenmotor prüfen](https://btm.shortaktien.de/hilfe/hinterrad): Wildfire · Hinterrad / Nabenmotor. Am Hinterrad treffen Reifen, Bremse, Lager, Achse und Motorleitung zusammen. Deshalb wird jeder Arbeitsschritt dokumentiert.
-- [Laden bricht ab oder Typ 2 startet nicht](https://btm.shortaktien.de/hilfe/laden): Bonfire & Wildfire · Laden / BMS. Wenn der Ladeziegel oder eine öffentliche AC-Säule nicht lädt, werden Strompfad, Kabel, Akkuzustand und BMS getrennt geprüft.
-- [NFC / Keyless nachrüsten und prüfen](https://btm.shortaktien.de/hilfe/nfc): Wildfire · Startsystem. Beim NFC-Umbau zählen Modul, Stecker, Einbauort und Funktionsprüfung — nicht das Verbinden von Kabeln nach Farben.
-- [QS8-Akkuanschluss sicher prüfen](https://btm.shortaktien.de/hilfe/qs8): Bonfire · Akkuanschluss / Hochstrom. Ein QS8-Ersatz oder eine externe Lademöglichkeit darf nicht nach Optik ausgewählt werden. Stecker, Polung und BMS müssen zusammenpassen.
-- [Reifen, Bremsen und Lager warten](https://btm.shortaktien.de/hilfe/wartung): Bonfire & Wildfire · Wartung. Regelmäßige Sicht- und Funktionskontrollen verhindern, dass aus Reifen-, Brems- oder Lagerspiel ein Sicherheitsproblem wird.
-- [Wildfire-Fehlercodes richtig einordnen](https://btm.shortaktien.de/hilfe/fehlercodes): Wildfire · FarDriver / Antrieb. Pieptöne und Kontrollleuchte helfen bei der Eingrenzung. Sie ersetzen keine Prüfung von Akku, Motor, Controller und Verkabelung.
+- [12-V-Versorgung prüfen](https://btm-community.de/hilfe/dcdc): Wildfire · DC/DC-Wandler. Wenn Licht, Steuerung oder andere 12-V-Verbraucher ausfallen, nicht blind ein ähnliches Netzteil bestellen.
+- [Akku wird nicht erkannt](https://btm-community.de/hilfe/akku-bms): Bonfire & Wildfire · Akku / BMS. Laden sofort stoppen und den Akku nicht auf Verdacht weiterverwenden.
+- [Fehlerbild systematisch eingrenzen](https://btm-community.de/hilfe/fehleranalyse): Bonfire & Wildfire · Diagnose. Erst Fahrzeug und Symptom sauber einordnen, dann gezielt prüfen lassen — so vermeidest du Teiletausch auf Verdacht.
+- [MOSFET-Fehler: Wildfire bleibt stehen](https://btm-community.de/hilfe/mosfet): Wildfire · FarDriver / Antrieb. MOSFET-Fehler und fehlende Gasannahme gehören in eine sichere Antriebsdiagnose — nicht in einen weiteren Probefahrt-Test.
+- [Controller-Ausfall richtig zuordnen](https://btm-community.de/hilfe/controller): Bonfire Performance · FarDriver / CAN. Abschalten bei Rekuperation oder Last kann vom Controller kommen — genauso aber von BMS, Verkabelung oder falschen Einstellungen.
+- [Vibrationen und Schläge aus dem Antrieb](https://btm-community.de/hilfe/vibrationen): Wildfire · Motor, Rad und Controller. Vibrationen zwischen bestimmten Geschwindigkeiten können mechanisch oder elektrisch entstehen. Erst eingrenzen, dann einstellen oder reparieren.
+- [Gabelbrücke: Schrauben gerissen](https://btm-community.de/hilfe/gabelbruecke): Wildfire · Fahrwerk / sicherheitskritisch. Gerissene oder unklare Befestigungsschrauben an der Gabelbrücke sind ein Abbruchsignal und keine schnelle Standardreparatur.
+- [Undichte Gabel abdichten](https://btm-community.de/hilfe/gabelabdichtung): Wildfire · USD-Gabel. Öl an der Gabel ist nicht nur ein Komfortproblem: Es kann die Bremsanlage und die Kontrolle über das Vorderrad beeinträchtigen.
+- [Vorderrad ausbauen und wieder einsetzen](https://btm-community.de/hilfe/vorderrad): Bonfire · Vorderrad / Bremse. Der Ausbau ist machbar, aber Spacer, Bremsanlage, Achse und Drehmoment müssen in der richtigen Reihenfolge dokumentiert werden.
+- [Hinterrad und Nabenmotor prüfen](https://btm-community.de/hilfe/hinterrad): Wildfire · Hinterrad / Nabenmotor. Am Hinterrad treffen Reifen, Bremse, Lager, Achse und Motorleitung zusammen. Deshalb wird jeder Arbeitsschritt dokumentiert.
+- [Laden bricht ab oder Typ 2 startet nicht](https://btm-community.de/hilfe/laden): Bonfire & Wildfire · Laden / BMS. Wenn der Ladeziegel oder eine öffentliche AC-Säule nicht lädt, werden Strompfad, Kabel, Akkuzustand und BMS getrennt geprüft.
+- [NFC / Keyless nachrüsten und prüfen](https://btm-community.de/hilfe/nfc): Wildfire · Startsystem. Beim NFC-Umbau zählen Modul, Stecker, Einbauort und Funktionsprüfung — nicht das Verbinden von Kabeln nach Farben.
+- [QS8-Akkuanschluss sicher prüfen](https://btm-community.de/hilfe/qs8): Bonfire · Akkuanschluss / Hochstrom. Ein QS8-Ersatz oder eine externe Lademöglichkeit darf nicht nach Optik ausgewählt werden. Stecker, Polung und BMS müssen zusammenpassen.
+- [Reifen, Bremsen und Lager warten](https://btm-community.de/hilfe/wartung): Bonfire & Wildfire · Wartung. Regelmäßige Sicht- und Funktionskontrollen verhindern, dass aus Reifen-, Brems- oder Lagerspiel ein Sicherheitsproblem wird.
+- [Wildfire-Fehlercodes richtig einordnen](https://btm-community.de/hilfe/fehlercodes): Wildfire · FarDriver / Antrieb. Pieptöne und Kontrollleuchte helfen bei der Eingrenzung. Sie ersetzen keine Prüfung von Akku, Motor, Controller und Verkabelung.
 
 ## Ersatzteile
 
-- [Ersatzteilkatalog](https://btm.shortaktien.de/ersatzteile): Historische BTM-Shop-Einträge mit eigener Detailseite, lokal gesicherten Archivdaten und einem nur bei belegter Passform veröffentlichten Kauf-Link.
+- [Ersatzteilkatalog](https://btm-community.de/ersatzteile): Historische BTM-Shop-Einträge mit eigener Detailseite, lokal gesicherten Archivdaten und einem nur bei belegter Passform veröffentlichten Kauf-Link.
 
 ## Dokumente
 
-- [PDF-Index](https://btm.shortaktien.de/pdfs/index.html): Übersicht der lokal gesicherten Handbücher, Schaltpläne, Datenblätter und Community-PDFs.
+- [PDF-Index](https://btm-community.de/pdfs/index.html): Übersicht der lokal gesicherten Handbücher, Schaltpläne, Datenblätter und Community-PDFs.
 
 ## Bikes-Wiki
 
-- [Black Tea Bonfire](https://btm.shortaktien.de/bikes/bonfire): Bonfire. Technische Grundlagen, Modellvarianten und belegte Wartungsspuren zur Black Tea Bonfire.
-- [Black Tea Wildfire](https://btm.shortaktien.de/bikes/wildfire): Wildfire. Technische Dokumente, elektrische Systeme und belegte Diagnosehinweise zur Black Tea Wildfire.
+- [Black Tea Bonfire](https://btm-community.de/bikes/bonfire): Bonfire. Technische Grundlagen, Modellvarianten und belegte Wartungsspuren zur Black Tea Bonfire.
+- [Black Tea Wildfire](https://btm-community.de/bikes/wildfire): Wildfire. Technische Dokumente, elektrische Systeme und belegte Diagnosehinweise zur Black Tea Wildfire.
 
 ## Optional
 
-- [Vollständiger LLM-Index](https://btm.shortaktien.de/full-llms.txt): Ausführliche Seiten-, Reparatur- und Dokumentübersicht.
-- [Open-Knowledge-Manifest](https://btm.shortaktien.de/open-knowledge.json): Version, letzte Prüfung, Lizenzstatus, Bearbeitungshistorie und Quellenkette je Wissenseintrag.
-- [Sitemap](https://btm.shortaktien.de/sitemap.xml): Indexierbare HTML- und PDF-URLs.
+- [Vollständiger LLM-Index](https://btm-community.de/full-llms.txt): Ausführliche Seiten-, Reparatur- und Dokumentübersicht.
+- [Open-Knowledge-Manifest](https://btm-community.de/open-knowledge.json): Version, letzte Prüfung, Lizenzstatus, Bearbeitungshistorie und Quellenkette je Wissenseintrag.
+- [Sitemap](https://btm-community.de/sitemap.xml): Indexierbare HTML- und PDF-URLs.

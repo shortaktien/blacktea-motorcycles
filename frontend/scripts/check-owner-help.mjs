@@ -46,7 +46,7 @@ for (const page of guides) {
     assert.ok(decode(html).includes(section.paragraphs[0]), 'Answers must exist without JavaScript');
     for (const { href } of section.links) {
       if (!href.startsWith('/')) continue;
-      const url = new URL(href, 'https://btm.shortaktien.de');
+      const url = new URL(href, 'https://btm-community.de');
       const file = url.pathname.includes('.') ? `dist${url.pathname}` : `dist${url.pathname}/index.html`;
       assert.ok(existsSync(join(root, file)), `Missing destination ${href}`);
       if (url.hash) assert.ok(read(file).includes(`id="${url.hash.slice(1)}"`), `Missing anchor ${href}`);
@@ -105,7 +105,7 @@ for (const path of ['/', '/insolvenz', '/faq', '/bikes/bonfire', '/bikes/wildfir
   assert.equal(new Set(headingIds).size, headingIds.length, `${path}: headings must have unique anchors`);
   for (const href of [...html.matchAll(/href="([^\"]+)"/g)].map((match) => decode(match[1]))) {
     if (!href.startsWith('/') && !href.startsWith('#')) continue;
-    const url = new URL(href, `https://btm.shortaktien.de${path}`);
+    const url = new URL(href, `https://btm-community.de${path}`);
     // PDFs are intentionally not tracked; production keeps the archive separately.
     // The dedicated SEO test validates local files when they are available.
     if (url.pathname.startsWith('/pdfs/') && url.pathname.endsWith('.pdf')) {
@@ -124,8 +124,8 @@ for (const [query, scope, href] of [
   ['CT-22', 'part', '/ersatzteile/display'],
   ['Ist Black Tea Motorbikes insolvent', 'faq', '/faq#insolvenzstatus'],
 ]) {
-  const result = JSON.parse(searchBtmKnowledge(webMcpKnowledgeEntries, 'https://btm.shortaktien.de', query, scope));
-  assert.ok(result.results.some((entry) => entry.url === `https://btm.shortaktien.de${href}`), `${query}: actual production search must find ${href}`);
+  const result = JSON.parse(searchBtmKnowledge(webMcpKnowledgeEntries, 'https://btm-community.de', query, scope));
+  assert.ok(result.results.some((entry) => entry.url === `https://btm-community.de${href}`), `${query}: actual production search must find ${href}`);
 }
 assert.match(htmlFor('/ersatzteile/display'), /Teileanfrage für Display/);
 assert.match(htmlFor('/profil'), /name="robots" content="noindex,follow,noarchive"/);

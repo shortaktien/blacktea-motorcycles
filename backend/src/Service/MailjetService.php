@@ -84,7 +84,7 @@ final class MailjetService
     {
         $baseUrl = rtrim($this->env('PUBLIC_SITE_URL'), '/');
         if ($baseUrl === '') {
-            $baseUrl = 'https://btm.shortaktien.de';
+            $baseUrl = 'https://btm-community.de';
         }
         $requestUrl = $baseUrl . '/' . ltrim($requestPath, '/');
         $this->sendMessage(
@@ -355,7 +355,7 @@ final class MailjetService
     private function publicSiteUrl(): string
     {
         $configured = rtrim($this->env('PUBLIC_SITE_URL'), '/');
-        return $configured !== '' ? $configured : 'https://btm.shortaktien.de';
+        return $configured !== '' ? $configured : 'https://btm-community.de';
     }
 
     private function adminEmail(): string
