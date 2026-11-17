@@ -235,7 +235,7 @@ content/wiki/          gemeinschaftliche Wiki-Artikel zu Bonfire und Wildfire
 research/              Quellen, Provenienz, Ersatzteil- und Rechte-Metadaten
 docker-compose.yml     lokale Entwicklungsumgebung
 docker-compose.prod.yml Produktionsstack mit statischem Caddy-Frontend
-deploy/Caddyfile.btm.example  Caddy-Site-Block für btm.shortaktien.de
+deploy/Caddyfile.btm.example  Caddy-Site-Blöcke für btm-community.de und die bisherige Domain
 ```
 
 Wiki-Beiträge werden über GitHub-Pull-Requests eingereicht und vor der Veröffentlichung geprüft. Format und Checkliste stehen in [CONTRIBUTING.md](CONTRIBUTING.md).
@@ -303,6 +303,8 @@ Nur falls ein abweichender Server tatsächlich PHP-FPM verwendet: das zum Zweig 
 `frontend/Dockerfile.prod` baut zuerst mit `npm run build`, inklusive SEO-Dateigenerierung und serverseitigem Prerendering. Das fertige `dist/` wird anschließend ausschließlich über den Caddy-Container auf Port 80 ausgeliefert. Der Vite-Dev-Server ist in diesem Stack nicht enthalten und wird nicht öffentlich betrieben. API-Anfragen werden intern von Caddy an `backend:8000` weitergeleitet.
 
 Der Site-Block aus [deploy/Caddyfile.btm.example](deploy/Caddyfile.btm.example) wird in die bestehende TLS-Caddy-Konfiguration übernommen. Der `/api/*`-Pfad muss dabei direkt an den `backend:8000`-Dienst gehen; die übrigen Anfragen gehen an den statischen `frontend:80`-Dienst. So kann kein älterer API-Upstream neue Auth-, Community- oder Bugreport-Routen verdecken. Unbekannte Pfade fallen nicht auf `index.html` zurück, sondern erhalten HTTP 404. `/pdfs/` wird auf den kanonischen PDF-Index `/pdfs/index.html` weitergeleitet.
+
+Für den Domainumzug müssen DNS für `btm-community.de`, die Website-Konfiguration und der öffentliche Caddy gemeinsam umgestellt werden. Den bestehenden Block für `btm.shortaktien.de` durch den Redirect-Block ersetzen, nicht zusätzlich einen zweiten Block für denselben Host anlegen. Caddy benötigt für beide Domains gültiges HTTPS; der 308-Redirect erhält Pfad und Query. DNS-Einträge für Mailjet und den E-Mail-Empfang bleiben bestehen. Eine optionale `www`-Adresse benötigt zusätzlich eigene DNS- und Caddy-Konfiguration. Konfiguration vor dem Reload mit `caddy validate` prüfen und erst nach Freigabe ausrollen.
 
 Die Sitemap wird bei jedem Build aus den tatsächlich vorhandenen Reparatur-, Wiki-, Ersatzteil- und PDF-Dateien erzeugt. `lastmod` bleibt standardmäßig weg, weil ein Build allein keine Inhaltsänderung beweist. Für bewusst dokumentierte Änderungen können `SEO_LASTMOD_MAP` (JSON mit URL-Pfaden und ISO-Daten) oder – nur bei einer echten Gesamtänderung – `SEO_LASTMOD` gesetzt werden.
 

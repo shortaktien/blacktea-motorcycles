@@ -3,7 +3,8 @@
 # Der Frontend-Container ist im Produktionsmodus selbst ein statischer Caddy
 # und lauscht intern auf Port 80. Der Vite-Dev-Server wird nicht veröffentlicht.
 
-btm.shortaktien.de {
+# Erst aktivieren, nachdem btm-community.de per DNS auf diesen Server zeigt.
+btm-community.de {
     encode zstd gzip
 
     header {
@@ -24,4 +25,10 @@ btm.shortaktien.de {
     handle {
         reverse_proxy frontend:80
     }
+}
+
+# Alte Links einschließlich Pfad und Query dauerhaft auf die neue Domain leiten.
+# Den bestehenden TLS-Site-Block für btm.shortaktien.de damit ersetzen.
+btm.shortaktien.de {
+    redir https://btm-community.de{uri} 308
 }
