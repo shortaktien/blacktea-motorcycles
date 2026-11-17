@@ -1,34 +1,23 @@
-# In den bestehenden Caddyfile übernehmen.
-# Voraussetzung: Caddy läuft im selben Docker-Netzwerk wie der BTM-Stack.
-# Der Frontend-Container ist im Produktionsmodus selbst ein statischer Caddy
-# und lauscht intern auf Port 80. Der Vite-Dev-Server wird nicht veröffentlicht.
+# Ausschnitt für den bestehenden öffentlichen Caddy auf dem VPS.
+# Den vorhandenen btm.shortaktien.de-Block ersetzen, nicht doppelt anlegen.
+# Erst aktivieren, wenn DNS, Zertifikat und der neue Anwendungsbuild bereit sind.
 
-# Erst aktivieren, nachdem btm-community.de per DNS auf diesen Server zeigt.
 btm-community.de {
+    handle /yandex_c2f094dcdecf3575.html {
+        root * /srv/shortaktien/public
+        file_server
+    }
+    @indexnow_key path /b39b7f8fe59a4f781143bfcbfed3f68b.txt
+    handle @indexnow_key {
+        respond "b39b7f8fe59a4f781143bfcbfed3f68b" 200
+    }
     encode zstd gzip
 
-    header {
-        Strict-Transport-Security "max-age=31536000; includeSubDomains"
-        X-Content-Type-Options "nosniff"
-        X-Frame-Options "DENY"
-        Referrer-Policy "strict-origin-when-cross-origin"
-        Permissions-Policy "camera=(), microphone=(), geolocation=()"
-        -Server
-    }
-
-    # Route the API directly to the current production backend. Keeping this
-    # explicit prevents a legacy API upstream from shadowing new routes.
-    handle /api/* {
-        reverse_proxy backend:8000
-    }
-
-    handle {
-        reverse_proxy frontend:80
-    }
+    @api path /api/*
+    reverse_proxy @api btm-backend-1:8000
+    reverse_proxy btm-frontend-1:5173
 }
 
-# Alte Links einschließlich Pfad und Query dauerhaft auf die neue Domain leiten.
-# Den bestehenden TLS-Site-Block für btm.shortaktien.de damit ersetzen.
 btm.shortaktien.de {
     redir https://btm-community.de{uri} 308
 }
