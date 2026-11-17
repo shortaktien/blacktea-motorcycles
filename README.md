@@ -21,8 +21,8 @@ Der Grundsatz lautet: **so viel wie möglich bewahren, aber nichts als offiziell
 
 Das Wiki ist der gemeinschaftliche Bereich für technische Informationen zu den Black Tea **Bonfire**- und **Wildfire**-Modellen. Die sichtbaren Einstiege findest du auf der Website unter:
 
-- [Bonfire-Wiki](https://btm.shortaktien.de/bikes/bonfire)
-- [Wildfire-Wiki](https://btm.shortaktien.de/bikes/wildfire)
+- [Bonfire-Wiki](https://btm-community.de/bikes/bonfire)
+- [Wildfire-Wiki](https://btm-community.de/bikes/wildfire)
 
 Du brauchst für einen Hinweis keinen GitHub-Account: Am Ende jedes Bike-Artikels kannst du über **„Etwas ergänzen oder korrigieren?“** direkt eine Wiki-Ergänzung, eine Quelle und optional ein Bild einreichen. Die Redaktion prüft den Vorschlag im Admin-Bereich; erst freigegebene Beiträge werden auf der Website angezeigt. So können auch kurze Korrekturen und praktische Erfahrungen ohne GitHub eingebracht werden.
 

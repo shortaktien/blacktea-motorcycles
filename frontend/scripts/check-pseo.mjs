@@ -47,7 +47,7 @@ for (const { slug, file } of pages) {
   if (/default title|undefined|copy of|kopie von/i.test(`${title} ${heading} ${visibleText}`)) failures.push(`${slug}: Platzhaltertext gefunden`);
   if (canonical) {
     try {
-      if (new URL(canonical, 'https://btm.shortaktien.de').pathname !== `/ersatzteile/${slug}`) failures.push(`${slug}: Canonical zeigt auf eine andere Seite`);
+      if (new URL(canonical, 'https://btm-community.de').pathname !== `/ersatzteile/${slug}`) failures.push(`${slug}: Canonical zeigt auf eine andere Seite`);
     } catch {
       failures.push(`${slug}: Canonical ist keine gültige URL`);
     }
